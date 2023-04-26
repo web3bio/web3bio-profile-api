@@ -12,7 +12,7 @@ import {
   LinksItem,
   errorHandle,
 } from "@/utils/base";
-import { PlatformType, platfomData } from "@/utils/platform";
+import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
 import client from "@/utils/apollo";
 
@@ -49,7 +49,7 @@ const resolveNameFromLens = async (
       const linksRecords = response.attributes;
       const linksToFetch = linksRecords.reduce(
         (pre: Array<any>, cur: { key: string }) => {
-          if (Object.keys(platfomData).includes(cur.key)) pre.push(cur.key);
+          if (Object.keys(PlatfomData).includes(cur.key)) pre.push(cur.key);
           return pre;
         },
         []

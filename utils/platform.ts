@@ -46,7 +46,7 @@ export enum PlatformType {
   nostr = "nostr",
 }
 
-export const platfomData: { [key in PlatformType]: SocialPlatform } = {
+export const PlatfomData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.twitter]: {
     key: PlatformType.twitter,
     color: "#4A99E9",
@@ -346,7 +346,7 @@ export const platfomData: { [key in PlatformType]: SocialPlatform } = {
 
 export const SocialPlatformMapping = (platform: PlatformType) => {
   return (
-    platfomData[platform] ?? {
+    PlatfomData[platform] ?? {
       key: platform,
       color: "",
       icon: "",

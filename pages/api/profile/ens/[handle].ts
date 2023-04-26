@@ -13,7 +13,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { gql } from "@apollo/client";
-import { PlatformType, platfomData } from "@/utils/platform";
+import { PlatformType, PlatfomData } from "@/utils/platform";
 import { CoinType } from "@/utils/ens";
 import client from "@/utils/apollo";
 import { regexEns } from "@/utils/regexp";
@@ -99,7 +99,7 @@ const resolveHandleFromURL = async (
           const recordText = linksToFetch[i];
 
           const key =
-            _.findKey(platfomData, (o) => {
+            _.findKey(PlatfomData, (o) => {
               return o.ensText?.includes(recordText);
             }) || recordText;
           const handle = resolveHandle(
