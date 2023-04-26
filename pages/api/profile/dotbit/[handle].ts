@@ -14,7 +14,7 @@ import {
 } from "@/utils/base";
 import { createInstance } from "dotbit";
 import { BitPluginAvatar } from "@dotbit/plugin-avatar";
-import { PlatformType, platfomData } from "@/utils/platform";
+import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
 
 const resolveNameFromDotbit = async (
@@ -41,7 +41,7 @@ const resolveNameFromDotbit = async (
             !["avatar", "description", "email"].includes(x.subtype)
           ) {
             const key =
-              _.find(platfomData, (o) => o.dotbitText!.includes(x.key))?.key ||
+              _.find(PlatfomData, (o) => o.dotbitText!.includes(x.key))?.key ||
               x.key;
 
             const resolvedHandle = resolveHandle(x.value);
