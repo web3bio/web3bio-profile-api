@@ -70,7 +70,6 @@ const resolveNameFromDotbit = async (
           pre[key] = cur.value;
         }
         return pre;
-        _;
       }, {} as any);
     }
 
