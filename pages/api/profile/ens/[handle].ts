@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
-import { StaticJsonRpcProvider } from "@ethersproject/providers";
+import { FallbackProvider, JsonRpcProvider } from "@ethersproject/providers";
 import { getAddress, isAddress } from "@ethersproject/address";
 import {
   HandleNotFoundResponseData,
@@ -45,15 +45,21 @@ const getENSRecordsQuery = gql`
   }
 `;
 
-const provider = new StaticJsonRpcProvider(
-  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL
-);
+const fallbackProviders = [
+  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL,
+  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL1,
+  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL2,
+];
 
 const resolveHandleFromURL = async (
   handle: string,
   res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
 ) => {
   try {
+    const provider = new FallbackProvider(
+      fallbackProviders.map((x) => new JsonRpcProvider(x)),
+      1
+    );
     let address = null;
     let ensDomain = null;
     let avatar = null;
