@@ -11,6 +11,7 @@ import {
   HandleResponseData,
   LinksItem,
   errorHandle,
+  resolve,
 } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
@@ -122,6 +123,10 @@ export default async function handler(
   res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
 ) {
   const inputName = req.query.handle as string;
+  const lowercaseName = inputName.toLowerCase();
+  if (inputName !== lowercaseName) {
+    return res.redirect(307, resolve(req.url!, lowercaseName));
+  }
   if (!regexLens.test(inputName)) return errorHandle(inputName, res);
   return resolveNameFromLens(inputName, res);
 }
