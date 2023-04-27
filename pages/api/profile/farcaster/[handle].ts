@@ -93,5 +93,5 @@ export default async function handler(
   const reqValue = req.query.handle as string;
   if (!reqValue || !regexTwitter.test(reqValue))
     return errorHandle(reqValue, res);
-  return resolveFarcasterHandle(reqValue, res);
+  return resolveFarcasterHandle(reqValue.toLowerCase(), res);
 }

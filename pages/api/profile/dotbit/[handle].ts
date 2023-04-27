@@ -115,5 +115,5 @@ export default async function handler(
 ) {
   const inputName = req.query.handle as string;
   if (!regexDotbit.test(inputName)) return errorHandle(inputName, res);
-  return resolveNameFromDotbit(inputName, res);
+  return resolveNameFromDotbit(inputName.toLowerCase(), res);
 }

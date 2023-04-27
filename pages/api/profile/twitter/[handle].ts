@@ -94,5 +94,5 @@ export default async function handler(
   const reqValue = req.query.handle as string;
   if (!reqValue || !regexTwitter.test(reqValue))
     return errorHandle(reqValue, res);
-  return resolveTwitterHandle(reqValue, res);
+  return resolveTwitterHandle(reqValue.toLowerCase(), res);
 }
