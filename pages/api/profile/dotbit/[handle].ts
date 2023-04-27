@@ -41,8 +41,12 @@ const resolveNameFromDotbit = async (
             !["avatar", "description", "email"].includes(x.subtype)
           ) {
             const key =
-              _.find(PlatfomData, (o) => o.dotbitText!.includes(x.key))?.key ||
-              x.key;
+              _.find(PlatfomData, (o) => {
+                if (o.dotbitText) {
+                  return o.dotbitText?.includes(x.key);
+                }
+                return false;
+              })?.key || x.key;
 
             const resolvedHandle = resolveHandle(x.value);
             _linkRes[key] = {
@@ -65,7 +69,8 @@ const resolveNameFromDotbit = async (
         if (!pre[key]) {
           pre[key] = cur.value;
         }
-        return pre;_
+        return pre;
+        _;
       }, {} as any);
     }
 
