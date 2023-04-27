@@ -1,11 +1,11 @@
 export default function Home() {
   return (
     <main
-      className={`flex min-h-screen flex-col items-center justify-between p-24`}
+      style={{"textAlign": "center"}}
     >
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        Hello from Web3.bio
-      </div>
+      <h1 className="text-pride" style={{"fontWeight": "400", "fontFamily": "Inter,-apple-system,system-ui,BlinkMacSystemFont,Segoe UI,Roboto,Helvetica Neue,sans-serif"}}>
+        Hello from <strong style={{"fontWeight": "900"}}>Web3.bio</strong>
+      </h1>
     </main>
   )
 }

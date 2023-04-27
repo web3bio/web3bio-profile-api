@@ -11,6 +11,7 @@ import {
   HandleResponseData,
   LinksItem,
   errorHandle,
+  resolve,
 } from "@/utils/base";
 import { createInstance } from "dotbit";
 import { BitPluginAvatar } from "@dotbit/plugin-avatar";
@@ -41,8 +42,12 @@ const resolveNameFromDotbit = async (
             !["avatar", "description", "email"].includes(x.subtype)
           ) {
             const key =
-              _.find(PlatfomData, (o) => o.dotbitText!.includes(x.key))?.key ||
-              x.key;
+              _.find(PlatfomData, (o) => {
+                if (o.dotbitText) {
+                  return o.dotbitText?.includes(x.key);
+                }
+                return false;
+              })?.key || x.key;
 
             const resolvedHandle = resolveHandle(x.value);
             _linkRes[key] = {
@@ -65,7 +70,7 @@ const resolveNameFromDotbit = async (
         if (!pre[key]) {
           pre[key] = cur.value;
         }
-        return pre;_
+        return pre;
       }, {} as any);
     }
 
@@ -109,6 +114,10 @@ export default async function handler(
   res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
 ) {
   const inputName = req.query.handle as string;
-  if (!regexDotbit.test(inputName)) return errorHandle(inputName, res);
-  return resolveNameFromDotbit(inputName, res);
+  const lowercaseName = inputName.toLowerCase();
+  if (inputName !== lowercaseName) {
+    return res.redirect(307, resolve(req.url!, lowercaseName));
+  }
+  if (!regexDotbit.test(lowercaseName)) return errorHandle(lowercaseName, res);
+  return resolveNameFromDotbit(lowercaseName, res);
 }
