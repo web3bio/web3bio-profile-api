@@ -11,6 +11,7 @@ import {
   HandleResponseData,
   LinksItem,
   errorHandle,
+  resolve,
 } from "@/utils/base";
 import { createInstance } from "dotbit";
 import { BitPluginAvatar } from "@dotbit/plugin-avatar";
@@ -113,6 +114,10 @@ export default async function handler(
   res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
 ) {
   const inputName = req.query.handle as string;
-  if (!regexDotbit.test(inputName)) return errorHandle(inputName, res);
-  return resolveNameFromDotbit(inputName.toLowerCase(), res);
+  const lowercaseName = inputName.toLowerCase();
+  if (inputName !== lowercaseName) {
+    return res.redirect(307, resolve(req.url!, lowercaseName));
+  }
+  if (!regexDotbit.test(inputName)) return errorHandle(lowercaseName, res);
+  return resolveNameFromDotbit(lowercaseName, res);
 }

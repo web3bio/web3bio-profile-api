@@ -123,5 +123,5 @@ export default async function handler(
 ) {
   const inputName = req.query.handle as string;
   if (!regexLens.test(inputName)) return errorHandle(inputName, res);
-  return resolveNameFromLens(inputName.toLowerCase(), res);
+  return resolveNameFromLens(inputName, res);
 }

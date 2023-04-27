@@ -5,6 +5,7 @@ import {
   HandleResponseData,
   LinksItem,
   errorHandle,
+  resolve,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
@@ -91,8 +92,12 @@ export default async function handler(
   req: NextApiRequest,
   res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
 ) {
-  const reqValue = req.query.handle as string;
-  if (!reqValue || !regexTwitter.test(reqValue))
-    return errorHandle(reqValue, res);
-  return resolveTwitterHandle(reqValue.toLowerCase(), res);
+  const inputName = req.query.handle as string;
+  const lowercaseName = inputName.toLowerCase();
+  if (inputName !== lowercaseName) {
+    return res.redirect(307, resolve(req.url!, lowercaseName));
+  }
+  if (!inputName || !regexTwitter.test(inputName))
+    return errorHandle(inputName, res);
+  return resolveTwitterHandle(lowercaseName, res);
 }
