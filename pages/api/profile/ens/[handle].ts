@@ -203,5 +203,5 @@ export default async function handler(
   if (inputAddress !== lowercaseAddress) {
     return res.redirect(307, resolve(req.url!, lowercaseAddress));
   }
-  return resolveHandleFromURL(inputAddress.toLowerCase(), res);
+  return resolveHandleFromURL(lowercaseAddress, res);
 }

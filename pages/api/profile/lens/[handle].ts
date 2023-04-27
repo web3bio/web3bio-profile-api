@@ -127,6 +127,6 @@ export default async function handler(
   if (inputName !== lowercaseName) {
     return res.redirect(307, resolve(req.url!, lowercaseName));
   }
-  if (!regexLens.test(inputName)) return errorHandle(inputName, res);
-  return resolveNameFromLens(inputName, res);
+  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName, res);
+  return resolveNameFromLens(lowercaseName, res);
 }

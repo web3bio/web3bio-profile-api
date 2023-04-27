@@ -118,6 +118,6 @@ export default async function handler(
   if (inputName !== lowercaseName) {
     return res.redirect(307, resolve(req.url!, lowercaseName));
   }
-  if (!regexDotbit.test(inputName)) return errorHandle(lowercaseName, res);
+  if (!regexDotbit.test(lowercaseName)) return errorHandle(lowercaseName, res);
   return resolveNameFromDotbit(lowercaseName, res);
 }

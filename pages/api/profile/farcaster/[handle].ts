@@ -95,7 +95,7 @@ export default async function handler(
   if (inputName !== lowercaseName) {
     return res.redirect(307, resolve(req.url!, lowercaseName));
   }
-  if (!inputName || !regexTwitter.test(inputName))
-    return errorHandle(inputName, res);
+  if (!lowercaseName || !regexTwitter.test(lowercaseName))
+    return errorHandle(lowercaseName, res);
   return resolveFarcasterHandle(lowercaseName, res);
 }
