@@ -200,8 +200,5 @@ export default async function handler(
   const inputAddress = req.query.handle as string;
   const lowercaseAddress = inputAddress.toLowerCase();
 
-  if (inputAddress !== lowercaseAddress) {
-    return res.redirect(307, resolve(req.url!, lowercaseAddress));
-  }
   return resolveHandleFromURL(lowercaseAddress, res);
 }

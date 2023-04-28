@@ -124,9 +124,7 @@ export default async function handler(
 ) {
   const inputName = req.query.handle as string;
   const lowercaseName = inputName.toLowerCase();
-  if (inputName !== lowercaseName) {
-    return res.redirect(307, resolve(req.url!, lowercaseName));
-  }
+
   if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName, res);
   return resolveNameFromLens(lowercaseName, res);
 }
