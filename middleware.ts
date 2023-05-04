@@ -1,12 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
 
-const Middleware = (req: { nextUrl: { pathname: string; origin: string } }) => {
-  if (req.nextUrl.pathname === req.nextUrl.pathname.toLowerCase()) {
-    return NextResponse.next();
+export const config = {
+  matcher: '/profile/:path*',
+}
+
+const Middleware = (req: any) => {
+  if (req.nextUrl.pathname !== req.nextUrl.pathname.toLowerCase()) {
+    const url = req.nextUrl.clone()
+    url.pathname = url.pathname.toLowerCase()
+    return NextResponse.redirect(url)
   }
-  return NextResponse.redirect(
-    new URL(req.nextUrl.origin + req.nextUrl.pathname.toLowerCase())
-  );
+  return NextResponse.next();
 };
 
 export default Middleware;
