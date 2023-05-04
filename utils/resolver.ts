@@ -22,7 +22,7 @@ export const resolveHandle = (handle: string) => {
   ) {
     return domainRegexp.exec(handle)![1].replaceAll("@", "");
   }
-  return handle;
+  return handle.replaceAll("@", "");
 };
 
 export const getSocialMediaLink = (url: string, type: PlatformType) => {

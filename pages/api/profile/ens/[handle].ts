@@ -5,7 +5,6 @@ import {
   HandleNotFoundResponseData,
   HandleResponseData,
   errorHandle,
-  resolve,
 } from "@/utils/base";
 import {
   getSocialMediaLink,
@@ -98,19 +97,17 @@ const resolveHandleFromURL = async (
         const _linkRes: { [index: string]: any } = {};
         for (let i = 0; i < linksToFetch.length; i++) {
           const recordText = linksToFetch[i];
-
-          const key =
-            _.findKey(PlatfomData, (o) => {
-              return o.ensText?.includes(recordText);
-            }) || recordText;
+          const key = _.findKey(PlatfomData, (o) => {
+            return o.ensText?.includes(recordText);
+          });
           const handle = resolveHandle(
             (await resolver.getText(recordText)) || ""
           );
-          if (handle) {
+          if (key && handle) {
             const resolvedKey =
               key === PlatformType.url ? PlatformType.website : key;
             _linkRes[resolvedKey] = {
-              link: getSocialMediaLink(handle, resolvedKey),
+              link: getSocialMediaLink(handle, resolvedKey as PlatformType),
               handle: handle,
             };
           }

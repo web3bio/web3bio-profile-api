@@ -84,20 +84,22 @@ const resolveNameFromLens = async (
         ...(await getLink()),
       };
     }
+
+    const avatarUri =
+      response.picture?.original?.url || response.picture?.uri || "";
+    const coverPictureUri =
+      response.coverPicture?.original?.url || response.coverPicture?.uri || "";
     const resJSON = {
       owner: response.ownedBy,
       identity: response.handle,
       displayName: response.name,
-      avatar:
-        (await resolveEipAssetURL(response.picture?.original.url || "")) || "",
+      avatar: (await resolveEipAssetURL(avatarUri)) || "",
       email: null,
       description: response.bio,
       location: response.attributes
         ? _.find(response.attributes, (o) => o.key === "location")?.value
         : null,
-      header:
-        (await resolveEipAssetURL(response.coverPicture?.original.url || "")) ||
-        "",
+      header: (await resolveEipAssetURL(coverPictureUri)) || "",
       links: LINKRES,
       addresses: CRYPTORES,
     };
