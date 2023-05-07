@@ -18,6 +18,6 @@ export const CoinType = {
   // xem: 43,
   // trx: 195,
   // xdai: 700,
-  matic: 2147483785,
+  // matic: 2147483785,
 };
 
