@@ -13,6 +13,7 @@ export const resolveMediaURL = (url: string) => {
 };
 
 export const resolveHandle = (handle: string) => {
+  if (!handle) return null;
   const prefixHttps = "https://";
   const prefixHttp = "http://";
   const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
@@ -25,7 +26,7 @@ export const resolveHandle = (handle: string) => {
   return handle.replaceAll("@", "");
 };
 
-export const getSocialMediaLink = (url: string, type: PlatformType) => {
+export const getSocialMediaLink = (url: string | null, type: PlatformType) => {
   let resolvedURL = "";
   if (!url) return null;
   if (url.startsWith("https")) {
