@@ -1,11 +1,7 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import { StaticJsonRpcProvider } from "@ethersproject/providers";
 import { getAddress, isAddress } from "@ethersproject/address";
-import {
-  HandleNotFoundResponseData,
-  HandleResponseData,
-  errorHandle,
-} from "@/utils/base";
+import { errorHandle } from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -48,6 +44,7 @@ const provider = new StaticJsonRpcProvider(
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
   if (!handle) return errorHandle("");
+
   try {
     let address = null;
     let ensDomain = null;
@@ -61,10 +58,8 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       avatar = (await provider.getAvatar(ensDomain)) || null;
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
-      [address, avatar] = await Promise.all([
-        provider.resolveName(handle),
-        provider.getAvatar(handle),
-      ]);
+      address = (await provider.resolveName(handle)) || null;
+      avatar = (await provider.getAvatar(handle)) || null;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
     }
