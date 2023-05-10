@@ -31,14 +31,11 @@ export const getLensProfile = async (handle: string) => {
   return null;
 };
 
-const resolveNameFromLens = async (
-  handle: string,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) => {
+const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      errorHandle(handle, res);
+      errorHandle(handle);
       return;
     }
     const pureHandle = handle.replaceAll(".lens", "");
@@ -103,30 +100,33 @@ const resolveNameFromLens = async (
       links: LINKRES,
       addresses: CRYPTORES,
     };
-    res
-      .status(200)
-      .setHeader(
-        "Cache-Control",
-        `public, s-maxage=${60 * 60 * 24 * 7}, stale-while-revalidate=${
-          60 * 30
-        }`
-      )
-      .json(resJSON);
-  } catch (error: any) {
-    res.status(500).json({
-      identity: handle,
-      error: error.message,
+    return new Response(JSON.stringify(resJSON), {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, s-maxage=${
+          60 * 60 * 24 * 7
+        }, stale-while-revalidate=${60 * 30}`,
+      },
     });
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({
+        identity: handle,
+        error: error.message,
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) {
-  const inputName = req.query.handle as string;
-  const lowercaseName = inputName.toLowerCase();
+export default async function handler(req: NextApiRequest) {
+  const { searchParams } = new URL(req.url as string);
+  const inputName = searchParams.get("handle");
 
-  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName, res);
-  return resolveNameFromLens(lowercaseName, res);
+  const lowercaseName = inputName?.toLowerCase() || "";
+
+  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName);
+  return resolveNameFromLens(lowercaseName);
 }

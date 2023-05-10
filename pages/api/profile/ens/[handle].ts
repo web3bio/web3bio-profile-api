@@ -60,23 +60,23 @@ const resolveHandleFromURL = async (
       address = getAddress(handle);
       ensDomain = (await provider.lookupAddress(address)) || null;
       if (!ensDomain) {
-        return errorHandle(handle, res);
+        return errorHandle(handle);
       }
       avatar = (await provider.getAvatar(ensDomain)) || null;
     } else {
-      if (!regexEns.test(handle)) return errorHandle(handle, res);
+      if (!regexEns.test(handle)) return errorHandle(handle);
       [address, avatar] = await Promise.all([
         provider.resolveName(handle),
         provider.getAvatar(handle),
       ]);
-      if (!address) return errorHandle(handle, res);
+      if (!address) return errorHandle(handle);
       ensDomain = handle;
     }
 
     const gtext = await getENSTexts(ensDomain);
     const resolver = await provider.getResolver(ensDomain);
     if (!resolver) {
-      return errorHandle(handle, res);
+      return errorHandle(handle);
     }
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {

@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cloudflare:build": "npx @cloudflare/next-on-pages --experimental-minify"
   },
   "dependencies": {
     "@apollo/client": "^3.6.9",

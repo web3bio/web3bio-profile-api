@@ -1,17 +1,16 @@
-import type { NextApiRequest, NextApiResponse } from "next";
-import {
-  HandleNotFoundResponseData,
-  HandleResponseData,
-  LinksItem,
-  errorHandle,
-} from "@/utils/base";
+import type { NextApiRequest } from "next";
+import { LinksItem, errorHandle } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
 
+export const config = {
+  runtime: "edge",
+};
+
 const originBase = "https://searchcaster.xyz/api/";
 
-const regTwitter = /(\S*).twitter/i;
+const regexTwitterLink = /(\S*).twitter/i;
 
 const FetchFromOrigin = async (value: string) => {
   if (!value) return;
@@ -21,14 +20,11 @@ const FetchFromOrigin = async (value: string) => {
   return res;
 };
 
-const resolveFarcasterHandle = async (
-  handle: string,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) => {
+const resolveFarcasterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response || !response.length) {
-      errorHandle(handle, res);
+      errorHandle(handle);
       return;
     }
     const _res = response[0].body;
@@ -39,8 +35,8 @@ const resolveFarcasterHandle = async (
         handle: resolvedHandle,
       },
     };
-    if (_res.bio && _res.bio.match(regTwitter)) {
-      const matched = _res.bio.match(regTwitter)[1];
+    if (_res.bio && _res.bio.match(regexTwitterLink)) {
+      const matched = _res.bio.match(regexTwitterLink)[1];
       const resolveMatch = resolveHandle(matched);
       LINKRES[PlatformType.twitter] = {
         link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
@@ -61,20 +57,24 @@ const resolveFarcasterHandle = async (
         eth: response[0].connectedAddress || _res.address,
       },
     };
-    res
-      .status(200)
-      .setHeader(
-        "Cache-Control",
-        `public, s-maxage=${60 * 60 * 24 * 7}, stale-while-revalidate=${
-          60 * 30
-        }`
-      )
-      .json(resJSON);
-  } catch (e: any) {
-    res.status(500).json({
-      identity: handle,
-      error: e.message,
+    return new Response(JSON.stringify(resJSON), {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, s-maxage=${
+          60 * 60 * 24 * 7
+        }, stale-while-revalidate=${60 * 30}`,
+      },
     });
+  } catch (e: any) {
+    return new Response(
+      JSON.stringify({
+        identity: handle,
+        error: e.message,
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 };
 const resolve = (from: string, to: string) => {
@@ -86,14 +86,13 @@ const resolve = (from: string, to: string) => {
   return resolvedUrl.toString();
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) {
-  const inputName = req.query.handle as string;
-  const lowercaseName = inputName.toLowerCase();
+export default async function handler(req: NextApiRequest) {
+  const { searchParams } = new URL(req.url as string);
+  const inputName = searchParams.get("handle");
+
+  const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return errorHandle(lowercaseName, res);
-  return resolveFarcasterHandle(lowercaseName, res);
+    return errorHandle(lowercaseName);
+  return resolveFarcasterHandle(lowercaseName);
 }

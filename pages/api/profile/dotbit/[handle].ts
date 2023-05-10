@@ -11,12 +11,13 @@ import {
   HandleResponseData,
   LinksItem,
   errorHandle,
-  resolve,
 } from "@/utils/base";
 import { createInstance } from "dotbit";
 import { BitPluginAvatar } from "@dotbit/plugin-avatar";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
+
+export const runtime = "edge";
 
 const resolveNameFromDotbit = async (
   handle: string,
@@ -116,6 +117,6 @@ export default async function handler(
   const inputName = req.query.handle as string;
   const lowercaseName = inputName.toLowerCase();
 
-  if (!regexDotbit.test(lowercaseName)) return errorHandle(lowercaseName, res);
+  if (!regexDotbit.test(lowercaseName)) return errorHandle(lowercaseName);
   return resolveNameFromDotbit(lowercaseName, res);
 }
