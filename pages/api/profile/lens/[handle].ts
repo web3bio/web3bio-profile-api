@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -6,29 +6,35 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { GET_PROFILE_LENS } from "@/utils/lens";
-import {
-  HandleNotFoundResponseData,
-  HandleResponseData,
-  LinksItem,
-  errorHandle,
-  resolve,
-} from "@/utils/base";
+import { LinksItem, errorHandle } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
-import client from "@/utils/apollo";
+
+export const config = {
+  runtime: "edge",
+};
+
+const LensGraphQLEndpoint = "https://api.lens.dev/";
 
 export const getLensProfile = async (handle: string) => {
-  const fetchRes = await client.query({
-    query: GET_PROFILE_LENS,
-    variables: {
-      handle,
-    },
-    context: {
-      uri: process.env.NEXT_PUBLIC_LENS_GRAPHQL_SERVER,
-    },
-  });
-  if (fetchRes) return fetchRes.data.profile;
-  return null;
+  try {
+    const payload = {
+      query: GET_PROFILE_LENS,
+      variables: {
+        handle,
+      },
+    };
+    const fetchRes = await fetch(LensGraphQLEndpoint, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+    if (fetchRes) return fetchRes.data.profile;
+  } catch (e) {
+    return null;
+  }
 };
 
 const resolveNameFromLens = async (handle: string) => {
