@@ -10,7 +10,6 @@
     "cloudflare:build": "npx @cloudflare/next-on-pages --experimental-minify"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.9",
     "@dotbit/plugin-avatar": "^0.0.1",
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",

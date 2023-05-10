@@ -12,10 +12,8 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import _ from "lodash";
-import { gql } from "@apollo/client";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { CoinType } from "@/utils/ens";
-import client from "@/utils/apollo";
 import { regexEns } from "@/utils/regexp";
 
 const ensRecordsDefaultOrShouldSkipText = [
@@ -31,7 +29,7 @@ const ensRecordsDefaultOrShouldSkipText = [
   "location",
 ];
 
-const getENSRecordsQuery = gql`
+const getENSRecordsQuery = `
   query Profile($name: String) {
     domains(where: { name: $name }) {
       id
@@ -48,10 +46,8 @@ const provider = new StaticJsonRpcProvider(
   process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL
 );
 
-const resolveHandleFromURL = async (
-  handle: string,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) => {
+const resolveHandleFromURL = async (handle: string | undefined) => {
+  if (!handle) return errorHandle("");
   try {
     let address = null;
     let ensDomain = null;
@@ -161,41 +157,56 @@ const resolveHandleFromURL = async (
       links: LINKRES,
       addresses: CRYPTORES,
     };
-
-    res
-      .status(200)
-      .setHeader(
-        "Cache-Control",
-        `public, s-maxage=${60 * 60 * 24 * 7}, stale-while-revalidate=${
-          60 * 30
-        }`
-      )
-      .json(resJSON);
-  } catch (error: any) {
-    res.status(500).json({
-      identity: isAddress(handle) ? handle : null,
-      error: error.message,
+    return new Response(JSON.stringify(resJSON), {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, s-maxage=${
+          60 * 60 * 24 * 7
+        }, stale-while-revalidate=${60 * 30}`,
+      },
     });
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({
+        identity: handle,
+        error: error.message,
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 };
 
 export const getENSTexts = async (name: string) => {
-  const fetchRes = await client.query({
-    query: getENSRecordsQuery,
-    variables: {
-      name,
-    },
-  });
-  if (fetchRes) return fetchRes.data.domains;
-  return null;
+  try {
+    const ensSubGraphBaseURL =
+      "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
+    const payload = {
+      query: getENSRecordsQuery,
+      variables: {
+        name,
+      },
+    };
+    const fetchRes = await fetch(ensSubGraphBaseURL, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+    if (fetchRes) return fetchRes.data.domains;
+  } catch (e) {
+    return null;
+  }
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) {
-  const inputAddress = req.query.handle as string;
-  const lowercaseAddress = inputAddress.toLowerCase();
+export default async function handler(req: NextApiRequest) {
+  const { searchParams } = new URL(req.url as string);
+  const inputAddress = searchParams.get("handle");
+  const lowercaseAddress = inputAddress?.toLowerCase();
 
-  return resolveHandleFromURL(lowercaseAddress, res);
+  return resolveHandleFromURL(lowercaseAddress);
 }
+
+export const runtime = "edge";
