@@ -12,9 +12,9 @@ import { CoinType } from "@/utils/ens";
 import { regexEns } from "@/utils/regexp";
 import { ethers } from "ethers";
 import { base, resolverABI } from "../../../../utils/resolverABI";
-import { formatsByName } from "@ensdomains/address-encoder";
+import { formatsByCoinType } from "@ensdomains/address-encoder";
 
-const COIN_LIST = Object.keys(formatsByName);
+const COIN_LIST = Object.keys(formatsByCoinType);
 
 const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
@@ -138,6 +138,7 @@ const resolveENSCoinTypesValue = async (
   coinType: string | number
 ) => {
   const nodeHash = ethers.utils.namehash(name);
+  const { encoder } = formatsByCoinType[coinType];
   const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
   const requestData = {
     jsonrpc: "2.0",
@@ -162,12 +163,13 @@ const resolveENSCoinTypesValue = async (
     }
   );
   const res = await resp.text();
-
   const rr = ethers.utils.defaultAbiCoder.decode(
     ["bytes"],
     JSON.parse(res)?.result
-  );
-  return rr[0] || null;
+  )[0];
+  if (!rr || rr === "0x") return null;
+
+  return encoder(Buffer.from(rr.slice(2), "hex"));
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
