@@ -11,6 +11,8 @@
   },
   "dependencies": {
     "@dotbit/plugin-avatar": "^0.0.1",
+    "@ensdomains/address-encoder": "^0.2.21",
+    "@ensdomains/resolver": "^0.3.1",
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",
