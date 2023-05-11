@@ -14,8 +14,6 @@ import { ethers } from "ethers";
 import { base, resolverABI } from "../../../../utils/resolverABI";
 import { formatsByCoinType } from "@ensdomains/address-encoder";
 
-const COIN_LIST = Object.keys(formatsByCoinType);
-
 const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
 
@@ -375,8 +373,7 @@ export const config = {
   runtime: "edge",
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ethersproject/providers/**/*.js",
-    "**/node_modules/@ensdomains/ensjs/**/*.js",
-    "**/node_modules/web3/**/*.min.js",
+    "**/node_modules/@ensdomain/address-encoder/**/*.js",
+    "**/node_modules/js-sha256/**/*.js",
   ],
 };

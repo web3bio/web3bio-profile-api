@@ -17,7 +17,10 @@ import { BitPluginAvatar } from "@dotbit/plugin-avatar";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
 
-export const runtime = "edge";
+export const config = {
+  runtime: "edge",
+  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
+};
 
 const resolveNameFromDotbit = async (
   handle: string,

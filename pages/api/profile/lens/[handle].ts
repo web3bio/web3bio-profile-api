@@ -12,8 +12,8 @@ import { regexLens } from "@/utils/regexp";
 
 export const config = {
   runtime: "edge",
+  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
 };
-
 const LensGraphQLEndpoint = "https://api.lens.dev/";
 
 export const getLensProfile = async (handle: string) => {
