@@ -60,7 +60,7 @@ const getENSRecordsQuery = `
 const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
-  return res[0];
+  return res[0]
 };
 
 const resolveNameFromAddress = async (address: string) => {
@@ -193,12 +193,12 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       resolverAddress = (await resolveAddressFromName(ensDomain)).resolver
         .address;
     }
-
-    const gtext = await getENSProfile(ensDomain);
-
     if (!resolverAddress) {
       return errorHandle(handle);
     }
+
+    const gtext = await getENSProfile(ensDomain);
+
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {
       eth: address,
@@ -289,7 +289,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       owner: address,
       identity: ensDomain,
-      displayName: ensDomain,
+      displayName: (await resolveENSTextValue(resolverAddress, ensDomain, "name")) || ensDomain,
       avatar: (await resolveEipAssetURL(avatarHandle)) || null,
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
