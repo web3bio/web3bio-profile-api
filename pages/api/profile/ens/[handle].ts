@@ -60,7 +60,7 @@ const getENSRecordsQuery = `
 const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
-  return res[0]
+  return res[0];
 };
 
 const resolveNameFromAddress = async (address: string) => {
@@ -183,15 +183,15 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       if (!ensDomain) {
         return errorHandle(handle);
       }
-      resolverAddress = (await resolveAddressFromName(ensDomain)).resolver
-        .address;
+      resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
+        ?.address;
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
-      address = (await resolveAddressFromName(handle)).resolvedAddress.id;
+      address = (await resolveAddressFromName(handle))?.resolvedAddress?.id;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
-      resolverAddress = (await resolveAddressFromName(ensDomain)).resolver
-        .address;
+      resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
+        ?.address;
     }
     if (!resolverAddress) {
       return errorHandle(handle);
@@ -205,7 +205,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       btc: null,
     };
     if (gtext && gtext[0].resolver.texts) {
-      const linksRecords = gtext[0].resolver.texts;
+      const linksRecords = gtext[0]?.resolver?.texts;
       const linksToFetch = linksRecords.reduce(
         (pre: Array<string>, cur: string) => {
           if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
@@ -289,7 +289,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       owner: address,
       identity: ensDomain,
-      displayName: (await resolveENSTextValue(resolverAddress, ensDomain, "name")) || ensDomain,
+      displayName:
+        (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
+        ensDomain,
       avatar: (await resolveEipAssetURL(avatarHandle)) || null,
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
