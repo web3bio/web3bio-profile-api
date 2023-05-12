@@ -50,6 +50,9 @@ const getENSRecordsQuery = `
         coinTypes
         address
       }
+      owner {
+        id
+      }
       resolvedAddress{
         id
       }
@@ -187,13 +190,39 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         ?.address;
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
-      address = (await resolveAddressFromName(handle))?.resolvedAddress?.id;
+      const response = await resolveAddressFromName(handle);
+      address = response?.resolvedAddress?.id || response?.owner.id;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
       resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
         ?.address;
     }
-    if (!resolverAddress) {
+    if (ensDomain && address) {
+      if (!resolverAddress) {
+        return new Response(
+          JSON.stringify({
+            owner: ensDomain,
+            identity: address,
+            displayName: ensDomain,
+            avatar: null,
+            email: null,
+            description: null,
+            location: null,
+            header: null,
+            links: null,
+            addresses: null,
+          }),
+          {
+            status: 200,
+            headers: {
+              "Cache-Control": `public, s-maxage=${
+                60 * 60 * 24 * 7
+              }, stale-while-revalidate=${60 * 30}`,
+            },
+          }
+        );
+      }
+    } else {
       return errorHandle(handle);
     }
 
