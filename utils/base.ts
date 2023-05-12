@@ -34,14 +34,16 @@ export type HandleNotFoundResponseData = {
   error: string;
 };
 
-export const errorHandle = (
-  handle: string,
-  res: NextApiResponse<HandleNotFoundResponseData>
-) => {
-  res.status(404).json({
-    identity: handle,
-    error: "No results",
-  });
+export const errorHandle = (handle: string) => {
+  return new Response(
+    JSON.stringify({
+      identity: handle,
+      error: "No results",
+    }),
+    {
+      status: 404,
+    }
+  );
 };
 
 export const resolve = (from: string, to: string) => {

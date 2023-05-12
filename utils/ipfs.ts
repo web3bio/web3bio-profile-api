@@ -1,4 +1,3 @@
-import urlcat from "urlcat";
 const MATCH_IPFS_CID_RAW =
   "Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[2-7A-Za-z]{58,}|B[2-7A-Z]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[\\dA-F]{50,}";
 const CORS_HOST = "https://cors.r2d2.to";
@@ -60,17 +59,10 @@ export function resolveIPFS_URL(
 
         if (cid) {
           if (u.pathname === "/") {
-            return resolveIPFS_URL(
-              urlcat("https://ipfs.io/ipfs/:cid", {
-                cid,
-              })
-            );
+            return resolveIPFS_URL("https://ipfs.io/ipfs/" + cid);
           } else {
             return resolveIPFS_URL(
-              urlcat("https://ipfs.io/ipfs/:cid/:path", {
-                cid,
-                path: u.pathname.slice(1),
-              })
+              "https://ipfs.io/ipfs/" + cid + "/" + u.pathname.slice(1)
             );
           }
         }
