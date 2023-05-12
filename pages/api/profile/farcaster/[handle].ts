@@ -24,8 +24,7 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response || !response.length) {
-      errorHandle(handle);
-      return;
+      return errorHandle(handle);
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);

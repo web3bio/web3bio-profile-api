@@ -41,8 +41,7 @@ const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      errorHandle(handle);
-      return;
+      return errorHandle(handle);
     }
     const pureHandle = handle.replaceAll(".lens", "");
     let LINKRES = {};

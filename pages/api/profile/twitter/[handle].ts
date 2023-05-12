@@ -30,8 +30,7 @@ const resolveTwitterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response) {
-      errorHandle(handle);
-      return;
+      return errorHandle(handle);
     }
     const urlHandle = resolveHandle(
       response.entities.url
