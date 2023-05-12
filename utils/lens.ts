@@ -1,6 +1,4 @@
-import { gql } from "@apollo/client";
-
-export const GET_PROFILE_LENS = gql`
+export const GET_PROFILE_LENS = `
   query Profile($handle: Handle) {
     profile(request: { handle: $handle }) {
       id

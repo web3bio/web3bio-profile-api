@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from "next";
+import type { NextApiRequest } from "next";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -6,39 +6,42 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { GET_PROFILE_LENS } from "@/utils/lens";
-import {
-  HandleNotFoundResponseData,
-  HandleResponseData,
-  LinksItem,
-  errorHandle,
-  resolve,
-} from "@/utils/base";
+import { LinksItem, errorHandle } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
-import client from "@/utils/apollo";
+
+export const config = {
+  runtime: "edge",
+  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
+};
+const LensGraphQLEndpoint = "https://api.lens.dev/";
 
 export const getLensProfile = async (handle: string) => {
-  const fetchRes = await client.query({
-    query: GET_PROFILE_LENS,
-    variables: {
-      handle,
-    },
-    context: {
-      uri: process.env.NEXT_PUBLIC_LENS_GRAPHQL_SERVER,
-    },
-  });
-  if (fetchRes) return fetchRes.data.profile;
-  return null;
+  try {
+    const payload = {
+      query: GET_PROFILE_LENS,
+      variables: {
+        handle,
+      },
+    };
+    const fetchRes = await fetch(LensGraphQLEndpoint, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }).then((res) => res.json());
+    if (fetchRes) return fetchRes.data.profile;
+  } catch (e) {
+    return null;
+  }
 };
 
-const resolveNameFromLens = async (
-  handle: string,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) => {
+const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      errorHandle(handle, res);
+      errorHandle(handle);
       return;
     }
     const pureHandle = handle.replaceAll(".lens", "");
@@ -103,30 +106,33 @@ const resolveNameFromLens = async (
       links: LINKRES,
       addresses: CRYPTORES,
     };
-    res
-      .status(200)
-      .setHeader(
-        "Cache-Control",
-        `public, s-maxage=${60 * 60 * 24 * 7}, stale-while-revalidate=${
-          60 * 30
-        }`
-      )
-      .json(resJSON);
-  } catch (error: any) {
-    res.status(500).json({
-      identity: handle,
-      error: error.message,
+    return new Response(JSON.stringify(resJSON), {
+      status: 200,
+      headers: {
+        "Cache-Control": `public, s-maxage=${
+          60 * 60 * 24 * 7
+        }, stale-while-revalidate=${60 * 30}`,
+      },
     });
+  } catch (error: any) {
+    return new Response(
+      JSON.stringify({
+        identity: handle,
+        error: error.message,
+      }),
+      {
+        status: 500,
+      }
+    );
   }
 };
 
-export default async function handler(
-  req: NextApiRequest,
-  res: NextApiResponse<HandleResponseData | HandleNotFoundResponseData>
-) {
-  const inputName = req.query.handle as string;
-  const lowercaseName = inputName.toLowerCase();
+export default async function handler(req: NextApiRequest) {
+  const { searchParams } = new URL(req.url as string);
+  const inputName = searchParams.get("handle");
 
-  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName, res);
-  return resolveNameFromLens(lowercaseName, res);
+  const lowercaseName = inputName?.toLowerCase() || "";
+
+  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName);
+  return resolveNameFromLens(lowercaseName);
 }

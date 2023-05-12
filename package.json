@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "cloudflare:build": "npx @cloudflare/next-on-pages --experimental-minify"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.9",
     "@dotbit/plugin-avatar": "^0.0.1",
+    "@ensdomains/address-encoder": "^0.2.21",
+    "@ensdomains/resolver": "^0.3.1",
     "@types/node": "18.16.0",
     "@types/react": "18.0.38",
     "@types/react-dom": "18.0.11",
@@ -23,10 +25,10 @@
     "next": "13.3.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.8.2",
-    "urlcat": "^3.1.0"
+    "typescript": "4.8.2"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.194"
+    "@types/lodash": "^4.14.194",
+    "vercel": "^29.3.0"
   }
 }
