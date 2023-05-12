@@ -63,7 +63,7 @@ export const resolveEipAssetURL = async (source: string) => {
     const res = await _fetcher(fetchURL);
     if (res || res.nft_id) {
       return resolveMediaURL(
-        res.previews.image_medium_url || res.image_url
+        res.image_url || res.previews.image_large_url
       );
     }
   }
