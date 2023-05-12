@@ -194,15 +194,14 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       address = response?.resolvedAddress?.id || response?.owner.id;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
-      resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
-        ?.address;
+      resolverAddress = response?.resolver?.address;
     }
     if (ensDomain && address) {
       if (!resolverAddress) {
         return new Response(
           JSON.stringify({
-            owner: ensDomain,
-            identity: address,
+            owner: address,
+            identity: ensDomain,
             displayName: ensDomain,
             avatar: null,
             email: null,
@@ -372,21 +371,6 @@ export const getENSProfile = async (name: string) => {
       body: JSON.stringify(payload),
     }).then((res) => res.json());
     if (fetchRes) return fetchRes.data.domains;
-  } catch (e) {
-    return null;
-  }
-};
-
-export const getENSNameByAddress = async (address: string) => {
-  try {
-    const reverseLookUpURL = "https://ens.fafrd.workers.dev/ens/";
-    const fetchURL = reverseLookUpURL + address.toLowerCase();
-    const fetchRes = await fetch(fetchURL, {
-      ...commonQueryOptions,
-    }).then((res) => {
-      return res.json();
-    });
-    if (fetchRes) return fetchRes.reverseRecord || fetchRes.domains[0];
   } catch (e) {
     return null;
   }
