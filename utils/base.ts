@@ -38,9 +38,10 @@ export const errorHandle = (handle: string) => {
   return new Response(
     JSON.stringify({
       identity: handle,
+      error: "No results",
     }),
     {
-      status: 500,
+      status: 404,
     }
   );
 };
