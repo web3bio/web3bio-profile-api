@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 export const config = {
-  runtime: "edge",
+  runtime: "experimental-edge",
   matcher: '/profile/:path*',
 }
 
