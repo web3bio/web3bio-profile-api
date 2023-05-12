@@ -289,7 +289,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       owner: address,
       identity: ensDomain,
-      displayName: ensDomain,
+      displayName: (await resolveENSTextValue(resolverAddress, ensDomain, "name")) || ensDomain,
       avatar: (await resolveEipAssetURL(avatarHandle)) || null,
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
