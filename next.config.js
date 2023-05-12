@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
-  experimental: { 
-    runtime: "edge"
-  },
   redirects: async () => [
     {
       source: "/api/:path*",

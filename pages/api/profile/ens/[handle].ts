@@ -8,7 +8,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { PlatformType, PlatfomData } from "@/utils/platform";
-import { CoinType } from "@/utils/ens";
+import { CoinType } from "@/utils/cointype";
 import { regexEns } from "@/utils/regexp";
 import { ethers } from "ethers";
 import { base, resolverABI } from "../../../../utils/resolverABI";
@@ -49,6 +49,9 @@ const getENSRecordsQuery = `
         texts
         coinTypes
         address
+      }
+      owner {
+        id
       }
       resolvedAddress{
         id
@@ -183,29 +186,54 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       if (!ensDomain) {
         return errorHandle(handle);
       }
-      resolverAddress = (await resolveAddressFromName(ensDomain)).resolver
-        .address;
+      resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
+        ?.address;
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
-      address = (await resolveAddressFromName(handle)).resolvedAddress.id;
+      const response = await resolveAddressFromName(handle);
+      address = response?.resolvedAddress?.id || response?.owner.id;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
-      resolverAddress = (await resolveAddressFromName(ensDomain)).resolver
-        .address;
+      resolverAddress = response?.resolver?.address;
+    }
+    if (ensDomain && address) {
+      if (!resolverAddress) {
+        return new Response(
+          JSON.stringify({
+            owner: address,
+            identity: ensDomain,
+            displayName: ensDomain,
+            avatar: null,
+            email: null,
+            description: null,
+            location: null,
+            header: null,
+            links: null,
+            addresses: null,
+          }),
+          {
+            status: 200,
+            headers: {
+              "Cache-Control": `public, s-maxage=${
+                60 * 60 * 24 * 7
+              }, stale-while-revalidate=${60 * 30}`,
+            },
+          }
+        );
+      }
+    } else {
+      return errorHandle(handle);
     }
 
     const gtext = await getENSProfile(ensDomain);
 
-    if (!resolverAddress) {
-      return errorHandle(handle);
-    }
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {
       eth: address,
       btc: null,
     };
     if (gtext && gtext[0].resolver.texts) {
-      const linksRecords = gtext[0].resolver.texts;
+      const linksRecords = gtext[0]?.resolver?.texts;
       const linksToFetch = linksRecords.reduce(
         (pre: Array<string>, cur: string) => {
           if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
@@ -289,7 +317,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       owner: address,
       identity: ensDomain,
-      displayName: ensDomain,
+      displayName:
+        (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
+        ensDomain,
       avatar: (await resolveEipAssetURL(avatarHandle)) || null,
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
@@ -341,21 +371,6 @@ export const getENSProfile = async (name: string) => {
       body: JSON.stringify(payload),
     }).then((res) => res.json());
     if (fetchRes) return fetchRes.data.domains;
-  } catch (e) {
-    return null;
-  }
-};
-
-export const getENSNameByAddress = async (address: string) => {
-  try {
-    const reverseLookUpURL = "https://ens.fafrd.workers.dev/ens/";
-    const fetchURL = reverseLookUpURL + address.toLowerCase();
-    const fetchRes = await fetch(fetchURL, {
-      ...commonQueryOptions,
-    }).then((res) => {
-      return res.json();
-    });
-    if (fetchRes) return fetchRes.reverseRecord || fetchRes.domains[0];
   } catch (e) {
     return null;
   }

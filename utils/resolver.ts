@@ -1,4 +1,4 @@
-import { NFTSCANFetcher, NFTSCAN_BASE_API_ENDPOINT } from "./fetcher";
+import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
 import { resolveIPFS_URL } from "./ipfs";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 
@@ -59,11 +59,12 @@ export const resolveEipAssetURL = async (source: string) => {
   if (source.startsWith(eipPrefix)) {
     const arr = source.split(eipPrefix)[1].split("/");
     const fetchURL =
-      NFTSCAN_BASE_API_ENDPOINT +
-      `assets/${arr[0]}/${arr[1]}?show_attribute=false`;
-    const res = await NFTSCANFetcher(fetchURL);
-    if (res && res.data) {
-      return resolveMediaURL(res.data.image_uri || res.data.content_uri);
+      SIMPLE_HASH_URL + `/api/v0/nfts/ethereum/${arr[0]}/${arr[1]}`;
+    const res = await _fetcher(fetchURL);
+    if (res || res.nft_id) {
+      return resolveMediaURL(
+        res.image_url || res.previews.image_large_url
+      );
     }
   }
   return resolveMediaURL(source);
