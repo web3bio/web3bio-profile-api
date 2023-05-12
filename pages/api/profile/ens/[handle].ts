@@ -8,7 +8,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { PlatformType, PlatfomData } from "@/utils/platform";
-import { CoinType } from "@/utils/ens";
+import { CoinType } from "@/utils/cointype";
 import { regexEns } from "@/utils/regexp";
 import { ethers } from "ethers";
 import { base, resolverABI } from "../../../../utils/resolverABI";
