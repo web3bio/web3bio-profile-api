@@ -55,16 +55,15 @@ export function resolveSocialMediaLink(name: string, type: PlatformType) {
 
 export const resolveEipAssetURL = async (source: string) => {
   if (!source) return null;
-  const eipPrefix = "eip155:1/erc721:";
+  const eipPrefix = "eip155:1";
   if (source.startsWith(eipPrefix)) {
-    const arr = source.split(eipPrefix)[1].split("/");
+    const arr = source.split(eipPrefix)[1].split(":")[1].split("/");
     const fetchURL =
       SIMPLE_HASH_URL + `/api/v0/nfts/ethereum/${arr[0]}/${arr[1]}`;
     const res = await _fetcher(fetchURL);
+
     if (res || res.nft_id) {
-      return resolveMediaURL(
-        res.previews.image_medium_url || res.image_url
-      );
+      return resolveMediaURL(res.previews.image_medium_url || res.image_url);
     }
   }
   return resolveMediaURL(source);
