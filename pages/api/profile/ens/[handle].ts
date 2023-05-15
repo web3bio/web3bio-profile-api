@@ -60,6 +60,9 @@ const getENSRecordsQuery = `
   }
 `;
 
+const ethereumRPCURL =
+  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	";
+
 const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
@@ -67,11 +70,9 @@ const resolveAddressFromName = async (name: string) => {
 };
 
 const resolveNameFromAddress = async (address: string) => {
-  const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
-
-  const resp = await fetch(
-    process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	",
-    {
+  try {
+    const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
+    const resp = await fetch(ethereumRPCURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -85,14 +86,16 @@ const resolveNameFromAddress = async (address: string) => {
           "latest",
         ],
       }),
-    }
-  );
-  const res = await resp.text();
-  const rr = ethers.utils.defaultAbiCoder.decode(
-    [ethers.utils.ParamType.from("string[]")],
-    JSON.parse(res)?.result
-  );
-  return rr[0][0];
+    });
+    const res = await resp.text();
+    const rr = ethers.utils.defaultAbiCoder.decode(
+      [ethers.utils.ParamType.from("string[]")],
+      JSON.parse(res)?.result
+    );
+    return rr[0][0];
+  } catch (e) {
+    return null;
+  }
 };
 
 const resolveENSTextValue = async (
@@ -100,37 +103,38 @@ const resolveENSTextValue = async (
   name: string,
   text: string
 ) => {
-  const nodeHash = ethers.utils.namehash(name);
-  const data = resolverFace.encodeFunctionData("text", [nodeHash, text]);
-  const requestData = {
-    jsonrpc: "2.0",
-    method: "eth_call",
-    params: [
-      {
-        to: resolverAddress,
-        data: data,
-      },
-      "latest",
-    ],
-    id: 1,
-  };
-  const resp = await fetch(
-    process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	",
-    {
+  try {
+    const nodeHash = ethers.utils.namehash(name);
+    const data = resolverFace.encodeFunctionData("text", [nodeHash, text]);
+    const requestData = {
+      jsonrpc: "2.0",
+      method: "eth_call",
+      params: [
+        {
+          to: resolverAddress,
+          data: data,
+        },
+        "latest",
+      ],
+      id: 1,
+    };
+    const resp = await fetch(ethereumRPCURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData),
-    }
-  );
-  const res = await resp.text();
+    });
+    const res = await resp.text();
 
-  const rr = ethers.utils.defaultAbiCoder.decode(
-    [ethers.utils.ParamType.from("string")],
-    JSON.parse(res)?.result
-  );
-  return rr[0];
+    const rr = ethers.utils.defaultAbiCoder.decode(
+      [ethers.utils.ParamType.from("string")],
+      JSON.parse(res)?.result
+    );
+    return rr[0];
+  } catch (e) {
+    return null;
+  }
 };
 
 const resolveENSCoinTypesValue = async (
@@ -138,39 +142,40 @@ const resolveENSCoinTypesValue = async (
   name: string,
   coinType: string | number
 ) => {
-  const nodeHash = ethers.utils.namehash(name);
-  const { encoder } = formatsByCoinType[coinType];
-  const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
-  const requestData = {
-    jsonrpc: "2.0",
-    method: "eth_call",
-    params: [
-      {
-        to: resolverAddress,
-        data: data,
-      },
-      "latest",
-    ],
-    id: 1,
-  };
-  const resp = await fetch(
-    process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	",
-    {
+  try {
+    const nodeHash = ethers.utils.namehash(name);
+    const { encoder } = formatsByCoinType[coinType];
+    const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
+    const requestData = {
+      jsonrpc: "2.0",
+      method: "eth_call",
+      params: [
+        {
+          to: resolverAddress,
+          data: data,
+        },
+        "latest",
+      ],
+      id: 1,
+    };
+    const resp = await fetch(ethereumRPCURL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(requestData),
-    }
-  );
-  const res = await resp.text();
-  const rr = ethers.utils.defaultAbiCoder.decode(
-    ["bytes"],
-    JSON.parse(res)?.result
-  )[0];
-  if (!rr || rr === "0x") return null;
+    });
+    const res = await resp.text();
+    const rr = ethers.utils.defaultAbiCoder.decode(
+      ["bytes"],
+      JSON.parse(res)?.result
+    )[0];
+    if (!rr || rr === "0x") return null;
 
-  return encoder(Buffer.from(rr.slice(2), "hex"));
+    return encoder(Buffer.from(rr.slice(2), "hex"));
+  } catch (e) {
+    return null;
+  }
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
