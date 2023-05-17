@@ -34,10 +34,11 @@ export type HandleNotFoundResponseData = {
   error: string;
 };
 
-export const errorHandle = (handle: string) => {
+export const emptyHandle = (handle: string, platform: PlatformType) => {
   return new Response(
     JSON.stringify({
       identity: handle,
+      platform,
       error: "No results",
     }),
     {

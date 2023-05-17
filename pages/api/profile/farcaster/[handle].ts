@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { LinksItem, errorHandle } from "@/utils/base";
+import { LinksItem, emptyHandle } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
@@ -24,7 +24,7 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response || !response.length) {
-      return errorHandle(handle);
+      return emptyHandle(handle, PlatformType.farcaster);
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);
@@ -69,6 +69,7 @@ const resolveFarcasterHandle = async (handle: string) => {
     return new Response(
       JSON.stringify({
         identity: handle,
+        platform: PlatfomData.farcaster.key,
         error: e.message,
       }),
       {
@@ -88,6 +89,6 @@ export default async function handler(req: NextApiRequest) {
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return errorHandle(lowercaseName);
+    return emptyHandle(lowercaseName, PlatformType.farcaster);
   return resolveFarcasterHandle(lowercaseName);
 }

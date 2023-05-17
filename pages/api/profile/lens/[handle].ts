@@ -6,7 +6,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { GET_PROFILE_LENS } from "@/utils/lens";
-import { LinksItem, errorHandle } from "@/utils/base";
+import { LinksItem, emptyHandle } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
 
@@ -41,7 +41,7 @@ const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      return errorHandle(handle);
+      return emptyHandle(handle, PlatformType.lens);
     }
     const pureHandle = handle.replaceAll(".lens", "");
     let LINKRES = {};
@@ -118,6 +118,7 @@ const resolveNameFromLens = async (handle: string) => {
     return new Response(
       JSON.stringify({
         identity: handle,
+        platform: PlatfomData.lens.key,
         error: error.message,
       }),
       {
@@ -136,6 +137,7 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName);
+  if (!regexLens.test(lowercaseName))
+    return emptyHandle(lowercaseName, PlatformType.lens);
   return resolveNameFromLens(lowercaseName);
 }

@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { getAddress, isAddress } from "@ethersproject/address";
-import { errorHandle } from "@/utils/base";
+import { emptyHandle } from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -179,7 +179,7 @@ const resolveENSCoinTypesValue = async (
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
-  if (!handle) return errorHandle("");
+  if (!handle) return emptyHandle("", PlatformType.ens);
 
   try {
     let address = null;
@@ -189,12 +189,12 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       address = getAddress(handle);
       ensDomain = await resolveNameFromAddress(handle);
       if (!ensDomain) {
-        return errorHandle(handle);
+        return emptyHandle(handle, PlatformType.ens);
       }
       resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
         ?.address;
     } else {
-      if (!regexEns.test(handle)) return errorHandle(handle);
+      if (!regexEns.test(handle)) return emptyHandle(handle, PlatformType.ens);
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
       address = response?.resolvedAddress?.id || null;
@@ -318,6 +318,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       address,
       identity: ensDomain,
+      platform: PlatfomData.ENS.key,
       displayName:
         (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
         ensDomain,
@@ -354,6 +355,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     return new Response(
       JSON.stringify({
         identity: handle,
+        platform: PlatfomData.ENS.key,
         error: error.message,
       }),
       {
