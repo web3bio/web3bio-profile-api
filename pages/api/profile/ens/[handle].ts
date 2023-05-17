@@ -195,39 +195,35 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         ?.address;
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
-      const response = await resolveAddressFromName(handle);
-      address = response?.resolvedAddress?.id;
-      if (!address) return errorHandle(handle);
       ensDomain = handle;
-      resolverAddress = response?.resolver?.address;
+      const response = await resolveAddressFromName(handle);
+      address = response?.resolvedAddress?.id || null;
+      resolverAddress = response?.resolver?.address || null;
     }
-    if (ensDomain && address) {
-      if (!resolverAddress) {
-        return new Response(
-          JSON.stringify({
-            address: address,
-            identity: ensDomain,
-            platform: PlatfomData.ENS.key,
-            displayName: ensDomain,
-            avatar: null,
-            email: null,
-            description: null,
-            location: null,
-            header: null,
-            links: null,
-            addresses: null,
-          }),
-          {
-            status: 503,
-            headers: {
-              "Cache-Control": `no-store`,
-              "Retry-After": "30",
-            },
-          }
-        );
-      }
-    } else {
-      return errorHandle(handle);
+
+    if (!resolverAddress) {
+      return new Response(
+        JSON.stringify({
+          address: address,
+          identity: ensDomain,
+          platform: PlatfomData.ENS.key,
+          displayName: ensDomain,
+          avatar: null,
+          email: null,
+          description: null,
+          location: null,
+          header: null,
+          links: null,
+          addresses: null,
+        }),
+        {
+          status: 503,
+          headers: {
+            "Cache-Control": `no-store`,
+            "Retry-After": "30",
+          },
+        }
+      );
     }
 
     const gtext = await getENSProfile(ensDomain);
