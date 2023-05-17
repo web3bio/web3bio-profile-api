@@ -365,6 +365,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       }),
       {
         status: 500,
+        headers: {
+          "Cache-Control": `no-store`,
+        },
       }
     );
   }
