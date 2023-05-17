@@ -42,6 +42,9 @@ export const errorHandle = (handle: string) => {
     }),
     {
       status: 404,
+      headers: {
+        "Cache-Control": "no-store",
+      },
     }
   );
 };
