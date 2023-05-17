@@ -222,9 +222,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           {
             status: 200,
             headers: {
-              "Cache-Control": `public, s-maxage=${
-                60 * 60 * 24 * 7
-              }, stale-while-revalidate=${60 * 30}`,
+              "Cache-Control": `no-store`,
             },
           }
         );
@@ -364,6 +362,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       }),
       {
         status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
       }
     );
   }
