@@ -72,6 +72,9 @@ const resolveFarcasterHandle = async (handle: string) => {
       }),
       {
         status: 500,
+        headers: {
+          "Cache-Control": "no-store",
+        },
       }
     );
   }

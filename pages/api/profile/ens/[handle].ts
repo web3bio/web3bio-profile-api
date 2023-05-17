@@ -328,10 +328,11 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       displayName:
         (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
         ensDomain,
-      avatar:
-        (await resolveEipAssetURL(avatarHandle)) ||
-        getENSMetadataAvatar(ensDomain) ||
-        null,
+      avatar: avatarHandle
+        ? (await resolveEipAssetURL(avatarHandle)) ||
+          getENSMetadataAvatar(ensDomain)
+        : null,
+
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
         null,
@@ -364,6 +365,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       }),
       {
         status: 500,
+        headers: {
+          "Cache-Control": `no-store`,
+        },
       }
     );
   }
