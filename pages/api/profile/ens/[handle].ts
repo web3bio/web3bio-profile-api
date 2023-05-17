@@ -50,9 +50,6 @@ const getENSRecordsQuery = `
         coinTypes
         address
       }
-      owner {
-        id
-      }
       resolvedAddress{
         id
       }
@@ -199,7 +196,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     } else {
       if (!regexEns.test(handle)) return errorHandle(handle);
       const response = await resolveAddressFromName(handle);
-      address = response?.resolvedAddress?.id || response?.owner.id;
+      address = response?.resolvedAddress?.id;
       if (!address) return errorHandle(handle);
       ensDomain = handle;
       resolverAddress = response?.resolver?.address;
@@ -208,8 +205,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       if (!resolverAddress) {
         return new Response(
           JSON.stringify({
-            owner: address,
+            address: address,
             identity: ensDomain,
+            platform: PlatfomData.ENS.key,
             displayName: ensDomain,
             avatar: null,
             email: null,
@@ -322,7 +320,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const avatarHandle =
       (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || "";
     const resJSON = {
-      owner: address,
+      address,
       identity: ensDomain,
       displayName:
         (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||

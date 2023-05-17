@@ -92,8 +92,9 @@ const resolveNameFromLens = async (handle: string) => {
     const coverPictureUri =
       response.coverPicture?.original?.url || response.coverPicture?.uri || "";
     const resJSON = {
-      owner: response.ownedBy,
+      address: response.ownedBy,
       identity: response.handle,
+      platform: PlatfomData.lens.key,
       displayName: response.name,
       avatar: (await resolveEipAssetURL(avatarUri)) || "",
       email: null,

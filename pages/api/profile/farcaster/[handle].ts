@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatformType } from "@/utils/platform";
+import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
 
 export const config = {
@@ -43,8 +43,9 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      owner: response[0].connectedAddress || _res.address,
+      address: response[0].connectedAddress || _res.address,
       identity: _res.username || _res.displayName,
+      platform: PlatfomData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
       avatar: _res.avatarUrl,
       email: null,

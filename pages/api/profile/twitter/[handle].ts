@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { LinksItem, errorHandle } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
 
 export const config = {
@@ -51,8 +51,9 @@ const resolveTwitterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      owner: resolvedHandle,
+      address: resolvedHandle,
       identity: resolvedHandle,
+      platform: PlatfomData.twitter.key,
       displayName: response.name || resolvedHandle,
       avatar: transformImageURLSize(
         response.profile_image_url_https || response.profile_image_url || null,
