@@ -220,11 +220,10 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
             addresses: null,
           }),
           {
-            status: 200,
+            status: 503,
             headers: {
-              "Cache-Control": `public, s-maxage=${
-                60 * 60 * 24 * 7
-              }, stale-while-revalidate=${60 * 30}`,
+              "Cache-Control": `no-store`,
+              "Retry-After": "30",
             },
           }
         );
