@@ -51,7 +51,7 @@ const resolveTwitterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: resolvedHandle,
+      address: null,
       identity: resolvedHandle,
       platform: PlatfomData.twitter.key,
       displayName: response.name || resolvedHandle,

@@ -185,7 +185,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     let address = "";
     let ensDomain = "";
     let resolverAddress = "";
-    
+
     if (isAddress(handle)) {
       address = getAddress(handle);
       ensDomain = await resolveNameFromAddress(handle);
@@ -232,7 +232,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {
       eth: address,
-      btc: null,
     };
     if (gtext && gtext[0].resolver.texts) {
       const linksRecords = gtext[0]?.resolver?.texts;
@@ -277,7 +276,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         const cryptoRecordsToFetch = cryptoRecrods.reduce(
           (pre: Array<number>, cur: number) => {
             if (
-              ![CoinType.btc, CoinType.eth].includes(Number(cur)) &&
+              ![CoinType.eth].includes(Number(cur)) &&
               _.findKey(CoinType, (o) => o == cur)
             )
               pre.push(cur);
@@ -304,11 +303,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       };
       CRYPTORES = {
         eth: address,
-        btc: await resolveENSCoinTypesValue(
-          resolverAddress,
-          ensDomain,
-          CoinType.btc
-        ),
         ...(await getCrypto()),
       };
     }
@@ -327,7 +321,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         ? (await resolveEipAssetURL(avatarHandle)) ||
           getENSMetadataAvatar(ensDomain)
         : null,
-
       email:
         (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
         null,
