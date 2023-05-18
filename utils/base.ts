@@ -1,4 +1,3 @@
-import { NextApiResponse } from "next";
 import { PlatformType } from "./platform";
 
 export type LinksItem = {
@@ -34,9 +33,10 @@ export type HandleNotFoundResponseData = {
   error: string;
 };
 
-export const emptyHandle = (handle: string, platform: PlatformType) => {
+export const emptyHandle = (address: string | null, handle: string | null, platform: PlatformType) => {
   return new Response(
     JSON.stringify({
+      address,
       identity: handle,
       platform,
       error: "No results",

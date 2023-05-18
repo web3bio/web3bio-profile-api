@@ -179,22 +179,23 @@ const resolveENSCoinTypesValue = async (
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
-  if (!handle) return emptyHandle("", PlatformType.ens);
+  if (!handle) return emptyHandle(null, null, PlatformType.ens);
 
   try {
-    let address = null;
+    let address = "";
     let ensDomain = "";
     let resolverAddress = "";
+    
     if (isAddress(handle)) {
       address = getAddress(handle);
       ensDomain = await resolveNameFromAddress(handle);
       if (!ensDomain) {
-        return emptyHandle(handle, PlatformType.ens);
+        return emptyHandle(handle, null, PlatformType.ens);
       }
       resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
         ?.address;
     } else {
-      if (!regexEns.test(handle)) return emptyHandle(handle, PlatformType.ens);
+      if (!regexEns.test(handle)) return emptyHandle(null, handle, PlatformType.ens);
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
       address = response?.resolvedAddress?.id || null;

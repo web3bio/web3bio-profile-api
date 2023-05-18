@@ -24,7 +24,7 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response || !response.length) {
-      return emptyHandle(handle, PlatformType.farcaster);
+      return emptyHandle(null, handle, PlatformType.farcaster);
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);
@@ -89,6 +89,6 @@ export default async function handler(req: NextApiRequest) {
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return emptyHandle(lowercaseName, PlatformType.farcaster);
+    return emptyHandle(null, lowercaseName, PlatformType.farcaster);
   return resolveFarcasterHandle(lowercaseName);
 }

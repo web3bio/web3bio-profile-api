@@ -41,7 +41,7 @@ const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      return emptyHandle(handle, PlatformType.lens);
+      return emptyHandle(null, handle, PlatformType.lens);
     }
     const pureHandle = handle.replaceAll(".lens", "");
     let LINKRES = {};
@@ -138,6 +138,6 @@ export default async function handler(req: NextApiRequest) {
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!regexLens.test(lowercaseName))
-    return emptyHandle(lowercaseName, PlatformType.lens);
+    return emptyHandle(null, lowercaseName, PlatformType.lens);
   return resolveNameFromLens(lowercaseName);
 }

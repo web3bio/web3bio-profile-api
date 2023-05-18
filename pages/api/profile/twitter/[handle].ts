@@ -30,7 +30,7 @@ const resolveTwitterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response) {
-      return emptyHandle(handle, PlatformType.twitter);
+      return emptyHandle(null, handle, PlatformType.twitter);
     }
     const urlHandle = resolveHandle(
       response.entities.url
@@ -96,6 +96,6 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return emptyHandle(lowercaseName, PlatformType.twitter);
+    return emptyHandle(null, lowercaseName, PlatformType.twitter);
   return resolveTwitterHandle(lowercaseName);
 }
