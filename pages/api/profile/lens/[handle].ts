@@ -6,7 +6,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { GET_PROFILE_LENS } from "@/utils/lens";
-import { LinksItem, emptyHandle } from "@/utils/base";
+import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
 
@@ -41,7 +41,13 @@ const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      return emptyHandle(null, handle, PlatformType.lens);
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: PlatformType.lens,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const pureHandle = handle.replaceAll(".lens", "");
     let LINKRES = {};
@@ -138,6 +144,12 @@ export default async function handler(req: NextApiRequest) {
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!regexLens.test(lowercaseName))
-    return emptyHandle(null, lowercaseName, PlatformType.lens);
+    return errorHandle({
+      address: null,
+      identity: lowercaseName,
+      platform: PlatformType.lens,
+      code: 404,
+      message: ErrorMessages.notExist,
+    });
   return resolveNameFromLens(lowercaseName);
 }

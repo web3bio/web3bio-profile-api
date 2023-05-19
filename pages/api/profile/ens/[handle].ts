@@ -1,12 +1,12 @@
 import type { NextApiRequest } from "next";
 import { getAddress, isAddress } from "@ethersproject/address";
-import { emptyHandle } from "@/utils/base";
+import { errorHandle, ErrorMessages } from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import _ from "lodash";
+import _, { add } from "lodash";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { CoinType } from "@/utils/cointype";
 import { regexEns } from "@/utils/regexp";
@@ -16,6 +16,14 @@ import { formatsByCoinType } from "@ensdomains/address-encoder";
 
 const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
+
+const isValidEthereumAddress = (address: string) => {
+  if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false; // invalid ethereum address
+  if (address.match(/^0x0*$|^0xdead.*$/)) return false; // empty & burn address
+  if (address == "0x0000000000000000000000000000000000000001")
+    // ethereum test address
+    return true;
+};
 
 const ensSubGraphBaseURL =
   "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
@@ -179,7 +187,14 @@ const resolveENSCoinTypesValue = async (
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
-  if (!handle) return emptyHandle(null, null, PlatformType.ens);
+  if (!handle)
+    return errorHandle({
+      address: null,
+      identity: null,
+      platform: PlatformType.ens,
+      code: 404,
+      message: ErrorMessages.inValidENS,
+    });
 
   try {
     let address = "";
@@ -187,44 +202,69 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     let resolverAddress = "";
 
     if (isAddress(handle)) {
+      if (!isValidEthereumAddress(handle))
+        return errorHandle({
+          address: handle,
+          identity: null,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.inValidAddr,
+        });
       address = getAddress(handle);
       ensDomain = await resolveNameFromAddress(handle);
       if (!ensDomain) {
-        return emptyHandle(handle, null, PlatformType.ens);
+        return errorHandle({
+          address: handle,
+          identity: null,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
       }
       resolverAddress = (await resolveAddressFromName(ensDomain))?.resolver
         ?.address;
     } else {
-      if (!regexEns.test(handle)) return emptyHandle(null, handle, PlatformType.ens);
+      if (!regexEns.test(handle))
+        return errorHandle({
+          address: null,
+          identity: handle,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.inValidENS,
+        });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
       address = response?.resolvedAddress?.id || null;
+      if (!address)
+        return errorHandle({
+          address,
+          identity: handle,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.notExist,
+        });
+      if (!isValidEthereumAddress(address))
+        return errorHandle({
+          address,
+          identity: handle,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.inValidResolved,
+        });
       resolverAddress = response?.resolver?.address || null;
     }
 
     if (!resolverAddress) {
-      return new Response(
-        JSON.stringify({
-          address: address,
-          identity: ensDomain,
-          platform: PlatfomData.ENS.key,
-          displayName: ensDomain,
-          avatar: null,
-          email: null,
-          description: null,
-          location: null,
-          header: null,
-          links: null,
-          addresses: null,
-        }),
-        {
-          status: 503,
-          headers: {
-            "Cache-Control": `no-store`,
-            "Retry-After": "30",
-          },
-        }
-      );
+      return errorHandle({
+        address,
+        identity: ensDomain,
+        platform: PlatformType.ens,
+        code: 503,
+        message: ErrorMessages.noResolver,
+        headers: {
+          "Retry-After": "30",
+        },
+      });
     }
 
     const gtext = await getENSProfile(ensDomain);

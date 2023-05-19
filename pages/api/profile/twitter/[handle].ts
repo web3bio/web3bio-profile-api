@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { LinksItem, emptyHandle } from "@/utils/base";
+import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
 
@@ -30,7 +30,13 @@ const resolveTwitterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response) {
-      return emptyHandle(null, handle, PlatformType.twitter);
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: PlatformType.twitter,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const urlHandle = resolveHandle(
       response.entities.url
@@ -96,6 +102,12 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return emptyHandle(null, lowercaseName, PlatformType.twitter);
+    return errorHandle({
+      address: null,
+      identity: lowercaseName,
+      platform: PlatformType.twitter,
+      code: 404,
+      message: ErrorMessages.notExist,
+    });
   return resolveTwitterHandle(lowercaseName);
 }
