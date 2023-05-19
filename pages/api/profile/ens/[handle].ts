@@ -18,11 +18,10 @@ const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
 
 const isValidEthereumAddress = (address: string) => {
-  if (!/^(0x)?[0-9a-f]{40}$/i.test(address)) return false; // invalid ethereum address
+  if (!isAddress(address)) return false; // invalid ethereum address
   if (address.match(/^0x0*$|^0xdead.*$/)) return false; // empty & burn address
-  if (address == "0x0000000000000000000000000000000000000001")
-    // ethereum test address
-    return true;
+  if (address == "0x0000000000000000000000000000000000000001") return false; // ethereum test address
+  return true;
 };
 
 const ensSubGraphBaseURL =
@@ -74,9 +73,16 @@ const resolveAddressFromName = async (name: string) => {
   return res[0];
 };
 
-const resolveNameFromAddress = async (address: string) => {
+const fetchEthereumRPC = async ({
+  data,
+  to,
+  decodeType,
+}: {
+  data: string;
+  to: string;
+  decodeType: string;
+}) => {
   try {
-    const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
     const resp = await fetch(ethereumRPCURL, {
       method: "POST",
       headers: {
@@ -86,21 +92,29 @@ const resolveNameFromAddress = async (address: string) => {
         jsonrpc: "2.0",
         id: "1",
         method: "eth_call",
-        params: [
-          { to: "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C", data: data },
-          "latest",
-        ],
+        params: [{ to, data }, "latest"],
       }),
     });
     const res = await resp.text();
     const rr = ethers.utils.defaultAbiCoder.decode(
-      [ethers.utils.ParamType.from("string[]")],
+      [ethers.utils.ParamType.from(decodeType)],
       JSON.parse(res)?.result
     );
-    return rr[0][0];
+    return rr[0];
   } catch (e) {
     return null;
   }
+};
+
+const resolveNameFromAddress = async (address: string) => {
+  const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
+  return (
+    await fetchEthereumRPC({
+      data: data,
+      to: "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C",
+      decodeType: "string[]",
+    })
+  )?.[0];
 };
 
 const resolveENSTextValue = async (
@@ -108,38 +122,13 @@ const resolveENSTextValue = async (
   name: string,
   text: string
 ) => {
-  try {
-    const nodeHash = ethers.utils.namehash(name);
-    const data = resolverFace.encodeFunctionData("text", [nodeHash, text]);
-    const requestData = {
-      jsonrpc: "2.0",
-      method: "eth_call",
-      params: [
-        {
-          to: resolverAddress,
-          data: data,
-        },
-        "latest",
-      ],
-      id: 1,
-    };
-    const resp = await fetch(ethereumRPCURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
-    const res = await resp.text();
-
-    const rr = ethers.utils.defaultAbiCoder.decode(
-      [ethers.utils.ParamType.from("string")],
-      JSON.parse(res)?.result
-    );
-    return rr[0];
-  } catch (e) {
-    return null;
-  }
+  const nodeHash = ethers.utils.namehash(name);
+  const data = resolverFace.encodeFunctionData("text", [nodeHash, text]);
+  return await fetchEthereumRPC({
+    data: data,
+    to: resolverAddress,
+    decodeType: "string",
+  });
 };
 
 const getENSMetadataAvatar = (domain: string) =>
@@ -150,40 +139,17 @@ const resolveENSCoinTypesValue = async (
   name: string,
   coinType: string | number
 ) => {
-  try {
-    const nodeHash = ethers.utils.namehash(name);
-    const { encoder } = formatsByCoinType[coinType];
-    const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
-    const requestData = {
-      jsonrpc: "2.0",
-      method: "eth_call",
-      params: [
-        {
-          to: resolverAddress,
-          data: data,
-        },
-        "latest",
-      ],
-      id: 1,
-    };
-    const resp = await fetch(ethereumRPCURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
-    const res = await resp.text();
-    const rr = ethers.utils.defaultAbiCoder.decode(
-      ["bytes"],
-      JSON.parse(res)?.result
-    )[0];
-    if (!rr || rr === "0x") return null;
+  const nodeHash = ethers.utils.namehash(name);
+  const { encoder } = formatsByCoinType[coinType];
+  const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
+  const rr = await fetchEthereumRPC({
+    data: data,
+    to: resolverAddress,
+    decodeType: "bytes",
+  });
+  if (!rr || rr === "0x") return null;
 
-    return encoder(Buffer.from(rr.slice(2), "hex"));
-  } catch (e) {
-    return null;
-  }
+  return encoder(Buffer.from(rr.slice(2), "hex"));
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
@@ -243,7 +209,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           code: 404,
           message: ErrorMessages.notExist,
         });
-      if (!isValidEthereumAddress(address))
+      if (!isValidEthereumAddress(address)) {
         return errorHandle({
           address,
           identity: handle,
@@ -251,6 +217,8 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           code: 404,
           message: ErrorMessages.inValidResolved,
         });
+      }
+
       resolverAddress = response?.resolver?.address || null;
     }
 
