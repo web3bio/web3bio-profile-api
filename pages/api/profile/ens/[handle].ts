@@ -57,6 +57,9 @@ const getENSRecordsQuery = `
         coinTypes
         address
       }
+      owner{
+        id
+      }
       resolvedAddress{
         id
       }
@@ -201,13 +204,14 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
       address = response?.resolvedAddress?.id || null;
+      const owner = response?.owner?.id;
       if (!address)
         return errorHandle({
           address,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
-          message: ErrorMessages.notExist,
+          message: owner ? ErrorMessages.noResolver : ErrorMessages.notExist,
         });
       if (!isValidEthereumAddress(address)) {
         return errorHandle({
