@@ -388,6 +388,9 @@ export const getENSProfile = async (name: string) => {
     const fetchRes = await fetch(ensSubGraphBaseURL, {
       ...commonQueryOptions,
       body: JSON.stringify(payload),
+      headers: {
+        "Cache-Control": "max-age=604800, must-revalidate",
+      },
     }).then((res) => res.json());
     if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
   } catch (e) {
