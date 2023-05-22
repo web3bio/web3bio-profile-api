@@ -73,7 +73,7 @@ const ethereumRPCURL =
 const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
-  return res[0];
+  return res?.[0];
 };
 
 const fetchEthereumRPC = async ({
@@ -169,6 +169,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     let address = "";
     let ensDomain = "";
     let resolverAddress = "";
+    let gtext = [] as any;
 
     if (isAddress(handle)) {
       if (!isValidEthereumAddress(handle))
@@ -203,6 +204,8 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
+      if (response.message) throw new Error(response.message);
+      gtext = [response];
       address = response?.resolvedAddress?.id || null;
       const owner = response?.owner?.id;
       if (!address)
@@ -239,7 +242,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       });
     }
 
-    const gtext = await getENSProfile(ensDomain);
+    gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
 
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {
@@ -386,7 +389,7 @@ export const getENSProfile = async (name: string) => {
       ...commonQueryOptions,
       body: JSON.stringify(payload),
     }).then((res) => res.json());
-    if (fetchRes) return fetchRes.data.domains;
+    if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
   } catch (e) {
     return null;
   }
