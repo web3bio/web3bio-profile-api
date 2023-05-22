@@ -119,7 +119,7 @@ export const PlatfomData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-nextid.svg",
     iconW: "icons/icon-nextid-w.svg",
     label: "Next.ID",
-    urlPrefix: "https://web5.bio",
+    urlPrefix: "https://web3.bio/",
     ensText: [],
     dotbitText: ["profile.nextid"],
   },
