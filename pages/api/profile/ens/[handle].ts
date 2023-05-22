@@ -6,7 +6,7 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import _, { add } from "lodash";
+import _ from "lodash";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { CoinType } from "@/utils/cointype";
 import { regexEns } from "@/utils/regexp";
@@ -361,19 +361,13 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       },
     });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        platform: PlatfomData.ENS.key,
-        error: error.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": `no-store`,
-        },
-      }
-    );
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.ens,
+      code: 500,
+      message: error.message,
+    })
   }
 };
 

@@ -121,19 +121,13 @@ const resolveNameFromLens = async (handle: string) => {
       },
     });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        platform: PlatfomData.lens.key,
-        error: error.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.lens,
+      code: 500,
+      message: error.message,
+    });
   }
 };
 

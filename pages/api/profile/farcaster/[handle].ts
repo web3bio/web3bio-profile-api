@@ -71,20 +71,14 @@ const resolveFarcasterHandle = async (handle: string) => {
         }, stale-while-revalidate=${60 * 30}`,
       },
     });
-  } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        platform: PlatfomData.farcaster.key,
-        error: e.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+  } catch (error: any) {
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.farcaster,
+      code: 500,
+      message: error.message,
+    });
   }
 };
 
