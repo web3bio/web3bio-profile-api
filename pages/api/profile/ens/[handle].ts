@@ -162,7 +162,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       identity: null,
       platform: PlatformType.ens,
       code: 404,
-      message: ErrorMessages.inValidENS,
+      message: ErrorMessages.invalidIdentity,
     });
 
   try {
@@ -178,7 +178,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           identity: null,
           platform: PlatformType.ens,
           code: 404,
-          message: ErrorMessages.inValidAddr,
+          message: ErrorMessages.invalidAddr,
         });
       address = getAddress(handle);
       ensDomain = await resolveNameFromAddress(handle);
@@ -200,7 +200,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
-          message: ErrorMessages.inValidENS,
+          message: ErrorMessages.invalidIdentity,
         });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
@@ -222,7 +222,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
-          message: ErrorMessages.inValidResolved,
+          message: ErrorMessages.invalidResolved,
         });
       }
 

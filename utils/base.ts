@@ -45,10 +45,10 @@ interface errorHandleProps {
 export enum ErrorMessages {
   notFound = "Not Found",
   noResolver = "No Resolver Address",
-  inValidResolved = "Invalid ResolvedAddress",
+  invalidResolved = "Invalid ResolvedAddress",
   notExist = "Does Not Exist",
-  inValidENS = "Invalid ENS Name",
-  inValidAddr = "Invalid Address",
+  invalidIdentity = "Invalid Identity or Domain",
+  invalidAddr = "Invalid Address",
 }
 
 export const errorHandle = (props: errorHandleProps) => {
