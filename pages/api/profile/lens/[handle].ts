@@ -143,7 +143,7 @@ export default async function handler(req: NextApiRequest) {
       identity: lowercaseName,
       platform: PlatformType.lens,
       code: 404,
-      message: ErrorMessages.notExist,
+      message: ErrorMessages.invalidIdentity,
     });
   return resolveNameFromLens(lowercaseName);
 }

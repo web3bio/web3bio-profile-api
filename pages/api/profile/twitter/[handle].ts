@@ -101,7 +101,7 @@ export default async function handler(req: NextApiRequest) {
       identity: lowercaseName,
       platform: PlatformType.twitter,
       code: 404,
-      message: ErrorMessages.notExist,
+      message: ErrorMessages.invalidIdentity,
     });
   return resolveTwitterHandle(lowercaseName);
 }

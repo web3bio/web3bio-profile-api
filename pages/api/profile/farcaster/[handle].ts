@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatfomData, PlatformType } from "@/utils/platform";
-import { regexTwitter } from "@/utils/regexp";
+import { regexFarcaster } from "@/utils/regexp";
 
 export const config = {
   runtime: "edge",
@@ -88,13 +88,13 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!lowercaseName || !regexTwitter.test(lowercaseName))
+  if (!lowercaseName || !regexFarcaster.test(lowercaseName))
     return errorHandle({
       address: null,
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
-      message: ErrorMessages.notExist,
+      message: ErrorMessages.invalidIdentity,
     });
   return resolveFarcasterHandle(lowercaseName);
 }
