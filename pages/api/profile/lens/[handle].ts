@@ -6,7 +6,7 @@ import {
 } from "@/utils/resolver";
 import _ from "lodash";
 import { GET_PROFILE_LENS } from "@/utils/lens";
-import { LinksItem, errorHandle } from "@/utils/base";
+import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
 
@@ -41,7 +41,13 @@ const resolveNameFromLens = async (handle: string) => {
   try {
     const response = await getLensProfile(handle);
     if (!response) {
-      return errorHandle(handle);
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: PlatformType.lens,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const pureHandle = handle.replaceAll(".lens", "");
     let LINKRES = {};
@@ -92,8 +98,9 @@ const resolveNameFromLens = async (handle: string) => {
     const coverPictureUri =
       response.coverPicture?.original?.url || response.coverPicture?.uri || "";
     const resJSON = {
-      owner: response.ownedBy,
+      address: response.ownedBy,
       identity: response.handle,
+      platform: PlatfomData.lens.key,
       displayName: response.name,
       avatar: (await resolveEipAssetURL(avatarUri)) || "",
       email: null,
@@ -114,18 +121,13 @@ const resolveNameFromLens = async (handle: string) => {
       },
     });
   } catch (error: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        error: error.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.lens,
+      code: 500,
+      message: error.message,
+    });
   }
 };
 
@@ -135,6 +137,13 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexLens.test(lowercaseName)) return errorHandle(lowercaseName);
+  if (!regexLens.test(lowercaseName))
+    return errorHandle({
+      address: null,
+      identity: lowercaseName,
+      platform: PlatformType.lens,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
   return resolveNameFromLens(lowercaseName);
 }

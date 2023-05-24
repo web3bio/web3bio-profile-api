@@ -1,8 +1,8 @@
 import type { NextApiRequest } from "next";
-import { LinksItem, errorHandle } from "@/utils/base";
+import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatformType } from "@/utils/platform";
-import { regexTwitter } from "@/utils/regexp";
+import { PlatfomData, PlatformType } from "@/utils/platform";
+import { regexFarcaster } from "@/utils/regexp";
 
 export const config = {
   runtime: "edge",
@@ -24,7 +24,13 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response || !response.length) {
-      return errorHandle(handle);
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);
@@ -43,8 +49,9 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      owner: response[0].connectedAddress || _res.address,
+      address: response[0].connectedAddress || _res.address,
       identity: _res.username || _res.displayName,
+      platform: PlatfomData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
       avatar: _res.avatarUrl,
       email: null,
@@ -64,19 +71,14 @@ const resolveFarcasterHandle = async (handle: string) => {
         }, stale-while-revalidate=${60 * 30}`,
       },
     });
-  } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        error: e.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+  } catch (error: any) {
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.farcaster,
+      code: 500,
+      message: error.message,
+    });
   }
 };
 
@@ -86,7 +88,13 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return errorHandle(lowercaseName);
+  if (!lowercaseName || !regexFarcaster.test(lowercaseName))
+    return errorHandle({
+      address: null,
+      identity: lowercaseName,
+      platform: PlatformType.farcaster,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
   return resolveFarcasterHandle(lowercaseName);
 }

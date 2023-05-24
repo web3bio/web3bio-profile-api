@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { LinksItem, errorHandle } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
+import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
 
 export const config = {
@@ -30,7 +30,13 @@ const resolveTwitterHandle = async (handle: string) => {
   try {
     const response = await FetchFromOrigin(handle);
     if (!response) {
-      return errorHandle(handle);
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: PlatformType.twitter,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const urlHandle = resolveHandle(
       response.entities.url
@@ -51,8 +57,9 @@ const resolveTwitterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      owner: resolvedHandle,
+      address: null,
       identity: resolvedHandle,
+      platform: PlatfomData.twitter.key,
       displayName: response.name || resolvedHandle,
       avatar: transformImageURLSize(
         response.profile_image_url_https || response.profile_image_url || null,
@@ -73,19 +80,14 @@ const resolveTwitterHandle = async (handle: string) => {
         }, stale-while-revalidate=${60 * 30}`,
       },
     });
-  } catch (e: any) {
-    return new Response(
-      JSON.stringify({
-        identity: handle,
-        error: e.message,
-      }),
-      {
-        status: 500,
-        headers: {
-          "Cache-Control": "no-store",
-        },
-      }
-    );
+  } catch (error: any) {
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform: PlatformType.twitter,
+      code: 500,
+      message: error.message,
+    });
   }
 };
 
@@ -94,6 +96,12 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
   if (!lowercaseName || !regexTwitter.test(lowercaseName))
-    return errorHandle(lowercaseName);
+    return errorHandle({
+      address: null,
+      identity: lowercaseName,
+      platform: PlatformType.twitter,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
   return resolveTwitterHandle(lowercaseName);
 }

@@ -1,4 +1,3 @@
-import { NextApiResponse } from "next";
 import { PlatformType } from "./platform";
 
 export type LinksItem = {
@@ -34,16 +33,37 @@ export type HandleNotFoundResponseData = {
   error: string;
 };
 
-export const errorHandle = (handle: string) => {
+interface errorHandleProps {
+  address: string | null;
+  identity: string | null;
+  platform: PlatformType;
+  code: number;
+  message: ErrorMessages;
+  headers?: HeadersInit;
+}
+
+export enum ErrorMessages {
+  notFound = "Not Found",
+  noResolver = "No Resolver Address",
+  invalidResolved = "Invalid ResolvedAddress",
+  notExist = "Does Not Exist",
+  invalidIdentity = "Invalid Identity or Domain",
+  invalidAddr = "Invalid Address",
+}
+
+export const errorHandle = (props: errorHandleProps) => {
   return new Response(
     JSON.stringify({
-      identity: handle,
-      error: "No results",
+      address: props.address,
+      identity: props.identity,
+      platform: props.platform,
+      error: props.message,
     }),
     {
-      status: 404,
+      status: props.code,
       headers: {
         "Cache-Control": "no-store",
+        ...props.headers,
       },
     }
   );
