@@ -204,7 +204,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
-      if (!response || !response?.length)
+      if (!response)
         return errorHandle({
           address,
           identity: handle,
