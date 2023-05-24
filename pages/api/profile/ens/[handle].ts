@@ -204,6 +204,14 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
+      if (!response || !response?.length)
+        return errorHandle({
+          address,
+          identity: handle,
+          platform: PlatformType.ens,
+          code: 404,
+          message: ErrorMessages.notExist,
+        });
       if (response.message) throw new Error(response.message);
       gtext = [response];
       address = response?.resolvedAddress?.id || null;
@@ -367,7 +375,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       platform: PlatformType.ens,
       code: 500,
       message: error.message,
-    })
+    });
   }
 };
 
@@ -383,7 +391,7 @@ export const getENSProfile = async (name: string) => {
       ...commonQueryOptions,
       body: JSON.stringify(payload),
     }).then((res) => res.json());
-    
+
     if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
   } catch (e) {
     return null;
