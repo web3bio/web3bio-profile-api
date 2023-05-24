@@ -2,19 +2,24 @@ import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatfomData, PlatformType } from "@/utils/platform";
-import { regexFarcaster } from "@/utils/regexp";
+import { regexEth, regexFarcaster } from "@/utils/regexp";
+import { isAddress } from "ethers/lib/utils";
 
 export const config = {
   runtime: "edge",
 };
+const enum ParamType {
+  username = "username",
+  connected_address = "connected_address",
+}
 
 const originBase = "https://searchcaster.xyz/api/";
 
 const regexTwitterLink = /(\S*).twitter/i;
 
-const FetchFromOrigin = async (value: string) => {
+const FetchFromOrigin = async (value: string, type: ParamType) => {
   if (!value) return;
-  const res = await fetch(originBase + `profiles?username=${value}`).then(
+  const res = await fetch(originBase + `profiles?${type}=${value}`).then(
     (res) => res.json()
   );
   return res;
@@ -22,7 +27,12 @@ const FetchFromOrigin = async (value: string) => {
 
 const resolveFarcasterHandle = async (handle: string) => {
   try {
-    const response = await FetchFromOrigin(handle);
+    let response;
+    if (isAddress(handle)) {
+      response = await FetchFromOrigin(handle, ParamType.connected_address);
+    } else {
+      response = await FetchFromOrigin(handle, ParamType.username);
+    }
     if (!response || !response.length) {
       return errorHandle({
         address: null,
@@ -88,7 +98,10 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!lowercaseName || !regexFarcaster.test(lowercaseName))
+  if (
+    !lowercaseName ||
+    (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
+  )
     return errorHandle({
       address: null,
       identity: lowercaseName,
