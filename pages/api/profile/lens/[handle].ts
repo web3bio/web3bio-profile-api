@@ -5,10 +5,16 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import _ from "lodash";
-import { GET_PROFILE_LENS } from "@/utils/lens";
+import { getLensProfileQuery } from "@/utils/lens";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatformType, PlatfomData } from "@/utils/platform";
-import { regexLens } from "@/utils/regexp";
+import { regexEth, regexLens } from "@/utils/regexp";
+import { isAddress } from "ethers/lib/utils";
+
+export const enum LensParamType {
+  domain = "domain",
+  address = "address",
+}
 
 export const config = {
   runtime: "edge",
@@ -16,10 +22,12 @@ export const config = {
 };
 const LensGraphQLEndpoint = "https://api.lens.dev/";
 
-export const getLensProfile = async (handle: string) => {
+export const getLensProfile = async (handle: string, type: LensParamType) => {
+  const query = getLensProfileQuery(type);
+
   try {
     const payload = {
-      query: GET_PROFILE_LENS,
+      query,
       variables: {
         handle,
       },
@@ -31,7 +39,11 @@ export const getLensProfile = async (handle: string) => {
         "Content-Type": "application/json",
       },
     }).then((res) => res.json());
-    if (fetchRes) return fetchRes.data.profile;
+
+    if (fetchRes)
+      return fetchRes.data?.[
+        type === LensParamType.address ? "defaultProfile" : "profile"
+      ];
   } catch (e) {
     return null;
   }
@@ -39,7 +51,12 @@ export const getLensProfile = async (handle: string) => {
 
 const resolveNameFromLens = async (handle: string) => {
   try {
-    const response = await getLensProfile(handle);
+    let response;
+    if (isAddress(handle)) {
+      response = await getLensProfile(handle, LensParamType.address);
+    } else {
+      response = await getLensProfile(handle, LensParamType.domain);
+    }
     if (!response) {
       return errorHandle({
         address: null,
@@ -137,7 +154,7 @@ export default async function handler(req: NextApiRequest) {
 
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexLens.test(lowercaseName))
+  if (!regexLens.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
       address: null,
       identity: lowercaseName,
