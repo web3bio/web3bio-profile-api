@@ -19,8 +19,7 @@ const resolverFace = new ethers.utils.Interface(resolverABI);
 
 const isValidEthereumAddress = (address: string) => {
   if (!isAddress(address)) return false; // invalid ethereum address
-  if (address.match(/^0x0*$|^0xdead.*$/)) return false; // empty & burn address
-  if (address == "0x0000000000000000000000000000000000000001") return false; // ethereum test address
+  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
   return true;
 };
 
