@@ -60,9 +60,6 @@ const getENSRecordsQuery = `
       owner{
         id
       }
-      resolvedAddress{
-        id
-      }
     }
   }
 `;
@@ -142,6 +139,7 @@ const resolveENSCoinTypesValue = async (
   name: string,
   coinType: string | number
 ) => {
+  if (!resolverAddress) return null;
   const nodeHash = ethers.utils.namehash(name);
   const { encoder } = formatsByCoinType[coinType];
   const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
@@ -214,8 +212,11 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       if (response.message) throw new Error(response.message);
       gtext = [response];
-      // TODO: NOTE HERE!
-      address = response?.resolvedAddress?.id || response?.owner?.id;
+      address = await resolveENSCoinTypesValue(
+        response?.resolver?.address,
+        handle,
+        60
+      );
       if (!address || !isValidEthereumAddress(address))
         return errorHandle({
           address,
