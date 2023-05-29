@@ -2,6 +2,8 @@ import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
 import { resolveIPFS_URL } from "./ipfs";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 
+const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
+
 export const resolveMediaURL = (url: string) => {
   const ArweaveAssetPrefix = "https://arweave.net/";
   if (!url) return null;
@@ -14,14 +16,9 @@ export const resolveMediaURL = (url: string) => {
 
 export const resolveHandle = (handle: string) => {
   if (!handle) return null;
-  const prefixHttps = "https://";
-  const prefixHttp = "http://";
-  const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
-  if (
-    handle &&
-    (handle.startsWith(prefixHttp) || handle.startsWith(prefixHttps))
-  ) {
-    return domainRegexp.exec(handle)![1].replaceAll("@", "");
+  if (handle && domainRegexp.test(handle)) {
+    const arr = handle.split("/");
+    return arr[arr.length - 1].replaceAll("@", "");
   }
   return handle.replaceAll("@", "");
 };
