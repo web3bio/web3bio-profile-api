@@ -28,4 +28,8 @@ describe("Test For ENS Profile API", () => {
     },
     maxTimeOut
   );
+  it("It should response 200 for guoyu.eth", async () => {
+    const res = await queryClient("/profile/ens/guoyu.eth");
+    expect(res.status).toBe(200);
+  }, 10000);
 });
