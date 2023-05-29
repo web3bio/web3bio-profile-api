@@ -214,17 +214,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       if (response.message) throw new Error(response.message);
       gtext = [response];
-      address = response?.resolvedAddress?.id || null;
-      const owner = response?.owner?.id;
-      if (!address)
-        return errorHandle({
-          address,
-          identity: handle,
-          platform: PlatformType.ens,
-          code: 404,
-          message: owner ? ErrorMessages.noResolver : ErrorMessages.notExist,
-        });
-      if (!isValidEthereumAddress(address)) {
+      // TODO: NOTE HERE!
+      address = response?.resolvedAddress?.id || response?.owner?.id;
+      if (!address || !isValidEthereumAddress(address))
         return errorHandle({
           address,
           identity: handle,
@@ -232,7 +224,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           code: 404,
           message: ErrorMessages.invalidResolved,
         });
-      }
 
       resolverAddress = response?.resolver?.address || null;
     }
