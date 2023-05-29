@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test": "jest",
     "lint": "next lint",
     "cloudflare:build": "npx @cloudflare/next-on-pages --experimental-minify"
   },
@@ -21,6 +22,7 @@
     "eslint-config-next": "13.3.1",
     "ethers": "^5.7.2",
     "graphql": "^15.8.0",
+    "jest": "^29.5.0",
     "lodash": "^4.17.21",
     "next": "13.3.1",
     "react": "18.2.0",
