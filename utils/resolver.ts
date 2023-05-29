@@ -18,7 +18,9 @@ export const resolveHandle = (handle: string) => {
   if (!handle) return null;
   if (handle && domainRegexp.test(handle)) {
     const arr = handle.split("/");
-    return arr[arr.length - 1].replaceAll("@", "");
+    return (
+      handle.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
+    ).replaceAll("@", "");
   }
   return handle.replaceAll("@", "");
 };
