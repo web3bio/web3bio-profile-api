@@ -89,7 +89,7 @@ export default async function handler(req: RequestInterface) {
     return errorHandle({
       address: null,
       identity: lowercaseName,
-      platform: PlatformType.twitter,
+      platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
