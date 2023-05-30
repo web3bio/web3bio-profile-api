@@ -3,7 +3,7 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
-import { resolveTwitterAndETH } from "../[handle]";
+import { resolveTwitterFromETH } from "../[handle]";
 
 export const config = {
   runtime: "edge",
@@ -58,7 +58,7 @@ const resolveTwitterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: await resolveTwitterAndETH(handle),
+      address: await resolveTwitterFromETH(handle),
       identity: resolvedHandle,
       platform: PlatfomData.twitter.key,
       displayName: response.name || resolvedHandle,

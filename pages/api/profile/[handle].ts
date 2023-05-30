@@ -20,31 +20,35 @@ const respondWithCache = (json: string) => {
   });
 };
 
-export const resolveTwitterAndETH = async (twitterHandle: string) => {
+export const resolveETHFromTwitter = async (twitterHandle: string) => {
   const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
   const response = await fetch(endPoint).then((res) => res.json());
   return response?.records?.find((x: any) => x.sns_handle === twitterHandle)
     ?.web3_addr;
 };
 
-const resolveTwitterResponse = async (
-  handle: string,
-  req: RequestInterface
-) => {
-  const ethAddress = await resolveTwitterAndETH(handle);
+export const resolveTwitterFromETH = async (address: string) => {
+  const endPoint = `https://twitter-handler-proxy.r2d2.to/v1/relation/handles?wallet=${address}&isVerified=true`;
+  const response = await fetch(endPoint).then((res) => res.json());
+  return response?.data?.[0];
+};
+
+const universalRespond = async ({
+  twitter,
+  address,
+  url,
+  handle,
+}: {
+  twitter: string;
+  address: string;
+  url: string;
+  handle: string;
+}) => {
   const obj = await Promise.all([
-    fetch(req.nextUrl.origin + `/api/profile/twitter/${handle}`).then((res) =>
-      res.json()
-    ),
-    fetch(req.nextUrl.origin + `/api/profile/ens/${ethAddress}`).then((res) =>
-      res.json()
-    ),
-    fetch(req.nextUrl.origin + `/api/profile/farcaster/${ethAddress}`).then(
-      (res) => res.json()
-    ),
-    fetch(req.nextUrl.origin + `/api/profile/lens/${ethAddress}`).then((res) =>
-      res.json()
-    ),
+    fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
+    fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
+    fetch(url + `/api/profile/farcaster/${address}`).then((res) => res.json()),
+    fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
       return {
@@ -64,10 +68,36 @@ const resolveTwitterResponse = async (
   return respondWithCache(JSON.stringify(obj));
 };
 
+const resolveTwitterResponse = async (
+  handle: string,
+  req: RequestInterface
+) => {
+  const ethAddress = await resolveETHFromTwitter(handle);
+  return await universalRespond({
+    address: ethAddress,
+    twitter: handle,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
+const resolveETHResponse = async (handle: string, req: RequestInterface) => {
+  const twitterHandle = await resolveTwitterFromETH(handle);
+  return await universalRespond({
+    address: handle,
+    twitter: twitterHandle,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
 const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
+  if (regexEth.test(handle)) {
+    return await resolveETHResponse(handle, req);
+  }
   if (regexTwitter.test(handle)) {
     return await resolveTwitterResponse(handle, req);
   }
