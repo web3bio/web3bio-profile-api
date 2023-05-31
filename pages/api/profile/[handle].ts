@@ -53,17 +53,23 @@ const universalRespond = async ({
   address,
   url,
   handle,
+  fallbackData,
 }: {
   twitter: string;
   address: string;
   url: string;
   handle: string;
+  fallbackData?: any;
 }) => {
   const obj = await Promise.all([
     fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
-    fetch(url + `/api/profile/farcaster/${address}`).then((res) => res.json()),
-    fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
+    fallbackData.farcaster ||
+      fetch(url + `/api/profile/farcaster/${address}`).then((res) =>
+        res.json()
+      ),
+    fallbackData.lens ||
+      fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
       return {
@@ -124,13 +130,18 @@ const resolveENSResponse = async (handle: string, req: RequestInterface) => {
 };
 
 const resolveLensResponse = async (handle: string, req: RequestInterface) => {
-  const ethAddress = await resolveETHFromLens(handle);
-  const twitterHandle = await resolveTwitterFromETH(ethAddress);
+  const lensResponse = await fetch(
+    req.nextUrl.origin + `/api/profile/lens/${handle}`
+  ).then((res) => res.json());
+  const twitterHandle = await resolveTwitterFromETH(lensResponse?.address);
   return await universalRespond({
-    address: ethAddress,
+    address: lensResponse?.address,
     twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
+    fallbackData: {
+      lens: lensResponse,
+    },
   });
 };
 
@@ -139,18 +150,19 @@ const resolveFarcasterResponse = async (
   req: RequestInterface
 ) => {
   const resolvedHandle = handle.replace(".farcaster", "");
-  const ethAddress = (
-    await FetchFromFarcasterOrigin(
-      resolvedHandle,
-      FarcasterQueryParamType.username
-    )
-  )?.[0]?.connectedAddress;
-  const twitterHandle = await resolveTwitterFromETH(ethAddress);
+  const farcasterResponse = await fetch(
+    req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
+  ).then((res) => res.json());
+
+  const twitterHandle = await resolveTwitterFromETH(farcasterResponse?.address);
   return await universalRespond({
-    address: ethAddress,
+    address: farcasterResponse?.address,
     twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
+    fallbackData: {
+      farcaster: farcasterResponse,
+    },
   });
 };
 
