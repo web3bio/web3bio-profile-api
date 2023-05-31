@@ -208,7 +208,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
-      resolverAddress = await getResolverAddressFromName(handle);
       if (!response)
         return errorHandle({
           address: null,
@@ -218,6 +217,8 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
           message: ErrorMessages.notExist,
         });
       if (response.message) throw new Error(response.message);
+      resolverAddress = await getResolverAddressFromName(handle);
+
       if (!isValidEthereumAddress(resolverAddress)) {
         return errorHandle({
           address: null,
