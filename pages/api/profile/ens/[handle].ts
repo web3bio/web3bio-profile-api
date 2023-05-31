@@ -110,7 +110,7 @@ const getResolverAddressFromName = async (name: string) => {
     to: ENSRegistryAddress,
     decodeType: "address",
   });
-  return res;
+  return res.toLowerCase();
 };
 
 const resolveNameFromAddress = async (address: string) => {
@@ -121,7 +121,7 @@ const resolveNameFromAddress = async (address: string) => {
       to: ENSReverseRecordsAddress,
       decodeType: "string[]",
     })
-  )?.[0];
+  )?.[0].toLowerCase();
 };
 
 const resolveENSTextValue = async (
@@ -157,7 +157,7 @@ const resolveENSCoinTypesValue = async (
   });
   if (!rr || rr === "0x") return null;
 
-  return encoder(Buffer.from(rr.slice(2), "hex"));
+  return encoder(Buffer.from(rr.slice(2), "hex")).toLowerCase();
 };
 
 const resolveHandleFromURL = async (handle: string | undefined) => {
@@ -230,7 +230,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       }
 
       gtext = [response];
-      address = await resolveENSCoinTypesValue(resolverAddress, handle, 60);
+      address = await resolveENSCoinTypesValue(resolverAddress, handle, CoinType.eth);
       if (!address || !isValidEthereumAddress(address))
         return errorHandle({
           address: null,
