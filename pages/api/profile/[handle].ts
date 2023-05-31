@@ -12,12 +12,6 @@ import {
   getResolverAddressFromName,
   resolveENSCoinTypesValue,
 } from "./ens/[handle]";
-import { resolveETHFromLens } from "./lens/[handle]";
-import {
-  FarcasterQueryParamType,
-  FetchFromFarcasterOrigin,
-} from "./farcaster/[handle]";
-
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -48,6 +42,21 @@ export const resolveTwitterFromETH = async (address: string) => {
   return response?.data?.[0];
 };
 
+const respondEmpty = () => {
+  return new Response(
+    JSON.stringify({
+      total: 0,
+      results: [],
+    }),
+    {
+      status: 404,
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    }
+  );
+};
+
 const universalRespond = async ({
   twitter,
   address,
@@ -64,17 +73,18 @@ const universalRespond = async ({
   const obj = await Promise.all([
     fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
-    fallbackData.farcaster ||
+    fallbackData?.farcaster ||
       fetch(url + `/api/profile/farcaster/${address}`).then((res) =>
         res.json()
       ),
-    fallbackData.lens ||
+    fallbackData?.lens ||
       fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
+      const _res = responses.filter((x) => !x.error);
       return {
-        total: responses.length,
-        results: responses,
+        total: _res.length,
+        results: _res,
       };
     })
     .catch((error) => {
@@ -119,12 +129,13 @@ const resolveENSResponse = async (handle: string, req: RequestInterface) => {
     handle,
     60
   );
+  if (!ethAddress) return respondEmpty();
   const twitterHandle = await resolveTwitterFromETH(ethAddress);
 
   return await universalRespond({
     address: ethAddress,
     twitter: twitterHandle,
-    handle,
+    handle: handle,
     url: req.nextUrl.origin,
   });
 };
@@ -133,6 +144,7 @@ const resolveLensResponse = async (handle: string, req: RequestInterface) => {
   const lensResponse = await fetch(
     req.nextUrl.origin + `/api/profile/lens/${handle}`
   ).then((res) => res.json());
+  if (!lensResponse?.address) return respondEmpty();
   const twitterHandle = await resolveTwitterFromETH(lensResponse?.address);
   return await universalRespond({
     address: lensResponse?.address,
@@ -153,7 +165,7 @@ const resolveFarcasterResponse = async (
   const farcasterResponse = await fetch(
     req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
   ).then((res) => res.json());
-
+  if (!farcasterResponse?.address) return respondEmpty();
   const twitterHandle = await resolveTwitterFromETH(farcasterResponse?.address);
   return await universalRespond({
     address: farcasterResponse?.address,
@@ -170,6 +182,7 @@ const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
+  if (!handle) return respondEmpty();
   if (regexEth.test(handle)) {
     return await resolveETHResponse(handle, req);
   }
