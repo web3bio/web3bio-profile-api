@@ -209,21 +209,18 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       ensDomain = handle;
       const response = await resolveAddressFromName(handle);
       resolverAddress = await getResolverAddressFromName(handle);
-      if (!resolverAddress) {
+      if (!isValidEthereumAddress(resolverAddress)) {
         return errorHandle({
-          address,
+          address: null,
           identity: ensDomain,
           platform: PlatformType.ens,
-          code: 503,
-          message: ErrorMessages.noResolver,
-          headers: {
-            "Retry-After": "30",
-          },
+          code: 404,
+          message: ErrorMessages.invalidResolver,
         });
       }
       if (!response)
         return errorHandle({
-          address,
+          address: null,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
@@ -234,7 +231,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       address = await resolveENSCoinTypesValue(resolverAddress, handle, 60);
       if (!address || !isValidEthereumAddress(address))
         return errorHandle({
-          address,
+          address: null,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
@@ -242,16 +239,13 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         });
     }
 
-    if (!resolverAddress) {
+    if (!isValidEthereumAddress(resolverAddress)) {
       return errorHandle({
-        address,
+        address: null,
         identity: ensDomain,
         platform: PlatformType.ens,
-        code: 503,
-        message: ErrorMessages.noResolver,
-        headers: {
-          "Retry-After": "30",
-        },
+        code: 404,
+        message: ErrorMessages.invalidResolver,
       });
     }
 

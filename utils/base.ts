@@ -44,7 +44,7 @@ interface errorHandleProps {
 
 export enum ErrorMessages {
   notFound = "Not Found",
-  noResolver = "No Resolver Address",
+  invalidResolver = "Invalid Resolver Address",
   invalidResolved = "Invalid ResolvedAddress",
   notExist = "Does Not Exist",
   invalidIdentity = "Invalid Identity or Domain",
