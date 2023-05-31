@@ -7,6 +7,11 @@ import { resolveTwitterFromETH } from "../[handle]";
 
 export const config = {
   runtime: "edge",
+  unstable_allowDynamic: [
+    "**/node_modules/lodash/**/*.js",
+    "**/node_modules/@ensdomain/address-encoder/**/*.js",
+    "**/node_modules/js-sha256/**/*.js",
+  ],
 };
 
 const originBase =

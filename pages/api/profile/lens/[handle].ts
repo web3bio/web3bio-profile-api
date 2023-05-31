@@ -48,10 +48,10 @@ export const getLensProfile = async (handle: string, type: LensParamType) => {
     return null;
   }
 };
-export const resolveETHFromLens = async(lens:string)=>{
-  const  response = await getLensProfile(lens, LensParamType.domain);
-  return response.ownedBy
-}
+export const resolveETHFromLens = async (lens: string) => {
+  const response = await getLensProfile(lens, LensParamType.domain);
+  return response.ownedBy;
+};
 
 const resolveNameFromLens = async (handle: string) => {
   try {
