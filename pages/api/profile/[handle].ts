@@ -1,7 +1,22 @@
 import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns, regexEth, regexTwitter } from "@/utils/regexp";
+import {
+  regexEns,
+  regexEth,
+  regexLens,
+  regexTwitter,
+  universalFarcaster,
+} from "@/utils/regexp";
+import {
+  getResolverAddressFromName,
+  resolveENSCoinTypesValue,
+} from "./ens/[handle]";
+import { resolveETHFromLens } from "./lens/[handle]";
+import {
+  FarcasterQueryParamType,
+  FetchFromFarcasterOrigin,
+} from "./farcaster/[handle]";
 
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
@@ -91,12 +106,69 @@ const resolveETHResponse = async (handle: string, req: RequestInterface) => {
   });
 };
 
+const resolveENSResponse = async (handle: string, req: RequestInterface) => {
+  const resolverAddress = await getResolverAddressFromName(handle);
+  const ethAddress = await resolveENSCoinTypesValue(
+    resolverAddress,
+    handle,
+    60
+  );
+  const twitterHandle = await resolveTwitterFromETH(ethAddress);
+
+  return await universalRespond({
+    address: ethAddress,
+    twitter: twitterHandle,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
+const resolveLensResponse = async (handle: string, req: RequestInterface) => {
+  const ethAddress = await resolveETHFromLens(handle);
+  const twitterHandle = await resolveTwitterFromETH(ethAddress);
+  return await universalRespond({
+    address: ethAddress,
+    twitter: twitterHandle,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
+const resolveFarcasterResponse = async (
+  handle: string,
+  req: RequestInterface
+) => {
+  const resolvedHandle = handle.replace(".farcaster", "");
+  const ethAddress = (
+    await FetchFromFarcasterOrigin(
+      resolvedHandle,
+      FarcasterQueryParamType.username
+    )
+  )?.[0]?.connectedAddress;
+  const twitterHandle = await resolveTwitterFromETH(ethAddress);
+  return await universalRespond({
+    address: ethAddress,
+    twitter: twitterHandle,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
 const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
   if (regexEth.test(handle)) {
     return await resolveETHResponse(handle, req);
+  }
+  if (regexEns.test(handle)) {
+    return await resolveENSResponse(handle, req);
+  }
+  if (regexLens.test(handle)) {
+    return await resolveLensResponse(handle, req);
+  }
+  if (universalFarcaster.test(handle)) {
+    return await resolveFarcasterResponse(handle, req);
   }
   if (regexTwitter.test(handle)) {
     return await resolveTwitterResponse(handle, req);

@@ -102,7 +102,7 @@ const fetchEthereumRPC = async ({
     return null;
   }
 };
-const getResolverAddressFromName = async (name: string) => {
+export const getResolverAddressFromName = async (name: string) => {
   const node = ethers.utils.namehash(name);
   const data = iface.encodeFunctionData("resolver", [node]);
   const res = await fetchEthereumRPC({
@@ -141,7 +141,7 @@ const resolveENSTextValue = async (
 const getENSMetadataAvatar = (domain: string) =>
   "https://metadata.ens.domains/mainnet/avatar/" + domain;
 
-const resolveENSCoinTypesValue = async (
+export const resolveENSCoinTypesValue = async (
   resolverAddress: string,
   name: string,
   coinType: string | number
