@@ -1,6 +1,6 @@
 export const CoinType = {
   btc: 0,
-  ltc: 2,
+  // ltc: 2,
   doge: 3,
   // dash: 5,
   // monacoin: 22,
