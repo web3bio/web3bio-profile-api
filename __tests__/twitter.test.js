@@ -14,6 +14,7 @@ describe("Test For Twitter Profile API", () => {
   it("It should response 200 for vitalik", async () => {
     const res = await queryClient("/profile/twitter/vitalik");
     expect(res.status).toBe(200);
+    const json = await res.json()
     expect(json.identity).toBe("vitalik");
     expect(json.links.twitter.handle).toBe("vitalik");
     expect(json.links.website.handle).toBe("vainer");
