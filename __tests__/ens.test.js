@@ -89,4 +89,12 @@ describe("Test For ENS Profile API", () => {
     const json = await res.json();
     expect(json.error).toBe("Invalid Address");
   });
+  it("It should response 404 for sujiyan.lens", async () => {
+    const res = await queryClient(
+      "/profile/ens/sujiyan.lens"
+    );
+    expect(res.status).toBe(404);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid Identity or Domain");
+  });
 });
