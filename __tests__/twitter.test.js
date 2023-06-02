@@ -11,13 +11,22 @@ describe("Test For Twitter Profile API", () => {
     expect(json.links.twitter.handle).toBe("suji_yan");
     expect(json.links.website.handle).toBe("mask.io");
   });
-  it("It should response 200 for vitalik", async () => {
-    const res = await queryClient("/profile/twitter/vitalik");
+  it("It should response 200 for VitalikButerin", async () => {
+    const res = await queryClient("/profile/twitter/VitalikButerin");
     expect(res.status).toBe(200);
-    const json = await res.json()
-    expect(json.identity).toBe("vitalik");
-    expect(json.links.twitter.handle).toBe("vitalik");
-    expect(json.links.website.handle).toBe("vainer");
+    const json = await res.json();
+    expect(json.identity).toBe("vitalikbuterin");
+    expect(json.links.twitter.handle).toBe("vitalikbuterin");
+    expect(json.displayName).toBe("vitalik.eth");
+    expect(json.links.website.handle).toBe("vitalik.ca");
+  });
+  it("It should response 200 for BrantlyMillegan", async () => {
+    const res = await queryClient("/profile/twitter/BrantlyMillegan");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.identity).toBe("brantlymillegan");
+    expect(json.links.twitter.handle).toBe("brantlymillegan");
+    expect(json.displayName).toBe("brantly.eth");
   });
   it("It should response 404 for null", async () => {
     const res = await queryClient("/profile/twitter/null");

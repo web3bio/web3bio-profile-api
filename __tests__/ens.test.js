@@ -73,14 +73,18 @@ describe("Test For ENS Profile API", () => {
     const json = await res.json();
     expect(json.error).toBe("Not Found");
   });
-  it("It should response 200 for 0x934B510D4C9103E6a87AEf13b816fb080286D649", async () => {
-    const res = await queryClient(
-      "/profile/ens/0x934B510D4C9103E6a87AEf13b816fb080286D649"
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("sujiyan.eth");
-  });
+  it(
+    "It should response 200 for 0x934B510D4C9103E6a87AEf13b816fb080286D649",
+    async () => {
+      const res = await queryClient(
+        "/profile/ens/0x934B510D4C9103E6a87AEf13b816fb080286D649"
+      );
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.identity).toBe("sujiyan.eth");
+    },
+    maxTimeOut
+  );
   it("It should response 404 for 0x000000000000000000000000000000000000dEaD", async () => {
     const res = await queryClient(
       "/profile/ens/0x000000000000000000000000000000000000dEaD"
@@ -90,9 +94,7 @@ describe("Test For ENS Profile API", () => {
     expect(json.error).toBe("Invalid Address");
   });
   it("It should response 404 for sujiyan.lens", async () => {
-    const res = await queryClient(
-      "/profile/ens/sujiyan.lens"
-    );
+    const res = await queryClient("/profile/ens/sujiyan.lens");
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.error).toBe("Invalid Identity or Domain");
