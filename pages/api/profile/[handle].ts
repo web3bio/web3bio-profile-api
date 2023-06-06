@@ -13,13 +13,16 @@ import {
   resolveENSCoinTypesValue,
 } from "./ens/[handle]";
 import { getRelationQuery } from "@/utils/query";
+import { NeighborWithTraversal, ProofRecord } from "@/utils/types";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
 }
 
-const getTranversal = (data: { neighborWithTraversal: any[] }) => {
+const getTranversal = (data: {
+  neighborWithTraversal: NeighborWithTraversal[];
+}) => {
   return data?.neighborWithTraversal.reduce((pre, cur) => {
     pre.push({
       ...cur.from,
@@ -28,15 +31,18 @@ const getTranversal = (data: { neighborWithTraversal: any[] }) => {
       ...cur.to,
     });
     return pre;
-  }, []);
+  }, [] as ProofRecord[]);
 };
 
 const getTwitterHandleRelation = (
-  res: { neighborWithTraversal: any[] },
+  res: { neighborWithTraversal: NeighborWithTraversal[] },
   platformType: PlatformType
 ) => {
-  return getTranversal(res)?.find((x: any) => x.platform === platformType)
-    ?.identity;
+  return (
+    getTranversal(res)?.find(
+      (x: ProofRecord) => x.platform === platformType
+    ) as ProofRecord
+  )?.identity;
 };
 
 const nextidGraphQLEndpoint = "https://relation-service.next.id";
@@ -57,7 +63,7 @@ const respondWithCache = (json: string) => {
 export const resolveETHFromTwitter = async (twitterHandle: string) => {
   const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
   const response = await fetch(endPoint).then((res) => res.json());
-  return response?.records?.find((x: any) => x.sns_handle === twitterHandle)
+  return response?.records?.find((x: { sns_handle: string; }) => x.sns_handle === twitterHandle)
     ?.web3_addr;
 };
 
@@ -117,7 +123,7 @@ const universalRespond = async ({
         address: null,
         identity: handle,
         code: 500,
-        message: error as any,
+        message: error,
         platform: PlatformType.nextid,
       });
     });
