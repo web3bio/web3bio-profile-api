@@ -63,8 +63,9 @@ const respondWithCache = (json: string) => {
 export const resolveETHFromTwitter = async (twitterHandle: string) => {
   const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
   const response = await fetch(endPoint).then((res) => res.json());
-  return response?.records?.find((x: { sns_handle: string; }) => x.sns_handle === twitterHandle)
-    ?.web3_addr;
+  return response?.records?.find(
+    (x: { sns_handle: string }) => x.sns_handle === twitterHandle
+  )?.web3_addr;
 };
 
 export const resolveTwitterFromETH = async (address: string) => {
@@ -331,6 +332,7 @@ export default async function handler(req: RequestInterface) {
       message: ErrorMessages.invalidIdentity,
     });
   // true to use relation service data provider
+  // return resolveUniversalHandle(lowercaseName, req);
   return resolveUniversalHandle(lowercaseName, req, true);
 }
 
