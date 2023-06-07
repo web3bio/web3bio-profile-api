@@ -6,7 +6,7 @@ import {
   regexEth,
   regexLens,
   regexTwitter,
-  universalFarcaster,
+  regexUniversalFarcaster,
 } from "@/utils/regexp";
 import {
   getResolverAddressFromName,
@@ -102,7 +102,7 @@ const universalRespond = async ({
   handle: string;
   fallbackData?: any;
 }) => {
-  const obj = await Promise.all([
+  const obj = await Promise.allSettled([
     fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
     fallbackData?.farcaster ||
@@ -113,7 +113,11 @@ const universalRespond = async ({
       fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
-      const _res = responses.filter((x) => !x.error);
+      const _res = responses
+        .filter(
+          (response) => response.status === "fulfilled" && !response.value.error
+        )
+        .map((response) => (response as PromiseFulfilledResult<any>).value);
       return {
         total: _res.length,
         results: _res,
@@ -243,7 +247,7 @@ const resolveLensResponse = async (
     handle,
     url: req.nextUrl.origin,
     fallbackData: {
-      lens: lensResponse,
+      [PlatformType.lens]: lensResponse,
     },
   });
 };
@@ -253,38 +257,34 @@ const resolveFarcasterResponse = async (
   req: RequestInterface,
   isRelation: boolean
 ) => {
+  const resolvedHandle = handle.replace(".farcaster", "");
   let ethAddress = "";
   let twitterHandle = "";
-  const resolvedHandle = handle.replace(".farcaster", "");
+  let farcasterResponse = null;
   if (isRelation) {
-    const relationRes = (
-      await resolveHandleFromRelationService(
+    const { data } =
+      (await resolveHandleFromRelationService(
         resolvedHandle,
         PlatformType.farcaster
-      )
-    )?.data?.identity;
-    twitterHandle = getTwitterHandleRelation(relationRes, PlatformType.twitter);
-    ethAddress = relationRes.ownedBy.identity;
-    return await universalRespond({
-      address: ethAddress,
-      twitter: twitterHandle,
-      handle,
-      url: req.nextUrl.origin,
-    });
+      )) ?? {};
+    const identity = data?.identity;
+    twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
+    ethAddress = identity?.ownedBy.identity;
+  } else {
+    farcasterResponse = await fetch(
+      req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
+    ).then((res) => res.json());
+    if (!farcasterResponse?.address) return respondEmpty();
+    ethAddress = farcasterResponse?.address;
+    twitterHandle = await resolveTwitterFromETH(ethAddress);
   }
-  const farcasterResponse = await fetch(
-    req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
-  ).then((res) => res.json());
-  if (!farcasterResponse?.address) return respondEmpty();
-  twitterHandle = await resolveTwitterFromETH(farcasterResponse?.address);
+
   return await universalRespond({
-    address: farcasterResponse?.address,
+    address: ethAddress,
     twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
-    fallbackData: {
-      farcaster: farcasterResponse,
-    },
+    fallbackData: { [PlatformType.farcaster]: farcasterResponse },
   });
 };
 
@@ -294,20 +294,30 @@ const resolveUniversalHandle = async (
   isRelation: boolean
 ) => {
   if (!handle) return respondEmpty();
-  if (regexEth.test(handle)) {
-    return await resolveETHResponse(handle, req, isRelation);
-  }
-  if (regexEns.test(handle)) {
-    return await resolveENSResponse(handle, req, isRelation);
-  }
-  if (regexLens.test(handle)) {
-    return await resolveLensResponse(handle, req, isRelation);
-  }
-  if (universalFarcaster.test(handle)) {
-    return await resolveFarcasterResponse(handle, req, isRelation);
-  }
-  if (regexTwitter.test(handle)) {
-    return await resolveTwitterResponse(handle, req, isRelation);
+  const handleResolvers: Record<
+    string,
+    [
+      RegExp,
+      (
+        handle: string,
+        req: RequestInterface,
+        isRelation: boolean
+      ) => Promise<any>
+    ]
+  > = {
+    [PlatformType.ethereum]: [regexEth, resolveETHResponse],
+    [PlatformType.ens]: [regexEns, resolveENSResponse],
+    [PlatformType.lens]: [regexLens, resolveLensResponse],
+    [PlatformType.farcaster]: [
+      regexUniversalFarcaster,
+      resolveFarcasterResponse,
+    ],
+    [PlatformType.twitter]: [regexTwitter, resolveTwitterResponse],
+  };
+  for (const [platform, [regex, resolver]] of Object.entries(handleResolvers)) {
+    if (regex.test(handle)) {
+      return await resolver(handle, req, isRelation);
+    }
   }
 
   return errorHandle({
@@ -320,20 +330,21 @@ const resolveUniversalHandle = async (
 };
 
 export default async function handler(req: RequestInterface) {
-  const { searchParams } = new URL(req.url as string);
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
-  if (!lowercaseName)
+  const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
+  const inputName = searchParams.get("handle")?.toLowerCase() || "";
+
+  if (!inputName) {
     return errorHandle({
       address: null,
-      identity: lowercaseName,
+      identity: inputName,
       platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+  }
   // true to use relation service data provider
   // return resolveUniversalHandle(lowercaseName, req);
-  return resolveUniversalHandle(lowercaseName, req, true);
+  return resolveUniversalHandle(inputName, req, true);
 }
 
 export const config = {
