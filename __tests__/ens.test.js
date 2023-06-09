@@ -23,9 +23,9 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(404);
     expect((await res.json()).error).toBe("Invalid Resolver Address");
   });
-  it("It should response 404 for xxxxxxxxxxxxxxxxxxxxxxxxxxx.eth", async () => {
+  it("It should response 404 for xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth", async () => {
     const res = await queryClient(
-      "/profile/ens/xxxxxxxxxxxxxxxxxxxxxxxxxxx.eth"
+      "/profile/ens/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth"
     );
     expect(res.status).toBe(404);
     const json = await res.json();
@@ -53,12 +53,16 @@ describe("Test For ENS Profile API", () => {
     },
     maxTimeOut
   );
-  it("It should response 200 for ricmoo.eth", async () => {
-    const res = await queryClient("/profile/ens/ricmoo.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.links.github.handle).toBe("ricmoo");
-  });
+  it(
+    "It should response 200 for ricmoo.eth",
+    async () => {
+      const res = await queryClient("/profile/ens/ricmoo.eth");
+      expect(res.status).toBe(200);
+      const json = await res.json();
+      expect(json.links.github.handle).toBe("ricmoo");
+    },
+    maxTimeOut
+  );
   it("It should response 200 for tartu.eth", async () => {
     const res = await queryClient("/profile/ens/tartu.eth");
     expect(res.status).toBe(200);

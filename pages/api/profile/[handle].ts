@@ -205,8 +205,7 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
-    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved
-        .identity
+    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
 
   if (!ethAddress) return respondEmpty();

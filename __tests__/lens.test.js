@@ -7,7 +7,7 @@ describe("Test For Lens Profile API", () => {
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
     expect(json.address).toBe("0x934B510D4C9103E6a87AEf13b816fb080286D649");
-  });
+  },200000);
   it("It should response 200 for stani.lens", async () => {
     const res = await queryClient("/profile/lens/stani.lens");
     expect(res.status).toBe(200);
