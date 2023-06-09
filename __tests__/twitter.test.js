@@ -1,7 +1,5 @@
 import { queryClient } from "../utils/test-utils";
 
-const maxTimeOut = 10000;
-
 describe("Test For Twitter Profile API", () => {
   it("It should response 200 for suji_yan", async () => {
     const res = await queryClient("/profile/twitter/suji_yan");

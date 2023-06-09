@@ -1,6 +1,5 @@
 import { queryClient } from "../utils/test-utils";
 
-const maxTimeOut = 200000;
 describe("Test For Universal Profile API", () => {
   it(
     "It should response 200 for sujiyan.eth",
@@ -13,7 +12,6 @@ describe("Test For Universal Profile API", () => {
           json.results?.find((x) => x.platform === "ENS")?.address
       );
     },
-    maxTimeOut
   );
   it(
     "It should response empty data for mcdonalds.eth",
@@ -23,7 +21,6 @@ describe("Test For Universal Profile API", () => {
       const json = await res.json();
       expect(json.total).toBe(0);
     },
-    maxTimeOut
   );
   it(
     "It should response 200 data for stani.lens",
@@ -39,7 +36,6 @@ describe("Test For Universal Profile API", () => {
       console.log(json, json2, "response");
       expect(json.total).toBe(json2.total);
     },
-    maxTimeOut
   );
   it(
     "It should response 200 data for brantly.eth",
@@ -58,6 +54,5 @@ describe("Test For Universal Profile API", () => {
       expect(links.length).toBe(6);
       expect(isValidHandle).toBe(true);
     },
-    maxTimeOut
   );
 });
