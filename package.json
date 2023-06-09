@@ -4,11 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn jest && next build",
+    "build": "next build",
     "start": "next start",
     "test": "jest",
-    "lint": "next lint",
-    "cloudflare:build": "npx @cloudflare/next-on-pages --experimental-minify"
+    "lint": "next lint"
   },
   "dependencies": {
     "@dotbit/plugin-avatar": "^0.0.1",
