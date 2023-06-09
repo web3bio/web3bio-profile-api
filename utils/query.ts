@@ -8,62 +8,100 @@ export const getRelationQuery = (handle: string) => {
 const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
   domain(domainSystem: $platform, name: $identity) {
-    source
-    system
-    name
-    fetcher
-    resolved {
-      identity
-      platform
-      displayName
-      neighborWithTraversal(depth: 5) {
-          source
-          from {
-            uuid
-            platform
-            identity
-            displayName
-          }
-          to {
-            uuid
-            platform
-            identity
-            displayName
-          }
-      }
-    }
-  }
+		source
+		system
+		name
+		fetcher
+		resolved {
+			identity
+			platform
+			displayName
+			neighborWithTraversal(depth: 5) {
+				...on ProofRecord {
+					__typename
+					source
+					from {
+						uuid
+						platform
+						identity
+						displayName
+					}
+					to {
+						uuid
+						platform
+						identity
+						displayName
+					}
+				}
+				...on HoldRecord {
+					__typename
+					source
+					from {
+						uuid
+						platform
+						identity
+						displayName
+					}
+					to {
+						uuid
+						platform
+						identity
+						displayName
+					}
+				}
+			}
+		}
+	}
 }
 `;
 
 export const GET_PROFILES_QUERY = `
-  query GET_PROFILES_QUERY($platform: String, $identity: String) {
-    identity(platform: $platform, identity: $identity) {
+query GET_PROFILES_QUERY($platform: String, $identity: String) {
+  identity(platform: $platform, identity: $identity) {
+    platform
+    identity
+    displayName
+    uuid
+    ownedBy {
+      uuid
       platform
       identity
       displayName
-      uuid
-      ownedBy {
-        uuid
-        platform
-        identity
-        displayName
+    }
+    neighborWithTraversal(depth: 5) {
+      ...on ProofRecord {
+        __typename
+        source
+        from {
+          uuid
+          platform
+          identity
+          displayName
+        }
+        to {
+          uuid
+          platform
+          identity
+          displayName
+        }
       }
-      neighborWithTraversal(depth: 5) {
-          source
-          from {
-            uuid
-            platform
-            identity
-            displayName
-          }
-          to {
-            uuid
-            platform
-            identity
-            displayName
-          }
+      ...on HoldRecord {
+        __typename
+        source
+        from {
+          uuid
+          platform
+          identity
+          displayName
+        }
+        to {
+          uuid
+          platform
+          identity
+          displayName
+        }
       }
     }
   }
+}
 `;
