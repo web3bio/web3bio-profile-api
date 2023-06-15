@@ -3,9 +3,15 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatfomData, PlatformType } from "@/utils/platform";
 import { regexTwitter } from "@/utils/regexp";
+import { resolveTwitterFromETH } from "../[handle]";
 
 export const config = {
   runtime: "edge",
+  unstable_allowDynamic: [
+    "**/node_modules/lodash/**/*.js",
+    "**/node_modules/@ensdomain/address-encoder/**/*.js",
+    "**/node_modules/js-sha256/**/*.js",
+  ],
 };
 
 const originBase =
@@ -57,7 +63,7 @@ const resolveTwitterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: null,
+      address: (await resolveTwitterFromETH(handle)) || null,
       identity: resolvedHandle,
       platform: PlatfomData.twitter.key,
       displayName: response.name || resolvedHandle,
