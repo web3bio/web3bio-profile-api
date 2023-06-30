@@ -8,6 +8,11 @@ const nextConfig = {
       destination: "/:path*",
       permanent: true,
     },
+    {
+      source: "/api",
+      destination: "/",
+      permanent:true
+    },
   ],
   rewrites: async () => ({
     beforeFiles: [
