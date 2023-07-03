@@ -2,6 +2,7 @@ import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
+  regexAvatar,
   regexEns,
   regexEth,
   regexLens,
@@ -45,7 +46,9 @@ const getTwitterHandleRelation = (
   )?.identity;
 };
 
-const nextidGraphQLEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_SERVER || 'https://relation-service-tiger.next.id'
+const nextidGraphQLEndpoint =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
+  "https://relation-service-tiger.next.id";
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id'
 
@@ -168,14 +171,18 @@ const resolveHandleFromRelationService = async (
       identity: handle,
     },
   };
-
   const fetchRes = await fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
+  })
+    .then((res) => res.json())
+    .catch((e) => {
+      console.log(e, "error");
+      return null;
+    });
   return fetchRes;
 };
 
@@ -205,7 +212,8 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
-    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved?.identity
+    ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
+        ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
 
   if (!ethAddress) return respondEmpty();
@@ -248,6 +256,54 @@ const resolveLensResponse = async (
     fallbackData: {
       [PlatformType.lens]: lensResponse,
     },
+  });
+};
+
+interface Neighbour {
+  from: NeighbourDetail;
+  to: NeighbourDetail;
+}
+interface NeighbourDetail {
+  platform: PlatformType;
+  identity: string;
+  uuid: string;
+  displayName: string;
+}
+
+const resolveAvatarResponse = async (
+  handle: string,
+  req: RequestInterface,
+  isRelation: boolean
+) => {
+  const responseFromRelation = await resolveHandleFromRelationService(
+    handle,
+    PlatformType.nextid
+  );
+  if (!responseFromRelation?.neighborWithTraversal) return respondEmpty();
+  const neighbours = responseFromRelation.neighborWithTraversal?.reduce(
+    (pre: NeighbourDetail[], cur: Neighbour) => {
+      pre.push({
+        ...cur.from,
+      });
+      pre.push({
+        ...cur.to,
+      });
+      return pre;
+    },
+    []
+  );
+  console.log(neighbours, "relation neighbours");
+  const address = neighbours?.find(
+    (x: NeighbourDetail) => x.platform === PlatformType.ethereum
+  )?.identity;
+  const twitter = neighbours?.find(
+    (x: NeighbourDetail) => x.platform === PlatformType.twitter
+  )?.identity;
+  return await universalRespond({
+    address,
+    twitter,
+    handle,
+    url: req.nextUrl.origin,
   });
 };
 
@@ -304,6 +360,7 @@ const resolveUniversalHandle = async (
       ) => Promise<any>
     ]
   > = {
+    [PlatformType.nextid]: [regexAvatar, resolveAvatarResponse],
     [PlatformType.ethereum]: [regexEth, resolveETHResponse],
     [PlatformType.ens]: [regexEns, resolveENSResponse],
     [PlatformType.lens]: [regexLens, resolveLensResponse],
@@ -331,7 +388,6 @@ const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-
   if (!inputName) {
     return errorHandle({
       address: null,
