@@ -78,18 +78,12 @@ export const resolveTwitterFromETH = async (address: string) => {
 };
 
 const respondEmpty = () => {
-  return new Response(
-    JSON.stringify({
-      total: 0,
-      results: [],
-    }),
-    {
-      status: 404,
-      headers: {
-        "Cache-Control": "no-store",
-      },
-    }
-  );
+  return new Response(JSON.stringify([]), {
+    status: 404,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
 };
 
 const universalRespond = async ({
@@ -116,15 +110,11 @@ const universalRespond = async ({
       fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
-      const _res = responses
+      return responses
         .filter(
           (response) => response.status === "fulfilled" && !response.value.error
         )
         .map((response) => (response as PromiseFulfilledResult<any>).value);
-      return {
-        total: _res.length,
-        results: _res,
-      };
     })
     .catch((error) => {
       return errorHandle({
@@ -279,8 +269,8 @@ const resolveAvatarResponse = async (
     handle,
     PlatformType.nextid
   );
-  if (!responseFromRelation?.neighborWithTraversal) return respondEmpty();
-  const neighbours = responseFromRelation.neighborWithTraversal?.reduce(
+  if (!responseFromRelation?.data?.identity?.neighborWithTraversal) return respondEmpty();
+  const neighbours = responseFromRelation.data.identity.neighborWithTraversal?.reduce(
     (pre: NeighbourDetail[], cur: Neighbour) => {
       pre.push({
         ...cur.from,
@@ -292,7 +282,6 @@ const resolveAvatarResponse = async (
     },
     []
   );
-  console.log(neighbours, "relation neighbours");
   const address = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.ethereum
   )?.identity;
