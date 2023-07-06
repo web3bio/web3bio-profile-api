@@ -26,7 +26,7 @@ const getPlatformHandleFromRelation = (
   platformType: PlatformType
 ) => {
   return (
-    res.find((x) => x.identity.platform === platformType)?.identity.identity ||
+    res?.find((x) => x.identity.platform === platformType)?.identity.identity ||
     ""
   );
 };
@@ -66,7 +66,10 @@ const universalRespond = async ({
   address: string;
   url: string;
   handle: string;
-  fallbackData?: any;
+  fallbackData?: {
+    [PlatformType.farcaster]?: Response;
+    [PlatformType.lens]?: Response;
+  };
 }) => {
   const obj = await Promise.allSettled([
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
@@ -82,7 +85,9 @@ const universalRespond = async ({
         .filter(
           (response) => response.status === "fulfilled" && !response.value.error
         )
-        .map((response) => (response as PromiseFulfilledResult<any>).value);
+        .map(
+          (response) => (response as PromiseFulfilledResult<Response>).value
+        );
     })
     .catch((error) => {
       return errorHandle({
@@ -128,13 +133,15 @@ const resolveHandleFromRelationService = async (
   const fetchRes = await fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify(payload),
+    headers: {
+      "Cache-Control": "cache",
+    },
   })
     .then((res) => res.json())
     .catch((e) => {
       console.log(e, "error");
       return null;
     });
-  console.log(fetchRes, "relation response");
   return fetchRes;
 };
 
@@ -188,7 +195,7 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   );
   if (!responseFromRelation?.data.identity.neighbor) return respondEmpty();
   const neighbours = responseFromRelation.data.identity.neighbor?.map(
-    (x: { identity: any }) => {
+    (x: { identity: NeighbourDetail }) => {
       return {
         ...x.identity,
       };
@@ -210,21 +217,20 @@ const resolveFarcasterResponse = async (
   req: RequestInterface
 ) => {
   const resolvedHandle = handle.replace(".farcaster", "");
-  let ethAddress = "";
-  let farcasterResponse = null;
-  const { data } =
-    (await resolveHandleFromRelationService(
-      resolvedHandle,
-      PlatformType.farcaster
-    )) ?? {};
-  const identity = data?.identity;
-  ethAddress = identity?.ownedBy.identity;
-
+  const ethAddress = getPlatformHandleFromRelation(
+    (
+      await resolveHandleFromRelationService(
+        resolvedHandle,
+        PlatformType.farcaster
+      )
+    )?.data?.identity.neighbor,
+    PlatformType.ethereum
+  );
+  if (!ethAddress) return respondEmpty();
   return await universalRespond({
     address: ethAddress,
     handle,
     url: req.nextUrl.origin,
-    fallbackData: { [PlatformType.farcaster]: farcasterResponse },
   });
 };
 
@@ -242,7 +248,7 @@ const resolveUniversalHandle = async (
         handle: string,
         req: RequestInterface,
         isRelation: boolean
-      ) => Promise<any>
+      ) => Promise<Response>
     ]
   > = {
     [PlatformType.nextid]: [regexAvatar, resolveAvatarResponse],
@@ -260,7 +266,6 @@ const resolveUniversalHandle = async (
       return await resolver(handle, req, isRelation);
     }
   }
-
   return errorHandle({
     address: null,
     identity: handle,
