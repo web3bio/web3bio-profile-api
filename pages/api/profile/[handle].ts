@@ -2,6 +2,7 @@ import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
+  regexAvatar,
   regexEns,
   regexEth,
   regexLens,
@@ -45,7 +46,9 @@ const getTwitterHandleRelation = (
   )?.identity;
 };
 
-const nextidGraphQLEndpoint = process.env.NEXT_PUBLIC_GRAPHQL_SERVER || 'https://relation-service-tiger.next.id'
+const nextidGraphQLEndpoint =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
+  "https://relation-service-tiger.next.id";
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id'
 
@@ -60,33 +63,13 @@ const respondWithCache = (json: string) => {
   });
 };
 
-export const resolveETHFromTwitter = async (twitterHandle: string) => {
-  const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
-  const response = await fetch(endPoint).then((res) => res.json());
-  return response?.records?.find(
-    (x: { sns_handle: string }) => x.sns_handle === twitterHandle
-  )?.web3_addr;
-};
-
-export const resolveTwitterFromETH = async (address: string) => {
-  const endPoint = `https://twitter-handler-proxy.r2d2.to/v1/relation/handles?wallet=${address}&isVerified=true`;
-  const response = await fetch(endPoint).then((res) => res.json());
-  return response?.data?.[0];
-};
-
 const respondEmpty = () => {
-  return new Response(
-    JSON.stringify({
-      total: 0,
-      results: [],
-    }),
-    {
-      status: 404,
-      headers: {
-        "Cache-Control": "no-store",
-      },
-    }
-  );
+  return new Response(JSON.stringify([]), {
+    status: 404,
+    headers: {
+      "Cache-Control": "no-store",
+    },
+  });
 };
 
 const universalRespond = async ({
@@ -103,7 +86,6 @@ const universalRespond = async ({
   fallbackData?: any;
 }) => {
   const obj = await Promise.allSettled([
-    fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
     fallbackData?.farcaster ||
       fetch(url + `/api/profile/farcaster/${address}`).then((res) =>
@@ -113,15 +95,11 @@ const universalRespond = async ({
       fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
   ])
     .then((responses) => {
-      const _res = responses
+      return responses
         .filter(
           (response) => response.status === "fulfilled" && !response.value.error
         )
         .map((response) => (response as PromiseFulfilledResult<any>).value);
-      return {
-        total: _res.length,
-        results: _res,
-      };
     })
     .catch((error) => {
       return errorHandle({
@@ -137,15 +115,12 @@ const universalRespond = async ({
 
 const resolveTwitterResponse = async (
   handle: string,
-  req: RequestInterface,
-  isRelation: boolean
+  req: RequestInterface
 ) => {
-  const ethAddress = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle))?.data.identity,
-        PlatformType.ethereum
-      )
-    : await resolveETHFromTwitter(handle);
+  const ethAddress = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle))?.data?.identity,
+    PlatformType.ethereum
+  );
 
   return await universalRespond({
     address: ethAddress,
@@ -168,28 +143,27 @@ const resolveHandleFromRelationService = async (
       identity: handle,
     },
   };
-
   const fetchRes = await fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify(payload),
     headers: {
       "Content-Type": "application/json",
     },
-  }).then((res) => res.json());
+  })
+    .then((res) => res.json())
+    .catch((e) => {
+      console.log(e, "error");
+      return null;
+    });
   return fetchRes;
 };
 
-const resolveETHResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.identity,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(handle);
+const resolveETHResponse = async (handle: string, req: RequestInterface) => {
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle))?.data?.identity,
+    PlatformType.twitter
+  );
+
   return await universalRespond({
     address: handle,
     twitter: twitterHandle,
@@ -205,16 +179,14 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
-    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved?.identity
+    ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
+        ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
-
   if (!ethAddress) return respondEmpty();
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.domain.resolved,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(ethAddress);
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle)).data.domain.resolved,
+    PlatformType.twitter
+  );
 
   return await universalRespond({
     address: ethAddress,
@@ -224,21 +196,15 @@ const resolveENSResponse = async (
   });
 };
 
-const resolveLensResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
+const resolveLensResponse = async (handle: string, req: RequestInterface) => {
   const lensResponse = await fetch(
     req.nextUrl.origin + `/api/profile/lens/${handle}`
   ).then((res) => res.json());
   if (!lensResponse?.address) return respondEmpty();
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.domain.resolved,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(lensResponse?.address);
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle))?.data.domain.resolved,
+    PlatformType.twitter
+  );
 
   return await universalRespond({
     address: lensResponse?.address,
@@ -251,32 +217,71 @@ const resolveLensResponse = async (
   });
 };
 
+interface Neighbour {
+  from: NeighbourDetail;
+  to: NeighbourDetail;
+}
+interface NeighbourDetail {
+  platform: PlatformType;
+  identity: string;
+  uuid: string;
+  displayName: string;
+}
+
+const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
+  const responseFromRelation = await resolveHandleFromRelationService(
+    handle,
+    PlatformType.nextid
+  );
+  if (!responseFromRelation?.data.identity.neighborWithTraversal)
+    return respondEmpty();
+  const neighbours =
+    responseFromRelation.data.identity.neighborWithTraversal?.reduce(
+      (pre: NeighbourDetail[], cur: Neighbour) => {
+        if (!pre.find((x) => x.uuid === cur.from.uuid)) {
+          pre.push({
+            ...cur.from,
+          });
+        }
+        if (!pre.find((x) => x.uuid === cur.to.uuid)) {
+          pre.push({
+            ...cur.to,
+          });
+        }
+        return pre;
+      },
+      []
+    );
+  const address = neighbours?.find(
+    (x: NeighbourDetail) => x.platform === PlatformType.ethereum
+  )?.identity;
+  const twitter = neighbours?.find(
+    (x: NeighbourDetail) => x.platform === PlatformType.twitter
+  )?.identity;
+  return await universalRespond({
+    address,
+    twitter,
+    handle,
+    url: req.nextUrl.origin,
+  });
+};
+
 const resolveFarcasterResponse = async (
   handle: string,
-  req: RequestInterface,
-  isRelation: boolean
+  req: RequestInterface
 ) => {
   const resolvedHandle = handle.replace(".farcaster", "");
   let ethAddress = "";
   let twitterHandle = "";
   let farcasterResponse = null;
-  if (isRelation) {
-    const { data } =
-      (await resolveHandleFromRelationService(
-        resolvedHandle,
-        PlatformType.farcaster
-      )) ?? {};
-    const identity = data?.identity;
-    twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
-    ethAddress = identity?.ownedBy.identity;
-  } else {
-    farcasterResponse = await fetch(
-      req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
-    ).then((res) => res.json());
-    if (!farcasterResponse?.address) return respondEmpty();
-    ethAddress = farcasterResponse?.address;
-    twitterHandle = await resolveTwitterFromETH(ethAddress);
-  }
+  const { data } =
+    (await resolveHandleFromRelationService(
+      resolvedHandle,
+      PlatformType.farcaster
+    )) ?? {};
+  const identity = data?.identity;
+  twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
+  ethAddress = identity?.ownedBy.identity;
 
   return await universalRespond({
     address: ethAddress,
@@ -304,6 +309,7 @@ const resolveUniversalHandle = async (
       ) => Promise<any>
     ]
   > = {
+    [PlatformType.nextid]: [regexAvatar, resolveAvatarResponse],
     [PlatformType.ethereum]: [regexEth, resolveETHResponse],
     [PlatformType.ens]: [regexEns, resolveENSResponse],
     [PlatformType.lens]: [regexLens, resolveLensResponse],
@@ -331,7 +337,6 @@ const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-
   if (!inputName) {
     return errorHandle({
       address: null,
