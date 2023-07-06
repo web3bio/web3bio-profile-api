@@ -63,24 +63,6 @@ const respondWithCache = (json: string) => {
   });
 };
 
-export const resolveETHFromTwitter = async (twitterHandle: string) => {
-  const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
-  const response = await fetch(endPoint)
-    .then((res) => res.json())
-    .catch((e) => null);
-  return response?.records?.find(
-    (x: { sns_handle: string }) => x.sns_handle === twitterHandle
-  )?.web3_addr;
-};
-
-export const resolveTwitterFromETH = async (address: string) => {
-  const endPoint = `https://twitter-handler-proxy.r2d2.to/v1/relation/handles?wallet=${address}&isVerified=true`;
-  const response = await fetch(endPoint)
-    .then((res) => res.json())
-    .catch((e) => null);
-  return response?.data?.[0];
-};
-
 const respondEmpty = () => {
   return new Response(JSON.stringify([]), {
     status: 404,
@@ -133,15 +115,12 @@ const universalRespond = async ({
 
 const resolveTwitterResponse = async (
   handle: string,
-  req: RequestInterface,
-  isRelation: boolean
+  req: RequestInterface
 ) => {
-  const ethAddress = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle))?.data.identity,
-        PlatformType.ethereum
-      )
-    : await resolveETHFromTwitter(handle);
+  const ethAddress = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle))?.data.identity,
+    PlatformType.ethereum
+  );
 
   return await universalRespond({
     address: ethAddress,
@@ -179,17 +158,12 @@ const resolveHandleFromRelationService = async (
   return fetchRes;
 };
 
-const resolveETHResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.identity,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(handle);
+const resolveETHResponse = async (handle: string, req: RequestInterface) => {
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle)).data.identity,
+    PlatformType.twitter
+  );
+
   return await universalRespond({
     address: handle,
     twitter: twitterHandle,
@@ -210,12 +184,10 @@ const resolveENSResponse = async (
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
 
   if (!ethAddress) return respondEmpty();
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.domain.resolved,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(ethAddress);
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle)).data.domain.resolved,
+    PlatformType.twitter
+  );
 
   return await universalRespond({
     address: ethAddress,
@@ -225,21 +197,15 @@ const resolveENSResponse = async (
   });
 };
 
-const resolveLensResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
+const resolveLensResponse = async (handle: string, req: RequestInterface) => {
   const lensResponse = await fetch(
     req.nextUrl.origin + `/api/profile/lens/${handle}`
   ).then((res) => res.json());
   if (!lensResponse?.address) return respondEmpty();
-  const twitterHandle = isRelation
-    ? getTwitterHandleRelation(
-        (await resolveHandleFromRelationService(handle)).data.domain.resolved,
-        PlatformType.twitter
-      )
-    : await resolveTwitterFromETH(lensResponse?.address);
+  const twitterHandle = getTwitterHandleRelation(
+    (await resolveHandleFromRelationService(handle)).data.domain.resolved,
+    PlatformType.twitter
+  );
 
   return await universalRespond({
     address: lensResponse?.address,
@@ -263,28 +229,26 @@ interface NeighbourDetail {
   displayName: string;
 }
 
-const resolveAvatarResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
+const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     PlatformType.nextid
   );
-  if (!responseFromRelation?.data?.identity?.neighborWithTraversal) return respondEmpty();
-  const neighbours = responseFromRelation.data.identity.neighborWithTraversal?.reduce(
-    (pre: NeighbourDetail[], cur: Neighbour) => {
-      pre.push({
-        ...cur.from,
-      });
-      pre.push({
-        ...cur.to,
-      });
-      return pre;
-    },
-    []
-  );
+  if (!responseFromRelation?.data?.identity?.neighborWithTraversal)
+    return respondEmpty();
+  const neighbours =
+    responseFromRelation.data.identity.neighborWithTraversal?.reduce(
+      (pre: NeighbourDetail[], cur: Neighbour) => {
+        pre.push({
+          ...cur.from,
+        });
+        pre.push({
+          ...cur.to,
+        });
+        return pre;
+      },
+      []
+    );
   const address = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.ethereum
   )?.identity;
@@ -301,30 +265,20 @@ const resolveAvatarResponse = async (
 
 const resolveFarcasterResponse = async (
   handle: string,
-  req: RequestInterface,
-  isRelation: boolean
+  req: RequestInterface
 ) => {
   const resolvedHandle = handle.replace(".farcaster", "");
   let ethAddress = "";
   let twitterHandle = "";
   let farcasterResponse = null;
-  if (isRelation) {
-    const { data } =
-      (await resolveHandleFromRelationService(
-        resolvedHandle,
-        PlatformType.farcaster
-      )) ?? {};
-    const identity = data?.identity;
-    twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
-    ethAddress = identity?.ownedBy.identity;
-  } else {
-    farcasterResponse = await fetch(
-      req.nextUrl.origin + `/api/profile/farcaster/${resolvedHandle}`
-    ).then((res) => res.json());
-    if (!farcasterResponse?.address) return respondEmpty();
-    ethAddress = farcasterResponse?.address;
-    twitterHandle = await resolveTwitterFromETH(ethAddress);
-  }
+  const { data } =
+    (await resolveHandleFromRelationService(
+      resolvedHandle,
+      PlatformType.farcaster
+    )) ?? {};
+  const identity = data?.identity;
+  twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
+  ethAddress = identity?.ownedBy.identity;
 
   return await universalRespond({
     address: ethAddress,
