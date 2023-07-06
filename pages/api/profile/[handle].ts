@@ -14,7 +14,7 @@ import {
   resolveENSCoinTypesValue,
 } from "./ens/[handle]";
 import { getRelationQuery } from "@/utils/query";
-import { Neighbor } from "@/utils/types";
+import { Neighbor, NeighbourDetail } from "@/utils/types";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -25,7 +25,10 @@ const getPlatformHandleFromRelation = (
   res: Neighbor[],
   platformType: PlatformType
 ) => {
-  return res.find(x=>x.identity.platform === platformType)?.identity.identity || ''
+  return (
+    res.find((x) => x.identity.platform === platformType)?.identity.identity ||
+    ""
+  );
 };
 
 const nextidGraphQLEndpoint =
@@ -131,7 +134,7 @@ const resolveHandleFromRelationService = async (
       console.log(e, "error");
       return null;
     });
-  console.log(fetchRes,'relation response')
+  console.log(fetchRes, "relation response");
   return fetchRes;
 };
 
@@ -178,30 +181,19 @@ const resolveLensResponse = async (handle: string, req: RequestInterface) => {
   });
 };
 
-interface Neighbour {
-  from: NeighbourDetail;
-  to: NeighbourDetail;
-}
-interface NeighbourDetail {
-  platform: PlatformType;
-  identity: string;
-  uuid: string;
-  displayName: string;
-}
-
 const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     PlatformType.nextid
   );
-  if (!responseFromRelation?.data.identity.neighbor)
-    return respondEmpty();
-  const neighbours =
-    responseFromRelation.data.identity.neighbor?.map((x: { identity: any; })=>{
+  if (!responseFromRelation?.data.identity.neighbor) return respondEmpty();
+  const neighbours = responseFromRelation.data.identity.neighbor?.map(
+    (x: { identity: any }) => {
       return {
-        ...x.identity
-      }
-    })
+        ...x.identity,
+      };
+    }
+  );
   const address = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.ethereum
   )?.identity;
