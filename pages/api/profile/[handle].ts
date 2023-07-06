@@ -14,36 +14,18 @@ import {
   resolveENSCoinTypesValue,
 } from "./ens/[handle]";
 import { getRelationQuery } from "@/utils/query";
-import { NeighborWithTraversal, ProofRecord } from "@/utils/types";
+import { Neighbor } from "@/utils/types";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
 }
 
-const getTranversal = (data: {
-  neighborWithTraversal: NeighborWithTraversal[];
-}) => {
-  return data?.neighborWithTraversal.reduce((pre, cur) => {
-    pre.push({
-      ...cur.from,
-    });
-    pre.push({
-      ...cur.to,
-    });
-    return pre;
-  }, [] as ProofRecord[]);
-};
-
-const getTwitterHandleRelation = (
-  res: { neighborWithTraversal: NeighborWithTraversal[] },
+const getPlatformHandleFromRelation = (
+  res: Neighbor[],
   platformType: PlatformType
 ) => {
-  return (
-    getTranversal(res)?.find(
-      (x: ProofRecord) => x.platform === platformType
-    ) as ProofRecord
-  )?.identity;
+  return res.find(x=>x.identity.platform === platformType)?.identity.identity || 
 };
 
 const nextidGraphQLEndpoint =
@@ -73,13 +55,11 @@ const respondEmpty = () => {
 };
 
 const universalRespond = async ({
-  twitter,
   address,
   url,
   handle,
   fallbackData,
 }: {
-  twitter: string;
   address: string;
   url: string;
   handle: string;
@@ -117,14 +97,13 @@ const resolveTwitterResponse = async (
   handle: string,
   req: RequestInterface
 ) => {
-  const ethAddress = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle))?.data?.identity,
+  const ethAddress = getPlatformHandleFromRelation(
+    (await resolveHandleFromRelationService(handle))?.data?.identity.neighbor,
     PlatformType.ethereum
   );
 
   return await universalRespond({
     address: ethAddress,
-    twitter: handle,
     handle,
     url: req.nextUrl.origin,
   });
@@ -146,27 +125,19 @@ const resolveHandleFromRelationService = async (
   const fetchRes = await fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify(payload),
-    headers: {
-      "Content-Type": "application/json",
-    },
   })
     .then((res) => res.json())
     .catch((e) => {
       console.log(e, "error");
       return null;
     });
+  console.log(fetchRes,'relation response')
   return fetchRes;
 };
 
 const resolveETHResponse = async (handle: string, req: RequestInterface) => {
-  const twitterHandle = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle))?.data?.identity,
-    PlatformType.twitter
-  );
-
   return await universalRespond({
     address: handle,
-    twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
   });
@@ -183,14 +154,9 @@ const resolveENSResponse = async (
         ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
   if (!ethAddress) return respondEmpty();
-  const twitterHandle = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle)).data.domain.resolved,
-    PlatformType.twitter
-  );
 
   return await universalRespond({
     address: ethAddress,
-    twitter: twitterHandle,
     handle: handle,
     url: req.nextUrl.origin,
   });
@@ -201,14 +167,9 @@ const resolveLensResponse = async (handle: string, req: RequestInterface) => {
     req.nextUrl.origin + `/api/profile/lens/${handle}`
   ).then((res) => res.json());
   if (!lensResponse?.address) return respondEmpty();
-  const twitterHandle = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle))?.data.domain.resolved,
-    PlatformType.twitter
-  );
 
   return await universalRespond({
     address: lensResponse?.address,
-    twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
     fallbackData: {
@@ -233,34 +194,20 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
     handle,
     PlatformType.nextid
   );
-  if (!responseFromRelation?.data.identity.neighborWithTraversal)
+  if (!responseFromRelation?.data.identity.neighbor)
     return respondEmpty();
   const neighbours =
-    responseFromRelation.data.identity.neighborWithTraversal?.reduce(
-      (pre: NeighbourDetail[], cur: Neighbour) => {
-        if (!pre.find((x) => x.uuid === cur.from.uuid)) {
-          pre.push({
-            ...cur.from,
-          });
-        }
-        if (!pre.find((x) => x.uuid === cur.to.uuid)) {
-          pre.push({
-            ...cur.to,
-          });
-        }
-        return pre;
-      },
-      []
-    );
+    responseFromRelation.data.identity.neighbor?.map((x: { identity: any; })=>{
+      return {
+        ...x.identity
+      }
+    })
   const address = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.ethereum
   )?.identity;
-  const twitter = neighbours?.find(
-    (x: NeighbourDetail) => x.platform === PlatformType.twitter
-  )?.identity;
+
   return await universalRespond({
     address,
-    twitter,
     handle,
     url: req.nextUrl.origin,
   });
@@ -272,7 +219,6 @@ const resolveFarcasterResponse = async (
 ) => {
   const resolvedHandle = handle.replace(".farcaster", "");
   let ethAddress = "";
-  let twitterHandle = "";
   let farcasterResponse = null;
   const { data } =
     (await resolveHandleFromRelationService(
@@ -280,12 +226,10 @@ const resolveFarcasterResponse = async (
       PlatformType.farcaster
     )) ?? {};
   const identity = data?.identity;
-  twitterHandle = getTwitterHandleRelation(identity, PlatformType.twitter);
   ethAddress = identity?.ownedBy.identity;
 
   return await universalRespond({
     address: ethAddress,
-    twitter: twitterHandle,
     handle,
     url: req.nextUrl.origin,
     fallbackData: { [PlatformType.farcaster]: farcasterResponse },
