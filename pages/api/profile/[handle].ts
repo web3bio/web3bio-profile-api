@@ -65,7 +65,9 @@ const respondWithCache = (json: string) => {
 
 export const resolveETHFromTwitter = async (twitterHandle: string) => {
   const endPoint = `https://7x16bogxfb.execute-api.us-east-1.amazonaws.com/v1/identity?identity=${twitterHandle}&platform=twitter&size=20&page=1`;
-  const response = await fetch(endPoint).then((res) => res.json());
+  const response = await fetch(endPoint)
+    .then((res) => res.json())
+    .catch((e) => null);
   return response?.records?.find(
     (x: { sns_handle: string }) => x.sns_handle === twitterHandle
   )?.web3_addr;
@@ -73,7 +75,9 @@ export const resolveETHFromTwitter = async (twitterHandle: string) => {
 
 export const resolveTwitterFromETH = async (address: string) => {
   const endPoint = `https://twitter-handler-proxy.r2d2.to/v1/relation/handles?wallet=${address}&isVerified=true`;
-  const response = await fetch(endPoint).then((res) => res.json());
+  const response = await fetch(endPoint)
+    .then((res) => res.json())
+    .catch((e) => null);
   return response?.data?.[0];
 };
 
@@ -100,7 +104,6 @@ const universalRespond = async ({
   fallbackData?: any;
 }) => {
   const obj = await Promise.allSettled([
-    fetch(url + `/api/profile/twitter/${twitter}`).then((res) => res.json()),
     fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
     fallbackData?.farcaster ||
       fetch(url + `/api/profile/farcaster/${address}`).then((res) =>
@@ -202,7 +205,11 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
+<<<<<<< Updated upstream
     ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
+=======
+    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved
+>>>>>>> Stashed changes
         ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
 
