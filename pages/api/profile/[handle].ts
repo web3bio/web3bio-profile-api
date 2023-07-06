@@ -25,7 +25,7 @@ const getPlatformHandleFromRelation = (
   res: Neighbor[],
   platformType: PlatformType
 ) => {
-  return res.find(x=>x.identity.platform === platformType)?.identity.identity || 
+  return res.find(x=>x.identity.platform === platformType)?.identity.identity || ''
 };
 
 const nextidGraphQLEndpoint =
