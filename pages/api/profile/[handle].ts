@@ -205,11 +205,7 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
-<<<<<<< Updated upstream
-    ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
-=======
     ? (await resolveHandleFromRelationService(handle)).data.domain.resolved
->>>>>>> Stashed changes
         ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
 
