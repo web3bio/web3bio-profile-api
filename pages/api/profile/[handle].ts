@@ -118,7 +118,7 @@ const resolveTwitterResponse = async (
   req: RequestInterface
 ) => {
   const ethAddress = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle))?.data.identity,
+    (await resolveHandleFromRelationService(handle))?.data?.identity,
     PlatformType.ethereum
   );
 
@@ -160,7 +160,7 @@ const resolveHandleFromRelationService = async (
 
 const resolveETHResponse = async (handle: string, req: RequestInterface) => {
   const twitterHandle = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle)).data.identity,
+    (await resolveHandleFromRelationService(handle))?.data?.identity,
     PlatformType.twitter
   );
 
@@ -239,12 +239,16 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   const neighbours =
     responseFromRelation.data.identity.neighborWithTraversal?.reduce(
       (pre: NeighbourDetail[], cur: Neighbour) => {
-        pre.push({
-          ...cur.from,
-        });
-        pre.push({
-          ...cur.to,
-        });
+        if (!pre.find((x) => x.uuid === cur.from.uuid)) {
+          pre.push({
+            ...cur.from,
+          });
+        }
+        if (!pre.find((x) => x.uuid === cur.to.uuid)) {
+          pre.push({
+            ...cur.to,
+          });
+        }
         return pre;
       },
       []
@@ -255,6 +259,7 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   const twitter = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.twitter
   )?.identity;
+  console.log(neighbours, "kkkk");
   return await universalRespond({
     address,
     twitter,
