@@ -179,10 +179,9 @@ const resolveENSResponse = async (
 ) => {
   const resolverAddress = await getResolverAddressFromName(handle);
   const ethAddress = isRelation
-    ? (await resolveHandleFromRelationService(handle)).data.domain.resolved
+    ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
         ?.identity
     : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
-
   if (!ethAddress) return respondEmpty();
   const twitterHandle = getTwitterHandleRelation(
     (await resolveHandleFromRelationService(handle)).data.domain.resolved,
@@ -203,7 +202,7 @@ const resolveLensResponse = async (handle: string, req: RequestInterface) => {
   ).then((res) => res.json());
   if (!lensResponse?.address) return respondEmpty();
   const twitterHandle = getTwitterHandleRelation(
-    (await resolveHandleFromRelationService(handle)).data.domain.resolved,
+    (await resolveHandleFromRelationService(handle))?.data.domain.resolved,
     PlatformType.twitter
   );
 
@@ -234,7 +233,7 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
     handle,
     PlatformType.nextid
   );
-  if (!responseFromRelation?.data?.identity?.neighborWithTraversal)
+  if (!responseFromRelation?.data.identity.neighborWithTraversal)
     return respondEmpty();
   const neighbours =
     responseFromRelation.data.identity.neighborWithTraversal?.reduce(
@@ -259,7 +258,6 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
   const twitter = neighbours?.find(
     (x: NeighbourDetail) => x.platform === PlatformType.twitter
   )?.identity;
-  console.log(neighbours, "kkkk");
   return await universalRespond({
     address,
     twitter,

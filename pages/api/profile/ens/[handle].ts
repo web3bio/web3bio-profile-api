@@ -110,7 +110,7 @@ export const getResolverAddressFromName = async (name: string) => {
     to: ENSRegistryAddress,
     decodeType: "address",
   });
-  return res.toLowerCase();
+  return res?.toLowerCase();
 };
 
 const resolveNameFromAddress = async (address: string) => {
