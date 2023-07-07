@@ -16,40 +16,16 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			identity
 			platform
 			displayName
-			neighborWithTraversal(depth: 5) {
-				...on ProofRecord {
-					__typename
-					source
-					from {
-						uuid
-						platform
-						identity
-						displayName
-					}
-					to {
-						uuid
-						platform
-						identity
-						displayName
-					}
-				}
-				...on HoldRecord {
-					__typename
-					source
-					from {
-						uuid
-						platform
-						identity
-						displayName
-					}
-					to {
-						uuid
-						platform
-						identity
-						displayName
-					}
-				}
-			}
+			neighbor(depth: 3) {
+        sources # Which upstreams provide these connection infos.
+        identity {
+          uuid
+          platform
+          identity
+          displayName
+        }
+      }
+  
 		}
 	}
 }
@@ -68,40 +44,16 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
       identity
       displayName
     }
-    neighborWithTraversal(depth: 5) {
-      ...on ProofRecord {
-        __typename
-        source
-        from {
-          uuid
-          platform
-          identity
-          displayName
-        }
-        to {
-          uuid
-          platform
-          identity
-          displayName
-        }
-      }
-      ...on HoldRecord {
-        __typename
-        source
-        from {
-          uuid
-          platform
-          identity
-          displayName
-        }
-        to {
-          uuid
-          platform
-          identity
-          displayName
-        }
+    neighbor(depth: 3) {
+      sources # Which upstreams provide these connection infos.
+      identity {
+        uuid
+        platform
+        identity
+        displayName
       }
     }
+
   }
 }
 `;
