@@ -30,7 +30,7 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(
-      json.find((x) => x.platform === "twitter")?.address ===
+      json.find((x) => x.platform === "lens")?.address ===
         json.find((x) => x.platform === "ENS")?.address
     );
   });
