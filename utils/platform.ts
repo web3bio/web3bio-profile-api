@@ -1,3 +1,13 @@
+import {
+  regexDotbit,
+  regexEns,
+  regexEth,
+  regexLens,
+  regexSpaceid,
+  regexTwitter,
+  regexUnstoppableDomains,
+} from "./regexp";
+
 type SocialPlatform = {
   key: string;
   color?: string;
@@ -355,4 +365,25 @@ export const SocialPlatformMapping = (platform: PlatformType) => {
       ensText: [],
     }
   );
+};
+
+export const handleSearchPlatform = (term: string) => {
+  switch (true) {
+    case regexEns.test(term):
+      return PlatformType.ens;
+    case regexEth.test(term):
+      return PlatformType.ethereum;
+    case regexLens.test(term):
+      return PlatformType.lens;
+    case regexUnstoppableDomains.test(term):
+      return PlatformType.unstoppableDomains;
+    case regexSpaceid.test(term):
+      return PlatformType.space_id;
+    case regexDotbit.test(term):
+      return PlatformType.dotbit;
+    case regexTwitter.test(term):
+      return PlatformType.twitter;
+    default:
+      return PlatformType.nextid;
+  }
 };
