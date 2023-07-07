@@ -66,4 +66,10 @@ describe("Test For Universal Profile API", () => {
     expect(links.length).toBe(6);
     expect(isValidHandle).toBe(true);
   });
+  it("It should response 200 data for suji_yan twitter", async () => {
+    const res = await queryClient("/profile/suji_yan");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBeTruthy();
+  });
 });
