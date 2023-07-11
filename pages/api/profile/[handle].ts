@@ -202,7 +202,8 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
     }
   );
   const address = neighbours?.find(
-    (x: NeighbourDetail) => x.platform === PlatformType.ethereum
+    (x: NeighbourDetail) =>
+      x.platform === PlatformType.ethereum && x.displayName
   )?.identity;
 
   return await universalRespond({
