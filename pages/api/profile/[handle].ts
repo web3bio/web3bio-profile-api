@@ -43,48 +43,29 @@ const respondEmpty = () => {
   });
 };
 
-const resolveHandleFromRelationService = async (
+const resolveHandleFromRelationService = (
   handle: string,
   platform?: PlatformType
 ) => {
   const _platform = platform || handleSearchPlatform(handle);
   const query = getRelationQuery(handle);
-  const payload = {
-    query,
-    variables: {
-      platform: _platform,
-      identity: handle,
-    },
-  };
-
-  const fetchRes = await fetch(nextidGraphQLEndpoint, {
+  return fetch(nextidGraphQLEndpoint, {
     method: "POST",
-    body: JSON.stringify(payload),
-    headers: {
-      "Cache-Control": "cache",
-    },
-  })
-    .then((res) => {
-      if (res.status === 200) {
-        return res.json();
-      } else {
-        return respondEmpty();
-      }
-    })
-    .catch((e) => {
-      console.log(e, "error");
-      return errorHandle({
-        address: null,
-        identity: handle,
+    body: JSON.stringify({
+      query,
+      variables: {
         platform: _platform,
-        code: 500,
-        message: e.message,
-      });
-    });
-  return fetchRes?.data?.identity || fetchRes?.data?.domain;
+        identity: handle,
+      },
+    }),
+  })
+    .then((res) => res.json())
+    .catch((e) => ({
+      error: e,
+    }));
 };
 
-const resolveUniversalFromRelation = async ({
+const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
   req,
@@ -98,11 +79,19 @@ const resolveUniversalFromRelation = async ({
     handle,
     platform
   );
-  const originNeighbours =
-    responseFromRelation?.neighbor || responseFromRelation?.resolved?.neighbor;
-  const resolvedIdentity = responseFromRelation?.identity
-    ? responseFromRelation
-    : responseFromRelation?.resolved;
+  console.log(responseFromRelation, "response");
+  if (responseFromRelation?.error)
+    return errorHandle({
+      address: null,
+      identity: handle,
+      platform,
+      message: responseFromRelation?.error,
+      code: 500,
+    });
+  const resolved =
+    responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
+  const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor;
+  const resolvedIdentity = resolved?.identity ? resolved : resolved?.resolved;
   if (!originNeighbours || !resolvedIdentity) return respondEmpty();
 
   const sourceNeighbour = {
@@ -173,25 +162,21 @@ const resolveUniversalHandle = async (
     [PlatformType.farcaster]: regexUniversalFarcaster,
     [PlatformType.twitter]: regexTwitter,
   };
+  let handleToQuery = "";
+  let platformToQuery = "";
   for (const [platform, regex] of Object.entries(handleResolvers)) {
     if (regex.test(handle)) {
-      const resolvedHandle =
+      handleToQuery =
         regex === regexUniversalFarcaster
           ? handle.replaceAll(".farcaster", "")
           : handle;
-      return await resolveUniversalFromRelation({
-        platform: platform as PlatformType,
-        handle: resolvedHandle,
-        req,
-      });
+      platformToQuery = platform;
     }
   }
-  return errorHandle({
-    address: null,
-    identity: handle,
-    platform: PlatformType.nextid,
-    message: ErrorMessages.unknownError,
-    code: 500,
+  return resolveUniversalRespondFromRelation({
+    platform: platformToQuery as PlatformType,
+    handle: handleToQuery,
+    req,
   });
 };
 

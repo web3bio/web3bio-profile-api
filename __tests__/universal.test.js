@@ -34,7 +34,7 @@ describe("Test For Universal Profile API", () => {
         json.find((x) => x.platform === "ENS")?.address
     );
   });
-  it("It should response empty data for mcdonalds.eth", async () => {
+  it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/mcdonalds.eth");
     expect(res.status).toBe(404);
     const json = await res.json();
