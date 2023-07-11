@@ -10,7 +10,7 @@ import {
   regexUniversalFarcaster,
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
-import { NeighbourDetail } from "@/utils/types";
+import { NeighbourDetail, ProfileAPIResponse } from "@/utils/types";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -64,7 +64,10 @@ const resolveHandleFromRelationService = (
       error: e,
     }));
 };
-const sortByPlatform = (arr: Array<any>, platform: PlatformType) => {
+const sortByPlatform = (
+  arr: Array<ProfileAPIResponse>,
+  platform: PlatformType
+) => {
   return arr.sort((a, b) => {
     if (a.platform === platform && b.platform !== platform) {
       return -1;
@@ -145,7 +148,8 @@ const resolveUniversalRespondFromRelation = async ({
             !response.value.error
         )
         .map(
-          (response) => (response as PromiseFulfilledResult<Response>).value
+          (response) =>
+            (response as PromiseFulfilledResult<ProfileAPIResponse>).value
         );
     })
     .catch((error) => {
@@ -159,7 +163,9 @@ const resolveUniversalRespondFromRelation = async ({
     });
 
   return respondWithCache(
-    JSON.stringify(sortByPlatform(obj as any[], platform || PlatformType.ens))
+    JSON.stringify(
+      sortByPlatform(obj as ProfileAPIResponse[], platform || PlatformType.ens)
+    )
   );
 };
 const resolveUniversalHandle = async (
