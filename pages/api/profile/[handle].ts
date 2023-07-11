@@ -64,7 +64,17 @@ const resolveHandleFromRelationService = (
       error: e,
     }));
 };
-
+const sortByPlatform = (arr: Array<any>, platform: PlatformType) => {
+  return arr.sort((a, b) => {
+    if (a.platform === platform && b.platform !== platform) {
+      return -1;
+    }
+    if (a.platform !== platform && b.platform === platform) {
+      return 1;
+    }
+    return 0;
+  });
+};
 const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
@@ -147,7 +157,10 @@ const resolveUniversalRespondFromRelation = async ({
         platform: PlatformType.nextid,
       });
     });
-  return respondWithCache(JSON.stringify(obj));
+
+  return respondWithCache(
+    JSON.stringify(sortByPlatform(obj as any[], platform || PlatformType.ens))
+  );
 };
 const resolveUniversalHandle = async (
   handle: string,
