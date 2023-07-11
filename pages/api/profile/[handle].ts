@@ -9,27 +9,13 @@ import {
   regexTwitter,
   regexUniversalFarcaster,
 } from "@/utils/regexp";
-import {
-  getResolverAddressFromName,
-  resolveENSCoinTypesValue,
-} from "./ens/[handle]";
 import { getRelationQuery } from "@/utils/query";
-import { Neighbor, NeighbourDetail } from "@/utils/types";
+import { NeighbourDetail } from "@/utils/types";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
 }
-
-const getPlatformHandleFromRelation = (
-  res: Neighbor[],
-  platformType: PlatformType
-) => {
-  return (
-    res?.find((x) => x.identity.platform === platformType)?.identity.identity ||
-    ""
-  );
-};
 
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
@@ -57,66 +43,6 @@ const respondEmpty = () => {
   });
 };
 
-const universalRespond = async ({
-  address,
-  url,
-  handle,
-  fallbackData,
-}: {
-  address: string;
-  url: string;
-  handle: string;
-  fallbackData?: {
-    [PlatformType.farcaster]?: Response;
-    [PlatformType.lens]?: Response;
-  };
-}) => {
-  const obj = await Promise.allSettled([
-    fetch(url + `/api/profile/ens/${address}`).then((res) => res.json()),
-    fallbackData?.farcaster ||
-      fetch(url + `/api/profile/farcaster/${address}`).then((res) =>
-        res.json()
-      ),
-    fallbackData?.lens ||
-      fetch(url + `/api/profile/lens/${address}`).then((res) => res.json()),
-  ])
-    .then((responses) => {
-      return responses
-        .filter(
-          (response) => response.status === "fulfilled" && !response.value.error
-        )
-        .map(
-          (response) => (response as PromiseFulfilledResult<Response>).value
-        );
-    })
-    .catch((error) => {
-      return errorHandle({
-        address: null,
-        identity: handle,
-        code: 500,
-        message: error,
-        platform: PlatformType.nextid,
-      });
-    });
-  return respondWithCache(JSON.stringify(obj));
-};
-
-const resolveTwitterResponse = async (
-  handle: string,
-  req: RequestInterface
-) => {
-  const ethAddress = getPlatformHandleFromRelation(
-    (await resolveHandleFromRelationService(handle))?.data?.identity.neighbor,
-    PlatformType.ethereum
-  );
-
-  return await universalRespond({
-    address: ethAddress,
-    handle,
-    url: req.nextUrl.origin,
-  });
-};
-
 const resolveHandleFromRelationService = async (
   handle: string,
   platform?: PlatformType
@@ -140,60 +66,39 @@ const resolveHandleFromRelationService = async (
     .then((res) => res.json())
     .catch((e) => {
       console.log(e, "error");
-      return null;
+      return errorHandle({
+        address: null,
+        identity: handle,
+        platform: _platform,
+        code: 500,
+        message: e.message,
+      });
     });
   return fetchRes;
 };
 
-const resolveETHResponse = async (handle: string, req: RequestInterface) => {
-  return await universalRespond({
-    address: handle,
-    handle,
-    url: req.nextUrl.origin,
-  });
-};
-
-const resolveENSResponse = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
-  const resolverAddress = await getResolverAddressFromName(handle);
-  const ethAddress = isRelation
-    ? (await resolveHandleFromRelationService(handle))?.data.domain.resolved
-        ?.identity
-    : await resolveENSCoinTypesValue(resolverAddress, handle, 60);
-  if (!ethAddress) return respondEmpty();
-
-  return await universalRespond({
-    address: ethAddress,
-    handle: handle,
-    url: req.nextUrl.origin,
-  });
-};
-
-const resolveLensResponse = async (handle: string, req: RequestInterface) => {
-  const lensResponse = await fetch(
-    req.nextUrl.origin + `/api/profile/lens/${handle}`
-  ).then((res) => res.json());
-  if (!lensResponse?.address) return respondEmpty();
-
-  return await universalRespond({
-    address: lensResponse?.address,
-    handle,
-    url: req.nextUrl.origin,
-    fallbackData: {
-      [PlatformType.lens]: lensResponse,
-    },
-  });
-};
-
-const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
+const resolveUniversalFromRelation = async ({
+  platform,
+  handle,
+  req,
+}: {
+  platform: PlatformType;
+  handle: string;
+  req: RequestInterface;
+}) => {
+  if (!handle) respondEmpty();
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
-    PlatformType.nextid
+    platform
   );
-  if (!responseFromRelation?.data.identity.neighbor) return respondEmpty();
+  const _identity = responseFromRelation?.data?.identity;
+  if (!_identity?.neighbor) return respondEmpty();
+  const sourceNeighbour = {
+    platform: _identity.platform,
+    identity: _identity.identity,
+    displayName: _identity.displayName,
+    uuid: _identity.uuid,
+  };
   const neighbours = responseFromRelation.data.identity.neighbor?.map(
     (x: { identity: NeighbourDetail }) => {
       return {
@@ -201,70 +106,72 @@ const resolveAvatarResponse = async (handle: string, req: RequestInterface) => {
       };
     }
   );
-  const address = neighbours?.find(
-    (x: NeighbourDetail) =>
-      x.platform === PlatformType.ethereum && x.displayName
-  )?.identity;
-
-  return await universalRespond({
-    address,
-    handle,
-    url: req.nextUrl.origin,
-  });
+  neighbours.unshift(sourceNeighbour);
+  const obj = await Promise.allSettled([
+    ...neighbours.map((x: NeighbourDetail) => {
+      if (
+        [
+          PlatformType.ethereum,
+          PlatformType.farcaster,
+          PlatformType.lens,
+        ].includes(x.platform) &&
+        x.displayName
+      ) {
+        const resolvedPlatform =
+          x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
+        return fetch(
+          req.nextUrl.origin + `/api/profile/${resolvedPlatform}/${x.identity}`
+        ).then((res) => res.json());
+      }
+    }),
+  ])
+    .then((responses) => {
+      return responses
+        .filter(
+          (response) =>
+            response.status === "fulfilled" &&
+            response.value &&
+            !response.value.error
+        )
+        .map(
+          (response) => (response as PromiseFulfilledResult<Response>).value
+        );
+    })
+    .catch((error) => {
+      return errorHandle({
+        address: null,
+        identity: handle,
+        code: 500,
+        message: error,
+        platform: PlatformType.nextid,
+      });
+    });
+  return respondWithCache(JSON.stringify(obj));
 };
-
-const resolveFarcasterResponse = async (
+const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
-  const resolvedHandle = handle.replace(".farcaster", "");
-  const ethAddress = getPlatformHandleFromRelation(
-    (
-      await resolveHandleFromRelationService(
-        resolvedHandle,
-        PlatformType.farcaster
-      )
-    )?.data?.identity.neighbor,
-    PlatformType.ethereum
-  );
-  if (!ethAddress) return respondEmpty();
-  return await universalRespond({
-    address: ethAddress,
-    handle,
-    url: req.nextUrl.origin,
-  });
-};
-
-const resolveUniversalHandle = async (
-  handle: string,
-  req: RequestInterface,
-  isRelation: boolean
-) => {
   if (!handle) return respondEmpty();
-  const handleResolvers: Record<
-    string,
-    [
-      RegExp,
-      (
-        handle: string,
-        req: RequestInterface,
-        isRelation: boolean
-      ) => Promise<Response>
-    ]
-  > = {
-    [PlatformType.nextid]: [regexAvatar, resolveAvatarResponse],
-    [PlatformType.ethereum]: [regexEth, resolveETHResponse],
-    [PlatformType.ens]: [regexEns, resolveENSResponse],
-    [PlatformType.lens]: [regexLens, resolveLensResponse],
-    [PlatformType.farcaster]: [
-      regexUniversalFarcaster,
-      resolveFarcasterResponse,
-    ],
-    [PlatformType.twitter]: [regexTwitter, resolveTwitterResponse],
+  const handleResolvers = {
+    [PlatformType.nextid]: regexAvatar,
+    [PlatformType.ethereum]: regexEth,
+    [PlatformType.ens]: regexEns,
+    [PlatformType.lens]: regexLens,
+    [PlatformType.farcaster]: regexUniversalFarcaster,
+    [PlatformType.twitter]: regexTwitter,
   };
-  for (const [platform, [regex, resolver]] of Object.entries(handleResolvers)) {
+  for (const [platform, regex] of Object.entries(handleResolvers)) {
     if (regex.test(handle)) {
-      return await resolver(handle, req, isRelation);
+      const resolvedHandle =
+        regex === regexUniversalFarcaster
+          ? handle.replaceAll(".farcaster", "")
+          : handle;
+      return await resolveUniversalFromRelation({
+        platform: platform as PlatformType,
+        handle: resolvedHandle,
+        req,
+      });
     }
   }
   return errorHandle({
@@ -288,9 +195,7 @@ export default async function handler(req: RequestInterface) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  // true to use relation service data provider
-  // return resolveUniversalHandle(lowercaseName, req);
-  return resolveUniversalHandle(inputName, req, true);
+  return resolveUniversalHandle(inputName, req);
 }
 
 export const config = {

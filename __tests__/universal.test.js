@@ -66,4 +66,14 @@ describe("Test For Universal Profile API", () => {
     expect(links.length).toBe(6);
     expect(isValidHandle).toBe(true);
   });
+  it("It should response 200 data for suji_yan", async () => {
+    const res = await queryClient("/profile/suji_yan");
+    expect(res.status).toBe(200);
+  });
+  it("It should response 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
+    const res = await queryClient(
+      "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649"
+    );
+    expect(res.status).toBe(200);
+  });
 });

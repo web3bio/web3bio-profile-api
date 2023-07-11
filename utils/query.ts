@@ -25,7 +25,6 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
           displayName
         }
       }
-  
 		}
 	}
 }
@@ -53,7 +52,6 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
         displayName
       }
     }
-
   }
 }
 `;
