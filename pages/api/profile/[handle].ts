@@ -56,6 +56,7 @@ const resolveHandleFromRelationService = async (
       identity: handle,
     },
   };
+
   const fetchRes = await fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify(payload),
@@ -63,7 +64,13 @@ const resolveHandleFromRelationService = async (
       "Cache-Control": "cache",
     },
   })
-    .then((res) => res.json())
+    .then((res) => {
+      if (res.status === 200) {
+        return res.json();
+      } else {
+        return respondEmpty();
+      }
+    })
     .catch((e) => {
       console.log(e, "error");
       return errorHandle({
@@ -74,7 +81,7 @@ const resolveHandleFromRelationService = async (
         message: e.message,
       });
     });
-  return fetchRes;
+  return fetchRes?.data?.identity || fetchRes?.data?.domain;
 };
 
 const resolveUniversalFromRelation = async ({
@@ -91,15 +98,20 @@ const resolveUniversalFromRelation = async ({
     handle,
     platform
   );
-  const _identity = responseFromRelation?.data?.identity;
-  if (!_identity?.neighbor) return respondEmpty();
+  const originNeighbours =
+    responseFromRelation?.neighbor || responseFromRelation?.resolved?.neighbor;
+  const resolvedIdentity = responseFromRelation?.identity
+    ? responseFromRelation
+    : responseFromRelation?.resolved;
+  if (!originNeighbours || !resolvedIdentity) return respondEmpty();
+
   const sourceNeighbour = {
-    platform: _identity.platform,
-    identity: _identity.identity,
-    displayName: _identity.displayName,
-    uuid: _identity.uuid,
+    platform: resolvedIdentity?.platform,
+    identity: resolvedIdentity?.identity,
+    displayName: resolvedIdentity?.displayName,
+    uuid: resolvedIdentity?.uuid,
   };
-  const neighbours = responseFromRelation.data.identity.neighbor?.map(
+  const neighbours = originNeighbours.map(
     (x: { identity: NeighbourDetail }) => {
       return {
         ...x.identity,

@@ -16,6 +16,7 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			identity
 			platform
 			displayName
+      uuid
 			neighbor(depth: 3) {
         sources # Which upstreams provide these connection infos.
         identity {
