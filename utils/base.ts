@@ -38,7 +38,7 @@ interface errorHandleProps {
   identity: string | null;
   platform: PlatformType;
   code: number;
-  message: ErrorMessages;
+  message: ErrorMessages | string;
   headers?: HeadersInit;
 }
 
