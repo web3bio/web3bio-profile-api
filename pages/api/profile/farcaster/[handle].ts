@@ -34,13 +34,23 @@ const resolveFarcasterHandle = async (handle: string) => {
       response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.username);
     }
     if (!response || !response.length) {
-      return errorHandle({
-        address: null,
-        identity: handle,
-        platform: PlatformType.farcaster,
-        code: 404,
-        message: ErrorMessages.notFound,
-      });
+      if (isAddress(handle)) {
+        return errorHandle({
+          address: handle,
+          identity: null,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      } else {
+        return errorHandle({
+          address: null,
+          identity: handle,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      }
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);

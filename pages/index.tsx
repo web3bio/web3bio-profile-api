@@ -33,7 +33,7 @@ export default function Home() {
           </a>
         </div>
         <section className="pt-4 pb-4">
-          <p>The Web3.bio Profile APIs enable developers to easily and quickly integrate Web3 universal profiles from <span className="text-underline">Ethereum (ENS)</span>, <span className="text-underline">Lens Protocol</span>, <span className="text-underline">Farcaster</span>, and <span className="text-underline">Next.ID</span> into their applications. These APIs are already integrated into <a href="https://web3.bio" target="_blank" className="text-underline text-bold">Web3.bio</a>'s search and profile services.</p>
+          <p>The Web3.bio Profile APIs enable developers to easily and quickly integrate Web3 universal profiles from <span className="text-underline">Ethereum (ENS)</span>, <span className="text-underline">Lens Protocol</span>, <span className="text-underline">Farcaster</span>, and <span className="text-underline">Next.ID</span> into their applications. These APIs are already integrated into <a href="https://web3.bio" target="_blank" className="text-underline text-bold">Web3.bio</a> search and profile services.</p>
           <p>This documentation describes the publicly available endpoints of the Web3.bio Profile API, which is a set of RESTful JSON APIs. It explains how to use them and what they return. Currently, the APIs are offered for free to assist developers in getting started with Web3 profiles. We will do our best to maintain uptime.</p>
         </section>
         <section className="pt-4 pb-4">
@@ -91,7 +91,7 @@ export default function Home() {
           </a>
         </section>
 
-        <section className="pt-4 pb-4" id="universal-profile-api">
+        <section className="pt-4 pb-4" id="universal-profile-api" style={{"marginTop": "4rem"}}>
           <h2 className="text-bold h5">
             Universal Profile API
           </h2>
@@ -106,15 +106,21 @@ export default function Home() {
             Parameter
           </h3>
           <ul>
-            <li><strong>identity <span className="label">string</span></strong> - An Ethereum address, an ENS domain, a Lens handle, a Farcaster username, or a Next.ID address.</li>
+            <li><strong>identity <span className="label">string</span></strong> - An Ethereum address, an ENS domain, a Lens handle, a Farcaster username (ends with .farcaster), or a Next.ID address.</li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Examples
           </h3>
+          <ul>
+            <li><a href="https://api.web3.bio/profile/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" target="_blank">https://api.web3.bio/profile/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</a></li>
+            <li><a href="https://api.web3.bio/profile/vitalik.eth" target="_blank">https://api.web3.bio/profile/vitalik.eth</a></li>
+            <li><a href="https://api.web3.bio/profile/stani.lens" target="_blank">https://api.web3.bio/profile/stani.lens</a></li>
+            <li><a href="https://api.web3.bio/profile/dwr.farcaster" target="_blank">https://api.web3.bio/profile/dwr.farcaster</a></li>
+          </ul>
           
         </section>
 
-        <section className="pt-4 pb-4" id="ens-profile-api">
+        <section className="pt-4 pb-4" id="ens-profile-api" style={{"marginTop": "4rem"}}>
           <h2 className="text-bold h5">
             ENS Profile API
           </h2>
@@ -134,10 +140,13 @@ export default function Home() {
           <h3 className="text-bold h6 mt-4">
             Examples
           </h3>
-          
+          <ul>
+            <li><a href="https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045" target="_blank">https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045</a></li>
+            <li><a href="https://api.web3.bio/profile/ens/vitalik.eth" target="_blank">https://api.web3.bio/profile/ens/vitalik.eth</a></li>
+          </ul>
         </section>
 
-        <section className="pt-4 pb-4" id="lens-profile-api">
+        <section className="pt-4 pb-4" id="lens-profile-api" style={{"marginTop": "4rem"}}>
           <h2 className="text-bold h5">
             Lens Profile API
           </h2>
@@ -157,10 +166,13 @@ export default function Home() {
           <h3 className="text-bold h6 mt-4">
             Examples
           </h3>
-          
+          <ul>
+            <li><a href="https://api.web3.bio/profile/lens/0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff" target="_blank">https://api.web3.bio/profile/lens/0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff</a></li>
+            <li><a href="https://api.web3.bio/profile/lens/stani.lens" target="_blank">https://api.web3.bio/profile/lens/stani.lens</a></li>
+          </ul>
         </section>
 
-        <section className="pt-4 pb-4" id="farcaster-profile-api">
+        <section className="pt-4 pb-4" id="farcaster-profile-api" style={{"marginTop": "4rem"}}>
           <h2 className="text-bold h5">
             Farcaster Profile API
           </h2>
@@ -180,7 +192,10 @@ export default function Home() {
           <h3 className="text-bold h6 mt-4">
             Examples
           </h3>
-          
+          <ul>
+            <li><a href="https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2" target="_blank">https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2</a></li>
+            <li><a href="https://api.web3.bio/profile/farcaster/dwr" target="_blank">https://api.web3.bio/profile/farcaster/dwr</a></li>
+          </ul>
         </section>
       </div>
     </main>
