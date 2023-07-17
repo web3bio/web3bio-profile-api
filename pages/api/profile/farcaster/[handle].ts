@@ -8,7 +8,7 @@ import { isAddress } from "ethers/lib/utils";
 export const config = {
   runtime: "edge",
 };
-const enum ParamType {
+export const enum FarcasterQueryParamType {
   username = "username",
   connected_address = "connected_address",
 }
@@ -17,7 +17,7 @@ const originBase = "https://searchcaster.xyz/api/";
 
 const regexTwitterLink = /(\S*).twitter/i;
 
-const FetchFromOrigin = async (value: string, type: ParamType) => {
+export const FetchFromFarcasterOrigin = async (value: string, type: FarcasterQueryParamType) => {
   if (!value) return;
   const res = await fetch(originBase + `profiles?${type}=${value}`).then(
     (res) => res.json()
@@ -29,18 +29,28 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromOrigin(handle, ParamType.connected_address);
+      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.connected_address);
     } else {
-      response = await FetchFromOrigin(handle, ParamType.username);
+      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.username);
     }
     if (!response || !response.length) {
-      return errorHandle({
-        address: null,
-        identity: handle,
-        platform: PlatformType.farcaster,
-        code: 404,
-        message: ErrorMessages.notFound,
-      });
+      if (isAddress(handle)) {
+        return errorHandle({
+          address: handle,
+          identity: null,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      } else {
+        return errorHandle({
+          address: null,
+          identity: handle,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      }
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);

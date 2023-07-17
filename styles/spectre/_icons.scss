@@ -1,0 +1,61 @@
+// CSS Icons
+$icon-border-width: $border-width-lg;
+
+.icon {
+  box-sizing: border-box;
+  display: inline-block;
+  font-size: 1rem;
+  font-style: normal;
+  height: 1em;
+  position: relative;
+  text-indent: -9999px;
+  vertical-align: middle;
+  width: 1em;
+  
+  &::before,
+  &::after {
+    content: "";
+    display: block;
+    left: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+  }
+}
+
+.icon-arrow-down,
+.icon-arrow-left,
+.icon-arrow-right,
+.icon-arrow-up {
+  &::before {
+    border: $icon-border-width solid currentColor;
+    border-bottom: 0;
+    border-right: 0;
+    height: .65em;
+    width: .65em;
+  }
+}
+
+.icon-arrow-down {
+  &::before {
+    transform: translate(-50%, -75%) rotate(225deg);
+  }
+}
+
+.icon-arrow-left {
+  &::before {
+    transform: translate(-25%, -50%) rotate(-45deg);
+  }
+}
+
+.icon-arrow-right {
+  &::before {
+    transform: translate(-75%, -50%) rotate(135deg);
+  }
+}
+
+.icon-arrow-up {
+  &::before {
+    transform: translate(-50%, -25%) rotate(45deg);
+  }
+}

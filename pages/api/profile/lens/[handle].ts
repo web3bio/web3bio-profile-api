@@ -48,6 +48,10 @@ export const getLensProfile = async (handle: string, type: LensParamType) => {
     return null;
   }
 };
+export const resolveETHFromLens = async (lens: string) => {
+  const response = await getLensProfile(lens, LensParamType.domain);
+  return response.ownedBy;
+};
 
 const resolveNameFromLens = async (handle: string) => {
   try {
@@ -58,15 +62,26 @@ const resolveNameFromLens = async (handle: string) => {
       response = await getLensProfile(handle, LensParamType.domain);
     }
     if (!response) {
-      return errorHandle({
-        address: null,
-        identity: handle,
-        platform: PlatformType.lens,
-        code: 404,
-        message: ErrorMessages.notFound,
-      });
+      if (isAddress(handle)) {
+        return errorHandle({
+          address: handle,
+          identity: null,
+          platform: PlatformType.lens,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      } else {
+        return errorHandle({
+          address: null,
+          identity: handle,
+          platform: PlatformType.lens,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      }
+      
     }
-    const pureHandle = handle.replaceAll(".lens", "");
+    const pureHandle = response.handle.replaceAll(".lens", "");
     let LINKRES = {};
     let CRYPTORES = {
       matic: response.ownedBy,

@@ -1,35 +1,34 @@
 # Web3.bio Profile API
 
-Web3.bio Profile API is a Web3 Profile data service which is powered by Web3.bio. Web3.bio will provide a frindly struct of profile data when you are searching any Twitter handle, Ethereum address, ENS domain, or Lens profile.
+Web3.bio Profile API is a Web3 Profile data service powered by Web3.bio. When searching for any Ethereum address, ENS domain, Lens profile, or Farcaster usernames, it provides a user-friendly structure of profile data.
 
-We're gradually making updates to Web3.bio Profile API. You may expect new features and data sources.
+We are constantly updating the Web3.bio Profile API, so expect new features and data sources.
 
 ## What are the data sources?
 
-Web3.bio Profile API is indexing all identity data from public verifiable connections and on-chain records.
+Web3.bio Profile API indexes all identity data from public verifiable connections and on-chain records.
 
-The supported platforms:
+The supported platforms are:
 
 - Ethereum
 - Ethereum Name Service (ENS)
-- Lens
+- Lens Protocol
 - Farcaster
-- Twitter
 
-The queries can be found here `pages/api/profile/`. Feel Free to expect new Platform support!
+Queries can be found in `pages/api/profile/`. Expect new platform support updates!
 
 ## Local Dev
 
-Run the development server:
+To run the development server, use:
 
-```bash
+```
 npm i && npm run dev
 ```
 
-```bash
+```
 yarn && yarn dev
 ```
 
 ## Contributing
 
-Feel free to submit a pull request to propose bug fixes and improvements. Help is always appreciated. You may give feature feedbacks or bug report to [Web5.bio Twitter](https://twitter.com/web3bio) as well.
+Feel free to submit a pull request to propose bug fixes and improvements. Your help is always appreciated. You may also give feature feedback or report bugs to [Web3.bio Twitter](https://twitter.com/web3bio) and [Telegram group](https://t.me/web3dotbio).

@@ -2,21 +2,24 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
+  rewrites: async () => [
+    {
+      source: "/:path*",
+      destination: "/api/:path*",
+    },
+  ],
   redirects: async () => [
+    {
+      source: "/api",
+      destination: "/",
+      permanent: true,
+    },
     {
       source: "/api/:path*",
       destination: "/:path*",
       permanent: true,
     },
   ],
-  rewrites: async () => ({
-    beforeFiles: [
-      {
-        source: "/:path*",
-        destination: "/api/:path*",
-      },
-    ],
-  }),
   headers: async () => [
     {
       source: "/:path*",

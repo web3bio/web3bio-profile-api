@@ -38,7 +38,7 @@ interface errorHandleProps {
   identity: string | null;
   platform: PlatformType;
   code: number;
-  message: ErrorMessages;
+  message: ErrorMessages | string;
   headers?: HeadersInit;
 }
 
@@ -49,6 +49,7 @@ export enum ErrorMessages {
   notExist = "Does Not Exist",
   invalidIdentity = "Invalid Identity or Domain",
   invalidAddr = "Invalid Address",
+  unknownError = "Unknown error occurs",
 }
 
 export const errorHandle = (props: errorHandleProps) => {
