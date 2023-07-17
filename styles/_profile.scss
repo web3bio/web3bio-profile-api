@@ -1,0 +1,804 @@
+// New Profile
+.web3-profile {
+  padding: 2rem;
+
+  @media screen and (max-width: $size-md) {
+    padding: 1rem;
+  }
+
+  .web3bio-custom {
+    background-color: $light-color;
+    background-size: cover;
+    display: block;
+    filter: blur(4rem);
+    height: 100vh;
+    left: 0;
+    opacity: .05;
+    position: fixed;
+    top: 0;
+    width: 100vw;
+    z-index: -1;
+  }
+}
+
+.web3-profile-base {
+  padding: .5rem .5rem 1rem .5rem;
+  position: sticky;
+  top: 2rem;
+
+  .profile-avatar {
+    align-items: center;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 .2rem rgba($light-color, .1);
+    display: flex;
+    height: 9rem;
+    justify-content: center;
+    width: 9rem;
+
+    .avatar {
+      box-shadow: 0 .4rem 1rem rgba(0, 0, 0, .1);
+      height: 9rem;
+      position: relative;
+      width: 9rem;
+      z-index: -1;
+    }
+  }
+
+  .profile-name {
+    color: $dark-color;
+    font-size: 1.8rem;
+    font-weight: 800;
+    line-height: 1.25;
+    margin-bottom: .5rem;
+    margin-top: 1rem;
+    max-width: 600px;
+    word-break: break-word;
+  }
+
+  .profile-identity {
+    align-items: center;
+    color: $gray-color-dark;
+    display: flex;
+    margin-bottom: 1rem;
+    font-size: .6rem;
+    line-height: 1rem;
+
+    .action {
+      color: $gray-color;
+      cursor: pointer;
+      flex: 0 1;
+      height: 1rem;
+      margin-left: .2rem;
+      position: relative;
+      transition: all .2s ease-in-out;
+      width: 1rem;
+
+      &:focus,
+      &:hover {
+        color: $dark-color;
+      }
+    }
+  }
+
+  .profile-description {
+    font-size: .9rem;
+    font-weight: 400;
+    line-height: 1.5;
+    margin-bottom: 1rem;
+    max-width: 20rem;
+  }
+
+  .profile-location {
+    align-items: center;
+    display: flex;
+    margin-bottom: .5rem;
+  }
+
+  .profile-email {
+    align-items: center;
+    display: flex;
+    margin-bottom: 1rem;
+
+    a {
+      border-bottom: .05rem dashed;
+      text-decoration: none;
+
+      &:focus,
+      &:hover {
+        border-bottom: .05rem solid;
+      }
+    }
+  }
+}
+
+.web3-section-title {
+  font-size: .9rem;
+  font-weight: 500;
+  margin-top: 1rem;
+  padding: 1rem 1.5rem;
+}
+
+.web3-section-widgets {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 0;
+
+  .profile-widget-item {
+    aspect-ratio: 1 / 1;
+    max-width: 50%;
+    padding: .5rem;
+    width: 25%;
+
+    @media screen and (max-width: $size-xl) {
+      width: 33.333%;
+    }
+
+    @media screen and (min-width: $size-md) and (max-width: $size-lg) {
+      width: 50%;
+    }
+
+    @media screen and (max-width: $size-sm) {
+      width: 50%;
+    }
+  }
+
+  .profile-widget-full {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: calc(100vh - 1rem);
+    padding: .5rem;
+    width: 100%;
+  }
+
+  .profile-widget-half {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: 90vh;
+    padding: .5rem;
+    width: 50%;
+
+    @media screen and (max-width: $size-sm) {
+      width: 100%;
+    }
+  }
+
+  .profile-widget-3-4 {
+    aspect-ratio: auto;
+    height: auto;
+    max-height: 90vh;
+    padding: .5rem;
+    width: 75%;
+
+    @media screen and (max-width: $size-sm) {
+      width: 100%;
+    }
+  }
+
+  .profile-widget {
+    background: $light-color;
+    border: .05rem solid rgba($dark-color, .075);
+    border-radius: .8rem;
+    box-shadow: 0 .1rem .2rem rgba($dark-color, .04);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    padding: 1rem;
+    text-decoration: none;
+    transition: all .25s ease-in-out;
+    width: 100%;
+    will-change: transform;
+
+    &.profile-widget-link {
+
+      &:focus,
+      &:hover {
+        box-shadow: 0 .4rem 1.6rem -.4rem rgba($dark-color, .15), 0 .1rem .2rem rgba($dark-color, .01);
+        z-index: 99;
+
+        .platform-action {
+          .btn {
+            opacity: 1;
+          }
+        }
+      }
+    }
+
+    .platform-icon {
+      align-items: center;
+      background: var(--widget-primary-color, $light-color);
+      border-radius: .6rem;
+      box-shadow: inset 0 0 0 .05rem rgba($dark-color, .1), 0 .2rem .4rem rgba($dark-color, .15), 1rem 0 6rem 3rem var(--widget-bg-color);
+      color: $light-color;
+      display: flex;
+      flex: 0 0 2rem;
+      height: 2rem;
+      justify-content: center;
+      transition: all .25s ease-in-out;
+      width: 2rem;
+
+      &.website {
+        background: $light-color;
+        box-shadow: inset 0 0 0 .05rem rgba($dark-color, .1), 0 .2rem .4rem rgba($dark-color, .05), 1rem 0 6rem 3rem var(--widget-bg-color);
+
+        img {
+          border-radius: .2rem;
+          height: 1.2rem;
+          position: absolute;
+          width: 1.2rem;
+        }
+      }
+    }
+
+    .platform-title {
+      font-weight: 500;
+      margin-top: .5rem;
+      width: 100%;
+    }
+
+    .platform-handle {
+      color: $gray-color;
+      font-size: .6rem;
+      width: 100%;
+    }
+
+    .platform-action {
+      margin-top: auto;
+
+      &.active {
+        .btn {
+          opacity: 1;
+        }
+      }
+
+      .btn {
+        background: var(--widget-primary-color, lighten($bg-color, 2%));
+        border: .05rem solid rgba($dark-color, .075);
+        color: $light-color;
+        opacity: 0;
+        transition: opacity .2s ease-in-out;
+        position: relative;
+      }
+    }
+
+    .profile-widget-title {
+      align-items: center;
+      display: flex;
+      font-size: .7rem;
+      font-weight: 500;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // NFT Widget
+  .profile-widget-nft {
+    background: $light-color;
+    border-color: lighten($bg-color, 3%);
+    position: relative;
+
+    &.active {
+      .collection-switcher {
+        box-shadow: 0 .4rem .4rem -.2rem rgba($dark-color, .1);
+      }
+    }
+
+    .emoji-large {
+      font-size: 1.2rem;
+    }
+
+    .expand-icon {
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      color: #121212;
+      cursor: pointer;
+    }
+
+    .widgets-collection-list {
+      display: flex;
+      flex-wrap: nowrap;
+      height: 4rem;
+      margin: 0 -1rem;
+      overflow-x: auto;
+      padding: 0 1rem;
+
+      .collection-item {
+        border-radius: .6rem;
+        height: 3.5rem;
+        padding: .25rem;
+        transition: all .25s ease-in-out;
+        width: 3.5rem;
+
+        &::after {
+          bottom: auto;
+          top: 100%;
+          transform: translate(-50%, -$unit-2);
+        }
+
+        &:focus,
+        &:hover {
+          background: lighten($bg-color, 2%);
+
+          &::after {
+            transform: translate(-50%, $unit-1);
+          }
+        }
+
+        &.active {
+          background: $bg-color;
+
+          .img-responsive {
+            box-shadow: 0 .1rem .4rem rgba($dark-color, .25);
+          }
+        }
+
+        .collection-img {
+          border-radius: .5rem;
+          height: 3rem;
+          width: 3rem;
+
+          .img-responsive {
+            border-radius: .5rem;
+            box-shadow: 0 .1rem .4rem rgba($dark-color, .1);
+            font-size: 1.6rem;
+            height: 100%;
+            object-fit: cover;
+            width: 100%;
+          }
+        }
+      }
+    }
+  }
+
+  // POAP Widget
+  .profile-widget-poap {
+    aspect-ratio: auto;
+    color: #463E68;
+    --widget-bg-color: #F5F4FE;
+
+    .platform-icon {
+      box-shadow: inset 0 0 0 .05rem rgba($dark-color, .05), 0 .2rem .4rem rgba($dark-color, .01), 2rem -4rem 6rem 10rem var(--widget-bg-color);
+    }
+
+    .widgets-collection-list {
+      display: flex;
+      flex-wrap: nowrap;
+      height: 5rem;
+      margin: 0 -1rem;
+      overflow-x: auto;
+      padding: 0 1rem;
+
+      .poap-item {
+        flex: 0 0 4rem;
+        height: 4rem;
+        width: 4rem;
+
+        &:not(:first-child) {
+          margin-left: -.5rem;
+        }
+
+        .img-responsive,
+        .video-responsive {
+          background: $light-color;
+          border: .05rem solid #2f2a47;
+          border-radius: 50%;
+          box-shadow: -.1rem .1rem 0 .1rem #E4E2FD;
+          height: 4rem;
+          padding: .25rem;
+          width: 4rem;
+        }
+      }
+    }
+  }
+}
+
+// NFT Preview
+.nft-preview {
+  align-items: center;
+  background-color: rgba($dark-color, .9);
+  display: flex;
+  height: 100vh;
+  justify-content: center;
+  left: 0;
+  position: fixed;
+  top: 0;
+  width: 100vw;
+  z-index: 199;
+
+  .preview-overlay {
+    background-position: center;
+    background-size: cover;
+    bottom: -2rem;
+    filter: blur(4rem);
+    left: -2rem;
+    opacity: .5;
+    position: fixed;
+    right: -2rem;
+    top: -2rem;
+  }
+
+  .btn-close {
+    position: fixed;
+    right: 1rem;
+    top: 1rem;
+    z-index: 999;
+  }
+
+  .preview-container {
+    border-radius: .8rem;
+    display: flex;
+    height: 80vh;
+    max-width: $size-xl;
+    width: 100%;
+
+    @media screen and (max-width: $size-md) {
+      flex-direction: column;
+      height: 98vh;
+      overflow-y: auto;
+      width: 98vw;
+
+      .preview-content {
+        max-height: none;
+      }
+
+      .preview-image {
+        .img-responsive,
+        .video-responsive {
+          max-width: 98vw;
+        }
+      }
+    }
+
+    @media screen and (min-width: $size-md) {
+      align-items: center;
+
+      .preview-content {
+        height: 24rem;
+        width: 20rem;
+        overflow: hidden auto;
+      }
+    }
+  }
+
+  .preview-image {
+    align-items: center;
+    border-radius: .8rem;
+    display: flex;
+    justify-content: center;
+    margin: auto;
+    position: relative;
+
+    &.preview-image-poap {
+      .img-container {
+        border-radius: 50%;
+      }
+    }
+
+    .img-responsive,
+    .video-responsive {
+      border-radius: .8rem;
+      box-shadow: 0 .5rem 8rem var(--nft-primary-color);
+      height: auto;
+      max-height: 80vh;
+      max-width: 50vw;
+      width: 100%;
+    }
+
+    .img-placeholder {
+      font-size: 6rem;
+      height: 12rem;
+      width: 12rem;
+    }
+  }
+
+  .preview-content {
+    background: lighten($bg-color, 5%);
+    border-radius: .8rem;
+    padding: 2rem;
+    position: relative;
+    width: 100%;
+    word-break: break-word;
+
+    .collection-title {
+      align-items: flex-start;
+      display: flex;
+      padding-bottom: .5rem;
+
+      .collection-logo {
+        flex: 0 0 1.2rem;
+        margin-right: .25rem;
+
+        .img-responsive {
+          border-radius: .4rem;
+          box-shadow: 0 .2rem .8rem rgba($dark-color, .2);
+          font-size: 1rem;
+          height: 1.2rem;
+          object-fit: cover;
+          width: 1.2rem;
+        }
+      }
+
+      .collection-name {
+        font-size: .65rem;
+        font-weight: 700;
+        line-height: 1.2rem;
+      }
+    }
+
+    .nft-header-name {
+      font-size: 1.2rem;
+      font-weight: 900;
+      line-height: 1.25;
+      word-break: break-all;
+    }
+
+    .nft-header-actions {
+      margin-top: .5rem;
+    }
+
+    .traits-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .5rem;
+
+      .traits-card {
+        background: $bg-color;
+        border: .05rem solid rgba($dark-color, 0.01);
+        box-shadow: 0 .2rem .8rem -.2rem rgba($dark-color, 0.1);
+        border-radius: .4rem;
+        color: $dark-color;
+        min-width: 3.5rem;
+        text-transform: uppercase;
+        padding: .2rem .4rem;
+
+        .trait-type {
+          color: $gray-color-dark;
+          font-size: .5rem;
+          line-height: 2;
+        }
+
+        .trait-value {
+          font-weight: 700;
+          font-size: .7rem;
+          line-height: 1.5;
+        }
+
+        .trait_percentage {
+          font-weight: 500;
+          font-size: .3rem;
+          line-height: 1;
+        }
+      }
+    }
+  }
+
+  .panel-widget {
+    margin: 2rem 0;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .panel-widget-title {
+      font-size: .7rem;
+      font-weight: 900;
+      line-height: 1.2rem;
+      margin-bottom: .5rem;
+      text-transform: uppercase;
+    }
+  }
+}
+
+// NFT Collection Switcher
+.collection-switcher {
+  background: $light-color;
+  user-select: none;
+  margin: 0 -1rem;
+
+  .collection-list {
+    display: flex;
+    gap: .1rem;
+    overflow: auto hidden;
+    padding: .25rem 1rem;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+
+    .collection-item {
+      background: #fff;
+      border-radius: .6rem;
+      flex: 0 0;
+      height: 3.1rem;
+      padding: .25rem;
+      transition: all .25s ease-in-out;
+      width: 3.1rem;
+
+      &::after {
+        bottom: auto;
+        top: 100%;
+        transform: translate(-50%, -$unit-2);
+      }
+
+      &:focus,
+      &:hover {
+        background: lighten($bg-color, 2%);
+
+        &::after {
+          transform: translate(-50%, $unit-1);
+        }
+      }
+
+      &.active {
+        background: $bg-color;
+
+        .img-responsive {
+          box-shadow: 0 .1rem .4rem rgba($dark-color, .25);
+        }
+      }
+
+      .collection-img {
+        border-radius: .5rem;
+        height: 2.6rem;
+        width: 2.6rem;
+
+        &.collection-img-more {
+          .img-responsive {
+            padding: .5rem;
+          }
+        }
+
+        .img-responsive {
+          border-radius: .5rem;
+          box-shadow: 0 .1rem .4rem rgba($dark-color, .1);
+          font-size: 1.6rem;
+          height: 2.6rem;
+          object-fit: cover;
+          width: 2.6rem;
+        }
+      }
+    }
+  }
+}
+
+.nft-collection {
+  position: relative;
+  flex: 1 1;
+  height: 100%;
+  overflow-y: auto;
+  padding: 0 .5rem;
+
+  .nft-collection-list {
+    .nft-collection-item {
+      margin-top: .5rem;
+    }
+
+    .collection-title {
+      align-items: center;
+      display: flex;
+      padding: 1rem 0 .5rem 0;
+
+      .collection-logo {
+        flex: 0 0 1.2rem;
+        margin-right: .25rem;
+
+        .img-responsive {
+          border-radius: .4rem;
+          box-shadow: 0 .2rem .8rem rgba($dark-color, .2);
+          font-size: 1rem;
+          height: 1.2rem;
+          object-fit: cover;
+          width: 1.2rem;
+        }
+      }
+
+      .collection-name {
+        font-size: .8rem;
+        font-weight: 700;
+      }
+    }
+
+    .nft-list {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      margin: 0 -.5rem 1rem -.5rem;
+
+      .nft-container {
+        flex: 0 0 33.3333%;
+        width: 33.3333%;
+        min-width: 8rem;
+
+        @media screen and (max-width: $size-md) {
+          flex: 0 0 50%;
+        }
+      }
+
+      .nft-item {
+        border-radius: .75rem;
+        padding: .5rem;
+        transition: all .25s ease-in-out;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+
+        &:focus,
+        &:hover {
+          background: lighten($bg-color, 2%);
+        }
+
+        .img-container {
+          margin-bottom: .5rem;
+          position: relative;
+          overflow: hidden;
+          transition: filter 0.3s ease-out;
+          border-radius: .5rem;
+
+          .loaded .img-responsive {
+            filter: none;
+          }
+
+
+          .img-responsive {
+            aspect-ratio: 1 / 1;
+            border-radius: .5rem;
+            box-shadow: 0 .2rem 1rem rgba($dark-color, .15), 0 .05rem .2rem rgba($dark-color, .05);
+            font-size: 4rem;
+            object-fit: cover;
+            width: 100%;
+            filter: blur(8px);
+            transition: filter 0.3s ease-out;
+          }
+        }
+
+        .collection-name {
+          color: $gray-color-dark;
+          font-size: .5rem;
+
+        }
+
+        .nft-name {
+          font-size: .65rem;
+          font-weight: 700;
+        }
+      }
+    }
+  }
+}
+
+// Share
+.share {
+  display: flex;
+  height: 6rem;
+  width: 16rem;
+}
+
+// Footer
+.web3bio-badge {
+  align-items: center;
+  border-radius: .6rem;
+  display: flex;
+  opacity: .95;
+  padding: .5rem;
+  transition: opacity .25s ease-in-out;
+
+  @media screen and (min-width: $size-lg) {
+    bottom: .5rem;
+    position: fixed;
+  }
+
+  span {
+    transition: transform .15s ease-in-out;
+  }
+
+  &:focus,
+  &:hover {
+    opacity: 1;
+
+    span {
+      transform: scale(1.5) rotate(-10deg);
+    }
+  }
+}

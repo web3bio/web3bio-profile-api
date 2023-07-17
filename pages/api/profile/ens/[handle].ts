@@ -179,7 +179,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     if (isAddress(handle)) {
       if (!isValidEthereumAddress(handle))
         return errorHandle({
-          address: handle,
+          address: handle.toLowerCase(),
           identity: null,
           platform: PlatformType.ens,
           code: 404,
@@ -189,7 +189,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       ensDomain = await resolveNameFromAddress(handle);
       if (!ensDomain) {
         return errorHandle({
-          address: handle,
+          address: handle.toLowerCase(),
           identity: null,
           platform: PlatformType.ens,
           code: 404,
@@ -255,7 +255,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
 
     let LINKRES = {};
     let CRYPTORES: { [index: string]: string | null } = {
-      eth: address,
+      eth: address.toLowerCase(),
     };
     if (gtext && gtext[0].resolver.texts) {
       const linksRecords = gtext[0]?.resolver?.texts;
@@ -326,7 +326,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         return _cryptoRes;
       };
       CRYPTORES = {
-        eth: address,
+        eth: address.toLowerCase(),
         ...(await getCrypto()),
       };
     }
@@ -335,7 +335,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const avatarHandle =
       (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || "";
     const resJSON = {
-      address,
+      address: address.toLowerCase(),
       identity: ensDomain,
       platform: PlatfomData.ENS.key,
       displayName:

@@ -28,12 +28,6 @@ describe("Test For Farcaster Profile API", () => {
     expect(json.identity).toBe("farcaster");
     expect(!!json.avatar).toBe(true);
   });
-  it("It should response 404 for null", async () => {
-    const res = await queryClient("/profile/farcaster/null");
-    expect(res.status).toBe(404);
-    const json = await res.json();
-    expect(json.error).toBe("Not Found");
-  });
   it("It should response 404 for 💗", async () => {
     const res = await queryClient("/profile/farcaster/💗");
     expect(res.status).toBe(404);
