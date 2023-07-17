@@ -13,6 +13,7 @@
 @import "spectre/forms";
 @import "spectre/labels";
 @import "spectre/media";
+@import "spectre/icons";
 
 // Layout
 @import "spectre/layout";
@@ -20,25 +21,18 @@
 // Components
 @import "spectre/avatars";
 @import "spectre/cards";
-@import "spectre/dropdowns";
+// @import "spectre/dropdowns";
 @import "spectre/empty";
-@import "spectre/menus";
-@import "spectre/modals";
-@import "spectre/navs";
-@import "spectre/pagination";
+// @import "spectre/menus";
+// @import "spectre/modals";
+// @import "spectre/navs";
+// @import "spectre/pagination";
 @import "spectre/toasts";
 @import "spectre/tooltips";
 
 // Utility classes
 @import "spectre/animations";
 @import "spectre/utilities";
-
-// Components
-@import "panel";
-@import "graph";
-@import "profile";
-@import "search";
-@import "share";
 
 // Variables
 $pride-color-1: #FBF4EC !default;

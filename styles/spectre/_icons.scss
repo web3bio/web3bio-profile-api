@@ -22,19 +22,40 @@ $icon-border-width: $border-width-lg;
     transform: translate(-50%, -50%);
   }
 }
-.icon-mail {
+
+.icon-arrow-down,
+.icon-arrow-left,
+.icon-arrow-right,
+.icon-arrow-up {
   &::before {
     border: $icon-border-width solid currentColor;
-    border-radius: $border-radius;
-    height: .8em;
-    width: 1em;
-  }
-  &::after {
-    border: $icon-border-width solid currentColor;
+    border-bottom: 0;
     border-right: 0;
-    border-top: 0;
-    height: .5em;
-    transform: translate(-50%, -90%) rotate(-45deg) skew(10deg, 10deg);
-    width: .5em;
+    height: .65em;
+    width: .65em;
+  }
+}
+
+.icon-arrow-down {
+  &::before {
+    transform: translate(-50%, -75%) rotate(225deg);
+  }
+}
+
+.icon-arrow-left {
+  &::before {
+    transform: translate(-25%, -50%) rotate(-45deg);
+  }
+}
+
+.icon-arrow-right {
+  &::before {
+    transform: translate(-75%, -50%) rotate(135deg);
+  }
+}
+
+.icon-arrow-up {
+  &::before {
+    transform: translate(-50%, -25%) rotate(45deg);
   }
 }
