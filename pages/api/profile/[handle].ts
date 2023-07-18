@@ -33,6 +33,21 @@ const respondWithCache = (json: string) => {
     },
   });
 };
+const getPlatformSort = (
+  obj: Array<ProfileAPIResponse>,
+  platform: PlatformType
+) => {
+  if (
+    [PlatformType.ens, PlatformType.lens, PlatformType.farcaster].includes(
+      platform
+    )
+  )
+    return platform;
+  if (obj.find((x) => x.platform === PlatformType.ens)) return PlatformType.ens;
+  if (obj.find((x) => x.platform === PlatformType.lens))
+    return PlatformType.lens;
+  return PlatformType.farcaster;
+};
 
 const resolveHandleFromRelationService = (
   handle: string,
@@ -115,7 +130,7 @@ const resolveUniversalRespondFromRelation = async ({
     }
   );
   neighbours.unshift(sourceNeighbour);
-  const obj = await Promise.allSettled([
+  const obj = (await Promise.allSettled([
     ...neighbours.map((x: NeighbourDetail) => {
       if (
         [
@@ -153,12 +168,10 @@ const resolveUniversalRespondFromRelation = async ({
         message: error,
         platform,
       });
-    });
+    })) as Array<ProfileAPIResponse>;
 
   return respondWithCache(
-    JSON.stringify(
-      sortByPlatform(obj as ProfileAPIResponse[], platform || PlatformType.ens)
-    )
+    JSON.stringify(sortByPlatform(obj, getPlatformSort(obj, platform)))
   );
 };
 const resolveUniversalHandle = async (
