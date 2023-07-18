@@ -34,15 +34,6 @@ const respondWithCache = (json: string) => {
   });
 };
 
-const respondEmpty = () => {
-  return new Response(JSON.stringify([]), {
-    status: 404,
-    headers: {
-      "Cache-Control": "no-store",
-    },
-  });
-};
-
 const resolveHandleFromRelationService = (
   handle: string,
   platform?: PlatformType
@@ -87,12 +78,10 @@ const resolveUniversalRespondFromRelation = async ({
   handle: string;
   req: RequestInterface;
 }) => {
-  if (!handle) respondEmpty();
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
   );
-  console.log(responseFromRelation, "response");
   if (responseFromRelation?.error)
     return errorHandle({
       identity: handle,
@@ -104,7 +93,13 @@ const resolveUniversalRespondFromRelation = async ({
     responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
   const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor;
   const resolvedIdentity = resolved?.identity ? resolved : resolved?.resolved;
-  if (!originNeighbours || !resolvedIdentity) return respondEmpty();
+  if (!originNeighbours?.length || !resolvedIdentity)
+    return errorHandle({
+      identity: handle,
+      platform,
+      code: 404,
+      message: ErrorMessages.notFound,
+    });
 
   const sourceNeighbour = {
     platform: resolvedIdentity?.platform,
@@ -156,7 +151,7 @@ const resolveUniversalRespondFromRelation = async ({
         identity: handle,
         code: 500,
         message: error,
-        platform: PlatformType.nextid,
+        platform,
       });
     });
 
@@ -170,7 +165,6 @@ const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
-  if (!handle) return respondEmpty();
   const handleResolvers = {
     [PlatformType.nextid]: regexAvatar,
     [PlatformType.ethereum]: regexEth,
@@ -190,7 +184,14 @@ const resolveUniversalHandle = async (
       platformToQuery = platform;
     }
   }
-  return resolveUniversalRespondFromRelation({
+  if (!platformToQuery)
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.nextid,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  return await resolveUniversalRespondFromRelation({
     platform: platformToQuery as PlatformType,
     handle: handleToQuery,
     req,
