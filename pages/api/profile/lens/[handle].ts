@@ -62,24 +62,12 @@ const resolveNameFromLens = async (handle: string) => {
       response = await getLensProfile(handle, LensParamType.domain);
     }
     if (!response) {
-      if (isAddress(handle)) {
-        return errorHandle({
-          address: handle,
-          identity: null,
-          platform: PlatformType.lens,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      } else {
-        return errorHandle({
-          address: null,
-          identity: handle,
-          platform: PlatformType.lens,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
-      
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.lens,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const pureHandle = response.handle.replaceAll(".lens", "");
     let LINKRES = {};
@@ -154,7 +142,6 @@ const resolveNameFromLens = async (handle: string) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.lens,
       code: 500,
@@ -171,7 +158,6 @@ export default async function handler(req: NextApiRequest) {
 
   if (!regexLens.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
-      address: null,
       identity: lowercaseName,
       platform: PlatformType.lens,
       code: 404,

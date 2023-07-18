@@ -95,7 +95,6 @@ const resolveUniversalRespondFromRelation = async ({
   console.log(responseFromRelation, "response");
   if (responseFromRelation?.error)
     return errorHandle({
-      address: null,
       identity: handle,
       platform,
       message: responseFromRelation?.error,
@@ -154,7 +153,6 @@ const resolveUniversalRespondFromRelation = async ({
     })
     .catch((error) => {
       return errorHandle({
-        address: null,
         identity: handle,
         code: 500,
         message: error,
@@ -204,7 +202,6 @@ export default async function handler(req: RequestInterface) {
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   if (!inputName) {
     return errorHandle({
-      address: null,
       identity: inputName,
       platform: PlatformType.nextid,
       code: 404,
