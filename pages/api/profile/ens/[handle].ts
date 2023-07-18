@@ -7,7 +7,7 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import _ from "lodash";
-import { PlatformType, PlatfomData } from "@/utils/platform";
+import { PlatformType, PlatformData } from "@/utils/platform";
 import { CoinType } from "@/utils/cointype";
 import { regexEns } from "@/utils/regexp";
 import { ethers } from "ethers";
@@ -267,7 +267,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
         const _linkRes: { [index: string]: any } = {};
         for (let i = 0; i < linksToFetch.length; i++) {
           const recordText = linksToFetch[i];
-          const key = _.findKey(PlatfomData, (o) => {
+          const key = _.findKey(PlatformData, (o) => {
             return o.ensText?.includes(recordText);
           });
           const handle = resolveHandle(
@@ -333,7 +333,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     const resJSON = {
       address: address.toLowerCase(),
       identity: ensDomain,
-      platform: PlatfomData.ENS.key,
+      platform: PlatformData.ENS.key,
       displayName:
         (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
         ensDomain,

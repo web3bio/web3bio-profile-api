@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatfomData, PlatformType } from "@/utils/platform";
+import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -69,7 +69,7 @@ const resolveFarcasterHandle = async (handle: string) => {
     const resJSON = {
       address: response[0].connectedAddress || _res.address,
       identity: _res.username || _res.displayName,
-      platform: PlatfomData.farcaster.key,
+      platform: PlatformData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
       avatar: _res.avatarUrl,
       email: null,
