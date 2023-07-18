@@ -13,15 +13,25 @@ export const enum FarcasterQueryParamType {
   connected_address = "connected_address",
 }
 
-const originBase = "https://searchcaster.xyz/api/";
+const originBase = "https://api.warpcast.com/v2/";
 
 const regexTwitterLink = /(\S*).twitter/i;
 
-export const FetchFromFarcasterOrigin = async (value: string, type: FarcasterQueryParamType) => {
+export const FetchFromFarcasterOrigin = async (
+  value: string,
+  type: FarcasterQueryParamType
+) => {
   if (!value) return;
-  const res = await fetch(originBase + `profiles?${type}=${value}`).then(
-    (res) => res.json()
-  );
+  const queryPath =
+    type === FarcasterQueryParamType.connected_address
+      ? `user-by-verification?address=${value}`
+      : `verifications?fid=966`;
+  const res = await fetch(originBase + queryPath, {
+    headers: {
+      Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
+    },
+  }).then((res) => res.json());
+  console.log(res, "kkkk");
   return res;
 };
 
@@ -29,9 +39,15 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.connected_address);
+      response = await FetchFromFarcasterOrigin(
+        handle,
+        FarcasterQueryParamType.connected_address
+      );
     } else {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.username);
+      response = await FetchFromFarcasterOrigin(
+        handle,
+        FarcasterQueryParamType.username
+      );
     }
     if (!response || !response.length) {
       if (isAddress(handle)) {
@@ -52,7 +68,7 @@ const resolveFarcasterHandle = async (handle: string) => {
         });
       }
     }
-    const _res = response[0].body;
+    const _res = response?.result.user;
     const resolvedHandle = resolveHandle(_res.username);
     const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
       [PlatformType.farcaster]: {
@@ -69,7 +85,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: response[0].connectedAddress || _res.address,
+      address: isAddress(handle) ? handle.toLowerCase() : null,
       identity: _res.username || _res.displayName,
       platform: PlatfomData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
