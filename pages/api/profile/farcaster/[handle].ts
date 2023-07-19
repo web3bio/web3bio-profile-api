@@ -51,14 +51,13 @@ const resolveFarcasterHandle = async (handle: string) => {
     if (isAddress(handle)) {
       response = {
         address: handle.toLowerCase(),
-        ...(await fetchWarpcastWithAddress(handle)).result.user,
+        ...(await fetchWarpcastWithAddress(handle))?.result?.user,
       };
     } else {
-      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
-        .user;
+      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result?.user;
       const firstAddress = (
         await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
-      )?.result.verifications?.[0]?.address;
+      )?.result?.verifications?.[0]?.address;
       if (!firstAddress)
         return errorHandle({
           identity: handle,
