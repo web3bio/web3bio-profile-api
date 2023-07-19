@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatfomData, PlatformType } from "@/utils/platform";
+import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -60,10 +60,10 @@ const resolveFarcasterHandle = async (handle: string) => {
     } else {
       const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
         .user;
-      const fristAddress = (
+      const firstAddress = (
         await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
       )?.result.verifications?.[0]?.address;
-      if (!fristAddress)
+      if (!firstAddress)
         return errorHandle({
           address: null,
           identity: handle,
@@ -72,7 +72,7 @@ const resolveFarcasterHandle = async (handle: string) => {
           message: ErrorMessages.notFound,
         });
       response = {
-        address: fristAddress.toLowerCase(),
+        address: firstAddress.toLowerCase(),
         ...rawUser,
       };
     }
@@ -96,7 +96,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       }
     }
     const resolvedHandle = resolveHandle(response.username);
-    const LINKERS: Partial<Record<PlatformType, LinksItem>> = {
+    const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
       [PlatformType.farcaster]: {
         link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
         handle: resolvedHandle,
@@ -109,7 +109,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       const text = response.profile.bio.text;
       const matched = text.match(regexTwitterLink)[1];
       const resolveMatch = resolveHandle(matched);
-      LINKERS[PlatformType.twitter] = {
+      LINKRES[PlatformType.twitter] = {
         link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
         handle: resolveMatch,
       };
@@ -117,14 +117,14 @@ const resolveFarcasterHandle = async (handle: string) => {
     const resJSON = {
       address: response.address.toLowerCase(),
       identity: response.username || response.displayName,
-      platform: PlatfomData.farcaster.key,
+      platform: PlatformData.farcaster.key,
       displayName: response.displayName || resolvedHandle,
       avatar: response.pfp.url,
       email: null,
       description: response.profile.bio.text,
       location: null,
       header: null,
-      links: LINKERS,
+      links: LINKRES,
       addresses: {
         eth: response.address.toLowerCase(),
       },
