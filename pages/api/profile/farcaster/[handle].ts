@@ -26,15 +26,12 @@ const _fetcher = (url: string) => {
 };
 
 const fetchWarpcastWithAddress = async (address: string) => {
-  if (!address) return;
-
   const res = await _fetcher(
     originBase + `user-by-verification?address=${address}`
   ).then((res) => res.json());
   return res;
 };
 const fetchFidFromWarpcastWithUsername = async (uname: string) => {
-  if (!uname) return;
   const res = await _fetcher(
     originBase + `user-by-username?username=${uname}`
   ).then((res) => res.json());
@@ -42,7 +39,6 @@ const fetchFidFromWarpcastWithUsername = async (uname: string) => {
 };
 
 const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
-  if (!fid) return;
   const res = await _fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
