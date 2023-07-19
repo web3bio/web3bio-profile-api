@@ -15,23 +15,37 @@ export const enum FarcasterQueryParamType {
 
 const originBase = "https://api.warpcast.com/v2/";
 
-const regexTwitterLink = /(\S*).twitter/i;
+const regexTwitterLink = /(\S*)(.|@)twitter/i;
 
-export const FetchFromFarcasterOrigin = async (
-  value: string,
-  type: FarcasterQueryParamType
-) => {
-  if (!value) return;
-  const queryPath =
-    type === FarcasterQueryParamType.connected_address
-      ? `user-by-verification?address=${value}`
-      : `verifications?fid=966`;
-  const res = await fetch(originBase + queryPath, {
+const _fetcher = (url: string) => {
+  return fetch(url, {
     headers: {
       Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
     },
-  }).then((res) => res.json());
-  console.log(res, "kkkk");
+  });
+};
+
+const fetchWarpcastWithAddress = async (address: string) => {
+  if (!address) return;
+
+  const res = await _fetcher(
+    originBase + `user-by-verification?address=${address}`
+  ).then((res) => res.json());
+  return res;
+};
+const fetchFidFromWarpcastWithUsername = async (uname: string) => {
+  if (!uname) return;
+  const res = await _fetcher(
+    originBase + `user-by-username?username=${uname}`
+  ).then((res) => res.json());
+  return res;
+};
+
+const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
+  if (!fid) return;
+  const res = await _fetcher(originBase + `verifications?fid=${fid}`).then(
+    (res) => res.json()
+  );
   return res;
 };
 
@@ -39,17 +53,30 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromFarcasterOrigin(
-        handle,
-        FarcasterQueryParamType.connected_address
-      );
+      response = {
+        address: handle.toLowerCase(),
+        ...(await fetchWarpcastWithAddress(handle)).result.user,
+      };
     } else {
-      response = await FetchFromFarcasterOrigin(
-        handle,
-        FarcasterQueryParamType.username
-      );
+      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
+        .user;
+      const fristAddress = (
+        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
+      )?.result.verifications?.[0]?.address;
+      if (!fristAddress)
+        return errorHandle({
+          address: null,
+          identity: handle,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      response = {
+        address: fristAddress.toLowerCase(),
+        ...rawUser,
+      };
     }
-    if (!response || !response.length) {
+    if (!response) {
       if (isAddress(handle)) {
         return errorHandle({
           address: handle,
@@ -68,35 +95,38 @@ const resolveFarcasterHandle = async (handle: string) => {
         });
       }
     }
-    const _res = response?.result.user;
-    const resolvedHandle = resolveHandle(_res.username);
-    const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
+    const resolvedHandle = resolveHandle(response.username);
+    const LINKERS: Partial<Record<PlatformType, LinksItem>> = {
       [PlatformType.farcaster]: {
         link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
         handle: resolvedHandle,
       },
     };
-    if (_res.bio && _res.bio.match(regexTwitterLink)) {
-      const matched = _res.bio.match(regexTwitterLink)[1];
+    if (
+      response.profile.bio.text &&
+      response.profile.bio.text.match(regexTwitterLink)
+    ) {
+      const text = response.profile.bio.text;
+      const matched = text.match(regexTwitterLink)[1];
       const resolveMatch = resolveHandle(matched);
-      LINKRES[PlatformType.twitter] = {
+      LINKERS[PlatformType.twitter] = {
         link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
         handle: resolveMatch,
       };
     }
     const resJSON = {
-      address: isAddress(handle) ? handle.toLowerCase() : null,
-      identity: _res.username || _res.displayName,
+      address: response.address.toLowerCase(),
+      identity: response.username || response.displayName,
       platform: PlatfomData.farcaster.key,
-      displayName: _res.displayName || resolvedHandle,
-      avatar: _res.avatarUrl,
+      displayName: response.displayName || resolvedHandle,
+      avatar: response.pfp.url,
       email: null,
-      description: _res.bio,
+      description: response.profile.bio.text,
       location: null,
       header: null,
-      links: LINKRES,
+      links: LINKERS,
       addresses: {
-        eth: response[0].connectedAddress || _res.address,
+        eth: response.address.toLowerCase(),
       },
     };
     return new Response(JSON.stringify(resJSON), {
