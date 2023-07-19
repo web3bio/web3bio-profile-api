@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatfomData, PlatformType } from "@/utils/platform";
+import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -17,7 +17,10 @@ const originBase = "https://searchcaster.xyz/api/";
 
 const regexTwitterLink = /(\S*).twitter/i;
 
-export const FetchFromFarcasterOrigin = async (value: string, type: FarcasterQueryParamType) => {
+export const FetchFromFarcasterOrigin = async (
+  value: string,
+  type: FarcasterQueryParamType
+) => {
   if (!value) return;
   const res = await fetch(originBase + `profiles?${type}=${value}`).then(
     (res) => res.json()
@@ -29,28 +32,23 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.connected_address);
+      response = await FetchFromFarcasterOrigin(
+        handle,
+        FarcasterQueryParamType.connected_address
+      );
     } else {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.username);
+      response = await FetchFromFarcasterOrigin(
+        handle,
+        FarcasterQueryParamType.username
+      );
     }
     if (!response || !response.length) {
-      if (isAddress(handle)) {
-        return errorHandle({
-          address: handle,
-          identity: null,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      } else {
-        return errorHandle({
-          address: null,
-          identity: handle,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const _res = response[0].body;
     const resolvedHandle = resolveHandle(_res.username);
@@ -69,9 +67,9 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: response[0].connectedAddress || _res.address,
+      address: (response[0].connectedAddress || _res.address)?.toLowerCase(),
       identity: _res.username || _res.displayName,
-      platform: PlatfomData.farcaster.key,
+      platform: PlatformData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
       avatar: _res.avatarUrl,
       email: null,
@@ -80,7 +78,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       header: null,
       links: LINKRES,
       addresses: {
-        eth: response[0].connectedAddress || _res.address,
+        eth: (response[0].connectedAddress || _res.address)?.toLowerCase(),
       },
     };
     return new Response(JSON.stringify(resJSON), {
@@ -93,7 +91,6 @@ const resolveFarcasterHandle = async (handle: string) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.farcaster,
       code: 500,
@@ -113,7 +110,6 @@ export default async function handler(req: NextApiRequest) {
     (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
   )
     return errorHandle({
-      address: null,
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
