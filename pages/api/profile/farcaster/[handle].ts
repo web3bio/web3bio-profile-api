@@ -67,7 +67,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: response[0].connectedAddress || _res.address,
+      address: (response[0].connectedAddress || _res.address)?.toLowerCase(),
       identity: _res.username || _res.displayName,
       platform: PlatformData.farcaster.key,
       displayName: _res.displayName || resolvedHandle,
@@ -78,7 +78,7 @@ const resolveFarcasterHandle = async (handle: string) => {
       header: null,
       links: LINKRES,
       addresses: {
-        eth: response[0].connectedAddress || _res.address,
+        eth: (response[0].connectedAddress || _res.address)?.toLowerCase(),
       },
     };
     return new Response(JSON.stringify(resJSON), {

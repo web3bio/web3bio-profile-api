@@ -316,7 +316,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
                 resolverAddress,
                 ensDomain,
                 _coinType
-              )) || null;
+              ))?.toLowerCase() || null;
           }
         }
         return _cryptoRes;
