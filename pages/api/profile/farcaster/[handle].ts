@@ -13,16 +13,33 @@ export const enum FarcasterQueryParamType {
   connected_address = "connected_address",
 }
 
-const originBase = "https://searchcaster.xyz/api/";
+const originBase = "https://api.warpcast.com/v2/";
 
-const regexTwitterLink = /(\S*).twitter/i;
+const regexTwitterLink = /(\S*)(.|@)twitter/i;
 
-export const FetchFromFarcasterOrigin = async (
-  value: string,
-  type: FarcasterQueryParamType
-) => {
-  if (!value) return;
-  const res = await fetch(originBase + `profiles?${type}=${value}`).then(
+const _fetcher = (url: string) => {
+  return fetch(url, {
+    headers: {
+      Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
+    },
+  });
+};
+
+const fetchWarpcastWithAddress = async (address: string) => {
+  const res = await _fetcher(
+    originBase + `user-by-verification?address=${address}`
+  ).then((res) => res.json());
+  return res;
+};
+const fetchFidFromWarpcastWithUsername = async (uname: string) => {
+  const res = await _fetcher(
+    originBase + `user-by-username?username=${uname}`
+  ).then((res) => res.json());
+  return res;
+};
+
+const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
+  const res = await _fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
   return res;
@@ -32,17 +49,28 @@ const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromFarcasterOrigin(
-        handle,
-        FarcasterQueryParamType.connected_address
-      );
+      response = {
+        address: handle.toLowerCase(),
+        ...(await fetchWarpcastWithAddress(handle))?.result?.user,
+      };
     } else {
-      response = await FetchFromFarcasterOrigin(
-        handle,
-        FarcasterQueryParamType.username
-      );
+      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result?.user;
+      const firstAddress = (
+        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
+      )?.result?.verifications?.[0]?.address;
+      if (!firstAddress)
+        return errorHandle({
+          identity: handle,
+          platform: PlatformType.farcaster,
+          code: 404,
+          message: ErrorMessages.notFound,
+        });
+      response = {
+        address: firstAddress.toLowerCase(),
+        ...rawUser,
+      };
     }
-    if (!response || !response.length) {
+    if (!response) {
       return errorHandle({
         identity: handle,
         platform: PlatformType.farcaster,
@@ -50,16 +78,19 @@ const resolveFarcasterHandle = async (handle: string) => {
         message: ErrorMessages.notFound,
       });
     }
-    const _res = response[0].body;
-    const resolvedHandle = resolveHandle(_res.username);
+    const resolvedHandle = resolveHandle(response.username);
     const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
       [PlatformType.farcaster]: {
         link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
         handle: resolvedHandle,
       },
     };
-    if (_res.bio && _res.bio.match(regexTwitterLink)) {
-      const matched = _res.bio.match(regexTwitterLink)[1];
+    if (
+      response.profile.bio.text &&
+      response.profile.bio.text.match(regexTwitterLink)
+    ) {
+      const text = response.profile.bio.text;
+      const matched = text.match(regexTwitterLink)[1];
       const resolveMatch = resolveHandle(matched);
       LINKRES[PlatformType.twitter] = {
         link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
@@ -67,18 +98,18 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     const resJSON = {
-      address: (response[0].connectedAddress || _res.address)?.toLowerCase(),
-      identity: _res.username || _res.displayName,
+      address: response.address.toLowerCase(),
+      identity: response.username || response.displayName,
       platform: PlatformData.farcaster.key,
-      displayName: _res.displayName || resolvedHandle,
-      avatar: _res.avatarUrl,
+      displayName: response.displayName || resolvedHandle,
+      avatar: response.pfp.url,
       email: null,
-      description: _res.bio,
+      description: response.profile.bio.text,
       location: null,
       header: null,
       links: LINKRES,
       addresses: {
-        eth: (response[0].connectedAddress || _res.address)?.toLowerCase(),
+        eth: response.address.toLowerCase(),
       },
     };
     return new Response(JSON.stringify(resJSON), {

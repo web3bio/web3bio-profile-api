@@ -6,7 +6,7 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.addresses.eth).toBe(
-      "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
+      "0x934b510d4c9103e6a87aef13b816fb080286d649"
     );
     expect(json.identity).toBe("suji");
   });
@@ -24,10 +24,8 @@ describe("Test For Farcaster Profile API", () => {
   });
   it("It should response 200 for farcaster", async () => {
     const res = await queryClient("/profile/farcaster/farcaster");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("farcaster");
-    expect(!!json.avatar).toBe(true);
+    expect(res.status).toBe(404);
+    expect((await res.json()).error).toBe('Not Found')
   });
   it("It should response 404 for 💗", async () => {
     const res = await queryClient("/profile/farcaster/💗");

@@ -6,7 +6,7 @@ describe("Test For Lens Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
-    expect(json.address).toBe("0x934B510D4C9103E6a87AEf13b816fb080286D649");
+    expect(json.address).toBe("0x934b510d4c9103e6a87aef13b816fb080286d649");
   }, 200000);
   it("It should response 200 for stani.lens", async () => {
     const res = await queryClient("/profile/lens/stani.lens");
@@ -14,7 +14,7 @@ describe("Test For Lens Profile API", () => {
     const json = await res.json();
     expect(json.links.website.handle).toBe("lens.xyz");
     expect(json.links.lenster.handle).toBe("stani");
-    expect(json.address).toBe("0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff");
+    expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
   });
   it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(
