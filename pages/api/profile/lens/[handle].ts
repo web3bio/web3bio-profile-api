@@ -4,7 +4,6 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import _ from "lodash";
 import { getLensProfileQuery } from "@/utils/lens";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { PlatformType, PlatformData } from "@/utils/platform";
@@ -18,7 +17,6 @@ export const enum LensParamType {
 
 export const config = {
   runtime: "edge",
-  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
 };
 const LensGraphQLEndpoint = "https://api.lens.dev/";
 
@@ -62,29 +60,17 @@ const resolveNameFromLens = async (handle: string) => {
       response = await getLensProfile(handle, LensParamType.domain);
     }
     if (!response) {
-      if (isAddress(handle)) {
-        return errorHandle({
-          address: handle,
-          identity: null,
-          platform: PlatformType.lens,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      } else {
-        return errorHandle({
-          address: null,
-          identity: handle,
-          platform: PlatformType.lens,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
-      
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.lens,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const pureHandle = response.handle.replaceAll(".lens", "");
     let LINKRES = {};
     let CRYPTORES = {
-      matic: response.ownedBy,
+      matic: response.ownedBy?.toLowerCase(),
     };
     if (response.attributes) {
       const linksRecords = response.attributes;
@@ -101,7 +87,7 @@ const resolveNameFromLens = async (handle: string) => {
         for (let i = 0; i < linksToFetch.length; i++) {
           const recordText = linksToFetch[i];
           const handle = resolveHandle(
-            _.find(linksRecords, (o) => o.key === recordText)?.value
+            linksRecords?.find((o: { key: any }) => o.key === recordText)?.value
           );
           if (handle) {
             const resolvedHandle =
@@ -130,16 +116,16 @@ const resolveNameFromLens = async (handle: string) => {
     const coverPictureUri =
       response.coverPicture?.original?.url || response.coverPicture?.uri || "";
     const resJSON = {
-      address: response.ownedBy,
+      address: response.ownedBy?.toLowerCase(),
       identity: response.handle,
       platform: PlatformData.lens.key,
       displayName: response.name,
-      avatar: (await resolveEipAssetURL(avatarUri)) || "",
+      avatar: (await resolveEipAssetURL(avatarUri)) || null,
       email: null,
       description: response.bio,
-      location: response.attributes
-        ? _.find(response.attributes, (o) => o.key === "location")?.value
-        : null,
+      location:
+        response.attributes?.find((o: { key: string }) => o.key === "location")
+          ?.value || null,
       header: (await resolveEipAssetURL(coverPictureUri)) || "",
       links: LINKRES,
       addresses: CRYPTORES,
@@ -154,7 +140,6 @@ const resolveNameFromLens = async (handle: string) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.lens,
       code: 500,
@@ -171,7 +156,6 @@ export default async function handler(req: NextApiRequest) {
 
   if (!regexLens.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
-      address: null,
       identity: lowercaseName,
       platform: PlatformType.lens,
       code: 404,

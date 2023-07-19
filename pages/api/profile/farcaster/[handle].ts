@@ -61,7 +61,6 @@ const resolveFarcasterHandle = async (handle: string) => {
       )?.result.verifications?.[0]?.address;
       if (!firstAddress)
         return errorHandle({
-          address: null,
           identity: handle,
           platform: PlatformType.farcaster,
           code: 404,
@@ -73,23 +72,12 @@ const resolveFarcasterHandle = async (handle: string) => {
       };
     }
     if (!response) {
-      if (isAddress(handle)) {
-        return errorHandle({
-          address: handle,
-          identity: null,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      } else {
-        return errorHandle({
-          address: null,
-          identity: handle,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
     const resolvedHandle = resolveHandle(response.username);
     const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
@@ -135,7 +123,6 @@ const resolveFarcasterHandle = async (handle: string) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.farcaster,
       code: 500,
@@ -155,7 +142,6 @@ export default async function handler(req: NextApiRequest) {
     (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
   )
     return errorHandle({
-      address: null,
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,

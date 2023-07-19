@@ -163,7 +163,6 @@ export const resolveENSCoinTypesValue = async (
 const resolveHandleFromURL = async (handle: string | undefined) => {
   if (!handle)
     return errorHandle({
-      address: null,
       identity: null,
       platform: PlatformType.ens,
       code: 404,
@@ -179,8 +178,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     if (isAddress(handle)) {
       if (!isValidEthereumAddress(handle))
         return errorHandle({
-          address: handle.toLowerCase(),
-          identity: null,
+          identity: handle.toLowerCase(),
           platform: PlatformType.ens,
           code: 404,
           message: ErrorMessages.invalidAddr,
@@ -189,8 +187,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       ensDomain = await resolveNameFromAddress(handle);
       if (!ensDomain) {
         return errorHandle({
-          address: handle.toLowerCase(),
-          identity: null,
+          identity: handle.toLowerCase(),
           platform: PlatformType.ens,
           code: 404,
           message: ErrorMessages.notFound,
@@ -200,7 +197,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     } else {
       if (!regexEns.test(handle))
         return errorHandle({
-          address: null,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
@@ -210,7 +206,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       const response = await resolveAddressFromName(handle);
       if (!response)
         return errorHandle({
-          address: null,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
@@ -221,7 +216,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
 
       if (!isValidEthereumAddress(resolverAddress)) {
         return errorHandle({
-          address: null,
           identity: ensDomain,
           platform: PlatformType.ens,
           code: 404,
@@ -230,10 +224,13 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       }
 
       gtext = [response];
-      address = await resolveENSCoinTypesValue(resolverAddress, handle, CoinType.eth);
+      address = await resolveENSCoinTypesValue(
+        resolverAddress,
+        handle,
+        CoinType.eth
+      );
       if (!address || !isValidEthereumAddress(address))
         return errorHandle({
-          address: null,
           identity: handle,
           platform: PlatformType.ens,
           code: 404,
@@ -243,7 +240,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
 
     if (!isValidEthereumAddress(resolverAddress)) {
       return errorHandle({
-        address: null,
         identity: ensDomain,
         platform: PlatformType.ens,
         code: 404,
@@ -320,7 +316,7 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
                 resolverAddress,
                 ensDomain,
                 _coinType
-              )) || null;
+              ))?.toLowerCase() || null;
           }
         }
         return _cryptoRes;
@@ -371,7 +367,6 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.ens,
       code: 500,

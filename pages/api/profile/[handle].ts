@@ -33,14 +33,20 @@ const respondWithCache = (json: string) => {
     },
   });
 };
-
-const respondEmpty = () => {
-  return new Response(JSON.stringify([]), {
-    status: 404,
-    headers: {
-      "Cache-Control": "no-store",
-    },
-  });
+const getPlatformSort = (
+  obj: Array<ProfileAPIResponse>,
+  platform: PlatformType
+) => {
+  if (
+    [PlatformType.ens, PlatformType.lens, PlatformType.farcaster].includes(
+      platform
+    )
+  )
+    return platform;
+  if (obj.find((x) => x.platform === PlatformType.ens)) return PlatformType.ens;
+  if (obj.find((x) => x.platform === PlatformType.lens))
+    return PlatformType.lens;
+  return PlatformType.farcaster;
 };
 
 const resolveHandleFromRelationService = (
@@ -87,15 +93,12 @@ const resolveUniversalRespondFromRelation = async ({
   handle: string;
   req: RequestInterface;
 }) => {
-  if (!handle) respondEmpty();
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
   );
-  console.log(responseFromRelation, "response");
   if (responseFromRelation?.error)
     return errorHandle({
-      address: null,
       identity: handle,
       platform,
       message: responseFromRelation?.error,
@@ -105,7 +108,13 @@ const resolveUniversalRespondFromRelation = async ({
     responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
   const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor;
   const resolvedIdentity = resolved?.identity ? resolved : resolved?.resolved;
-  if (!originNeighbours || !resolvedIdentity) return respondEmpty();
+  if (!originNeighbours?.length || !resolvedIdentity)
+    return errorHandle({
+      identity: handle,
+      platform,
+      code: 404,
+      message: ErrorMessages.notFound,
+    });
 
   const sourceNeighbour = {
     platform: resolvedIdentity?.platform,
@@ -121,7 +130,7 @@ const resolveUniversalRespondFromRelation = async ({
     }
   );
   neighbours.unshift(sourceNeighbour);
-  const obj = await Promise.allSettled([
+  const obj = (await Promise.allSettled([
     ...neighbours.map((x: NeighbourDetail) => {
       if (
         [
@@ -154,25 +163,21 @@ const resolveUniversalRespondFromRelation = async ({
     })
     .catch((error) => {
       return errorHandle({
-        address: null,
         identity: handle,
         code: 500,
         message: error,
-        platform: PlatformType.nextid,
+        platform,
       });
-    });
+    })) as Array<ProfileAPIResponse>;
 
   return respondWithCache(
-    JSON.stringify(
-      sortByPlatform(obj as ProfileAPIResponse[], platform || PlatformType.ens)
-    )
+    JSON.stringify(sortByPlatform(obj, getPlatformSort(obj, platform)))
   );
 };
 const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface
 ) => {
-  if (!handle) return respondEmpty();
   const handleResolvers = {
     [PlatformType.nextid]: regexAvatar,
     [PlatformType.ethereum]: regexEth,
@@ -192,7 +197,14 @@ const resolveUniversalHandle = async (
       platformToQuery = platform;
     }
   }
-  return resolveUniversalRespondFromRelation({
+  if (!platformToQuery)
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.nextid,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  return await resolveUniversalRespondFromRelation({
     platform: platformToQuery as PlatformType,
     handle: handleToQuery,
     req,
@@ -204,7 +216,6 @@ export default async function handler(req: RequestInterface) {
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   if (!inputName) {
     return errorHandle({
-      address: null,
       identity: inputName,
       platform: PlatformType.nextid,
       code: 404,
