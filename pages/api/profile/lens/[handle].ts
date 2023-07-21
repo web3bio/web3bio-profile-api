@@ -69,9 +69,6 @@ const resolveNameFromLens = async (handle: string) => {
     }
     const pureHandle = response.handle.replaceAll(".lens", "");
     let LINKRES = {};
-    let CRYPTORES = {
-      matic: response.ownedBy?.toLowerCase(),
-    };
     if (response.attributes) {
       const linksRecords = response.attributes;
       const linksToFetch = linksRecords.reduce(
@@ -128,7 +125,6 @@ const resolveNameFromLens = async (handle: string) => {
           ?.value || null,
       header: (await resolveEipAssetURL(coverPictureUri)) || "",
       links: LINKRES,
-      addresses: CRYPTORES,
     };
     return new Response(JSON.stringify(resJSON), {
       status: 200,

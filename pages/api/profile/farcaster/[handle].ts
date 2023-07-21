@@ -108,9 +108,6 @@ const resolveFarcasterHandle = async (handle: string) => {
       location: null,
       header: null,
       links: LINKRES,
-      addresses: {
-        eth: response.address.toLowerCase(),
-      },
     };
     return new Response(JSON.stringify(resJSON), {
       status: 200,

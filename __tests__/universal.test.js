@@ -70,6 +70,10 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/suji_yan");
     expect(res.status).toBe(200);
   });
+  it("It should response 200 data for 0xd8da6bf26964af9d7eed9e03e53415d37aa96045", async () => {
+    const res = await queryClient("/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045");
+    expect(res.status).toBe(200);
+  });
   it("It should response 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(
       "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649"
