@@ -327,9 +327,9 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       };
     }
     const headerHandle =
-      (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || "";
+      (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
     const avatarHandle =
-      (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || "";
+      (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
     const resJSON = {
       address: address.toLowerCase(),
       identity: ensDomain,
