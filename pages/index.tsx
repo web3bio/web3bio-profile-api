@@ -106,24 +106,24 @@ export default function Home() {
             Parameter
           </h3>
           <ul>
-            <li><strong>identity <span className="label">string</span></strong> - An Ethereum address, an ENS domain, a Lens handle, a Farcaster username (ends with .farcaster), or a Next.ID address.</li>
+            <li><strong>identity</strong> <span className="label">string</span> - An Ethereum address, an ENS domain, a Lens handle, a Farcaster username (ends with .farcaster), or a Next.ID address.</li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Examples
           </h3>
           <ul>
-            <li>Ethereum: <a href="https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045" target="_blank">https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045</a></li>
-            <li>ENS: <a href="https://api.web3.bio/profile/vitalik.eth" target="_blank">https://api.web3.bio/profile/vitalik.eth</a></li>
-            <li>Lens: <a href="https://api.web3.bio/profile/stani.lens" target="_blank">https://api.web3.bio/profile/stani.lens</a></li>
-            <li>Farcaster: <a href="https://api.web3.bio/profile/dwr.farcaster" target="_blank">https://api.web3.bio/profile/dwr.farcaster</a></li>
-            <li>Next.ID: <a href="https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50" target="_blank">https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50</a></li>
+            <li><span className="label">Ethereum</span> <a href="https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045" target="_blank">https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045</a></li>
+            <li><span className="label">ENS</span> <a href="https://api.web3.bio/profile/vitalik.eth" target="_blank">https://api.web3.bio/profile/vitalik.eth</a></li>
+            <li><span className="label">Lens</span> <a href="https://api.web3.bio/profile/stani.lens" target="_blank">https://api.web3.bio/profile/stani.lens</a></li>
+            <li><span className="label">Farcaster</span> <a href="https://api.web3.bio/profile/dwr.farcaster" target="_blank">https://api.web3.bio/profile/dwr.farcaster</a></li>
+            <li><span className="label">Next.ID</span> <a href="https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50" target="_blank">https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50</a></li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Responses
           </h3>
           <pre className="code" data-lang="JSON"><code>
-            <span className="text-gray">// https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045 </span><br/>
-            <span className="text-gray">// https://api.web3.bio/profile/vitalik.eth </span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/vitalik.eth`}</span><br/>
             {`[
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -197,7 +197,7 @@ export default function Home() {
             Parameter
           </h3>
           <ul>
-            <li><strong>identity <span className="label">string</span></strong> - An Ethereum address or an ENS domain.</li>
+            <li><strong>identity</strong> <span className="label">string</span> - An Ethereum address or an ENS domain.</li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Examples
@@ -210,8 +210,8 @@ export default function Home() {
             Responses
           </h3>
           <pre className="code" data-lang="JSON"><code>
-            <span className="text-gray">// https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045 </span><br/>
-            <span className="text-gray">// https://api.web3.bio/profile/ens/vitalik.eth </span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`} </span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/ens/vitalik.eth`} </span><br/>
             {`{
     "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
     "identity": "vitalik.eth",
@@ -250,7 +250,7 @@ export default function Home() {
             Parameter
           </h3>
           <ul>
-            <li><strong>identity <span className="label">string</span></strong> - An Ethereum/Polygon address or a Lens handle.</li>
+            <li><strong>identity</strong> <span className="label">string</span> - An Ethereum/Polygon address or a Lens handle.</li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Examples
@@ -260,8 +260,8 @@ export default function Home() {
             <li><a href="https://api.web3.bio/profile/lens/stani.lens" target="_blank">https://api.web3.bio/profile/lens/stani.lens</a></li>
           </ul>
           <pre className="code" data-lang="JSON"><code>
-            <span className="text-gray">// https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff</span><br/>
-            <span className="text-gray">// https://api.web3.bio/profile/lens/stani.lens</span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/lens/stani.lens`}</span><br/>
             {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
     "identity": "stani.lens",
@@ -300,7 +300,7 @@ export default function Home() {
             Parameter
           </h3>
           <ul>
-            <li><strong>identity <span className="label">string</span></strong> - An Ethereum address or a Farcaster username.</li>
+            <li><strong>identity</strong> <span className="label">string</span> - An Ethereum address or a Farcaster username.</li>
           </ul>
           <h3 className="text-bold h6 mt-4">
             Examples
@@ -310,8 +310,8 @@ export default function Home() {
             <li><a href="https://api.web3.bio/profile/farcaster/dwr" target="_blank">https://api.web3.bio/profile/farcaster/dwr</a></li>
           </ul>
           <pre className="code" data-lang="JSON"><code>
-            <span className="text-gray">// https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2</span><br/>
-            <span className="text-gray">// https://api.web3.bio/profile/farcaster/dwr</span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2`}</span><br/>
+            <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/dwr`}</span><br/>
             {`{
     "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
     "identity": "dwr",
