@@ -14,10 +14,8 @@ export const enum FarcasterQueryParamType {
 }
 
 const originBase = "https://api.warpcast.com/v2/";
-
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
-
-const _fetcher = (url: string) => {
+const fetcher = (url: string) => {
   return fetch(url, {
     headers: {
       Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
@@ -26,20 +24,20 @@ const _fetcher = (url: string) => {
 };
 
 const fetchWarpcastWithAddress = async (address: string) => {
-  const res = await _fetcher(
+  const res = await fetcher(
     originBase + `user-by-verification?address=${address}`
   ).then((res) => res.json());
   return res;
 };
 const fetchFidFromWarpcastWithUsername = async (uname: string) => {
-  const res = await _fetcher(
+  const res = await fetcher(
     originBase + `user-by-username?username=${uname}`
   ).then((res) => res.json());
   return res;
 };
 
 const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
-  const res = await _fetcher(originBase + `verifications?fid=${fid}`).then(
+  const res = await fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
   return res;
