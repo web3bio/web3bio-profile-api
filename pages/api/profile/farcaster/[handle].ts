@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatformData, PlatformType } from "@/utils/platform";
+import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -45,6 +45,38 @@ const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
   return res;
 };
 
+const resolveFarcasterLinks = (
+  response: {
+    username: string;
+    profile: { bio: { text: string | null } };
+  },
+  resolvedHandle: string | null
+) => {
+  const LINKRES: {
+    [key in PlatformType.twitter | PlatformType.farcaster]?: {
+      link: string | null;
+      handle: string | null;
+    };
+  } = {
+    farcaster: {
+      link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
+      handle: resolvedHandle,
+    },
+  };
+  const bioText = response.profile.bio.text || "";
+  const twitterMatch = bioText.match(regexTwitterLink);
+  if (twitterMatch) {
+    const matched = twitterMatch[1];
+    const resolveMatch = resolveHandle(matched);
+    LINKRES[PlatformType.twitter] = {
+      link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
+      handle: resolveMatch,
+    };
+  }
+
+  return LINKRES;
+};
+
 const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
@@ -54,7 +86,8 @@ const resolveFarcasterHandle = async (handle: string) => {
         ...(await fetchWarpcastWithAddress(handle))?.result?.user,
       };
     } else {
-      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result?.user;
+      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
+        ?.user;
       const firstAddress = (
         await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
       )?.result?.verifications?.[0]?.address;
@@ -79,35 +112,18 @@ const resolveFarcasterHandle = async (handle: string) => {
       });
     }
     const resolvedHandle = resolveHandle(response.username);
-    const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
-      [PlatformType.farcaster]: {
-        link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
-        handle: resolvedHandle,
-      },
-    };
-    if (
-      response.profile.bio.text &&
-      response.profile.bio.text.match(regexTwitterLink)
-    ) {
-      const text = response.profile.bio.text;
-      const matched = text.match(regexTwitterLink)[1];
-      const resolveMatch = resolveHandle(matched);
-      LINKRES[PlatformType.twitter] = {
-        link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
-        handle: resolveMatch,
-      };
-    }
+    const links = resolveFarcasterLinks(response, resolvedHandle);
     const resJSON = {
       address: response.address.toLowerCase(),
       identity: response.username || response.displayName,
-      platform: PlatformData.farcaster.key,
+      platform: PlatformType.farcaster,
       displayName: response.displayName || resolvedHandle,
       avatar: response.pfp.url,
       email: null,
       description: response.profile.bio.text,
       location: null,
       header: null,
-      links: LINKRES,
+      links: links,
     };
     return new Response(JSON.stringify(resJSON), {
       status: 200,
@@ -130,7 +146,6 @@ const resolveFarcasterHandle = async (handle: string) => {
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
-
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (
