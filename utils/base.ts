@@ -1,3 +1,4 @@
+import { isAddress } from "ethers/lib/utils";
 import { PlatformType } from "./platform";
 
 export type LinksItem = {
@@ -34,7 +35,6 @@ export type HandleNotFoundResponseData = {
 };
 
 interface errorHandleProps {
-  address: string | null;
   identity: string | null;
   platform: PlatformType;
   code: number;
@@ -53,10 +53,11 @@ export enum ErrorMessages {
 }
 
 export const errorHandle = (props: errorHandleProps) => {
+  const _isAddress = isAddress(props.identity || "");
   return new Response(
     JSON.stringify({
-      address: props.address,
-      identity: props.identity,
+      address: _isAddress ? props.identity : null,
+      identity: !_isAddress ? props.identity : null,
       platform: props.platform,
       error: props.message,
     }),
@@ -68,13 +69,4 @@ export const errorHandle = (props: errorHandleProps) => {
       },
     }
   );
-};
-
-export const resolve = (from: string, to: string) => {
-  const resolvedUrl = new URL(to, new URL(from, "resolve://"));
-  if (resolvedUrl.protocol === "resolve:") {
-    const { pathname, search, hash } = resolvedUrl;
-    return `${pathname}${search}${hash}`;
-  }
-  return resolvedUrl.toString();
 };

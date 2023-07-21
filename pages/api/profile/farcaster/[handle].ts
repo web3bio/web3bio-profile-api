@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatfomData, PlatformType } from "@/utils/platform";
+import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -13,75 +13,116 @@ export const enum FarcasterQueryParamType {
   connected_address = "connected_address",
 }
 
-const originBase = "https://searchcaster.xyz/api/";
+const originBase = "https://api.warpcast.com/v2/";
+const regexTwitterLink = /(\S*)(.|@)twitter/i;
+const fetcher = (url: string) => {
+  return fetch(url, {
+    headers: {
+      Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
+    },
+  });
+};
 
-const regexTwitterLink = /(\S*).twitter/i;
+const fetchWarpcastWithAddress = async (address: string) => {
+  const res = await fetcher(
+    originBase + `user-by-verification?address=${address}`
+  ).then((res) => res.json());
+  return res;
+};
+const fetchFidFromWarpcastWithUsername = async (uname: string) => {
+  const res = await fetcher(
+    originBase + `user-by-username?username=${uname}`
+  ).then((res) => res.json());
+  return res;
+};
 
-export const FetchFromFarcasterOrigin = async (value: string, type: FarcasterQueryParamType) => {
-  if (!value) return;
-  const res = await fetch(originBase + `profiles?${type}=${value}`).then(
+const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
+  const res = await fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
   return res;
+};
+
+const resolveFarcasterLinks = (
+  response: {
+    username: string;
+    profile: { bio: { text: string | null } };
+  },
+  resolvedHandle: string | null
+) => {
+  const LINKRES: {
+    [key in PlatformType.twitter | PlatformType.farcaster]?: {
+      link: string | null;
+      handle: string | null;
+    };
+  } = {
+    farcaster: {
+      link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
+      handle: resolvedHandle,
+    },
+  };
+  const bioText = response.profile.bio.text || "";
+  const twitterMatch = bioText.match(regexTwitterLink);
+  if (twitterMatch) {
+    const matched = twitterMatch[1];
+    const resolveMatch = resolveHandle(matched);
+    LINKRES[PlatformType.twitter] = {
+      link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
+      handle: resolveMatch,
+    };
+  }
+
+  return LINKRES;
 };
 
 const resolveFarcasterHandle = async (handle: string) => {
   try {
     let response;
     if (isAddress(handle)) {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.connected_address);
+      response = {
+        address: handle.toLowerCase(),
+        ...(await fetchWarpcastWithAddress(handle))?.result?.user,
+      };
     } else {
-      response = await FetchFromFarcasterOrigin(handle, FarcasterQueryParamType.username);
-    }
-    if (!response || !response.length) {
-      if (isAddress(handle)) {
+      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
+        ?.user;
+      if (!rawUser?.fid) {
         return errorHandle({
-          address: handle,
-          identity: null,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      } else {
-        return errorHandle({
-          address: null,
           identity: handle,
           platform: PlatformType.farcaster,
           code: 404,
           message: ErrorMessages.notFound,
         });
       }
-    }
-    const _res = response[0].body;
-    const resolvedHandle = resolveHandle(_res.username);
-    const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
-      [PlatformType.farcaster]: {
-        link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
-        handle: resolvedHandle,
-      },
-    };
-    if (_res.bio && _res.bio.match(regexTwitterLink)) {
-      const matched = _res.bio.match(regexTwitterLink)[1];
-      const resolveMatch = resolveHandle(matched);
-      LINKRES[PlatformType.twitter] = {
-        link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
-        handle: resolveMatch,
+      const firstAddress = (
+        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
+      )?.result?.verifications?.[0]?.address;
+      response = {
+        address: firstAddress?.toLowerCase(),
+        ...rawUser,
       };
     }
+    if (!response?.fid) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
+    }
+    const resolvedHandle = resolveHandle(response.username);
+    const links = resolveFarcasterLinks(response, resolvedHandle);
     const resJSON = {
-      address: response[0].connectedAddress || _res.address,
-      identity: _res.username || _res.displayName,
-      platform: PlatfomData.farcaster.key,
-      displayName: _res.displayName || resolvedHandle,
-      avatar: _res.avatarUrl,
+      address: response.address || null,
+      identity: response.username || response.displayName,
+      platform: PlatformType.farcaster,
+      displayName: response.displayName || resolvedHandle,
+      avatar: response.pfp.url,
       email: null,
-      description: _res.bio,
+      description: response.profile.bio.text,
       location: null,
       header: null,
-      links: LINKRES,
-      addresses: {
-        eth: response[0].connectedAddress || _res.address,
-      },
+      links: links,
     };
     return new Response(JSON.stringify(resJSON), {
       status: 200,
@@ -93,7 +134,6 @@ const resolveFarcasterHandle = async (handle: string) => {
     });
   } catch (error: any) {
     return errorHandle({
-      address: null,
       identity: handle,
       platform: PlatformType.farcaster,
       code: 500,
@@ -105,7 +145,6 @@ const resolveFarcasterHandle = async (handle: string) => {
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
-
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (
@@ -113,7 +152,6 @@ export default async function handler(req: NextApiRequest) {
     (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
   )
     return errorHandle({
-      address: null,
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
