@@ -1,7 +1,7 @@
 import type { NextApiRequest } from "next";
 import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { PlatformData, PlatformType } from "@/utils/platform";
+import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 
@@ -14,10 +14,8 @@ export const enum FarcasterQueryParamType {
 }
 
 const originBase = "https://api.warpcast.com/v2/";
-
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
-
-const _fetcher = (url: string) => {
+const fetcher = (url: string) => {
   return fetch(url, {
     headers: {
       Authorization: process.env.NEXT_PUBLIC_FARCASTER_API_KEY || "",
@@ -26,23 +24,55 @@ const _fetcher = (url: string) => {
 };
 
 const fetchWarpcastWithAddress = async (address: string) => {
-  const res = await _fetcher(
+  const res = await fetcher(
     originBase + `user-by-verification?address=${address}`
   ).then((res) => res.json());
   return res;
 };
 const fetchFidFromWarpcastWithUsername = async (uname: string) => {
-  const res = await _fetcher(
+  const res = await fetcher(
     originBase + `user-by-username?username=${uname}`
   ).then((res) => res.json());
   return res;
 };
 
 const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
-  const res = await _fetcher(originBase + `verifications?fid=${fid}`).then(
+  const res = await fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
   return res;
+};
+
+const resolveFarcasterLinks = (
+  response: {
+    username: string;
+    profile: { bio: { text: string | null } };
+  },
+  resolvedHandle: string | null
+) => {
+  const LINKRES: {
+    [key in PlatformType.twitter | PlatformType.farcaster]?: {
+      link: string | null;
+      handle: string | null;
+    };
+  } = {
+    farcaster: {
+      link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
+      handle: resolvedHandle,
+    },
+  };
+  const bioText = response.profile.bio.text || "";
+  const twitterMatch = bioText.match(regexTwitterLink);
+  if (twitterMatch) {
+    const matched = twitterMatch[1];
+    const resolveMatch = resolveHandle(matched);
+    LINKRES[PlatformType.twitter] = {
+      link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
+      handle: resolveMatch,
+    };
+  }
+
+  return LINKRES;
 };
 
 const resolveFarcasterHandle = async (handle: string) => {
@@ -81,38 +111,18 @@ const resolveFarcasterHandle = async (handle: string) => {
       });
     }
     const resolvedHandle = resolveHandle(response.username);
-    const LINKRES: Partial<Record<PlatformType, LinksItem>> = {
-      [PlatformType.farcaster]: {
-        link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
-        handle: resolvedHandle,
-      },
-    };
-    if (
-      response.profile.bio.text &&
-      response.profile.bio.text.match(regexTwitterLink)
-    ) {
-      const text = response.profile.bio.text;
-      const matched = text.match(regexTwitterLink)[1];
-      const resolveMatch = resolveHandle(matched);
-      LINKRES[PlatformType.twitter] = {
-        link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
-        handle: resolveMatch,
-      };
-    }
+    const links = resolveFarcasterLinks(response, resolvedHandle);
     const resJSON = {
       address: response.address || null,
       identity: response.username || response.displayName,
-      platform: PlatformData.farcaster.key,
+      platform: PlatformType.farcaster,
       displayName: response.displayName || resolvedHandle,
       avatar: response.pfp.url,
       email: null,
       description: response.profile.bio.text,
       location: null,
       header: null,
-      links: LINKRES,
-      addresses: {
-        eth: response.address || null,
-      },
+      links: links,
     };
     return new Response(JSON.stringify(resJSON), {
       status: 200,
@@ -135,7 +145,6 @@ const resolveFarcasterHandle = async (handle: string) => {
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
-
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (

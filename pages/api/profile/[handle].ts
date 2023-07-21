@@ -51,16 +51,15 @@ const getPlatformSort = (
 
 const resolveHandleFromRelationService = (
   handle: string,
-  platform?: PlatformType
+  platform: PlatformType = handleSearchPlatform(handle)
 ) => {
-  const _platform = platform || handleSearchPlatform(handle);
   const query = getRelationQuery(handle);
   return fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify({
       query,
       variables: {
-        platform: _platform,
+        platform,
         identity: handle,
       },
     }),
@@ -97,7 +96,7 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  if (responseFromRelation?.error)
+  if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
       identity: handle,
       platform,
@@ -197,7 +196,7 @@ const resolveUniversalHandle = async (
       platformToQuery = platform;
     }
   }
-  if (!platformToQuery)
+  if (!handleToQuery || !platformToQuery)
     return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
@@ -214,14 +213,6 @@ const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  if (!inputName) {
-    return errorHandle({
-      identity: inputName,
-      platform: PlatformType.nextid,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-  }
   return resolveUniversalHandle(inputName, req);
 }
 
