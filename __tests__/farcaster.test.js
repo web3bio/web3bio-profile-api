@@ -19,8 +19,8 @@ describe("Test For Farcaster Profile API", () => {
   });
   it("It should response 200 for farcaster", async () => {
     const res = await queryClient("/profile/farcaster/farcaster");
-    expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Not Found");
+    expect(res.status).toBe(200);
+    expect((await res.json()).displayName).toBe("Farcaster");
   });
   it("It should response 404 for 💗", async () => {
     const res = await queryClient("/profile/farcaster/💗");
