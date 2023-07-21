@@ -86,22 +86,23 @@ const resolveFarcasterHandle = async (handle: string) => {
     } else {
       const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
         ?.user;
-      const firstAddress = (
-        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
-      )?.result?.verifications?.[0]?.address;
-      if (!firstAddress)
+      if (!rawUser?.fid) {
         return errorHandle({
           identity: handle,
           platform: PlatformType.farcaster,
           code: 404,
           message: ErrorMessages.notFound,
         });
+      }
+      const firstAddress = (
+        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
+      )?.result?.verifications?.[0]?.address;
       response = {
-        address: firstAddress.toLowerCase(),
+        address: firstAddress?.toLowerCase(),
         ...rawUser,
       };
     }
-    if (!response) {
+    if (!response?.fid) {
       return errorHandle({
         identity: handle,
         platform: PlatformType.farcaster,
@@ -112,7 +113,7 @@ const resolveFarcasterHandle = async (handle: string) => {
     const resolvedHandle = resolveHandle(response.username);
     const links = resolveFarcasterLinks(response, resolvedHandle);
     const resJSON = {
-      address: response.address.toLowerCase(),
+      address: response.address || null,
       identity: response.username || response.displayName,
       platform: PlatformType.farcaster,
       displayName: response.displayName || resolvedHandle,
