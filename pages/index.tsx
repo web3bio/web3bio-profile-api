@@ -112,12 +112,79 @@ export default function Home() {
             Examples
           </h3>
           <ul>
-            <li><a href="https://api.web3.bio/profile/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045" target="_blank">https://api.web3.bio/profile/0xd8dA6BF26964aF9D7eEd9e03E53415D37aA96045</a></li>
+            <li><a href="https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045" target="_blank">https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045</a></li>
             <li><a href="https://api.web3.bio/profile/vitalik.eth" target="_blank">https://api.web3.bio/profile/vitalik.eth</a></li>
             <li><a href="https://api.web3.bio/profile/stani.lens" target="_blank">https://api.web3.bio/profile/stani.lens</a></li>
             <li><a href="https://api.web3.bio/profile/dwr.farcaster" target="_blank">https://api.web3.bio/profile/dwr.farcaster</a></li>
           </ul>
-          
+          <h3 className="text-bold h6 mt-4">
+            Responses
+          </h3>
+          <pre className="code" data-lang="JSON"><code>
+            <span className="text-gray">// https://api.web3.bio/profile/vitalik.eth </span><br/>
+            &#91;<br/>
+            {"    "}&#123;<br/>
+            {"        "}"address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",<br/>
+            {"        "}"identity": "vitalik.eth",<br/>
+            {"        "}"platform": "ENS",<br/>
+            {"        "}"displayName": "vitalik.eth",<br/>
+            {"        "}"avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",<br/>
+            {"        "}"email": null,<br/>
+            {"        "}"description": null,<br/>
+            {"        "}"location": null,<br/>
+            {"        "}"header": null,<br/>
+            {"        "}"links": &#123;<br/>
+            {"        "}{"    "}"website": &#123;<br/>
+            {"        "}{"        "}"link": "https://vitalik.ca",<br/>
+            {"        "}{"        "}"handle": "vitalik.ca"<br/>
+            {"        "}{"    "}&#125;<br/>
+            {"        "}&#125;,<br/>
+            {"        "}"addresses": &#123;<br/>
+            {"        "}{"    "}"eth": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"<br/>
+            {"        "}&#125;<br/>
+            {"    "}&#125;,<br/>
+            {"    "}&#123;<br/>
+            {"        "}"address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",<br/>
+            {"        "}"identity": "vbuterin",<br/>
+            {"        "}"platform": "farcaster",<br/>
+            {"        "}"displayName": "Vitalik Buterin",<br/>
+            {"        "}"avatar": "https://imgur.com/gF9Yaeg",<br/>
+            {"        "}"email": null,<br/>
+            {"        "}"description": "hullo",<br/>
+            {"        "}"location": null,<br/>
+            {"        "}"header": null,<br/>
+            {"        "}"links": &#123;<br/>
+            {"        "}{"    "}"farcaster": &#123;<br/>
+            {"        "}{"        "}"link": "https://warpcast.com/vbuterin",<br/>
+            {"        "}{"        "}"handle": "vbuterin"<br/>
+            {"        "}{"    "}&#125;<br/>
+            {"        "}&#125;,<br/>
+            {"        "}"addresses": &#123;<br/>
+            {"        "}{"    "}"eth": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"<br/>
+            {"        "}&#125;<br/>
+            {"    "}&#125;,<br/>
+            {"    "}&#123;<br/>
+            {"        "}"address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",<br/>
+            {"        "}"identity": "vitalik.lens",<br/>
+            {"        "}"platform": "lens",<br/>
+            {"        "}"displayName": "Vitalik Buterin",<br/>
+            {"        "}"avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",<br/>
+            {"        "}"email": null,<br/>
+            {"        "}"description": "Ethereum\n\nFable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY\n\nAbolish daylight savings time and leap seconds",<br/>
+            {"        "}"location": null,<br/>
+            {"        "}"header": null,<br/>
+            {"        "}"links": &#123;<br/>
+            {"        "}{"    "}"lenster": &#123;<br/>
+            {"        "}{"        "}"link": "https://lenster.xyz/u/vitalik",<br/>
+            {"        "}{"        "}"handle": "vitalik"<br/>
+            {"        "}{"    "}&#125;<br/>
+            {"        "}&#125;,<br/>
+            {"        "}"addresses": &#123;<br/>
+            {"        "}{"    "}"matic": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"<br/>
+            {"        "}&#125;<br/>
+            {"    "}&#125;<br/>
+            &#93;<br/>
+          </code></pre>
         </section>
 
         <section className="pt-4 pb-4" id="ens-profile-api" style={{"marginTop": "4rem"}}>
@@ -144,6 +211,33 @@ export default function Home() {
             <li><a href="https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045" target="_blank">https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045</a></li>
             <li><a href="https://api.web3.bio/profile/ens/vitalik.eth" target="_blank">https://api.web3.bio/profile/ens/vitalik.eth</a></li>
           </ul>
+          <h3 className="text-bold h6 mt-4">
+            Responses
+          </h3>
+          <pre className="code" data-lang="JSON"><code>
+            <span className="text-gray">// https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045 </span><br/>
+            <span className="text-gray">// https://api.web3.bio/profile/ens/vitalik.eth </span><br/>
+            &#123;<br/>
+            {"    "}"address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",<br/>
+            {"    "}"identity": "vitalik.eth",<br/>
+            {"    "}"platform": "ENS",<br/>
+            {"    "}"displayName": "vitalik.eth",<br/>
+            {"    "}"avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",<br/>
+            {"    "}"email": null,<br/>
+            {"    "}"description": null,<br/>
+            {"    "}"location": null,<br/>
+            {"    "}"header": null,<br/>
+            {"    "}"links": &#123;<br/>
+            {"    "}{"    "}"website": &#123;<br/>
+            {"    "}{"        "}"link": "https://vitalik.ca",<br/>
+            {"    "}{"        "}"handle": "vitalik.ca"<br/>
+            {"    "}{"    "}&#125;<br/>
+            {"    "}&#125;,<br/>
+            {"    "}"addresses": &#123;<br/>
+            {"    "}{"    "}"eth": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"<br/>
+            {"    "}&#125;<br/>
+            &#125;
+          </code></pre>
         </section>
 
         <section className="pt-4 pb-4" id="lens-profile-api" style={{"marginTop": "4rem"}}>
@@ -167,9 +261,37 @@ export default function Home() {
             Examples
           </h3>
           <ul>
-            <li><a href="https://api.web3.bio/profile/lens/0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff" target="_blank">https://api.web3.bio/profile/lens/0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff</a></li>
+            <li><a href="https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff" target="_blank">https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff</a></li>
             <li><a href="https://api.web3.bio/profile/lens/stani.lens" target="_blank">https://api.web3.bio/profile/lens/stani.lens</a></li>
           </ul>
+          <pre className="code" data-lang="JSON"><code>
+            <span className="text-gray">// https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff</span><br/>
+            <span className="text-gray">// https://api.web3.bio/profile/lens/stani.lens</span><br/>
+            &#123;<br/>
+            {"    "}"address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",<br/>
+            {"    "}"identity": "stani.lens",<br/>
+            {"    "}"platform": "lens",<br/>
+            {"    "}"displayName": "stani.lens",<br/>
+            {"    "}"avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",<br/>
+            {"    "}"email": null,<br/>
+            {"    "}"description": "Building @LensProtocol & @AaveAave",<br/>
+            {"    "}"location": null,<br/>
+            {"    "}"header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",<br/>
+            {"    "}"links": &#123;<br/>
+            {"    "}{"    "}"lenster": &#123;<br/>
+            {"    "}{"        "}"link": "https://lenster.xyz/u/stani",<br/>
+            {"    "}{"        "}"handle": "stani"<br/>
+            {"    "}{"    "}&#125;<br/>
+            {"    "}{"    "}"website": &#123;<br/>
+            {"    "}{"        "}"link": "https://lens.xyz",<br/>
+            {"    "}{"        "}"handle": "lens.xyz"<br/>
+            {"    "}{"    "}&#125;<br/>
+            {"    "}&#125;,<br/>
+            {"    "}"addresses": &#123;<br/>
+            {"    "}{"    "}"matic": "0x7241dddec3a6af367882eaf9651b87e1c7549dff"<br/>
+            {"    "}&#125;<br/>
+            &#125;
+          </code></pre>
         </section>
 
         <section className="pt-4 pb-4" id="farcaster-profile-api" style={{"marginTop": "4rem"}}>
@@ -196,6 +318,30 @@ export default function Home() {
             <li><a href="https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2" target="_blank">https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2</a></li>
             <li><a href="https://api.web3.bio/profile/farcaster/dwr" target="_blank">https://api.web3.bio/profile/farcaster/dwr</a></li>
           </ul>
+          <pre className="code" data-lang="JSON"><code>
+            <span className="text-gray">// https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2</span><br/>
+            <span className="text-gray">// https://api.web3.bio/profile/farcaster/dwr</span><br/>
+            &#123;<br/>
+            {"    "}"address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",<br/>
+            {"    "}"identity": "dwr",<br/>
+            {"    "}"platform": "farcaster",<br/>
+            {"    "}"displayName": "Dan Romero",<br/>
+            {"    "}"avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",<br/>
+            {"    "}"email": null,<br/>
+            {"    "}"description": "Working on Farcaster and Warpcast.",<br/>
+            {"    "}"location": null,<br/>
+            {"    "}"header": null,<br/>
+            {"    "}"links": &#123;<br/>
+            {"    "}{"    "}"farcaster": &#123;<br/>
+            {"    "}{"        "}"link": "https://warpcast.com/dwr",<br/>
+            {"    "}{"        "}"handle": "dwr"<br/>
+            {"    "}{"    "}&#125;<br/>
+            {"    "}&#125;,<br/>
+            {"    "}"addresses": &#123;<br/>
+            {"    "}{"    "}"eth": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2"<br/>
+            {"    "}&#125;<br/>
+            &#125;
+          </code></pre>
         </section>
       </div>
     </main>
