@@ -109,9 +109,9 @@ const resolveNameFromLens = async (handle: string) => {
     }
 
     const avatarUri =
-      response.picture?.original?.url || response.picture?.uri || "";
+      response.picture?.original?.url || response.picture?.uri || null;
     const coverPictureUri =
-      response.coverPicture?.original?.url || response.coverPicture?.uri || "";
+      response.coverPicture?.original?.url || response.coverPicture?.uri || null;
     const resJSON = {
       address: response.ownedBy?.toLowerCase(),
       identity: response.handle,
@@ -123,7 +123,7 @@ const resolveNameFromLens = async (handle: string) => {
       location:
         response.attributes?.find((o: { key: string }) => o.key === "location")
           ?.value || null,
-      header: (await resolveEipAssetURL(coverPictureUri)) || "",
+      header: (await resolveEipAssetURL(coverPictureUri)) || null,
       links: LINKRES,
     };
     return new Response(JSON.stringify(resJSON), {
@@ -147,7 +147,6 @@ const resolveNameFromLens = async (handle: string) => {
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
-
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (!regexLens.test(lowercaseName) && !regexEth.test(lowercaseName))
