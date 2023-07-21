@@ -96,7 +96,7 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  if (responseFromRelation?.error)
+  if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
       identity: handle,
       platform,
