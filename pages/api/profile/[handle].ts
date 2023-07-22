@@ -105,9 +105,9 @@ const resolveUniversalRespondFromRelation = async ({
     });
   const resolved =
     responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
-  const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor;
+  const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.identity ? resolved : resolved?.resolved;
-  if (!originNeighbours?.length || !resolvedIdentity)
+  if (!resolvedIdentity)
     return errorHandle({
       identity: handle,
       platform,
