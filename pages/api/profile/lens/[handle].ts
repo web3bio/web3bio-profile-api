@@ -116,7 +116,7 @@ const resolveNameFromLens = async (handle: string) => {
       address: response.ownedBy?.toLowerCase(),
       identity: response.handle,
       platform: PlatformData.lens.key,
-      displayName: response.name,
+      displayName: response.name || response.handle,
       avatar: (await resolveEipAssetURL(avatarUri)) || null,
       email: null,
       description: response.bio,
