@@ -105,8 +105,9 @@ const resolveUniversalRespondFromRelation = async ({
     });
   const resolved =
     responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
-  const originNeighbours = resolved?.neighbor || resolved?.resolved?.neighbor || [];
-  const resolvedIdentity = resolved?.identity ? resolved : resolved?.resolved;
+  const originNeighbours =
+    resolved?.neighbor || resolved?.resolved?.neighbor || [];
+  const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
   if (!resolvedIdentity)
     return errorHandle({
       identity: handle,
@@ -116,11 +117,12 @@ const resolveUniversalRespondFromRelation = async ({
     });
 
   const sourceNeighbour = {
-    platform: resolvedIdentity?.platform,
-    identity: resolvedIdentity?.identity,
-    displayName: resolvedIdentity?.displayName,
-    uuid: resolvedIdentity?.uuid,
+    platform: resolvedIdentity.platform,
+    identity: resolvedIdentity.identity,
+    displayName: resolvedIdentity.displayName || resolved.name,
+    uuid: resolvedIdentity.uuid,
   };
+
   const neighbours = originNeighbours.map(
     (x: { identity: NeighbourDetail }) => {
       return {
@@ -129,7 +131,7 @@ const resolveUniversalRespondFromRelation = async ({
     }
   );
   neighbours.unshift(sourceNeighbour);
-  const obj = (await Promise.allSettled([
+  return await Promise.allSettled([
     ...neighbours.map((x: NeighbourDetail) => {
       if (
         [
@@ -137,18 +139,21 @@ const resolveUniversalRespondFromRelation = async ({
           PlatformType.farcaster,
           PlatformType.lens,
         ].includes(x.platform) &&
-        x.displayName
+        x.identity
       ) {
         const resolvedPlatform =
           x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
+        const resolvedHandle =
+          x.platform === PlatformType.ethereum ? x.displayName : x.identity;
         return fetch(
-          req.nextUrl.origin + `/api/profile/${resolvedPlatform}/${x.identity}`
+          req.nextUrl.origin +
+            `/api/profile/${resolvedPlatform}/${resolvedHandle}`
         ).then((res) => res.json());
       }
     }),
   ])
     .then((responses) => {
-      return responses
+      const returnRes = responses
         .filter(
           (response) =>
             response.status === "fulfilled" &&
@@ -159,6 +164,18 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>).value
         );
+      return returnRes?.length
+        ? respondWithCache(
+            JSON.stringify(
+              sortByPlatform(returnRes, getPlatformSort(returnRes, platform))
+            )
+          )
+        : errorHandle({
+            identity: handle,
+            code: 404,
+            message: ErrorMessages.notFound,
+            platform,
+          });
     })
     .catch((error) => {
       return errorHandle({
@@ -167,11 +184,7 @@ const resolveUniversalRespondFromRelation = async ({
         message: error,
         platform,
       });
-    })) as Array<ProfileAPIResponse>;
-
-  return respondWithCache(
-    JSON.stringify(sortByPlatform(obj, getPlatformSort(obj, platform)))
-  );
+    });
 };
 const resolveUniversalHandle = async (
   handle: string,

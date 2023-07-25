@@ -38,7 +38,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/mcdonalds.eth");
     expect(res.status).toBe(404);
     const json = await res.json();
-    expect(json.error).toBe('Not Found');
+    expect(json.error).toBe("Not Found");
   });
   it("It should response 200 data for stani.lens", async () => {
     const res = await queryClient("/profile/stani.lens");
@@ -71,7 +71,9 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
   });
   it("It should response 200 data for 0xd8da6bf26964af9d7eed9e03e53415d37aa96045", async () => {
-    const res = await queryClient("/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045");
+    const res = await queryClient(
+      "/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+    );
     expect(res.status).toBe(200);
   });
   it("It should response 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
@@ -79,5 +81,11 @@ describe("Test For Universal Profile API", () => {
       "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649"
     );
     expect(res.status).toBe(200);
+  });
+  it("It should response 200 data for svg.eth", async () => {
+    const res = await queryClient("/profile/svg.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.filter((x) => x.platform === "lens").length > 1);
   });
 });
