@@ -34,8 +34,12 @@ describe("Test For Farcaster Profile API", () => {
     const json = await res.json();
     expect(json.address).toBe("0x5be51f8fe19af2543828a241e7555889a2ac9532");
   });
-  it("It should response 200 for dwr", async () => {
+  it("It should response 404 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");
+    expect(res.status).toBe(404);
+  });
+  it("It should response 200 for dwr.eth", async () => {
+    const res = await queryClient("/profile/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.displayName).toBe("Dan Romero");
