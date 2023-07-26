@@ -14,6 +14,7 @@ describe("Test For Lens Profile API", () => {
     const json = await res.json();
     expect(json.links.website.handle).toBe("lens.xyz");
     expect(json.links.lenster.handle).toBe("stani");
+    expect(json.displayName).toBe('Stani')
     expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
   });
   it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
