@@ -1,7 +1,7 @@
-import { regexEns, regexLens } from "./regexp";
+import { PlatformType } from "./platform";
 
-export const getRelationQuery = (handle: string) => {
-  return [regexEns.test(handle), regexLens.test(handle)].includes(true)
+export const getRelationQuery = (platform: PlatformType) => {
+  return [PlatformType.ens, PlatformType.lens].includes(platform)
     ? GET_PROFILES_DOMAIN
     : GET_PROFILES_QUERY;
 };

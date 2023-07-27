@@ -70,3 +70,13 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
+export const respondWithCache = (json: string) => {
+  return new Response(json, {
+    status: 200,
+    headers: {
+      "Cache-Control": `public, s-maxage=${
+        60 * 60 * 24 * 7
+      }, stale-while-revalidate=${60 * 30}`,
+    },
+  });
+};
