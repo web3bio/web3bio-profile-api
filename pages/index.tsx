@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Script from "next/script";
 
 export default function Home() {
   const endpointItem = {
@@ -43,6 +44,10 @@ export default function Home() {
         <link
           rel="canonical"
           href={process.env.NEXT_PUBLIC_PROFILE_END_POINT}
+        />
+        <link 
+          rel="shortcut icon"
+          href="/favicon.ico" 
         />
       </Head>
       <main className="web3bio-container p-4 mt-4 mb-4">
@@ -516,50 +521,65 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href="https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                  href="https://api.web3.bio/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649"
                   target="_blank"
                 >
-                  https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2
+                  https://api.web3.bio/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649
                 </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
                 <a
-                  href="https://api.web3.bio/profile/farcaster/dwr.eth"
+                  href="https://api.web3.bio/profile/farcaster/suji"
                   target="_blank"
                 >
-                  https://api.web3.bio/profile/farcaster/dwr.eth
+                  https://api.web3.bio/profile/farcaster/suji
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/0xd7029bdea1c17493893aafe29aad69ef892b8ff2`}</span>
+                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649`}</span>
                 <br />
-                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/dwr.eth`}</span>
+                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/suji`}</span>
                 <br />
                 {`{
-      "address": "0xb877f7bb52d28f06e60f557c00a56225124b357f",
-      "identity": "dwr.eth",
-      "platform": "farcaster",
-      "displayName": "Dan Romero",
-      "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
-      "email": null,
-      "description": "Working on Farcaster and Warpcast.",
-      "location": null,
-      "header": null,
-      "links": {
-          "farcaster": {
-              "link": "https://warpcast.com/dwr.eth",
-              "handle": "dwr.eth"
-          }
-      }
-  }`}
+    "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+    "identity": "suji",
+    "platform": "farcaster",
+    "displayName": "Suji Yan",
+    "avatar": "https://i.seadn.io/gae/ILVYPJ4U951KDc4F2XszloLR0CyAS7odjfr_8GjnrRT-Mdw_BPOMZOou4MStp-imxIIUGoysFZImHAksLQMzcOy1zGIC8T6gxqx-jg?w=500&auto=format",
+    "email": null,
+    "description": "Mask.io / suji_yan.twitter",
+    "location": null,
+    "header": null,
+    "links": {
+        "farcaster": {
+            "link": "https://warpcast.com/suji",
+            "handle": "suji"
+        },
+        "twitter": {
+            "link": "https://twitter.com/suji_yan",
+            "handle": "suji_yan"
+        }
+    }
+}`}
               </code>
             </pre>
           </section>
         </div>
       </main>
+      <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W"></script>
+      <Script src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W" />
+      <Script id="google-analytics">
+        {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+ 
+          gtag('config', 'G-DNMXB1P85W');
+        `}
+      </Script>
     </div>
   );
 }
