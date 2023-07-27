@@ -1,5 +1,10 @@
 import type { NextApiRequest } from "next";
-import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
+import {
+  LinksItem,
+  errorHandle,
+  ErrorMessages,
+  respondWithCache,
+} from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
@@ -75,34 +80,17 @@ const resolveFarcasterLinks = (
   return LINKRES;
 };
 
-const resolveFarcasterHandle = async (handle: string) => {
-  try {
-    let response;
-    if (isAddress(handle)) {
-      response = {
-        address: handle.toLowerCase(),
-        ...(await fetchWarpcastWithAddress(handle))?.result?.user,
-      };
-    } else {
-      const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
-        ?.user;
-      if (!rawUser?.fid) {
-        return errorHandle({
-          identity: handle,
-          platform: PlatformType.farcaster,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
-      const firstAddress = (
-        await fetchAddressesFromWarpcastWithFid(rawUser?.fid)
-      )?.result?.verifications?.[0]?.address;
-      response = {
-        address: firstAddress?.toLowerCase(),
-        ...rawUser,
-      };
-    }
-    if (!response?.fid) {
+export const resolveFarcasterHandle = async (handle: string) => {
+  let response;
+  if (isAddress(handle)) {
+    response = {
+      address: handle.toLowerCase(),
+      ...(await fetchWarpcastWithAddress(handle))?.result?.user,
+    };
+  } else {
+    const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
+      ?.user;
+    if (!rawUser?.fid) {
       return errorHandle({
         identity: handle,
         platform: PlatformType.farcaster,
@@ -110,34 +98,48 @@ const resolveFarcasterHandle = async (handle: string) => {
         message: ErrorMessages.notFound,
       });
     }
-    const resolvedHandle = resolveHandle(response.username);
-    const links = resolveFarcasterLinks(response, resolvedHandle);
-    const resJSON = {
-      address: response.address || null,
-      identity: response.username || response.displayName,
-      platform: PlatformType.farcaster,
-      displayName: response.displayName || resolvedHandle,
-      avatar: response.pfp.url,
-      email: null,
-      description: response.profile.bio.text,
-      location: null,
-      header: null,
-      links: links,
+    const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
+      ?.result?.verifications?.[0]?.address;
+    response = {
+      address: firstAddress?.toLowerCase(),
+      ...rawUser,
     };
-    return new Response(JSON.stringify(resJSON), {
-      status: 200,
-      headers: {
-        "Cache-Control": `public, s-maxage=${
-          60 * 60 * 24 * 7
-        }, stale-while-revalidate=${60 * 30}`,
-      },
+  }
+  if (!response?.fid) {
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.farcaster,
+      code: 404,
+      message: ErrorMessages.notFound,
     });
-  } catch (error: any) {
+  }
+  const resolvedHandle = resolveHandle(response.username);
+  const links = resolveFarcasterLinks(response, resolvedHandle);
+  const resJSON = {
+    address: response.address || null,
+    identity: response.username || response.displayName,
+    platform: PlatformType.farcaster,
+    displayName: response.displayName || resolvedHandle,
+    avatar: response.pfp.url,
+    email: null,
+    description: response.profile.bio.text,
+    location: null,
+    header: null,
+    links: links,
+  };
+  return resJSON;
+};
+
+const resolveFarcasterRespond = async (handle: string) => {
+  try {
+    const json = await resolveFarcasterHandle(handle);
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.farcaster,
       code: 500,
-      message: error.message,
+      message: e.message,
     });
   }
 };
@@ -147,15 +149,12 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (
-    !lowercaseName ||
-    (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
-  )
+  if (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveFarcasterHandle(lowercaseName);
+  return resolveFarcasterRespond(lowercaseName);
 }

@@ -5,7 +5,12 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { getLensProfileQuery } from "@/utils/lens";
-import { LinksItem, errorHandle, ErrorMessages } from "@/utils/base";
+import {
+  LinksItem,
+  errorHandle,
+  ErrorMessages,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
@@ -51,95 +56,93 @@ export const resolveETHFromLens = async (lens: string) => {
   return response.ownedBy;
 };
 
-const resolveNameFromLens = async (handle: string) => {
-  try {
-    let response;
-    if (isAddress(handle)) {
-      response = await getLensProfile(handle, LensParamType.address);
-    } else {
-      response = await getLensProfile(handle, LensParamType.domain);
-    }
-    if (!response) {
-      return errorHandle({
-        identity: handle,
-        platform: PlatformType.lens,
-        code: 404,
-        message: ErrorMessages.notFound,
-      });
-    }
-    const pureHandle = response.handle.replaceAll(".lens", "");
-    let LINKRES = {};
-    if (response.attributes) {
-      const linksRecords = response.attributes;
-      const linksToFetch = linksRecords.reduce(
-        (pre: Array<any>, cur: { key: string }) => {
-          if (Object.keys(PlatformData).includes(cur.key)) pre.push(cur.key);
-          return pre;
-        },
-        []
-      );
-
-      const getLink = async () => {
-        const _linkRes: Partial<Record<string, LinksItem>> = {};
-        for (let i = 0; i < linksToFetch.length; i++) {
-          const recordText = linksToFetch[i];
-          const handle = resolveHandle(
-            linksRecords?.find((o: { key: any }) => o.key === recordText)?.value
-          );
-          if (handle) {
-            const resolvedHandle =
-              recordText === PlatformType.twitter
-                ? handle.replaceAll("@", "")
-                : handle;
-            _linkRes[recordText] = {
-              link: getSocialMediaLink(resolvedHandle, recordText),
-              handle: resolvedHandle,
-            };
-          }
-        }
-        return _linkRes;
-      };
-      LINKRES = {
-        [PlatformType.lenster]: {
-          link: getSocialMediaLink(pureHandle, PlatformType.lenster),
-          handle: pureHandle,
-        },
-        ...(await getLink()),
-      };
-    }
-
-    const avatarUri =
-      response.picture?.original?.url || response.picture?.uri || null;
-    const coverPictureUri =
-      response.coverPicture?.original?.url || response.coverPicture?.uri || null;
-    const resJSON = {
-      address: response.ownedBy?.toLowerCase(),
-      identity: response.handle,
-      platform: PlatformData.lens.key,
-      displayName: response.name || response.handle,
-      avatar: (await resolveEipAssetURL(avatarUri)) || null,
-      email: null,
-      description: response.bio,
-      location:
-        response.attributes?.find((o: { key: string }) => o.key === "location")
-          ?.value || null,
-      header: (await resolveEipAssetURL(coverPictureUri)) || null,
-      links: LINKRES,
-    };
-    return new Response(JSON.stringify(resJSON), {
-      status: 200,
-      headers: {
-        "Cache-Control": `public, s-maxage=${
-          60 * 60 * 24 * 7
-        }, stale-while-revalidate=${60 * 30}`,
-      },
+export const resolveLensHandle = async (handle: string) => {
+  let response;
+  if (isAddress(handle)) {
+    response = await getLensProfile(handle, LensParamType.address);
+  } else {
+    response = await getLensProfile(handle, LensParamType.domain);
+  }
+  if (!response) {
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.lens,
+      code: 404,
+      message: ErrorMessages.notFound,
     });
-  } catch (error: any) {
+  }
+  const pureHandle = response.handle.replaceAll(".lens", "");
+  let LINKRES = {};
+  if (response.attributes) {
+    const linksRecords = response.attributes;
+    const linksToFetch = linksRecords.reduce(
+      (pre: Array<any>, cur: { key: string }) => {
+        if (Object.keys(PlatformData).includes(cur.key)) pre.push(cur.key);
+        return pre;
+      },
+      []
+    );
+
+    const getLink = async () => {
+      const _linkRes: Partial<Record<string, LinksItem>> = {};
+      for (let i = 0; i < linksToFetch.length; i++) {
+        const recordText = linksToFetch[i];
+        const handle = resolveHandle(
+          linksRecords?.find((o: { key: any }) => o.key === recordText)?.value
+        );
+        if (handle) {
+          const resolvedHandle =
+            recordText === PlatformType.twitter
+              ? handle.replaceAll("@", "")
+              : handle;
+          _linkRes[recordText] = {
+            link: getSocialMediaLink(resolvedHandle, recordText),
+            handle: resolvedHandle,
+          };
+        }
+      }
+      return _linkRes;
+    };
+    LINKRES = {
+      [PlatformType.lenster]: {
+        link: getSocialMediaLink(pureHandle, PlatformType.lenster),
+        handle: pureHandle,
+      },
+      ...(await getLink()),
+    };
+  }
+
+  const avatarUri =
+    response.picture?.original?.url || response.picture?.uri || null;
+  const coverPictureUri =
+    response.coverPicture?.original?.url || response.coverPicture?.uri || null;
+  const resJSON = {
+    address: response.ownedBy?.toLowerCase(),
+    identity: response.handle,
+    platform: PlatformData.lens.key,
+    displayName: response.name || response.handle,
+    avatar: (await resolveEipAssetURL(avatarUri)) || null,
+    email: null,
+    description: response.bio,
+    location:
+      response.attributes?.find((o: { key: string }) => o.key === "location")
+        ?.value || null,
+    header: (await resolveEipAssetURL(coverPictureUri)) || null,
+    links: LINKRES,
+  };
+  return resJSON;
+};
+
+const resolveLensRespond = async (handle: string) => {
+  try {
+    const json = await resolveLensHandle(handle);
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.lens,
       code: 500,
-      message: error.message,
+      message: e.message,
     });
   }
 };
@@ -156,5 +159,5 @@ export default async function handler(req: NextApiRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveNameFromLens(lowercaseName);
+  return resolveLensRespond(lowercaseName);
 }

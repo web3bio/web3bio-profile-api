@@ -1,6 +1,6 @@
 import type { NextApiRequest } from "next";
 import { getAddress, isAddress } from "@ethersproject/address";
-import { errorHandle, ErrorMessages } from "@/utils/base";
+import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -9,7 +9,7 @@ import {
 import _ from "lodash";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { CoinType } from "@/utils/cointype";
-import { regexEns } from "@/utils/regexp";
+import { regexEns, regexEth } from "@/utils/regexp";
 import { ethers } from "ethers";
 import { base, resolverABI } from "../../../../utils/resolverABI";
 import { formatsByCoinType } from "@ensdomains/address-encoder";
@@ -160,83 +160,50 @@ export const resolveENSCoinTypesValue = async (
   return encoder(Buffer.from(rr.slice(2), "hex")).toLowerCase();
 };
 
-const resolveHandleFromURL = async (handle: string | undefined) => {
-  if (!handle)
-    return errorHandle({
-      identity: null,
-      platform: PlatformType.ens,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
+export const resolveENSHandle = async (handle: string) => {
+  let address = "";
+  let ensDomain = "";
+  let resolverAddress = "";
+  let gtext = [] as any;
 
-  try {
-    let address = "";
-    let ensDomain = "";
-    let resolverAddress = "";
-    let gtext = [] as any;
-
-    if (isAddress(handle)) {
-      if (!isValidEthereumAddress(handle))
-        return errorHandle({
-          identity: handle.toLowerCase(),
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.invalidAddr,
-        });
-      address = getAddress(handle);
-      ensDomain = await resolveNameFromAddress(handle);
-      if (!ensDomain) {
-        return errorHandle({
-          identity: handle.toLowerCase(),
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.notFound,
-        });
-      }
-      resolverAddress = await getResolverAddressFromName(ensDomain);
-    } else {
-      if (!regexEns.test(handle))
-        return errorHandle({
-          identity: handle,
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.invalidIdentity,
-        });
-      ensDomain = handle;
-      const response = await resolveAddressFromName(handle);
-      if (!response)
-        return errorHandle({
-          identity: handle,
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.notExist,
-        });
-      if (response.message) throw new Error(response.message);
-      resolverAddress = await getResolverAddressFromName(handle);
-
-      if (!isValidEthereumAddress(resolverAddress)) {
-        return errorHandle({
-          identity: ensDomain,
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.invalidResolver,
-        });
-      }
-
-      gtext = [response];
-      address = await resolveENSCoinTypesValue(
-        resolverAddress,
-        handle,
-        CoinType.eth
-      );
-      if (!address || !isValidEthereumAddress(address))
-        return errorHandle({
-          identity: handle,
-          platform: PlatformType.ens,
-          code: 404,
-          message: ErrorMessages.invalidResolved,
-        });
+  if (isAddress(handle)) {
+    if (!isValidEthereumAddress(handle))
+      return errorHandle({
+        identity: handle.toLowerCase(),
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.invalidAddr,
+      });
+    address = getAddress(handle);
+    ensDomain = await resolveNameFromAddress(handle);
+    if (!ensDomain) {
+      return errorHandle({
+        identity: handle.toLowerCase(),
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.notFound,
+      });
     }
+    resolverAddress = await getResolverAddressFromName(ensDomain);
+  } else {
+    if (!regexEns.test(handle))
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.invalidIdentity,
+      });
+    ensDomain = handle;
+    const response = await resolveAddressFromName(handle);
+    if (!response)
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.notExist,
+      });
+    if (response.message) throw new Error(response.message);
+    resolverAddress = await getResolverAddressFromName(handle);
 
     if (!isValidEthereumAddress(resolverAddress)) {
       return errorHandle({
@@ -247,132 +214,136 @@ const resolveHandleFromURL = async (handle: string | undefined) => {
       });
     }
 
-    gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
+    gtext = [response];
+    address = await resolveENSCoinTypesValue(
+      resolverAddress,
+      handle,
+      CoinType.eth
+    );
+    if (!address || !isValidEthereumAddress(address))
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.invalidResolved,
+      });
+  }
 
-    let LINKRES = {};
-    let CRYPTORES: { [index: string]: string | null } = {
-      eth: address.toLowerCase(),
+  if (!isValidEthereumAddress(resolverAddress)) {
+    return errorHandle({
+      identity: ensDomain,
+      platform: PlatformType.ens,
+      code: 404,
+      message: ErrorMessages.invalidResolver,
+    });
+  }
+
+  gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
+
+  let LINKRES = {};
+  let CRYPTORES: { [index: string]: string | null } = {
+    eth: address.toLowerCase(),
+  };
+  if (gtext && gtext[0].resolver.texts) {
+    const linksRecords = gtext[0]?.resolver?.texts;
+    const linksToFetch = linksRecords.reduce(
+      (pre: Array<string>, cur: string) => {
+        if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
+        return pre;
+      },
+      []
+    );
+
+    const getLink = async () => {
+      const _linkRes: { [index: string]: any } = {};
+      for (let i = 0; i < linksToFetch.length; i++) {
+        const recordText = linksToFetch[i];
+        const key = _.findKey(PlatformData, (o) => {
+          return o.ensText?.includes(recordText);
+        });
+        const handle = resolveHandle(
+          (await resolveENSTextValue(resolverAddress, ensDomain, recordText)) ||
+            ""
+        );
+        if (key && handle) {
+          const resolvedKey =
+            key === PlatformType.url ? PlatformType.website : key;
+          _linkRes[resolvedKey] = {
+            link: getSocialMediaLink(handle, resolvedKey as PlatformType),
+            handle: handle,
+          };
+        }
+      }
+      return _linkRes;
     };
-    if (gtext && gtext[0].resolver.texts) {
-      const linksRecords = gtext[0]?.resolver?.texts;
-      const linksToFetch = linksRecords.reduce(
-        (pre: Array<string>, cur: string) => {
-          if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
+    LINKRES = await getLink();
+  }
+  if (gtext && gtext[0].resolver.coinTypes) {
+    const getCrypto = async () => {
+      const cryptoRecrods = gtext[0].resolver.coinTypes;
+      const cryptoRecordsToFetch = cryptoRecrods.reduce(
+        (pre: Array<number>, cur: number) => {
+          if (
+            ![CoinType.eth].includes(Number(cur)) &&
+            _.findKey(CoinType, (o) => o == cur)
+          )
+            pre.push(cur);
           return pre;
         },
         []
       );
-
-      const getLink = async () => {
-        const _linkRes: { [index: string]: any } = {};
-        for (let i = 0; i < linksToFetch.length; i++) {
-          const recordText = linksToFetch[i];
-          const key = _.findKey(PlatformData, (o) => {
-            return o.ensText?.includes(recordText);
-          });
-          const handle = resolveHandle(
-            (await resolveENSTextValue(
-              resolverAddress,
-              ensDomain,
-              recordText
-            )) || ""
-          );
-          if (key && handle) {
-            const resolvedKey =
-              key === PlatformType.url ? PlatformType.website : key;
-            _linkRes[resolvedKey] = {
-              link: getSocialMediaLink(handle, resolvedKey as PlatformType),
-              handle: handle,
-            };
-          }
-        }
-        return _linkRes;
-      };
-      LINKRES = await getLink();
-    }
-    if (gtext && gtext[0].resolver.coinTypes) {
-      const getCrypto = async () => {
-        const cryptoRecrods = gtext[0].resolver.coinTypes;
-        const cryptoRecordsToFetch = cryptoRecrods.reduce(
-          (pre: Array<number>, cur: number) => {
-            if (
-              ![CoinType.eth].includes(Number(cur)) &&
-              _.findKey(CoinType, (o) => o == cur)
-            )
-              pre.push(cur);
-            return pre;
-          },
-          []
-        );
-        const _cryptoRes: { [index: string]: string | null } = {};
-        for (let i = 0; i < cryptoRecordsToFetch.length; i++) {
-          const _coinType = cryptoRecordsToFetch[i];
-          const key = _.findKey(CoinType, (o) => {
-            return o == _coinType;
-          });
-          if (key) {
-            _cryptoRes[key] =
-              (await resolveENSCoinTypesValue(
+      const _cryptoRes: { [index: string]: string | null } = {};
+      for (let i = 0; i < cryptoRecordsToFetch.length; i++) {
+        const _coinType = cryptoRecordsToFetch[i];
+        const key = _.findKey(CoinType, (o) => {
+          return o == _coinType;
+        });
+        if (key) {
+          _cryptoRes[key] =
+            (
+              await resolveENSCoinTypesValue(
                 resolverAddress,
                 ensDomain,
                 _coinType
-              ))?.toLowerCase() || null;
-          }
+              )
+            )?.toLowerCase() || null;
         }
-        return _cryptoRes;
-      };
-      CRYPTORES = {
-        eth: address.toLowerCase(),
-        ...(await getCrypto()),
-      };
-    }
-    const headerHandle =
-      (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
-    const avatarHandle =
-      (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
-    const resJSON = {
-      address: address.toLowerCase(),
-      identity: ensDomain,
-      platform: PlatformData.ENS.key,
-      displayName:
-        (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
-        ensDomain,
-      avatar: avatarHandle
-        ? (await resolveEipAssetURL(avatarHandle)) ||
-          getENSMetadataAvatar(ensDomain)
-        : null,
-      email:
-        (await resolveENSTextValue(resolverAddress, ensDomain, "email")) ||
-        null,
-      description:
-        (await resolveENSTextValue(
-          resolverAddress,
-          ensDomain,
-          "description"
-        )) || null,
-      location:
-        (await resolveENSTextValue(resolverAddress, ensDomain, "location")) ||
-        null,
-      header: (await resolveEipAssetURL(headerHandle)) || null,
-      links: LINKRES,
-      addresses: CRYPTORES,
+      }
+      return _cryptoRes;
     };
-    return new Response(JSON.stringify(resJSON), {
-      status: 200,
-      headers: {
-        "Cache-Control": `public, s-maxage=${
-          60 * 60 * 24 * 7
-        }, stale-while-revalidate=${60 * 30}`,
-      },
-    });
-  } catch (error: any) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.ens,
-      code: 500,
-      message: error.message,
-    });
+    CRYPTORES = {
+      eth: address.toLowerCase(),
+      ...(await getCrypto()),
+    };
   }
+  const headerHandle =
+    (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
+  const avatarHandle =
+    (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
+  const resJSON = {
+    address: address.toLowerCase(),
+    identity: ensDomain,
+    platform: PlatformData.ENS.key,
+    displayName:
+      (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
+      ensDomain,
+    avatar: avatarHandle
+      ? (await resolveEipAssetURL(avatarHandle)) ||
+        getENSMetadataAvatar(ensDomain)
+      : null,
+    email:
+      (await resolveENSTextValue(resolverAddress, ensDomain, "email")) || null,
+    description:
+      (await resolveENSTextValue(resolverAddress, ensDomain, "description")) ||
+      null,
+    location:
+      (await resolveENSTextValue(resolverAddress, ensDomain, "location")) ||
+      null,
+    header: (await resolveEipAssetURL(headerHandle)) || null,
+    links: LINKRES,
+    addresses: CRYPTORES,
+  };
+  return resJSON;
 };
 
 export const getENSProfile = async (name: string) => {
@@ -394,12 +365,39 @@ export const getENSProfile = async (name: string) => {
   }
 };
 
+const resolveENSRespond = async (handle: string) => {
+  try {
+    if (!handle)
+      return errorHandle({
+        identity: null,
+        platform: PlatformType.ens,
+        code: 404,
+        message: ErrorMessages.invalidIdentity,
+      });
+    const json = await resolveENSHandle(handle);
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.ens,
+      code: 500,
+      message: e.message,
+    });
+  }
+};
+
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
-  const inputAddress = searchParams.get("handle");
-  const lowercaseAddress = inputAddress?.toLowerCase();
-
-  return resolveHandleFromURL(lowercaseAddress);
+  const inputName = searchParams.get("handle") || "";
+  const lowercaseName = inputName?.toLowerCase();
+  if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
+    return errorHandle({
+      identity: lowercaseName,
+      platform: PlatformType.ens,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  return resolveENSRespond(lowercaseName);
 }
 
 export const config = {

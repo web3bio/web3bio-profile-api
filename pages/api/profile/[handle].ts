@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages } from "@/utils/base";
+import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
   regexAvatar,
@@ -11,6 +11,9 @@ import {
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
 import { NeighbourDetail, ProfileAPIResponse } from "@/utils/types";
+import { resolveENSHandle } from "./ens/[handle]";
+import { resolveLensHandle } from "./lens/[handle]";
+import { resolveFarcasterHandle } from "./farcaster/[handle]";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -23,16 +26,6 @@ const nextidGraphQLEndpoint =
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id'
 
-const respondWithCache = (json: string) => {
-  return new Response(json, {
-    status: 200,
-    headers: {
-      "Cache-Control": `public, s-maxage=${
-        60 * 60 * 24 * 7
-      }, stale-while-revalidate=${60 * 30}`,
-    },
-  });
-};
 const getPlatformSort = (
   obj: Array<ProfileAPIResponse>,
   platform: PlatformType
@@ -53,7 +46,7 @@ const resolveHandleFromRelationService = (
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)
 ) => {
-  const query = getRelationQuery(handle);
+  const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
     method: "POST",
     body: JSON.stringify({
@@ -96,6 +89,7 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+  console.log(responseFromRelation,'res')
   if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
       identity: handle,
@@ -141,14 +135,20 @@ const resolveUniversalRespondFromRelation = async ({
         ].includes(x.platform) &&
         x.identity
       ) {
-        const resolvedPlatform =
-          x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
         const resolvedHandle =
           x.platform === PlatformType.ethereum ? x.displayName : x.identity;
-        return fetch(
-          req.nextUrl.origin +
-            `/api/profile/${resolvedPlatform}/${resolvedHandle}`
-        ).then((res) => res.json());
+        const resolvedPlatform =
+          x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
+        switch (resolvedPlatform) {
+          case PlatformType.ens:
+            return resolveENSHandle(resolvedHandle);
+          case PlatformType.lens:
+            return resolveLensHandle(resolvedHandle);
+          case PlatformType.farcaster:
+            return resolveFarcasterHandle(resolvedHandle);
+          default:
+            return Promise.reject({ value: undefined });
+        }
       }
     }),
   ])
@@ -157,8 +157,8 @@ const resolveUniversalRespondFromRelation = async ({
         .filter(
           (response) =>
             response.status === "fulfilled" &&
-            response.value &&
-            !response.value.error
+            response.value?.address &&
+            !response.value?.error
         )
         .map(
           (response) =>
