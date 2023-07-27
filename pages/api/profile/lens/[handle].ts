@@ -63,14 +63,8 @@ export const resolveLensHandle = async (handle: string) => {
   } else {
     response = await getLensProfile(handle, LensParamType.domain);
   }
-  if (!response) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.lens,
-      code: 404,
-      message: ErrorMessages.notFound,
-    });
-  }
+  if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
+
   const pureHandle = response.handle.replaceAll(".lens", "");
   let LINKRES = {};
   if (response.attributes) {
@@ -141,7 +135,7 @@ const resolveLensRespond = async (handle: string) => {
     return errorHandle({
       identity: handle,
       platform: PlatformType.lens,
-      code: 500,
+      code: e.cause || 500,
       message: e.message,
     });
   }

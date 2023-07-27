@@ -1,10 +1,5 @@
 import type { NextApiRequest } from "next";
-import {
-  LinksItem,
-  errorHandle,
-  ErrorMessages,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
@@ -90,14 +85,8 @@ export const resolveFarcasterHandle = async (handle: string) => {
   } else {
     const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
       ?.user;
-    if (!rawUser?.fid) {
-      return errorHandle({
-        identity: handle,
-        platform: PlatformType.farcaster,
-        code: 404,
-        message: ErrorMessages.notFound,
-      });
-    }
+    if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
+
     const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
       ?.result?.verifications?.[0]?.address;
     response = {
@@ -105,14 +94,8 @@ export const resolveFarcasterHandle = async (handle: string) => {
       ...rawUser,
     };
   }
-  if (!response?.fid) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.farcaster,
-      code: 404,
-      message: ErrorMessages.notFound,
-    });
-  }
+  if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
+
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);
   const resJSON = {
@@ -138,7 +121,7 @@ const resolveFarcasterRespond = async (handle: string) => {
     return errorHandle({
       identity: handle,
       platform: PlatformType.farcaster,
-      code: 500,
+      code: e.cause || 500,
       message: e.message,
     });
   }

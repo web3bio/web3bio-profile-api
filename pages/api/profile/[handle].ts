@@ -89,7 +89,6 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  console.log(responseFromRelation,'res')
   if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
       identity: handle,
