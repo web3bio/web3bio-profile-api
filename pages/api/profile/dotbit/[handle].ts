@@ -29,7 +29,7 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
     method: "POST",
     body: payload,
   }).then((res) => res.json());
-  return response?.data || response.result?.data;
+  return response?.data
 };
 
 const resolveDotbitHandle = async (handle: string) => {
@@ -37,7 +37,7 @@ const resolveDotbitHandle = async (handle: string) => {
   let domain;
   if (isAddress(handle)) {
     const res = await fetchDotbitProfile(
-      "v1/account/list",
+      "v1/reverse/record",
       JSON.stringify({
         type: "blockchain",
         key_info: {
@@ -46,11 +46,11 @@ const resolveDotbitHandle = async (handle: string) => {
         },
       })
     );
-    if (!res?.account_list?.length) {
+    if (!res?.account) {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
     address = handle;
-    domain = res.account_list[0].account;
+    domain = res.account;
   } else {
     const res = await fetchDotbitProfile(
       "v1/account/info",
