@@ -8,12 +8,6 @@ import { CoinType } from "@/utils/cointype";
 
 export const config = {
   runtime: "edge",
-  unstable_allowDynamic: [
-    // allows a single file
-    "/lib/utilities.js",
-    // use a glob to allow anything in the function-bind 3rd party module
-    "/node_modules/function-bind/**",
-  ],
 };
 interface RecordItem {
   key: string;
@@ -29,7 +23,7 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
     method: "POST",
     body: payload,
   }).then((res) => res.json());
-  return response?.data
+  return response?.data;
 };
 
 const resolveDotbitHandle = async (handle: string) => {
@@ -67,7 +61,7 @@ const resolveDotbitHandle = async (handle: string) => {
     JSON.stringify({ account: domain })
   );
   const recordsMap = new Map<string, RecordItem>(
-    recordsResponse.records?.map((x: RecordItem) => [x.key, { ...x }])
+    recordsResponse?.records?.map((x: RecordItem) => [x.key, { ...x }])
   );
   const linksObj: Record<
     string,
@@ -76,7 +70,9 @@ const resolveDotbitHandle = async (handle: string) => {
       link: string;
     }
   > = {};
-  const cryptoObj: Record<string, string> = {};
+  const cryptoObj: Record<string, string> = {
+    eth: address.toLowerCase(),
+  };
   recordsMap.forEach((x) => {
     if (x.key.includes("address.")) {
       cryptoObj[x.key.replace("address.", "")] = x.value?.toLocaleLowerCase();
@@ -107,7 +103,7 @@ const resolveDotbitHandle = async (handle: string) => {
   };
 };
 
-const resolveFarcasterRespond = async (handle: string) => {
+const resolveDotbitRespond = async (handle: string) => {
   try {
     const json = await resolveDotbitHandle(handle);
     return respondWithCache(JSON.stringify(json));
@@ -133,5 +129,5 @@ export default async function handler(req: NextApiRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveFarcasterRespond(lowercaseName);
+  return resolveDotbitRespond(lowercaseName);
 }

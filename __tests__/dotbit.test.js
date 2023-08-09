@@ -27,4 +27,18 @@ describe("Test For Lens Profile API", () => {
     );
     expect(res.status).toBe(404);
   });
+  it("It should response 200 for mitchatmask.bit", async () => {
+    const res = await queryClient("/profile/dotbit/mitchatmask.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.addresses.eth).toBeTruthy();
+    expect(json.links.nextid.handle).toBeTruthy();
+  });
+  it("It should response 200 for test0920.bit", async () => {
+    const res = await queryClient("/profile/dotbit/test0920.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBe("0x4271b15dca69f8c1c942c64028dbd3b84c5d03b0");
+  });
 });
+
