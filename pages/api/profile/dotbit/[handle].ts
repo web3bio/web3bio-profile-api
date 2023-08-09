@@ -2,7 +2,7 @@ import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
-import { regexDotbit, regexEth, regexFarcaster } from "@/utils/regexp";
+import { regexDotbit, regexEth } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 import { CoinType } from "@/utils/cointype";
 
@@ -79,7 +79,7 @@ const resolveDotbitHandle = async (handle: string) => {
     }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
-      if (!["description", "email"].includes(platform) && x.value) {
+      if (!["description", "email","avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value)!;
         linksObj[platform] = {
           handle: _handle,
