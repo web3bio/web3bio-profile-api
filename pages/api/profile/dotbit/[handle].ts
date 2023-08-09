@@ -29,8 +29,7 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
     method: "POST",
     body: payload,
   }).then((res) => res.json());
-  console.log(response, "kkkk");
-  return response?.data;
+  return response?.data || response.result?.data;
 };
 
 const resolveDotbitHandle = async (handle: string) => {
@@ -38,20 +37,20 @@ const resolveDotbitHandle = async (handle: string) => {
   let domain;
   if (isAddress(handle)) {
     const res = await fetchDotbitProfile(
-      "v1/reverse/record",
+      "v1/account/list",
       JSON.stringify({
         type: "blockchain",
         key_info: {
-          coin_type: CoinType.eth,
-          key: handle,
+          coin_type: CoinType.eth.toString(),
+          key: "0x2ec8ebb0a8eaa40e4ce620cf9f84a96df68d4669",
         },
       })
     );
-    if (!res?.account) {
+    if (!res?.account_list?.length) {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
     address = handle;
-    domain = res.account;
+    domain = res.account_list[0].account;
   } else {
     const res = await fetchDotbitProfile(
       "v1/account/info",
@@ -80,7 +79,7 @@ const resolveDotbitHandle = async (handle: string) => {
   const cryptoObj: Record<string, string> = {};
   recordsMap.forEach((x) => {
     if (x.key.includes("address.")) {
-      cryptoObj[x.key.replace("address.", "")] = x.value;
+      cryptoObj[x.key.replace("address.", "")] = x.value?.toLocaleLowerCase();
     }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
