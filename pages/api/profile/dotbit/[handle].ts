@@ -42,7 +42,7 @@ const resolveDotbitHandle = async (handle: string) => {
         type: "blockchain",
         key_info: {
           coin_type: CoinType.eth.toString(),
-          key: "0x2ec8ebb0a8eaa40e4ce620cf9f84a96df68d4669",
+          key: handle,
         },
       })
     );
