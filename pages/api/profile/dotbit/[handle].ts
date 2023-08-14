@@ -29,6 +29,7 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
 const resolveDotbitHandle = async (handle: string) => {
   let address;
   let domain;
+  let avatar;
   if (isAddress(handle)) {
     const res = await fetchDotbitProfile(
       "v1/reverse/record",
@@ -77,6 +78,7 @@ const resolveDotbitHandle = async (handle: string) => {
     }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
+      if(platform === 'avatar') avatar = x.value
       if (!["description", "email", "avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value)!;
         linksObj[platform] = {
@@ -91,7 +93,7 @@ const resolveDotbitHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.dotbit,
     displayName: domain,
-    avatar: "https://display.did.id/identicon/" + domain,
+    avatar: avatar || "https://display.did.id/identicon/" + domain,
     email: recordsMap.get("profile.email")?.value,
     description: recordsMap.get("profile.description")?.value,
     location: null,
