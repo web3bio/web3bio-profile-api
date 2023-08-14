@@ -45,4 +45,10 @@ describe("Test For Dotbit Profile API", () => {
     const json = await res.json();
     expect(json.address).toBe("tqqfpd5qzaeqjs74xbr3eiqfqpy6a2qdxj");
   });
+  it("It should response 200 for kingsgam.bit", async () => {
+    const res = await queryClient("/profile/dotbit/kingsgam.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.avatar).toBeTruthy();
+  });
 });
