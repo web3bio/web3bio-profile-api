@@ -54,7 +54,7 @@ const resolveDotbitHandle = async (handle: string) => {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
     domain = res.account_info.account || handle;
-    address = res.account_info.owner_key;
+    address = res.account_info.owner_key.toLowerCase();
   }
   const recordsResponse = await fetchDotbitProfile(
     "v1/account/records",
