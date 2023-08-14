@@ -70,16 +70,14 @@ const resolveDotbitHandle = async (handle: string) => {
       link: string;
     }
   > = {};
-  const cryptoObj: Record<string, string> = {
-    eth: address.toLowerCase(),
-  };
+  const cryptoObj: Record<string, string> = {};
   recordsMap.forEach((x) => {
     if (x.key.includes("address.")) {
       cryptoObj[x.key.replace("address.", "")] = x.value?.toLocaleLowerCase();
     }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
-      if (!["description", "email","avatar"].includes(platform) && x.value) {
+      if (!["description", "email", "avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value)!;
         linksObj[platform] = {
           handle: _handle,
