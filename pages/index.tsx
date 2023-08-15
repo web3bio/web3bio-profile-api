@@ -73,7 +73,8 @@ export default function Home() {
               integrate Web3 universal profiles from{" "}
               <span className="text-underline">Ethereum (ENS)</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
-              <span className="text-underline">Farcaster</span>, and{" "}
+              <span className="text-underline">Farcaster</span>,{" "}
+              <span className="text-underline">.bit</span> and{" "}
               <span className="text-underline">Next.ID</span> into their
               applications. These APIs are already integrated into{" "}
               <a
@@ -181,6 +182,29 @@ export default function Home() {
               <div className="mr-2" style={endpointRight}>
                 <div className="text-">
                   Retrieve a Farcaster profile
+                  <div
+                    className="icon icon-arrow-down ml-2"
+                    style={{ fontSize: ".75rem" }}
+                  ></div>
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#dotbit-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray">https://api.web3.bio</span>
+                  /profile/dotbit/{"{"}identity{"}"}
+                </div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-">
+                  Retrieve a .bit profile
                   <div
                     className="icon icon-arrow-down ml-2"
                     style={{ fontSize: ".75rem" }}
@@ -562,6 +586,106 @@ export default function Home() {
             "link": "https://twitter.com/suji_yan",
             "handle": "suji_yan"
         }
+    }
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="dotbit-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h5">.bit Profile API</h2>
+            <p>Retrieve a .bit profile</p>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray">https://api.web3.bio</span>
+                  /profile/dotbit/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6 mt-4">Parameter</h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                - An Ethereum address or a .bit username.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">Examples</h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d"
+                  target="_blank"
+                >
+                  https://api.web3.bio/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d
+                </a>
+              </li>
+              <li>
+                <span className="label">.bit</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/dotbit/bestcase.bit"
+                  target="_blank"
+                >
+                  https://api.web3.bio/profile/dotbit/bestcase.bit
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// https://api.web3.bio/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/profile/dotbit/bestcase.bit`}</span>
+                <br />
+                {`{
+    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+    "identity": "bestcase.bit",
+    "platform": "dotbit",
+    "displayName": "bestcase.bit",
+    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
+    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world.",
+    "location": null,
+    "header": null,
+    "links": {
+        "twitter": {
+            "handle": "dotbitHQ",
+            "link": "https://twitter.com/dotbitHQ"
+        },
+        "github": {
+            "handle": "dotbitHQ",
+            "link": "https://github.com/dotbitHQ"
+        },
+        "discord": {
+            "handle": "did",
+            "link": "https://discord.com/invite/did"
+        },
+        "website": {
+            "handle": "www.did.id",
+            "link": "https://www.did.id/"
+        },
+        "nostr": {
+            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
+            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
+        }
+    },
+    "addresses": {
+        "btc": "3gcu7eghuqanqxun2osmx1bavcvvcsjrrc",
+        "doge": "dcuu7pt2dj1u3wzyysvcmwegps3vp81pzj",
+        "bsc": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+        "polygon": "0xb2e895579b2ace78e2de99af2d4820e3922b932f",
+        "dot": "15w9dugwzz8sqvpzry46j4lrrd8ttdfnx2qqf4arm6jqn2rn",
+        "ltc": "lef4g3y8ydpyjurtbdg2zsboxzyxcuqfvf",
+        "ckb": "ckb1qzfhdsa4syv599s2s3nfrctwga70g0tu07n9gpnun9ydlngf5vsnwqgrl286nn6catlcd23qsdn2zntfm6rcvlcaq0agl2w0tr40lp42yzpkdg2dd80g0pnlr5whhswq",
+        "eth": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+        "trx": "tkxhn9yswcnk2c39lewdne4dcl8xnee2nf"
     }
 }`}
               </code>

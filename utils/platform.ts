@@ -319,7 +319,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     key: PlatformType.nostr,
     icon: "",
     label: "Nostr",
-    urlPrefix: "https://app.coracle.social/",
+    urlPrefix: "https://snort.social/p/",
     dotbitText: ["profile.nostr"],
   },
 };
