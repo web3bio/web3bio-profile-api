@@ -50,7 +50,7 @@ const resolveHandleFromRelationService = (
   return fetch(nextidGraphQLEndpoint, {
     method: "POST",
     headers: {
-      "x-api-token": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
+      "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
     },
     body: JSON.stringify({
       query,
