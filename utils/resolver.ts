@@ -14,8 +14,10 @@ export const resolveMediaURL = (url: string) => {
     : resolveIPFS_URL(url);
 };
 
-export const resolveHandle = (handle: string) => {
+export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
+  if (platform && platform === PlatformType.website)
+    return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
   if (handle && domainRegexp.test(handle)) {
     const arr = handle.split("/");
     return (

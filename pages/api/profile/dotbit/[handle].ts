@@ -78,9 +78,9 @@ const resolveDotbitHandle = async (handle: string) => {
     }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
-      if(platform === 'avatar') avatar = x.value
+      if (platform === "avatar") avatar = x.value;
       if (!["description", "email", "avatar"].includes(platform) && x.value) {
-        const _handle = resolveHandle(x.value)!;
+        const _handle = resolveHandle(x.value, platform as PlatformType)!;
         linksObj[platform] = {
           handle: _handle,
           link: getSocialMediaLink(x.value, platform as PlatformType)!,
