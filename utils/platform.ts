@@ -222,6 +222,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     label: "Discord",
     ensText: ["com.discord"],
     dotbitText: ["profile.discord"],
+    urlPrefix:"https://discord.gg/"
   },
   [PlatformType.url]: {
     key: PlatformType.url,

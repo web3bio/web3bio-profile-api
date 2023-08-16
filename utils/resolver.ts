@@ -14,8 +14,10 @@ export const resolveMediaURL = (url: string) => {
     : resolveIPFS_URL(url);
 };
 
-export const resolveHandle = (handle: string) => {
+export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
+  if (platform && platform === PlatformType.website)
+    return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
   if (handle && domainRegexp.test(handle)) {
     const arr = handle.split("/");
     return (
@@ -45,6 +47,10 @@ export function resolveSocialMediaLink(name: string, type: PlatformType) {
       return `${name}`;
     case PlatformType.website:
       return `https://${name}`;
+    case PlatformType.discord:
+      if (!name.includes("#"))
+        return SocialPlatformMapping(type).urlPrefix + name;
+      return "";
     default:
       return SocialPlatformMapping(type).urlPrefix
         ? SocialPlatformMapping(type).urlPrefix + name

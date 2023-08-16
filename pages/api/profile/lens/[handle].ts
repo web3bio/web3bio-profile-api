@@ -82,7 +82,8 @@ export const resolveLensHandle = async (handle: string) => {
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
         const handle = resolveHandle(
-          linksRecords?.find((o: { key: any }) => o.key === recordText)?.value
+          linksRecords?.find((o: { key: any }) => o.key === recordText)?.value,
+          recordText
         );
         if (handle) {
           const resolvedHandle =

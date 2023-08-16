@@ -33,6 +33,8 @@ describe("Test For ENS Profile API", () => {
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/ens/sujiyan.eth");
     expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.links.website.handle).toBe("mask.io");
   });
   it("It should response 200 for vitalik.eth", async () => {
     const res = await queryClient("/profile/ens/vitalik.eth");
@@ -79,5 +81,11 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.error).toBe("Invalid Identity or Domain");
+  });
+  it("It should response 404 for gothgorl.eth", async () => {
+    const res = await queryClient("/profile/ens/gothgorl.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.links.website.handle).toBe("linktr.ee/starcaster12");
   });
 });
