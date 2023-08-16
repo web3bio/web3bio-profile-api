@@ -65,7 +65,7 @@ const resolveFarcasterLinks = (
   const twitterMatch = bioText.match(regexTwitterLink);
   if (twitterMatch) {
     const matched = twitterMatch[1];
-    const resolveMatch = resolveHandle(matched);
+    const resolveMatch = resolveHandle(matched, PlatformType.farcaster);
     LINKRES[PlatformType.twitter] = {
       link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
       handle: resolveMatch,

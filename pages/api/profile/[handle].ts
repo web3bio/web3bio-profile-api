@@ -49,6 +49,9 @@ const resolveHandleFromRelationService = (
   const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
     method: "POST",
+    headers: {
+      "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
+    },
     body: JSON.stringify({
       query,
       variables: {

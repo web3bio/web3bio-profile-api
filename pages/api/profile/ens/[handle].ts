@@ -228,7 +228,8 @@ export const resolveENSHandle = async (handle: string) => {
         });
         const handle = resolveHandle(
           (await resolveENSTextValue(resolverAddress, ensDomain, recordText)) ||
-            ""
+            "",
+            key as PlatformType
         );
         if (key && handle) {
           const resolvedKey =
