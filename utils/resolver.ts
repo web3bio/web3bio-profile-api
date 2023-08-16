@@ -47,6 +47,10 @@ export function resolveSocialMediaLink(name: string, type: PlatformType) {
       return `${name}`;
     case PlatformType.website:
       return `https://${name}`;
+    case PlatformType.discord:
+      if (!name.includes("#"))
+        return SocialPlatformMapping(type).urlPrefix + name;
+      return "";
     default:
       return SocialPlatformMapping(type).urlPrefix
         ? SocialPlatformMapping(type).urlPrefix + name
