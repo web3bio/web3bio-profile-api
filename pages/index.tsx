@@ -45,10 +45,7 @@ export default function Home() {
           rel="canonical"
           href={process.env.NEXT_PUBLIC_PROFILE_END_POINT}
         />
-        <link 
-          rel="shortcut icon"
-          href="/favicon.ico" 
-        />
+        <link rel="shortcut icon" href="/favicon.ico" />
       </Head>
       <main className="web3bio-container p-4 mt-4 mb-4">
         <div className="container grid-md">
@@ -238,7 +235,8 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 - An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), or a Next.ID address.
+                username (ends with .farcaster), a .bit domain, or a Next.ID
+                address.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">Examples</h3>
@@ -286,6 +284,15 @@ export default function Home() {
                   target="_blank"
                 >
                   https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50
+                </a>
+              </li>
+              <li>
+                <span className="label">.bit</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/jeffx.bit"
+                  target="_blank"
+                >
+                  https://api.web3.bio/profile/jeffx.bit
                 </a>
               </li>
             </ul>
@@ -693,7 +700,10 @@ export default function Home() {
           </section>
         </div>
       </main>
-      <script async src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W"></script>
+      <script
+        async
+        src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W"
+      ></script>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W" />
       <Script id="google-analytics">
         {`
