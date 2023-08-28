@@ -27,13 +27,16 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
   return handle.replaceAll("@", "");
 };
 
-export const getSocialMediaLink = (url: string | null, type: PlatformType) => {
+export const getSocialMediaLink = (
+  url: string | null,
+  type: PlatformType | string
+) => {
   let resolvedURL = "";
   if (!url) return null;
   if (url.startsWith("https")) {
     resolvedURL = url;
   } else {
-    resolvedURL = resolveSocialMediaLink(url, type);
+    resolvedURL = resolveSocialMediaLink(url, type as PlatformType);
   }
 
   return resolvedURL;

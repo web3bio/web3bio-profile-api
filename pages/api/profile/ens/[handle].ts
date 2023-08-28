@@ -204,7 +204,6 @@ export const resolveENSHandle = async (handle: string) => {
     throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
 
   gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
-
   let LINKRES = {};
   let CRYPTORES: { [index: string]: string | null } = {
     eth: address.toLowerCase(),
@@ -223,19 +222,24 @@ export const resolveENSHandle = async (handle: string) => {
       const _linkRes: { [index: string]: any } = {};
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
-        const key = _.findKey(PlatformData, (o) => {
-          return o.ensText?.includes(recordText);
-        });
-        const handle = resolveHandle(
-          (await resolveENSTextValue(resolverAddress, ensDomain, recordText)) ||
-            "",
-            key as PlatformType
+        const key =
+          _.findKey(PlatformData, (o) => {
+            return o.ensText?.includes(recordText);
+          }) || recordText;
+        const textValue = await resolveENSTextValue(
+          resolverAddress,
+          ensDomain,
+          recordText
         );
+        const handle = Object.values(PlatformType).includes(key)
+          ? resolveHandle(textValue, key as PlatformType)
+          : textValue;
+
         if (key && handle) {
           const resolvedKey =
             key === PlatformType.url ? PlatformType.website : key;
           _linkRes[resolvedKey] = {
-            link: getSocialMediaLink(handle, resolvedKey as PlatformType),
+            link: getSocialMediaLink(handle, resolvedKey),
             handle: handle,
           };
         }
