@@ -59,17 +59,15 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.twitter]: {
     key: PlatformType.twitter,
     color: "#4A99E9",
-    icon: "icons/icon-twitter.svg",
     label: "Twitter",
     urlPrefix: "https://twitter.com/",
-    ensText: ["com.twitter", "vnd.twitter"],
+    ensText: ["com.twitter", "vnd.twitter", "twitter", "x"],
     dotbitText: ["profile.twitter"],
   },
   [PlatformType.ens]: {
     key: PlatformType.ens,
     color: "#5298FF",
     // TODO: add ens search icon here
-    icon: "icons/icon-ethereum.svg",
     label: "ENS",
     urlPrefix: "https://app.ens.domains/search/",
     ensText: [],
@@ -77,7 +75,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.ethereum]: {
     key: PlatformType.ethereum,
     color: "#3c3c3d",
-    icon: "icons/icon-ethereum.svg",
     label: "Ethereum",
     urlPrefix: "https://etherscan.io/address/",
     ensText: [],
@@ -85,7 +82,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.farcaster]: {
     key: PlatformType.farcaster,
     color: "#8a63d2",
-    icon: "icons/icon-farcaster.svg",
     label: "Farcaster",
     urlPrefix: "https://warpcast.com/",
     ensText: [],
@@ -93,16 +89,14 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.github]: {
     key: PlatformType.github,
     color: "#000000",
-    icon: "icons/icon-github.svg",
     label: "GitHub",
     urlPrefix: "https://github.com/",
-    ensText: ["com.github", "vnd.github"],
+    ensText: ["com.github", "vnd.github", "github"],
     dotbitText: ["profile.github"],
   },
   [PlatformType.keybase]: {
     key: PlatformType.keybase,
     color: "#4162E2",
-    icon: "icons/icon-keybase.svg",
     label: "Keybase",
     urlPrefix: "https://keybase.io/",
     ensText: ["io.keybase"],
@@ -110,7 +104,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.lens]: {
     key: PlatformType.lens,
     color: "#BDFC5A",
-    icon: "icons/icon-lens.svg",
     label: "Lens",
     urlPrefix: "https://www.lensfrens.xyz/",
     ensText: [],
@@ -118,7 +111,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.nextid]: {
     key: PlatformType.nextid,
     color: "#121212",
-    icon: "icons/icon-nextid.svg",
     label: "Next.ID",
     urlPrefix: "https://web3.bio/",
     ensText: [],
@@ -127,7 +119,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.reddit]: {
     key: PlatformType.reddit,
     color: "#ff4500",
-    icon: "icons/icon-reddit.svg",
     label: "Reddit",
     urlPrefix: "https://www.reddit.com/user/",
     ensText: ["com.reddit"],
@@ -136,7 +127,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.space_id]: {
     key: PlatformType.space_id,
     color: "#71EBAA",
-    icon: "icons/icon-spaceid.svg",
     label: "SPACE ID",
     urlPrefix: "https://space.id/search?query=",
     ensText: [],
@@ -144,7 +134,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.unstoppableDomains]: {
     key: PlatformType.unstoppableDomains,
     color: "#2E65F5",
-    icon: "icons/icon-unstoppabledomains.svg",
     label: "Unstoppable Domains",
     ensText: [],
     urlPrefix: "https://unstoppabledomains.com/search?searchTerm=",
@@ -152,7 +141,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.telegram]: {
     key: PlatformType.telegram,
     color: "#0088cc",
-    icon: "icons/icon-telegram.svg",
     label: "Telegram",
     ensText: ["org.telegram", "vnd.telegram", "VND.TELEGRAM"],
     dotbitText: ["profile.telegram"],
@@ -161,7 +149,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.instagram]: {
     key: PlatformType.instagram,
     color: "#EA3377",
-    icon: "icons/icon-instagram.svg",
     label: "Instagram",
     ensText: ["com.instagram"],
     dotbitText: ["profile.instagram"],
@@ -169,7 +156,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   },
   [PlatformType.weibo]: {
     key: PlatformType.instagram,
-    icon: "",
     label: "Weibo",
     ensText: [],
     dotbitText: ["profile.weibo"],
@@ -178,7 +164,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.dotbit]: {
     key: PlatformType.dotbit,
     color: "#0e7dff",
-    icon: "icons/icon-dotbit.svg",
     label: ".bit",
     ensText: [],
     urlPrefix: "https://data.did.id/",
@@ -194,14 +179,12 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     key: PlatformType.cyberconnect,
     color: "#000000",
     // TODO: icons to add
-    icon: "icons/icon-cyberconnect.svg",
     label: "CyberConnect",
     ensText: [],
   },
   [PlatformType.opensea]: {
     key: PlatformType.opensea,
     color: "#407FDB",
-    icon: "icons/icon-opensea.svg",
     label: "OpenSea",
     ensText: [],
     urlPrefix: "https://opensea.io/",
@@ -209,8 +192,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.sybil]: {
     key: PlatformType.sybil,
     color: "#4125E1",
-    // TODO: icons to add
-    icon: "icons/icon-sybil.svg",
     label: "Sybil",
     ensText: [],
     urlPrefix: "https://sybil.org/",
@@ -218,22 +199,19 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   [PlatformType.discord]: {
     key: PlatformType.discord,
     color: "#5865f2",
-    icon: "icons/icon-discord.svg",
     label: "Discord",
     ensText: ["com.discord"],
     dotbitText: ["profile.discord"],
-    urlPrefix:"https://discord.gg/"
+    urlPrefix: "https://discord.gg/",
   },
   [PlatformType.url]: {
     key: PlatformType.url,
-    icon: "icons/icon-web.svg",
     color: "#121212",
     label: "Website",
     ensText: [],
   },
   [PlatformType.website]: {
     key: PlatformType.website,
-    icon: "icons/icon-web.svg",
     color: "#121212",
     label: "Website",
     ensText: ["url"],
@@ -243,82 +221,70 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     key: PlatformType.linkedin,
     color: "#195DB4",
     label: "LinkedIn",
-    icon: "icons/icon-linkedin.svg",
     ensText: ["com.linkedin"],
     urlPrefix: "https://www.linkedin.com/in/",
     dotbitText: ["profile.linkedin"],
   },
   [PlatformType.dns]: {
     key: PlatformType.dns,
-    icon: "icons/icon-web.svg",
     label: "DNS",
   },
   [PlatformType.lenster]: {
     key: PlatformType.lenster,
-    icon: "icons/icon-lenster.svg",
     color: "#845EEE",
     label: "Lenster",
     urlPrefix: "https://lenster.xyz/u/",
   },
   [PlatformType.facebook]: {
     key: PlatformType.facebook,
-    icon: "icons/social-facebook.svg",
     label: "Facebook",
     urlPrefix: "https://www.facebook.com/",
     dotbitText: ["profile.facebook"],
   },
   [PlatformType.youtube]: {
     key: PlatformType.youtube,
-    icon: "",
     label: "Youtube",
     urlPrefix: "https://www.youtube.com/",
     dotbitText: ["profile.youtube"],
   },
   [PlatformType.tiktok]: {
     key: PlatformType.tiktok,
-    icon: "",
     label: "TikTok",
     urlPrefix: "https://www.tiktok.com/",
     dotbitText: ["profile.tiktok"],
   },
   [PlatformType.bilibili]: {
     key: PlatformType.bilibili,
-    icon: "",
     label: "Bilibili",
     urlPrefix: "https://www.bilibili.com/",
     dotbitText: ["profile.bilibili"],
   },
   [PlatformType.medium]: {
     key: PlatformType.medium,
-    icon: "icons/social-medium.svg",
     label: "Medium",
     urlPrefix: "https://medium.com/",
     dotbitText: ["profile.medium"],
   },
   [PlatformType.mirror]: {
     key: PlatformType.mirror,
-    icon: "",
     label: "Mirror",
     urlPrefix: "https://mirror.xyz/",
     dotbitText: ["profile.mirror"],
   },
   [PlatformType.jike]: {
     key: PlatformType.jike,
-    icon: "",
     label: "Jike",
     urlPrefix: "https://web.okjike.com/",
     dotbitText: ["profile.jike"],
   },
   [PlatformType.dribbble]: {
     key: PlatformType.dribbble,
-    icon: "",
     label: "Dribbble",
     urlPrefix: "https://dribbble.com/search/",
     dotbitText: ["profile.dribbble"],
   },
   [PlatformType.nostr]: {
     key: PlatformType.nostr,
-    icon: "",
     label: "Nostr",
     urlPrefix: "https://snort.social/p/",
     dotbitText: ["profile.nostr"],

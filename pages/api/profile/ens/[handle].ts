@@ -222,18 +222,15 @@ export const resolveENSHandle = async (handle: string) => {
       const _linkRes: { [index: string]: any } = {};
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
-        const key =
-          _.findKey(PlatformData, (o) => {
-            return o.ensText?.includes(recordText);
-          }) || recordText;
+        const key = _.findKey(PlatformData, (o) => {
+          return o.ensText?.includes(recordText.toLowerCase());
+        });
         const textValue = await resolveENSTextValue(
           resolverAddress,
           ensDomain,
           recordText
         );
-        const handle = Object.values(PlatformType).includes(key)
-          ? resolveHandle(textValue, key as PlatformType)
-          : textValue;
+        const handle = resolveHandle(textValue, key as PlatformType);
 
         if (key && handle) {
           const resolvedKey =

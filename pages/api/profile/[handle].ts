@@ -26,7 +26,7 @@ const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
 // staging
-// const nextidGraphQLEndpoint='https://relation-service.nextnext.id'
+// const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
 
 const getPlatformSort = (
   obj: Array<ProfileAPIResponse>,

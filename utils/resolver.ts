@@ -36,13 +36,16 @@ export const getSocialMediaLink = (
   if (url.startsWith("https")) {
     resolvedURL = url;
   } else {
-    resolvedURL = resolveSocialMediaLink(url, type as PlatformType);
+    resolvedURL = resolveSocialMediaLink(url, type);
   }
 
   return resolvedURL;
 };
 
-export function resolveSocialMediaLink(name: string, type: PlatformType) {
+export function resolveSocialMediaLink(
+  name: string,
+  type: PlatformType | string
+) {
   if (!Object.keys(PlatformType).includes(type))
     return `https://web5.bio/?s=${name}`;
   switch (type) {
@@ -55,8 +58,8 @@ export function resolveSocialMediaLink(name: string, type: PlatformType) {
         return SocialPlatformMapping(type).urlPrefix + name;
       return "";
     default:
-      return SocialPlatformMapping(type).urlPrefix
-        ? SocialPlatformMapping(type).urlPrefix + name
+      return SocialPlatformMapping(type as PlatformType).urlPrefix
+        ? SocialPlatformMapping(type as PlatformType).urlPrefix + name
         : "";
   }
 }
