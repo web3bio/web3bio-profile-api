@@ -84,4 +84,16 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json.filter((x) => x.platform === "lens").length > 1);
   });
+  it("It should response 200 data for jeffx.bit", async () => {
+    const res = await queryClient("/profile/jeffx.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.length > 1);
+  });
+  it("It should response 200 data for 0x638b1350920333d23a7a7472c00aa5c38c278b90", async () => {
+    const res = await queryClient("/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find(x=>x.platform === 'dotbit')).toBeTruthy();
+  });
 });

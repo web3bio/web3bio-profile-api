@@ -26,7 +26,7 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
   return response?.data;
 };
 
-const resolveDotbitHandle = async (handle: string) => {
+export const resolveDotbitHandle = async (handle: string) => {
   let address;
   let domain;
   let avatar;

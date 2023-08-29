@@ -62,7 +62,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-twitter.svg",
     label: "Twitter",
     urlPrefix: "https://twitter.com/",
-    ensText: ["com.twitter", "vnd.twitter"],
+    ensText: ["com.twitter", "vnd.twitter", "twitter", "x"],
     dotbitText: ["profile.twitter"],
   },
   [PlatformType.ens]: {
@@ -96,7 +96,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-github.svg",
     label: "GitHub",
     urlPrefix: "https://github.com/",
-    ensText: ["com.github", "vnd.github"],
+    ensText: ["com.github", "vnd.github", "github"],
     dotbitText: ["profile.github"],
   },
   [PlatformType.keybase]: {
@@ -222,7 +222,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     label: "Discord",
     ensText: ["com.discord"],
     dotbitText: ["profile.discord"],
-    urlPrefix:"https://discord.gg/"
+    urlPrefix: "https://discord.gg/",
   },
   [PlatformType.url]: {
     key: PlatformType.url,

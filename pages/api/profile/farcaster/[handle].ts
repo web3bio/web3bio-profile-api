@@ -55,12 +55,14 @@ const resolveFarcasterLinks = (
       link: string | null;
       handle: string | null;
     };
-  } = {
-    farcaster: {
-      link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
-      handle: resolvedHandle,
-    },
-  };
+  } = resolvedHandle
+    ? {
+        farcaster: {
+          link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
+          handle: resolvedHandle,
+        },
+      }
+    : {};
   const bioText = response.profile.bio.text || "";
   const twitterMatch = bioText.match(regexTwitterLink);
   if (twitterMatch) {
@@ -82,6 +84,8 @@ export const resolveFarcasterHandle = async (handle: string) => {
       address: handle.toLowerCase(),
       ...(await fetchWarpcastWithAddress(handle))?.result?.user,
     };
+    if (!response?.username)
+      throw new Error(ErrorMessages.notFound, { cause: 404 });
   } else {
     const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
       ?.user;
@@ -100,9 +104,9 @@ export const resolveFarcasterHandle = async (handle: string) => {
   const links = resolveFarcasterLinks(response, resolvedHandle);
   const resJSON = {
     address: response.address || null,
-    identity: response.username || response.displayName,
+    identity: response.username,
     platform: PlatformType.farcaster,
-    displayName: response.displayName || resolvedHandle,
+    displayName: response.displayName,
     avatar: response.pfp.url,
     email: null,
     description: response.profile.bio.text,

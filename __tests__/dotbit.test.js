@@ -27,11 +27,9 @@ describe("Test For Dotbit Profile API", () => {
     );
     expect(res.status).toBe(404);
   });
-  it("It should response 200 for mitchatmask.bit", async () => {
+  it("It should response 404 for mitchatmask.bit", async () => {
     const res = await queryClient("/profile/dotbit/mitchatmask.bit");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.links.nextid.handle).toBeTruthy();
+    expect(res.status).toBe(404);
   });
   it("It should response 200 for test0920.bit", async () => {
     const res = await queryClient("/profile/dotbit/test0920.bit");

@@ -27,7 +27,10 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
   return handle.replaceAll("@", "");
 };
 
-export const getSocialMediaLink = (url: string | null, type: PlatformType) => {
+export const getSocialMediaLink = (
+  url: string | null,
+  type: PlatformType | string
+) => {
   let resolvedURL = "";
   if (!url) return null;
   if (url.startsWith("https")) {
@@ -39,7 +42,10 @@ export const getSocialMediaLink = (url: string | null, type: PlatformType) => {
   return resolvedURL;
 };
 
-export function resolveSocialMediaLink(name: string, type: PlatformType) {
+export function resolveSocialMediaLink(
+  name: string,
+  type: PlatformType | string
+) {
   if (!Object.keys(PlatformType).includes(type))
     return `https://web5.bio/?s=${name}`;
   switch (type) {
@@ -52,8 +58,8 @@ export function resolveSocialMediaLink(name: string, type: PlatformType) {
         return SocialPlatformMapping(type).urlPrefix + name;
       return "";
     default:
-      return SocialPlatformMapping(type).urlPrefix
-        ? SocialPlatformMapping(type).urlPrefix + name
+      return SocialPlatformMapping(type as PlatformType).urlPrefix
+        ? SocialPlatformMapping(type as PlatformType).urlPrefix + name
         : "";
   }
 }
