@@ -92,7 +92,7 @@ const resolveUniversalRespondFromRelation = async ({
 }) => {
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
-    platform 
+    platform
   );
   if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
@@ -165,6 +165,7 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             response.status === "fulfilled" &&
             response.value?.address &&
+            response.value?.identity &&
             !response.value?.error
         )
         .map(
