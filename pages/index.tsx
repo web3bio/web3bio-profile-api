@@ -888,6 +888,7 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>Release Notes</h2>
+            <p>We're gradually making updates to Web3.bio Profile APIs. You may expect new features, improvements and bug fixes. If you have any feedback on the features or want to report a bug, please reach out to us on <a href="https://twitter.com/web3bio" target="_blank" className="text-underline">Web3.bio Twitter</a> or <a href="https://t.me/web3dotbio" target="_blank" className="text-underline">Telegram group</a>.</p>
             <h3 className="text-bold h6 mt-4"><span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span> August Update</h3>
             <ul>
               <li>
