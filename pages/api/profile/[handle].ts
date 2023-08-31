@@ -3,6 +3,7 @@ import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
   regexAvatar,
+  regexDotbit,
   regexEns,
   regexEth,
   regexLens,
@@ -14,6 +15,7 @@ import { NeighbourDetail, ProfileAPIResponse } from "@/utils/types";
 import { resolveENSHandle } from "./ens/[handle]";
 import { resolveLensHandle } from "./lens/[handle]";
 import { resolveFarcasterHandle } from "./farcaster/[handle]";
+import { resolveDotbitHandle } from "./dotbit/[handle]";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -24,7 +26,7 @@ const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
 // staging
-// const nextidGraphQLEndpoint='https://relation-service.nextnext.id'
+// const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
 
 const getPlatformSort = (
   obj: Array<ProfileAPIResponse>,
@@ -134,6 +136,7 @@ const resolveUniversalRespondFromRelation = async ({
           PlatformType.ethereum,
           PlatformType.farcaster,
           PlatformType.lens,
+          PlatformType.dotbit,
         ].includes(x.platform) &&
         x.identity
       ) {
@@ -146,6 +149,8 @@ const resolveUniversalRespondFromRelation = async ({
             return resolveENSHandle(resolvedHandle);
           case PlatformType.lens:
             return resolveLensHandle(resolvedHandle);
+          case PlatformType.dotbit:
+            return resolveDotbitHandle(resolvedHandle);
           case PlatformType.farcaster:
             return resolveFarcasterHandle(resolvedHandle);
           default:
@@ -160,6 +165,7 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             response.status === "fulfilled" &&
             response.value?.address &&
+            response.value?.identity &&
             !response.value?.error
         )
         .map(
@@ -197,6 +203,7 @@ const resolveUniversalHandle = async (
     [PlatformType.ethereum]: regexEth,
     [PlatformType.ens]: regexEns,
     [PlatformType.lens]: regexLens,
+    [PlatformType.dotbit]: regexDotbit,
     [PlatformType.farcaster]: regexUniversalFarcaster,
     [PlatformType.twitter]: regexTwitter,
   };
