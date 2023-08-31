@@ -1,4 +1,5 @@
 import Head from "next/head";
+import Image from "next/image";
 import Script from "next/script";
 
 export default function Home() {
@@ -76,7 +77,7 @@ export default function Home() {
               <div className="profile-examples">
                 <div className="profile-card">
                   <div className="card-avatar">
-                    <img 
+                    <Image 
                       src="https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png" 
                       className="avatar"
                       alt="Profile Avatar"
@@ -112,7 +113,7 @@ export default function Home() {
                 </div>
                 <div className="profile-card">
                   <div className="card-avatar">
-                    <img 
+                    <Image 
                       src="https://ens.xyz/dwr.eth" 
                       className="avatar"
                       alt="Profile Avatar"
@@ -154,7 +155,7 @@ export default function Home() {
                 </div>
                 <div className="profile-card">
                   <div className="card-avatar">
-                    <img 
+                    <Image 
                       src="https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif" 
                       className="avatar"
                       alt="Profile Avatar"
@@ -189,7 +190,7 @@ export default function Home() {
                 </div>
                 <div className="profile-card">
                   <div className="card-avatar">
-                    <img 
+                    <Image 
                       src="https://cdn.simplehash.com/assets/ac5a29e6cff91f3c71df34db114366a684b4eb3b99b4d6a4c1b60f450d2d3f5c.png" 
                       className="avatar"
                       alt="Profile Avatar"
@@ -888,7 +889,7 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>Release Notes</h2>
-            <p>We're gradually making updates to Web3.bio Profile APIs. You may expect new features, improvements and bug fixes. If you have any feedback on the features or want to report a bug, please reach out to us on <a href="https://twitter.com/web3bio" target="_blank" className="text-underline">Web3.bio Twitter</a> or <a href="https://t.me/web3dotbio" target="_blank" className="text-underline">Telegram group</a>.</p>
+            <p>We are gradually making updates to Web3.bio Profile APIs. You may expect new features, improvements and bug fixes. If you have any feedback on the features or want to report a bug, please reach out to us on <a href="https://twitter.com/web3bio" target="_blank" className="text-underline">Web3.bio Twitter</a> or <a href="https://t.me/web3dotbio" target="_blank" className="text-underline">Telegram group</a>.</p>
             <h3 className="text-bold h6 mt-4"><span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span> August Update</h3>
             <ul>
               <li>
@@ -924,10 +925,6 @@ export default function Home() {
           </section>
         </div>
       </main>
-      <script
-        async
-        src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W"
-      ></script>
       <Script src="https://www.googletagmanager.com/gtag/js?id=G-DNMXB1P85W" />
       <Script id="google-analytics">
         {`

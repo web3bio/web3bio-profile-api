@@ -168,7 +168,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     urlPrefix: "https://www.instagram.com/",
   },
   [PlatformType.weibo]: {
-    key: PlatformType.instagram,
+    key: PlatformType.weibo,
     icon: "",
     label: "Weibo",
     ensText: [],
