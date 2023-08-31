@@ -47,6 +47,8 @@ $pride-color-7: #C7F8FF !default;
 /*! Web3bio.css | MIT License */
 body {
   background: $light-color;
+  font-size: .8rem;
+  line-height: 1.75;
   overflow-x: hidden;
 }
 
@@ -55,109 +57,6 @@ body {
   padding: .5rem;
   scroll-behavior: smooth;
   width: 100vw;
-}
-
-.web3bio-mask-cover {
-  align-items: center;
-  display: flex;
-  position: fixed;
-  justify-content: center;
-  left: 0;
-  top: 0;
-  background: rgba($color: #000000, $alpha: .3);
-  right: 0;
-  bottom: 0;
-  z-index: 100;
-
-  .web3bio-modal-container {
-    position: relative;
-    background: #fff;
-    border-radius: 1rem;
-    height: 100%;
-    max-height: calc(100vh - 1rem);
-    max-width: calc(100vw - 1rem);
-    overflow-y: auto;
-    padding: 2rem;
-    scroll-behavior: smooth;
-    width: 100%;
-
-    .web3-profile-base {
-      top: 0;
-    }
-
-    .modal-close-icon {
-      position: absolute;
-      right: 1rem;
-      top: 1rem;
-      z-index: 99;
-    }
-  }
-}
-
-//- Web3.bio Cover
-.web3bio-cover {
-  background-image:
-    radial-gradient(at 40% 33%, $pride-color-1 0px, transparent 50%),
-    radial-gradient(at 82% 10%, $pride-color-2 0px, transparent 50%),
-    radial-gradient(at 17% 11%, $pride-color-3 0px, transparent 50%),
-    radial-gradient(at 48% 2%, $pride-color-4 0px, transparent 50%),
-    radial-gradient(at 39% 67%, $pride-color-5 0px, transparent 50%),
-    radial-gradient(at 86% 58%, $pride-color-6 0px, transparent 50%),
-    radial-gradient(at 61% 57%, $pride-color-7 0px, transparent 50%);
-  display: block;
-  filter: blur(1rem);
-  height: 100vh;
-  left: 0;
-  opacity: .75;
-  position: fixed;
-  top: 0;
-  width: 100vw;
-  z-index: -1;
-
-  &::after,
-  &::before {
-    border-radius: 50%;
-    content: "";
-    display: block;
-    filter: blur(3rem);
-    height: 50vh;
-    position: fixed;
-    width: 50vh;
-    z-index: 1;
-  }
-
-  &::before {
-    animation: bg-animation 24s ease infinite;
-    animation-delay: -8s;
-    background: linear-gradient(45deg, $pride-color-1 5%, $pride-color-2 50%, $pride-color-4 95%);
-    left: 10vh;
-    bottom: 0;
-  }
-
-  &::after {
-    animation: bg-animation 24s ease infinite;
-    animation-delay: 0;
-    background: linear-gradient(-45deg, $pride-color-5 5%, $pride-color-6 50%, $pride-color-7 95%);
-    top: 0;
-    right: 10vh;
-  }
-}
-
-@keyframes bg-animation {
-  0% {
-    opacity: 1;
-    transform: skewX(30deg) translateX(-40vh);
-  }
-
-  50% {
-    opacity: .75;
-    transform: skewX(-30deg) translateX(40vh);
-  }
-
-  100% {
-    opacity: 1;
-    transform: skewX(30deg) translateX(-40vh);
-  }
 }
 
 //- Web3.bio Header
@@ -207,36 +106,6 @@ body {
   }
 }
 
-.web3bio-action {
-  align-items: center;
-  background: $light-color;
-  border-radius: .8rem;
-  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
-  color: $dark-color;
-  cursor: pointer;
-  display: flex;
-  font-size: 1.8rem;
-  height: 3rem;
-  justify-content: center;
-  padding: .5rem;
-  position: relative;
-  text-decoration: none;
-  text-align: center;
-  transition: all .3s ease;
-  width: 3rem;
-
-  .action-icon {
-    transform: rotate(180deg) translateY(.2rem);
-  }
-
-  &:focus,
-  &:hover {
-    box-shadow: 0 .3rem .6rem rgba(0, 0, 0, .2);
-    color: $dark-color;
-    text-decoration: none;
-  }
-}
-
 .web3bio-content {
   min-height: 50vh;
 
@@ -247,6 +116,145 @@ body {
 
     @media screen and (max-width: $size-md) {
       font-size: 1.2rem;
+    }
+  }
+}
+
+//- Profile Card
+.profile-examples {
+  display: flex;
+  margin: 0 -2rem 2rem -2rem;
+}
+
+.profile-card {
+  background: $light-color;
+  border: .05rem solid rgba($dark-color, .075);
+  border-radius: .8rem;
+  box-shadow: 0 .1rem .2rem rgba($dark-color, .04), 0 0 2rem rgba($dark-color, .05);
+  display: flex;
+  flex: 1 0;
+  flex-direction: column;
+  max-width: 24rem;
+  padding: 1rem;
+  transition: transform .15s ease;
+  width: 100%;
+
+  & + .profile-card {
+    box-shadow: 0 .1rem .2rem rgba($dark-color, .04), 0 0 2rem rgba($dark-color, .05);
+    margin-left: -16rem;
+    z-index: 1;
+  }
+
+  &:focus,
+  &:hover {
+    transform: translateY(-.25rem) rotate(3deg);
+    z-index: 99;
+  }
+
+  .card-avatar {
+    flex: 0;
+
+    .avatar {
+      background: $gray-color;
+      box-shadow: inset 0 0 0 .2rem rgba($light-color, .1);
+      height: 2.4rem;
+      width: 2.4rem;
+    }
+  }
+
+  .card-content {
+    flex: 1;
+    padding: .5rem 0;
+    width: 100%;
+  }
+
+  .card-name {
+    font-size: 1rem;
+    font-weight: 900;
+  }
+
+  .card-identity {
+    color: $gray-color;
+    font-size: .65rem;
+    margin-bottom: .5rem;
+  }
+
+  .card-description {
+    font-size: .7rem;
+  }
+
+  .card-badges {
+    align-items: center;
+    color: $gray-color-dark;
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+    font-size: .6rem;
+    line-height: 1rem;
+    gap: .2rem;
+  
+    .platform-badge {
+      align-items: center;
+      background: rgba(#5298FF, .15);
+      border: .05rem solid transparent;
+      box-shadow: inset 0 0 .1rem rgba($dark-color, .1);
+      border-radius: .8rem;
+      display: flex;
+      height: 1.5rem;
+      padding: .15rem;
+      text-decoration: none;
+      transition: all .2s ease;
+    
+      &:focus,
+      &:hover {
+        box-shadow: inset 0 0 .1rem rgba($dark-color, .15), 0 0 2rem rgba($dark-color, .15);
+      }
+  
+      &.active {
+        box-shadow: inset 0 0 .05rem rgba($dark-color, .25);
+      }
+  
+      &.ENS {
+        background: lighten(#5298FF, 30%);
+        border-color: lighten(#5298FF, 20%);
+  
+        .platform-badge-icon {
+          color: #5298FF;
+        }
+      }
+  
+      &.lens {
+        background: lighten(#6bc674, 35%);
+        border-color: lighten(#6bc674, 25%);
+  
+        .platform-badge-icon {
+          color: #6bc674;
+        }
+      }
+  
+      &.farcaster {
+        background: lighten(#8465CB, 35%);
+        border-color: lighten(#8465CB, 25%);
+  
+        .platform-badge-icon {
+          color: #8465CB;
+        }
+      }
+
+      .platform-badge-icon {
+        align-items: center;
+        border-radius: .7rem;
+        display: flex;
+        flex: 0 0 1.2rem;
+        height: 1.3rem;
+        justify-content: center;
+        padding: .15rem;
+        width: 1.3rem;
+      }
+      
+      .platform-badge-name {
+        padding: 0 .3rem 0 .1rem;
+      }
     }
   }
 }
@@ -284,190 +292,6 @@ body {
   position: sticky;
   z-index: 99;
   top: 90vh;
-}
-
-.card-feature {
-  background: linear-gradient(70deg, lighten($gray-color, 30%), $light-color);
-  border: .05rem solid lighten($border-color, 25%);
-  border-radius: 1rem;
-  box-shadow: 0 .05rem .2rem rgba($dark-color, .1);
-  color: lighten($dark-color, 15%);
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  overflow: hidden;
-  padding: 2rem 1rem;
-  width: 100%;
-
-  .feature-header {
-    position: relative;
-    z-index: 1;
-
-    h3 {
-      font-size: .85rem;
-      font-weight: 800;
-    }
-
-    h4 {
-      color: lighten($dark-color, 25%);
-      font-size: .65rem;
-      font-weight: 400;
-      margin: 1rem 0;
-    }
-  }
-
-  .feature-body {
-    &.feature-body-profile {
-      .demo-profile {
-        align-items: center;
-        background: linear-gradient(70deg, lighten($gray-color, 30%), $light-color);
-        border: .05rem solid lighten($border-color, 25%);
-        border-radius: 1rem;
-        box-shadow: 0 .05rem .2rem rgba($dark-color, .1);
-        display: inline-flex;
-        margin: .1rem;
-        padding: .25rem;
-
-        .avatar {
-          align-items: center;
-          background: rgba($dark-color, .05);
-          display: flex;
-          font-size: 2rem;
-          justify-content: center;
-
-          &.avatar-1 {
-            
-          }
-
-          &.avatar-2 {
-            background: rgba(#F78E4E, .25);
-          }
-
-          &.avatar-3 {
-            background: rgba(#836F6F, .25);
-          }
-
-          &.avatar-4 {
-            background: rgba(#D2CFD1, .25);
-          }
-
-          &.avatar-5 {
-            background: rgba(#4AADCB, .25);
-          }
-
-          &.avatar-6 {
-            background: rgba(#F0415E, .25);
-          }
-
-          &.avatar-7 {
-            background: rgba(#93989B, .25);
-          }
-        }
-
-        .name {
-          font-size: .8rem;
-          font-weight: 800;
-          margin-left: .4rem;
-        }
-      }
-    }
-
-    &.feature-body-graph {
-      align-items: center;
-      display: flex;
-      flex: 1;
-      flex-direction: column;
-      justify-content: center;
-      position: relative;
-
-      .btn {
-        position: relative;
-        z-index: 99;
-      }
-
-      .circle {
-        background: rgba($dark-color, .04);
-        border-radius: 50%;
-        content: "";
-        display: block;
-        position: absolute;
-
-        &:first-child {
-          height: 4rem;
-          width: 4rem;
-        }
-
-        &:nth-child(2) {
-          height: 8rem;
-          width: 8rem;
-        }
-
-        &:nth-child(3) {
-          height: 13rem;
-          width: 13rem;
-        }
-
-        &:nth-child(4) {
-          height: 19rem;
-          width: 19rem;
-        }
-      }
-    }
-
-    .identity {
-      border: .05rem solid;
-      border-radius: .6rem;
-      color: rgba($dark-color, .75);
-      display: inline-flex;
-      margin: .1rem;
-      padding: .4rem;
-
-      &.identity-ens {
-        background: rgba(#5298FF, .1);
-        border-color: rgba(#5298FF, .15);
-
-        .icon {
-          color: #5298FF;
-        }
-      }
-
-      &.identity-spaceid {
-        background: rgba(#71EBAA, .2);
-        border-color: rgba(#71EBAA, .5);
-
-        .icon {
-          color: #71EBAA;
-        }
-      }
-
-      &.identity-farcaster {
-        background: rgba(#8465CB, .1);
-        border-color: rgba(#8465CB, .15);
-
-        .icon {
-          color: #8465CB;
-        }
-      }
-
-      &.identity-unstoppabledomains {
-        background: rgba(#2E65F5, .05);
-        border-color: rgba(#2E65F5, .15);
-
-        .icon {
-          color: #2E65F5;
-        }
-      }
-
-      &.identity-lens {
-        background: rgba(#BDFC5A, .25);
-        border-color: rgba(#BDFC5A, .75);
-
-        .icon {
-          color: #204F24;
-        }
-      }
-    }
-  }
 }
 
 //- Pride

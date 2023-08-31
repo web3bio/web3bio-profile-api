@@ -49,7 +49,7 @@ export enum ErrorMessages {
   notExist = "Does Not Exist",
   invalidIdentity = "Invalid Identity or Domain",
   invalidAddr = "Invalid Address",
-  unknownError = "Unknown error occurs",
+  unknownError = "Unknown Error Occurs",
 }
 
 export const errorHandle = (props: errorHandleProps) => {

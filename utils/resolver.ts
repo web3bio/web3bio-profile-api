@@ -47,7 +47,7 @@ export function resolveSocialMediaLink(
   type: PlatformType | string
 ) {
   if (!Object.keys(PlatformType).includes(type))
-    return `https://web5.bio/?s=${name}`;
+    return `https://web3.bio/?s=${name}`;
   switch (type) {
     case PlatformType.url:
       return `${name}`;
