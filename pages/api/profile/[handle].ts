@@ -11,7 +11,7 @@ import {
   regexUniversalFarcaster,
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
-import { NeighbourDetail, ProfileAPIResponse } from "@/utils/types";
+import { neighborDetail, ProfileAPIResponse } from "@/utils/types";
 import { resolveENSHandle } from "./ens/[handle]";
 import { resolveLensHandle } from "./lens/[handle]";
 import { resolveFarcasterHandle } from "./farcaster/[handle]";
@@ -103,7 +103,7 @@ const resolveUniversalRespondFromRelation = async ({
     });
   const resolved =
     responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
-  const originNeighbours =
+  const originneighbors =
     resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
   if (!resolvedIdentity)
@@ -114,23 +114,28 @@ const resolveUniversalRespondFromRelation = async ({
       message: ErrorMessages.notFound,
     });
 
-  const sourceNeighbour = {
+  const sourceneighbor = {
     platform: resolvedIdentity.platform,
     identity: resolvedIdentity.identity,
     displayName: resolvedIdentity.displayName || resolved.name,
     uuid: resolvedIdentity.uuid,
   };
 
-  const neighbours = originNeighbours.map(
-    (x: { identity: NeighbourDetail }) => {
+  const neighbors = originneighbors.map(
+    (x: { identity: neighborDetail }) => {
       return {
         ...x.identity,
       };
     }
   );
-  neighbours.unshift(sourceNeighbour);
+  neighbors.unshift(sourceneighbor);
+  neighbors.forEach((x: { platform: PlatformType; displayName: string; }) => {
+    if(x.platform === PlatformType.ethereum && x.displayName !== handle){
+      x.displayName = handle
+    }
+  });
   return await Promise.allSettled([
-    ...neighbours.map((x: NeighbourDetail) => {
+    ...neighbors.map((x: neighborDetail) => {
       if (
         [
           PlatformType.ethereum,
