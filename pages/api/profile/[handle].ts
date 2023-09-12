@@ -121,17 +121,19 @@ const resolveUniversalRespondFromRelation = async ({
     uuid: resolvedIdentity.uuid,
   };
 
-  const neighbors = originneighbors.map(
-    (x: { identity: neighborDetail }) => {
-      return {
-        ...x.identity,
-      };
-    }
-  );
+  const neighbors = originneighbors.map((x: { identity: neighborDetail }) => {
+    return {
+      ...x.identity,
+    };
+  });
   neighbors.unshift(sourceneighbor);
-  neighbors.forEach((x: { platform: PlatformType; displayName: string; }) => {
-    if(x.platform === PlatformType.ethereum && x.displayName !== handle){
-      x.displayName = handle
+  neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
+    if (
+      x.platform === PlatformType.ethereum &&
+      !!x.displayName &&
+      x.displayName !== handle
+    ) {
+      x.displayName = handle;
     }
   });
   return await Promise.allSettled([
