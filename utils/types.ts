@@ -5,7 +5,7 @@ export interface ProofRecord {
   identity: string;
   displayName: string;
 }
-export interface NeighbourDetail {
+export interface neighborDetail {
   platform: PlatformType;
   identity: string;
   uuid: string;
@@ -13,7 +13,7 @@ export interface NeighbourDetail {
 }
 export interface Neighbor {
   source: string[];
-  identity: NeighbourDetail;
+  identity: neighborDetail;
 }
 
 export interface ProfileAPIResponse {
