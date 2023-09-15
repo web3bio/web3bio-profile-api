@@ -104,4 +104,10 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json.find((x) => x.platform === "ENS").identity).toBe("gamedb.eth");
   });
+  it("It should response 200 data for livid.farcaster", async () => {
+    const res = await queryClient("/profile/livid.farcaster");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("livid");
+  });
 });
