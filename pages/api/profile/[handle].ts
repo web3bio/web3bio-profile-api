@@ -129,12 +129,12 @@ const resolveUniversalRespondFromRelation = async ({
   neighbors.unshift(sourceneighbor);
   // non response when Farcaster, Lens, .bit add profile api
   if (
-    [PlatformType.lens, PlatformType.facebook, PlatformType.dotbit].includes(
+    [PlatformType.lens, PlatformType.farcaster, PlatformType.dotbit].includes(
       platform
     ) &&
     !neighbors.some(
       (x: { identity: string; platform: PlatformType }) =>
-        x.identity === handle && x.platform === platform
+        x.identity.toLowerCase() === handle && x.platform === platform
     )
   ) {
     neighbors.unshift({
@@ -144,6 +144,7 @@ const resolveUniversalRespondFromRelation = async ({
       uuid: "",
     });
   }
+
   if (
     regexEns.test(handle) &&
     neighbors.filter(
@@ -159,7 +160,6 @@ const resolveUniversalRespondFromRelation = async ({
         x.displayName = handle;
       }
     });
-
   return await Promise.allSettled([
     ...neighbors.map((x: neighborDetail) => {
       if (
@@ -171,7 +171,8 @@ const resolveUniversalRespondFromRelation = async ({
         ].includes(x.platform) &&
         x.identity
       ) {
-        const resolvedHandle = x.identity;
+        const resolvedHandle =
+          x.platform === PlatformType.ethereum ? x.displayName : x.identity;
         const resolvedPlatform =
           x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
         switch (resolvedPlatform) {
