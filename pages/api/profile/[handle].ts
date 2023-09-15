@@ -127,7 +127,25 @@ const resolveUniversalRespondFromRelation = async ({
     };
   });
   neighbors.unshift(sourceneighbor);
+  // non response when Farcaster, Lens, .bit add profile api
   if (
+    [PlatformType.lens, PlatformType.facebook, PlatformType.dotbit].includes(
+      platform
+    ) &&
+    !neighbors.some(
+      (x: { identity: string; platform: PlatformType }) =>
+        x.identity === handle && x.platform === platform
+    )
+  ) {
+    neighbors.unshift({
+      platform: platform,
+      identity: handle,
+      displayName: handle,
+      uuid: "",
+    });
+  }
+  if (
+    regexEns.test(handle) &&
     neighbors.filter(
       (x: { platform: PlatformType }) => x.platform === PlatformType.ethereum
     ).length === 1
@@ -141,6 +159,7 @@ const resolveUniversalRespondFromRelation = async ({
         x.displayName = handle;
       }
     });
+
   return await Promise.allSettled([
     ...neighbors.map((x: neighborDetail) => {
       if (
