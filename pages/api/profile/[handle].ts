@@ -127,15 +127,20 @@ const resolveUniversalRespondFromRelation = async ({
     };
   });
   neighbors.unshift(sourceneighbor);
-  neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
-    if (
-      x.platform === PlatformType.ethereum &&
-      !!x.displayName &&
-      x.displayName !== handle
-    ) {
-      x.displayName = handle;
-    }
-  });
+  if (
+    neighbors.filter(
+      (x: { platform: PlatformType }) => x.platform === PlatformType.ethereum
+    ).length === 1
+  )
+    neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
+      if (
+        x.platform === PlatformType.ethereum &&
+        !!x.displayName &&
+        x.displayName !== handle
+      ) {
+        x.displayName = handle;
+      }
+    });
   return await Promise.allSettled([
     ...neighbors.map((x: neighborDetail) => {
       if (
@@ -147,8 +152,7 @@ const resolveUniversalRespondFromRelation = async ({
         ].includes(x.platform) &&
         x.identity
       ) {
-        const resolvedHandle =
-          x.platform === PlatformType.ethereum ? x.displayName : x.identity;
+        const resolvedHandle = x.identity;
         const resolvedPlatform =
           x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
         switch (resolvedPlatform) {
