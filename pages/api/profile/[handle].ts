@@ -106,20 +106,18 @@ const resolveUniversalRespondFromRelation = async ({
   const originneighbors =
     resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
-  if (!resolvedIdentity)
-    return errorHandle({
-      identity: handle,
-      platform,
-      code: 404,
-      message: ErrorMessages.notFound,
-    });
 
-  const sourceneighbor = {
-    platform: resolvedIdentity.platform,
-    identity: resolvedIdentity.identity,
-    displayName: resolvedIdentity.displayName || resolved.name,
-    uuid: resolvedIdentity.uuid,
-  };
+  const sourceneighbor = resolvedIdentity
+    ? {
+        platform: resolvedIdentity.platform,
+        identity: resolvedIdentity.identity,
+        displayName: resolvedIdentity.displayName || resolved.name,
+        uuid: resolvedIdentity.uuid,
+      }
+    : {
+        platform,
+        identity: handle,
+      };
 
   const neighbors = originneighbors.map((x: { identity: neighborDetail }) => {
     return {
@@ -127,23 +125,6 @@ const resolveUniversalRespondFromRelation = async ({
     };
   });
   neighbors.unshift(sourceneighbor);
-  // non response when Farcaster, Lens, .bit add profile api
-  if (
-    [PlatformType.lens, PlatformType.farcaster, PlatformType.dotbit].includes(
-      platform
-    ) &&
-    !neighbors.some(
-      (x: { identity: string; platform: PlatformType }) =>
-        x.identity.toLowerCase() === handle && x.platform === platform
-    )
-  ) {
-    neighbors.unshift({
-      platform: platform,
-      identity: handle,
-      displayName: handle,
-      uuid: "",
-    });
-  }
 
   if (
     regexEns.test(handle) &&
