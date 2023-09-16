@@ -106,20 +106,18 @@ const resolveUniversalRespondFromRelation = async ({
   const originneighbors =
     resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
-  if (!resolvedIdentity)
-    return errorHandle({
-      identity: handle,
-      platform,
-      code: 404,
-      message: ErrorMessages.notFound,
-    });
 
-  const sourceneighbor = {
-    platform: resolvedIdentity.platform,
-    identity: resolvedIdentity.identity,
-    displayName: resolvedIdentity.displayName || resolved.name,
-    uuid: resolvedIdentity.uuid,
-  };
+  const sourceneighbor = resolvedIdentity
+    ? {
+        platform: resolvedIdentity.platform,
+        identity: resolvedIdentity.identity,
+        displayName: resolvedIdentity.displayName || resolved.name,
+        uuid: resolvedIdentity.uuid,
+      }
+    : {
+        platform,
+        identity: handle,
+      };
 
   const neighbors = originneighbors.map((x: { identity: neighborDetail }) => {
     return {
@@ -127,15 +125,22 @@ const resolveUniversalRespondFromRelation = async ({
     };
   });
   neighbors.unshift(sourceneighbor);
-  neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
-    if (
-      x.platform === PlatformType.ethereum &&
-      !!x.displayName &&
-      x.displayName !== handle
-    ) {
-      x.displayName = handle;
-    }
-  });
+
+  if (
+    regexEns.test(handle) &&
+    neighbors.filter(
+      (x: { platform: PlatformType }) => x.platform === PlatformType.ethereum
+    ).length === 1
+  )
+    neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
+      if (
+        x.platform === PlatformType.ethereum &&
+        !!x.displayName &&
+        x.displayName !== handle
+      ) {
+        x.displayName = handle;
+      }
+    });
   return await Promise.allSettled([
     ...neighbors.map((x: neighborDetail) => {
       if (
