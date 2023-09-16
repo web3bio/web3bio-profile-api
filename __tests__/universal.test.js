@@ -91,9 +91,23 @@ describe("Test For Universal Profile API", () => {
     expect(json.length > 1);
   });
   it("It should response 200 data for 0x638b1350920333d23a7a7472c00aa5c38c278b90", async () => {
-    const res = await queryClient("/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90");
+    const res = await queryClient(
+      "/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90"
+    );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find(x=>x.platform === 'dotbit')).toBeTruthy();
+    expect(json.find((x) => x.platform === "dotbit")).toBeTruthy();
+  });
+  it("It should response 200 data for gamedb.eth", async () => {
+    const res = await queryClient("/profile/gamedb.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find((x) => x.platform === "ENS").identity).toBe("gamedb.eth");
+  });
+  it("It should response 200 data for livid.farcaster", async () => {
+    const res = await queryClient("/profile/livid.farcaster");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("livid");
   });
 });
