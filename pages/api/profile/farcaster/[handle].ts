@@ -99,7 +99,6 @@ export const resolveFarcasterHandle = async (handle: string) => {
     };
   }
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
-
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);
   const resJSON = {
@@ -110,7 +109,7 @@ export const resolveFarcasterHandle = async (handle: string) => {
     avatar: response.pfp.url,
     email: null,
     description: response.profile.bio.text,
-    location: null,
+    location: response?.profile.location.description || null,
     header: null,
     links: links,
   };
