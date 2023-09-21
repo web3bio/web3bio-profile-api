@@ -99,7 +99,6 @@ export const resolveFarcasterHandle = async (handle: string) => {
     };
   }
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
-  console.log(response,'kkkk')
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);
   const resJSON = {
