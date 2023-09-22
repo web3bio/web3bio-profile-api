@@ -30,6 +30,8 @@ export const resolveDotbitHandle = async (handle: string) => {
   let address;
   let domain;
   let avatar;
+  let location;
+  let header;
   if (isAddress(handle)) {
     const res = await fetchDotbitProfile(
       "v1/reverse/record",
@@ -51,6 +53,7 @@ export const resolveDotbitHandle = async (handle: string) => {
       "v1/account/info",
       JSON.stringify({ account: handle })
     );
+
     if (!res) {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
@@ -61,6 +64,7 @@ export const resolveDotbitHandle = async (handle: string) => {
     "v1/account/records",
     JSON.stringify({ account: domain })
   );
+  
   const recordsMap = new Map<string, RecordItem>(
     recordsResponse?.records?.map((x: RecordItem) => [x.key, { ...x }])
   );
@@ -79,6 +83,8 @@ export const resolveDotbitHandle = async (handle: string) => {
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
       if (platform === "avatar") avatar = x.value;
+      if (x.key.toLowerCase().includes("header")) header = x.value;
+      if (x.key.toLowerCase().includes("location")) location = x.value;
       if (!["description", "email", "avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value, platform as PlatformType)!;
         linksObj[platform] = {
@@ -96,8 +102,8 @@ export const resolveDotbitHandle = async (handle: string) => {
     avatar: avatar || "https://display.did.id/identicon/" + domain,
     email: recordsMap.get("profile.email")?.value,
     description: recordsMap.get("profile.description")?.value,
-    location: null,
-    header: null,
+    location: location,
+    header: header,
     links: linksObj,
     addresses: cryptoObj,
   };
