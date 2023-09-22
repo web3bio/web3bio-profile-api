@@ -2,8 +2,13 @@ import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexFarcaster } from "@/utils/regexp";
+import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
+import {
+  getResolverAddressFromName,
+  resolveENSCoinTypesValue,
+} from "../ens/[handle]";
+import { CoinType } from "@/utils/cointype";
 
 export const config = {
   runtime: "edge",
@@ -12,6 +17,12 @@ export const enum FarcasterQueryParamType {
   username = "username",
   connected_address = "connected_address",
 }
+
+const resolveENSHandleAddress = async (handle: string) => {
+  const resolver = await getResolverAddressFromName(handle);
+  if (!resolver) return null;
+  return await resolveENSCoinTypesValue(resolver, handle, CoinType.eth);
+};
 
 const originBase = "https://api.warpcast.com/v2/";
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
@@ -94,7 +105,10 @@ export const resolveFarcasterHandle = async (handle: string) => {
     const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
       ?.result?.verifications?.[0]?.address;
     response = {
-      address: firstAddress?.toLowerCase(),
+      address:
+        firstAddress?.toLowerCase() || regexEns.test(handle)
+          ? await resolveENSHandleAddress(handle)
+          : null,
       ...rawUser,
     };
   }
