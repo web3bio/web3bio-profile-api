@@ -10,9 +10,6 @@ import {
 } from "../ens/[handle]";
 import { CoinType } from "@/utils/cointype";
 
-export const config = {
-  runtime: "edge",
-};
 export const enum FarcasterQueryParamType {
   username = "username",
   connected_address = "connected_address",
@@ -158,3 +155,12 @@ export default async function handler(req: NextApiRequest) {
     });
   return resolveFarcasterRespond(lowercaseName);
 }
+
+export const config = {
+  runtime: "edge",
+  unstable_allowDynamic: [
+    "**/node_modules/lodash/**/*.js",
+    "**/node_modules/@ensdomain/address-encoder/**/*.js",
+    "**/node_modules/js-sha256/**/*.js",
+  ],
+};
