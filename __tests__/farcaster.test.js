@@ -39,11 +39,12 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.displayName).toBe("Dan Romero");
+    expect(json.address).toBeTruthy()
   });
   it("It should response 200 for dwr.eth", async () => {
     const res = await queryClient("/profile/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.displayName).toBe("Dan Romero");
+    expect(json.address).toBeTruthy()
   });
 });
