@@ -103,9 +103,9 @@ export const resolveFarcasterHandle = async (handle: string) => {
       ?.result?.verifications?.[0]?.address;
     response = {
       address:
-        firstAddress?.toLowerCase() || regexEns.test(handle)
+        firstAddress?.toLowerCase() || (regexEns.test(handle)
           ? await resolveENSHandleAddress(handle)
-          : null,
+          : null),
       ...rawUser,
     };
   }
