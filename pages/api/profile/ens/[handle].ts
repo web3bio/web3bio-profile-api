@@ -138,9 +138,6 @@ const resolveENSTextValue = async (
   });
 };
 
-const getENSMetadataAvatar = (domain: string) =>
-  "https://metadata.ens.domains/mainnet/avatar/" + domain;
-
 export const resolveENSCoinTypesValue = async (
   resolverAddress: string,
   name: string,
@@ -294,10 +291,7 @@ export const resolveENSHandle = async (handle: string) => {
     displayName:
       (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
       ensDomain,
-    avatar: avatarHandle
-      ? (await resolveEipAssetURL(avatarHandle)) ||
-        getENSMetadataAvatar(ensDomain)
-      : null,
+    avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
     email:
       (await resolveENSTextValue(resolverAddress, ensDomain, "email")) || null,
     description:
