@@ -272,6 +272,7 @@ export default async function handler(req: RequestInterface) {
 
 export const config = {
   runtime: "edge",
+  maxDuration: 30,
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",
     "**/node_modules/@ensdomain/address-encoder/**/*.js",
