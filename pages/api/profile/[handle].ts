@@ -189,12 +189,12 @@ const resolveUniversalRespondFromRelation = async ({
   ])
     .then((responses) => {
       const returnRes = responses
-        .filter(
-          (response) =>
-            response.status === "fulfilled" &&
-            response.value?.address &&
-            response.value?.identity
-        )
+        // .filter(
+        //   (response) =>
+        //     response.status === "fulfilled" &&
+        //     response.value?.address &&
+        //     response.value?.identity
+        // )
         .map(
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>).value
