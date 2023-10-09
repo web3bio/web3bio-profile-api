@@ -42,22 +42,6 @@ const nextidGraphQLEndpoint =
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
 
-const getPlatformSort = (
-  obj: Array<ProfileAPIResponse>,
-  platform: PlatformType
-) => {
-  if (
-    [PlatformType.ens, PlatformType.lens, PlatformType.farcaster].includes(
-      platform
-    )
-  )
-    return platform;
-  if (obj.find((x) => x.platform === PlatformType.ens)) return PlatformType.ens;
-  if (obj.find((x) => x.platform === PlatformType.lens))
-    return PlatformType.lens;
-  return PlatformType.farcaster;
-};
-
 const resolveHandleFromRelationService = (
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)
@@ -83,17 +67,35 @@ const resolveHandleFromRelationService = (
 };
 const sortByPlatform = (
   arr: Array<ProfileAPIResponse>,
-  platform: PlatformType
+  platform: PlatformType,
+  handle: string
 ) => {
-  return arr.sort((a, b) => {
-    if (a.platform === platform && b.platform !== platform) {
-      return -1;
-    }
-    if (a.platform !== platform && b.platform === platform) {
-      return 1;
-    }
-    return 0;
+  const defaultOrder = [
+    PlatformType.ens,
+    PlatformType.lens,
+    PlatformType.farcaster,
+    PlatformType.dotbit,
+  ];
+  const order = [platform, ...defaultOrder.filter((x) => x !== platform)];
+
+  const first: Array<ProfileAPIResponse> = [];
+  const second: Array<ProfileAPIResponse> = [];
+  const third: Array<ProfileAPIResponse> = [];
+  const forth: Array<ProfileAPIResponse> = [];
+
+  arr.map((x) => {
+    if (x.platform === order[0]) first.push(x);
+    if (x.platform === order[1]) second.push(x);
+    if (x.platform === order[2]) third.push(x);
+    if (x.platform === order[3]) forth.push(x);
   });
+  return [
+    first.find((x) => x.identity === handle),
+    ...first?.filter((x) => x.identity !== handle),
+  ]
+    .concat(second)
+    .concat(third)
+    .concat(forth);
 };
 const resolveUniversalRespondFromRelation = async ({
   platform,
@@ -201,9 +203,7 @@ const resolveUniversalRespondFromRelation = async ({
         );
       return returnRes?.length
         ? respondWithCache(
-            JSON.stringify(
-              sortByPlatform(returnRes, getPlatformSort(returnRes, platform))
-            )
+            JSON.stringify(sortByPlatform(returnRes, platform, handle))
           )
         : errorHandle({
             identity: handle,
