@@ -76,7 +76,10 @@ const sortByPlatform = (
     PlatformType.farcaster,
     PlatformType.dotbit,
   ];
-  const order = [platform, ...defaultOrder.filter((x) => x !== platform)];
+
+  const order = defaultOrder.includes(platform)
+    ? [platform, ...defaultOrder.filter((x) => x !== platform)]
+    : defaultOrder;
 
   const first: Array<ProfileAPIResponse> = [];
   const second: Array<ProfileAPIResponse> = [];
@@ -95,7 +98,8 @@ const sortByPlatform = (
   ]
     .concat(second)
     .concat(third)
-    .concat(forth);
+    .concat(forth)
+    .filter((x) => !!x);
 };
 const resolveUniversalRespondFromRelation = async ({
   platform,
