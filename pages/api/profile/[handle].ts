@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, ErrorMessages } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
   regexAvatar,
@@ -141,7 +141,7 @@ const resolveUniversalRespondFromRelation = async ({
     }),
     sourceNeighbor,
   ]);
-  
+
   if (
     regexEns.test(handle) &&
     neighbors.filter(
@@ -189,21 +189,26 @@ const resolveUniversalRespondFromRelation = async ({
   ])
     .then((responses) => {
       const returnRes = responses
-        // .filter(
-        //   (response) =>
-        //     response.status === "fulfilled" &&
-        //     response.value?.address &&
-        //     response.value?.identity
-        // )
+        .filter(
+          (response) =>
+            response.status === "fulfilled" &&
+            response.value?.address &&
+            response.value?.identity
+        )
         .map(
           (response) =>
-            (response as PromiseFulfilledResult<ProfileAPIResponse>).value
+            (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       return returnRes?.length
-        ? respondWithCache(
+        ? new Response(
             JSON.stringify(
               sortByPlatform(returnRes, getPlatformSort(returnRes, platform))
-            )
+            ),
+            {
+              headers: {
+                "Cache-Control": `no-store`,
+              },
+            }
           )
         : errorHandle({
             identity: handle,
