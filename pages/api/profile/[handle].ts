@@ -1,5 +1,5 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages } from "@/utils/base";
+import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { handleSearchPlatform, PlatformType } from "@/utils/platform";
 import {
   regexAvatar,
@@ -200,15 +200,10 @@ const resolveUniversalRespondFromRelation = async ({
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       return returnRes?.length
-        ? new Response(
+        ? respondWithCache(
             JSON.stringify(
               sortByPlatform(returnRes, getPlatformSort(returnRes, platform))
-            ),
-            {
-              headers: {
-                "Cache-Control": `no-store`,
-              },
-            }
+            )
           )
         : errorHandle({
             identity: handle,
