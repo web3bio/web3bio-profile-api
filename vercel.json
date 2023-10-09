@@ -1,6 +1,6 @@
 {
   "functions": {
-    "api/profile/*.ts": {
+    "api/*.ts": {
       "memory": 3008,
       "maxDuration": 30
     },
