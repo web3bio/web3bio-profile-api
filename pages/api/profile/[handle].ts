@@ -11,7 +11,7 @@ import {
   regexUniversalFarcaster,
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
-import { neighborDetail, ProfileAPIResponse } from "@/utils/types";
+import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
 import { resolveENSHandle } from "./ens/[handle]";
 import { resolveLensHandle } from "./lens/[handle]";
 import { resolveFarcasterHandle } from "./farcaster/[handle]";
@@ -21,6 +21,20 @@ interface RequestInterface extends NextApiRequest {
     origin: string;
   };
 }
+
+const processArr = (arr: NeighborDetail[]) => {
+  const cache: NeighborDetail[] = [];
+  for (const t of arr) {
+    if (
+      cache.find((c) => c.platform === t.platform && c.identity === t.identity)
+    ) {
+      continue;
+    }
+    cache.push(t);
+  }
+
+  return cache;
+};
 
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
@@ -107,7 +121,7 @@ const resolveUniversalRespondFromRelation = async ({
     resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
 
-  const sourceneighbor = resolvedIdentity
+  const sourceNeighbor = resolvedIdentity
     ? {
         platform: resolvedIdentity.platform,
         identity: resolvedIdentity.identity,
@@ -119,13 +133,15 @@ const resolveUniversalRespondFromRelation = async ({
         identity: handle,
       };
 
-  const neighbors = originneighbors.map((x: { identity: neighborDetail }) => {
-    return {
-      ...x.identity,
-    };
-  });
-  neighbors.unshift(sourceneighbor);
-
+  const neighbors = processArr([
+    ...originneighbors.map((x: { identity: NeighborDetail }) => {
+      return {
+        ...x.identity,
+      };
+    }),
+    sourceNeighbor,
+  ]);
+  
   if (
     regexEns.test(handle) &&
     neighbors.filter(
@@ -142,7 +158,7 @@ const resolveUniversalRespondFromRelation = async ({
       }
     });
   return await Promise.allSettled([
-    ...neighbors.map((x: neighborDetail) => {
+    ...neighbors.map((x: NeighborDetail) => {
       if (
         [
           PlatformType.ethereum,
@@ -166,7 +182,7 @@ const resolveUniversalRespondFromRelation = async ({
           case PlatformType.farcaster:
             return resolveFarcasterHandle(resolvedHandle);
           default:
-            return Promise.reject({ value: undefined });
+            return Promise.reject({ value: null });
         }
       }
     }),
@@ -177,8 +193,7 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             response.status === "fulfilled" &&
             response.value?.address &&
-            response.value?.identity &&
-            !response.value?.error
+            response.value?.identity
         )
         .map(
           (response) =>
