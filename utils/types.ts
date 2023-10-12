@@ -18,7 +18,6 @@ export interface Neighbor {
 
 export interface ProfileAPIResponse {
   address: string;
-  addresses: Record<string, string>;
   avatar: string | null;
   description: string | null;
   platform: string;

@@ -18,7 +18,7 @@ describe("Test For Dotbit Profile API", () => {
     const res = await queryClient("/profile/dotbit/suji.bit");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.avatar).toBe("https://display.did.id/identicon/suji.bit");
+    expect(json.avatar).toBe(null);
     expect(json.address).toBeTruthy();
   });
   it("It should response 404 for 0x0000000000000000000000000000000000000001", async () => {

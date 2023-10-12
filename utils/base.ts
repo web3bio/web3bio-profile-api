@@ -25,7 +25,6 @@ export type HandleResponseData = {
   location: string | null;
   header: string | null;
   links: LinksData;
-  addresses: AddressesData | null;
   error?: string;
 };
 

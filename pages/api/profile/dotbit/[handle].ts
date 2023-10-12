@@ -76,11 +76,7 @@ export const resolveDotbitHandle = async (handle: string) => {
       link: string;
     }
   > = {};
-  const cryptoObj: Record<string, string> = {};
   recordsMap.forEach((x) => {
-    if (x.key.includes("address.")) {
-      cryptoObj[x.key.replace("address.", "")] = x.value?.toLocaleLowerCase();
-    }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
       if (platform === "avatar") avatar = x.value;
@@ -99,14 +95,13 @@ export const resolveDotbitHandle = async (handle: string) => {
     address,
     identity: domain,
     platform: PlatformType.dotbit,
-    displayName: domain,
-    avatar: avatar || "https://display.did.id/identicon/" + domain,
-    email: recordsMap.get("profile.email")?.value,
-    description: recordsMap.get("profile.description")?.value,
-    location: location,
-    header: header,
+    displayName: domain || null,
+    avatar: avatar || null,
+    email: recordsMap.get("profile.email")?.value || null,
+    description: recordsMap.get("profile.description")?.value || null,
+    location: location || null,
+    header: header || null,
     links: linksObj,
-    addresses: cryptoObj,
   };
 };
 
