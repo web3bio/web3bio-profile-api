@@ -22,6 +22,7 @@ export const enum LensParamType {
 
 export const config = {
   runtime: "edge",
+  regions: ["sfo1", "hnd1", "sin1"],
 };
 const LensGraphQLEndpoint = "https://api.lens.dev/";
 

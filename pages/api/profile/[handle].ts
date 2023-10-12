@@ -11,7 +11,7 @@ import {
   regexUniversalFarcaster,
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
-import { neighborDetail, ProfileAPIResponse } from "@/utils/types";
+import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
 import { resolveENSHandle } from "./ens/[handle]";
 import { resolveLensHandle } from "./lens/[handle]";
 import { resolveFarcasterHandle } from "./farcaster/[handle]";
@@ -22,27 +22,25 @@ interface RequestInterface extends NextApiRequest {
   };
 }
 
+const processArr = (arr: NeighborDetail[]) => {
+  const cache: NeighborDetail[] = [];
+  for (const t of arr) {
+    if (
+      cache.find((c) => c.platform === t.platform && c.identity === t.identity)
+    ) {
+      continue;
+    }
+    cache.push(t);
+  }
+
+  return cache;
+};
+
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
-
-const getPlatformSort = (
-  obj: Array<ProfileAPIResponse>,
-  platform: PlatformType
-) => {
-  if (
-    [PlatformType.ens, PlatformType.lens, PlatformType.farcaster].includes(
-      platform
-    )
-  )
-    return platform;
-  if (obj.find((x) => x.platform === PlatformType.ens)) return PlatformType.ens;
-  if (obj.find((x) => x.platform === PlatformType.lens))
-    return PlatformType.lens;
-  return PlatformType.farcaster;
-};
 
 const resolveHandleFromRelationService = (
   handle: string,
@@ -69,17 +67,39 @@ const resolveHandleFromRelationService = (
 };
 const sortByPlatform = (
   arr: Array<ProfileAPIResponse>,
-  platform: PlatformType
+  platform: PlatformType,
+  handle: string
 ) => {
-  return arr.sort((a, b) => {
-    if (a.platform === platform && b.platform !== platform) {
-      return -1;
-    }
-    if (a.platform !== platform && b.platform === platform) {
-      return 1;
-    }
-    return 0;
+  const defaultOrder = [
+    PlatformType.ens,
+    PlatformType.lens,
+    PlatformType.farcaster,
+    PlatformType.dotbit,
+  ];
+
+  const order = defaultOrder.includes(platform)
+    ? [platform, ...defaultOrder.filter((x) => x !== platform)]
+    : defaultOrder;
+
+  const first: Array<ProfileAPIResponse> = [];
+  const second: Array<ProfileAPIResponse> = [];
+  const third: Array<ProfileAPIResponse> = [];
+  const forth: Array<ProfileAPIResponse> = [];
+
+  arr.map((x) => {
+    if (x.platform === order[0]) first.push(x);
+    if (x.platform === order[1]) second.push(x);
+    if (x.platform === order[2]) third.push(x);
+    if (x.platform === order[3]) forth.push(x);
   });
+  return [
+    first.find((x) => x.identity === handle),
+    ...first?.filter((x) => x.identity !== handle),
+  ]
+    .concat(second)
+    .concat(third)
+    .concat(forth)
+    .filter((x) => !!x);
 };
 const resolveUniversalRespondFromRelation = async ({
   platform,
@@ -107,7 +127,7 @@ const resolveUniversalRespondFromRelation = async ({
     resolved?.neighbor || resolved?.resolved?.neighbor || [];
   const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
 
-  const sourceneighbor = resolvedIdentity
+  const sourceNeighbor = resolvedIdentity
     ? {
         platform: resolvedIdentity.platform,
         identity: resolvedIdentity.identity,
@@ -119,12 +139,14 @@ const resolveUniversalRespondFromRelation = async ({
         identity: handle,
       };
 
-  const neighbors = originneighbors.map((x: { identity: neighborDetail }) => {
-    return {
-      ...x.identity,
-    };
-  });
-  neighbors.unshift(sourceneighbor);
+  const neighbors = processArr([
+    ...originneighbors.map((x: { identity: NeighborDetail }) => {
+      return {
+        ...x.identity,
+      };
+    }),
+    sourceNeighbor,
+  ]);
 
   if (
     regexEns.test(handle) &&
@@ -142,7 +164,7 @@ const resolveUniversalRespondFromRelation = async ({
       }
     });
   return await Promise.allSettled([
-    ...neighbors.map((x: neighborDetail) => {
+    ...neighbors.map((x: NeighborDetail) => {
       if (
         [
           PlatformType.ethereum,
@@ -166,7 +188,7 @@ const resolveUniversalRespondFromRelation = async ({
           case PlatformType.farcaster:
             return resolveFarcasterHandle(resolvedHandle);
           default:
-            return Promise.reject({ value: undefined });
+            return Promise.reject({ value: null });
         }
       }
     }),
@@ -177,18 +199,15 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             response.status === "fulfilled" &&
             response.value?.address &&
-            response.value?.identity &&
-            !response.value?.error
+            response.value?.identity
         )
         .map(
           (response) =>
-            (response as PromiseFulfilledResult<ProfileAPIResponse>).value
+            (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       return returnRes?.length
         ? respondWithCache(
-            JSON.stringify(
-              sortByPlatform(returnRes, getPlatformSort(returnRes, platform))
-            )
+            JSON.stringify(sortByPlatform(returnRes, platform, handle))
           )
         : errorHandle({
             identity: handle,
@@ -247,11 +266,12 @@ const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  return resolveUniversalHandle(inputName, req);
+  return await resolveUniversalHandle(inputName, req);
 }
 
 export const config = {
   runtime: "edge",
+  regions: ["sfo1", "hnd1", "sin1"],
   maxDuration: 30,
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",

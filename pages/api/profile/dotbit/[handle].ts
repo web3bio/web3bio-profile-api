@@ -8,6 +8,7 @@ import { CoinType } from "@/utils/cointype";
 
 export const config = {
   runtime: "edge",
+  regions: ["sfo1", "hnd1", "sin1"],
 };
 interface RecordItem {
   key: string;
