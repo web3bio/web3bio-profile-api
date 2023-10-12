@@ -17,7 +17,7 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			platform
 			displayName
       uuid
-			neighbor(depth: 5) {
+			neighbor(depth: 3) {
         sources # Which upstreams provide these connection infos.
         identity {
           uuid
@@ -44,7 +44,7 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
       identity
       displayName
     }
-    neighbor(depth: 5) {
+    neighbor(depth: 3) {
       sources # Which upstreams provide these connection infos.
       identity {
         uuid
