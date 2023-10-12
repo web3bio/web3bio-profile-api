@@ -76,11 +76,7 @@ export const resolveDotbitHandle = async (handle: string) => {
       link: string;
     }
   > = {};
-  const cryptoObj: Record<string, string> = {};
   recordsMap.forEach((x) => {
-    if (x.key.includes("address.")) {
-      cryptoObj[x.key.replace("address.", "")] = x.value?.toLocaleLowerCase();
-    }
     if (x.key.includes("profile.")) {
       const platform = x.key.replace("profile.", "");
       if (platform === "avatar") avatar = x.value;
@@ -106,7 +102,6 @@ export const resolveDotbitHandle = async (handle: string) => {
     location: location || null,
     header: header || null,
     links: linksObj,
-    addresses: cryptoObj,
   };
 };
 
