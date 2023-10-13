@@ -1,7 +1,7 @@
 import { PlatformType } from "./platform";
 
 export const getRelationQuery = (platform: PlatformType) => {
-  return [PlatformType.ens, PlatformType.lens].includes(platform)
+  return [PlatformType.ens].includes(platform)
     ? GET_PROFILES_DOMAIN
     : GET_PROFILES_QUERY;
 };

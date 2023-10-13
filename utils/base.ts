@@ -8,13 +8,6 @@ export type LinksItem = {
 export type LinksData = {
   [index: string | Partial<PlatformType>]: LinksItem | undefined;
 };
-export type AddressesData = {
-  eth?: string | null;
-  btc?: string | null;
-  ltc?: string | null;
-  doge?: string | null;
-  matic?: string | null;
-};
 export type HandleResponseData = {
   owner: string | null;
   identity: string | null;
