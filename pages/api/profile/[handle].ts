@@ -12,10 +12,6 @@ import {
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
 import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
-import { resolveENSHandle } from "./ens/[handle]";
-import { resolveLensHandle } from "./lens/[handle]";
-import { resolveFarcasterHandle } from "./farcaster/[handle]";
-import { resolveDotbitHandle } from "./dotbit/[handle]";
 interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -178,18 +174,9 @@ const resolveUniversalRespondFromRelation = async ({
           x.platform === PlatformType.ethereum ? x.displayName : x.identity;
         const resolvedPlatform =
           x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
-        switch (resolvedPlatform) {
-          case PlatformType.ens:
-            return resolveENSHandle(resolvedHandle);
-          case PlatformType.lens:
-            return resolveLensHandle(resolvedHandle);
-          case PlatformType.dotbit:
-            return resolveDotbitHandle(resolvedHandle);
-          case PlatformType.farcaster:
-            return resolveFarcasterHandle(resolvedHandle);
-          default:
-            return Promise.reject({ value: null });
-        }
+        const fetchURL = `${req.nextUrl.origin}/profile/${resolvedPlatform}/${resolvedHandle}`;
+        if (resolvedHandle && resolvedPlatform)
+          return fetch(fetchURL).then((res) => res.json());
       }
     }),
   ])
