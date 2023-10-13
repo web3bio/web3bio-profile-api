@@ -8,13 +8,6 @@ export type LinksItem = {
 export type LinksData = {
   [index: string | Partial<PlatformType>]: LinksItem | undefined;
 };
-export type AddressesData = {
-  eth?: string | null;
-  btc?: string | null;
-  ltc?: string | null;
-  doge?: string | null;
-  matic?: string | null;
-};
 export type HandleResponseData = {
   owner: string | null;
   identity: string | null;
@@ -25,7 +18,6 @@ export type HandleResponseData = {
   location: string | null;
   header: string | null;
   links: LinksData;
-  addresses: AddressesData | null;
   error?: string;
 };
 
@@ -74,9 +66,7 @@ export const respondWithCache = (json: string) => {
   return new Response(json, {
     status: 200,
     headers: {
-      "Cache-Control": `public, s-maxage=${
-        60 * 60 * 24
-      }, stale-while-revalidate=${60 * 30}`,
+      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
     },
   });
 };

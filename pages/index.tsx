@@ -481,9 +481,6 @@ export default function Home() {
                   "link": "https://vitalik.ca",
                   "handle": "vitalik.ca"
               }
-          },
-          "addresses": {
-              "eth": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
           }
       },
       {
@@ -597,9 +594,6 @@ export default function Home() {
               "link": "https://vitalik.ca",
               "handle": "vitalik.ca"
           }
-      },
-      "addresses": {
-          "eth": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
       }
   }`}
               </code>
@@ -844,17 +838,6 @@ export default function Home() {
             "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
             "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
         }
-    },
-    "addresses": {
-        "btc": "3gcu7eghuqanqxun2osmx1bavcvvcsjrrc",
-        "doge": "dcuu7pt2dj1u3wzyysvcmwegps3vp81pzj",
-        "bsc": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
-        "polygon": "0xb2e895579b2ace78e2de99af2d4820e3922b932f",
-        "dot": "15w9dugwzz8sqvpzry46j4lrrd8ttdfnx2qqf4arm6jqn2rn",
-        "ltc": "lef4g3y8ydpyjurtbdg2zsboxzyxcuqfvf",
-        "ckb": "ckb1qzfhdsa4syv599s2s3nfrctwga70g0tu07n9gpnun9ydlngf5vsnwqgrl286nn6catlcd23qsdn2zntfm6rcvlcaq0agl2w0tr40lp42yzpkdg2dd80g0pnlr5whhswq",
-        "eth": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
-        "trx": "tkxhn9yswcnk2c39lewdne4dcl8xnee2nf"
     }
 }`}
               </code>
@@ -890,6 +873,13 @@ export default function Home() {
           >
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>Release Notes</h2>
             <p>We are gradually making updates to Web3.bio Profile APIs. You may expect new features, improvements and bug fixes. If you have any feedback on the features or want to report a bug, please reach out to us on <a href="https://twitter.com/web3bio" target="_blank" className="text-underline">Web3.bio Twitter</a> or <a href="https://t.me/web3dotbio" target="_blank" className="text-underline">Telegram group</a>.</p>
+            <h3 className="text-bold h6 mt-4"><span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span> October Update</h3>
+            <ul>
+              <li>
+                <span className="label">Change</span>{" "}
+                Deprecated <code>addresses</code> field for faster API queries.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4"><span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span> August Update</h3>
             <ul>
               <li>

@@ -202,9 +202,6 @@ export const resolveENSHandle = async (handle: string) => {
 
   gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
   let LINKRES = {};
-  let CRYPTORES: { [index: string]: string | null } = {
-    eth: address.toLowerCase(),
-  };
   if (gtext && gtext[0].resolver.texts) {
     const linksRecords = gtext[0]?.resolver?.texts;
     const linksToFetch = linksRecords.reduce(
@@ -242,44 +239,7 @@ export const resolveENSHandle = async (handle: string) => {
     };
     LINKRES = await getLink();
   }
-  if (gtext && gtext[0].resolver.coinTypes) {
-    const getCrypto = async () => {
-      const cryptoRecrods = gtext[0].resolver.coinTypes;
-      const cryptoRecordsToFetch = cryptoRecrods.reduce(
-        (pre: Array<number>, cur: number) => {
-          if (
-            ![CoinType.eth].includes(Number(cur)) &&
-            _.findKey(CoinType, (o) => o == cur)
-          )
-            pre.push(cur);
-          return pre;
-        },
-        []
-      );
-      const _cryptoRes: { [index: string]: string | null } = {};
-      for (let i = 0; i < cryptoRecordsToFetch.length; i++) {
-        const _coinType = cryptoRecordsToFetch[i];
-        const key = _.findKey(CoinType, (o) => {
-          return o == _coinType;
-        });
-        if (key) {
-          _cryptoRes[key] =
-            (
-              await resolveENSCoinTypesValue(
-                resolverAddress,
-                ensDomain,
-                _coinType
-              )
-            )?.toLowerCase() || null;
-        }
-      }
-      return _cryptoRes;
-    };
-    CRYPTORES = {
-      eth: address.toLowerCase(),
-      ...(await getCrypto()),
-    };
-  }
+  
   const headerHandle =
     (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
   const avatarHandle =
@@ -302,7 +262,6 @@ export const resolveENSHandle = async (handle: string) => {
       null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
     links: LINKRES,
-    addresses: CRYPTORES,
   };
   return resJSON;
 };
@@ -357,7 +316,7 @@ export default async function handler(req: NextApiRequest) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
-  maxDuration: 30,
+  maxDuration: 45,
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",
     "**/node_modules/@ensdomain/address-encoder/**/*.js",
