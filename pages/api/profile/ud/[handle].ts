@@ -58,23 +58,25 @@ export const resolveUDHandle = async (handle: string) => {
     address = res.meta.owner.toLowerCase();
   }
   const metadata = await fetchUDProfile(domain);
-
   const LINKRES: {
     [key in PlatformType]?: {
       link: string | null;
       handle: string | null;
     };
   } = {};
-  UDSocialAccountsList.forEach((x) => {
-    const item = metadata.socialAccounts[x];
-    if (item) {
-      const resolvedHandle = resolveHandle(item.location);
-      LINKRES[x] = {
-        handle: resolvedHandle,
-        link: getSocialMediaLink(resolvedHandle, x),
-      };
-    }
-  });
+  if (metadata.socialAccounts) {
+    UDSocialAccountsList.forEach((x) => {
+      const item = metadata.socialAccounts[x];
+      if (item) {
+        const resolvedHandle = resolveHandle(item?.location);
+        LINKRES[x] = {
+          handle: resolvedHandle,
+          link: getSocialMediaLink(resolvedHandle, x),
+        };
+      }
+    });
+  }
+
   return {
     address,
     identity: domain,
