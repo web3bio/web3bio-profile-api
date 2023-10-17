@@ -82,12 +82,12 @@ export const resolveUDHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.unstoppableDomains,
     displayName: metadata.profile.displayName || handle,
-    avatar: metadata.profile.imagePath,
+    avatar: metadata.profile.imagePath || null,
     email: null,
     description: metadata.profile.description || null,
-    location: metadata.profile.location,
-    header: metadata.background_color,
-    links: LINKRES,
+    location: metadata.profile.location || null,
+    header: metadata.background_color || null,
+    links: LINKRES || null,
   };
 };
 
