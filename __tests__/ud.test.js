@@ -26,6 +26,6 @@ describe("Test For Unstoppable Domains Profile API", () => {
   });
   it("It should response 200 for 2024.hi", async () => {
     const res = await queryClient("/profile/ud/2024.hi");
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
   });
 });
