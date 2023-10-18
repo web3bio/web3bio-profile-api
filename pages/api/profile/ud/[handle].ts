@@ -5,6 +5,7 @@ import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import _ from "lodash";
+import { resolveIPFS_URL } from "@/utils/ipfs";
 
 export const config = {
   runtime: "edge",
@@ -64,6 +65,19 @@ export const resolveUDHandle = async (handle: string) => {
       handle: string | null;
     };
   } = {};
+  if (metadata.profile.web2Url) {
+    LINKRES[PlatformType.website] = {
+      handle: resolveHandle(metadata.profile?.web2Url),
+      link: getSocialMediaLink(metadata.profile?.web2Url, PlatformType.website),
+    };
+  }
+  if (metadata.records?.["ipfs.html.value"]) {
+    LINKRES[PlatformType.url] = {
+      handle: domain,
+      link:
+        resolveIPFS_URL(metadata.records?.["ipfs.html.value"], true) || null,
+    };
+  }
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
@@ -86,7 +100,7 @@ export const resolveUDHandle = async (handle: string) => {
     email: null,
     description: metadata.profile.description || null,
     location: metadata.profile.location || null,
-    header: metadata.background_color || null,
+    header: metadata.profile.coverPath || null,
     links: LINKRES || null,
   };
 };
