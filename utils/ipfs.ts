@@ -2,6 +2,7 @@ const MATCH_IPFS_CID_RAW =
   "Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[2-7A-Za-z]{58,}|B[2-7A-Z]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[\\dA-F]{50,}";
 const CORS_HOST = "https://cors-next.r2d2.to";
 const IPFS_GATEWAY_HOST = "https://hoot.it";
+const IPFS_HOST = "https://ipfs.io";
 const MATCH_IPFS_DATA_RE = /ipfs\/(data:.*)$/;
 const MATCH_IPFS_CID_RE = new RegExp(`(${MATCH_IPFS_CID_RAW})`);
 const MATCH_IPFS_CID_AT_STARTS_RE = new RegExp(
@@ -23,7 +24,8 @@ export const isIPFS_Resource = (str: string) => {
 };
 
 export function resolveIPFS_URL(
-  cidOrURL: string | undefined
+  cidOrURL: string | undefined,
+  disableGateway?: boolean
 ): string | undefined {
   if (!cidOrURL) return cidOrURL;
 
@@ -37,7 +39,7 @@ export function resolveIPFS_URL(
   }
 
   // a ipfs.io host
-  if (cidOrURL.startsWith(IPFS_GATEWAY_HOST)) {
+  if (cidOrURL.startsWith(IPFS_GATEWAY_HOST) && !disableGateway) {
     // base64 data string
     const [_, data] = cidOrURL.match(MATCH_IPFS_DATA_RE) ?? [];
     if (data) return decodeURIComponent(data);
@@ -72,7 +74,10 @@ export function resolveIPFS_URL(
     }
 
     const pathname = cidOrURL.match(MATCH_IPFS_CID_AND_PATHNAME_RE)?.[0];
-    if (pathname) return trimQuery(`${IPFS_GATEWAY_HOST}/ipfs/${pathname}`);
+    if (pathname)
+      return trimQuery(
+        `${disableGateway ? IPFS_HOST : IPFS_GATEWAY_HOST}/ipfs/${pathname}`
+      );
   }
 
   return cidOrURL;
