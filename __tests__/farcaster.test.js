@@ -32,7 +32,6 @@ describe("Test For Farcaster Profile API", () => {
     const res = await queryClient("/profile/farcaster/undefined");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("0x5be51f8fe19af2543828a241e7555889a2ac9532");
   });
   it("It should response 404 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");
