@@ -1,12 +1,8 @@
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
-import { CoinType } from "@/utils/cointype";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { NextApiRequest } from "next";
 import {
-  fetchDotbitProfile,
-  RecordItem,
   resolveDotbitResponse,
 } from "../../profile/dotbit/[handle]";
 
@@ -42,7 +38,6 @@ const resolveDotbitRespond = async (handle: string) => {
 };
 
 export default async function handler(req: NextApiRequest) {
-  console.log(req.url, "kkkk");
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";

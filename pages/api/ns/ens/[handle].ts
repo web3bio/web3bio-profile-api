@@ -1,18 +1,12 @@
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
-import { CoinType } from "@/utils/cointype";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
-import { getAddress, isAddress } from "ethers/lib/utils";
 import { NextApiRequest } from "next";
 import {
-  getResolverAddressFromName,
   isValidEthereumAddress,
-  resolveAddressFromName,
-  resolveENSCoinTypesValue,
   resolveENSResponse,
   resolveENSTextValue,
-  resolveNameFromAddress,
 } from "../../profile/ens/[handle]";
 
 export const resolveENSHandleNS = async (handle: string) => {
