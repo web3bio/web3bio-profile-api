@@ -85,7 +85,7 @@ const resolveFarcasterLinks = (
   return LINKRES;
 };
 
-export const resolveFarcasterHandle = async (handle: string) => {
+export const resolveFarcasterResponse = async(handle:string)=>{
   let response;
   if (isAddress(handle)) {
     response = {
@@ -109,6 +109,11 @@ export const resolveFarcasterHandle = async (handle: string) => {
       ...rawUser,
     };
   }
+  return response
+}
+
+export const resolveFarcasterHandle = async (handle: string) => {
+  const response = await resolveFarcasterResponse(handle)
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);

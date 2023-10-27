@@ -57,13 +57,17 @@ export const resolveETHFromLens = async (lens: string) => {
   return response.ownedBy;
 };
 
-export const resolveLensHandle = async (handle: string) => {
+export const resolveLensResponse = async (handle:string)=>{
   let response;
   if (isAddress(handle)) {
     response = await getLensProfile(handle, LensParamType.address);
   } else {
     response = await getLensProfile(handle, LensParamType.domain);
   }
+  return response
+}
+export const resolveLensHandle = async (handle: string) => {
+  const response = await resolveLensResponse(handle)
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
   const pureHandle = response.handle.replaceAll(".lens", "");
@@ -115,7 +119,7 @@ export const resolveLensHandle = async (handle: string) => {
   const resJSON = {
     address: response.ownedBy?.toLowerCase(),
     identity: response.handle,
-    platform: PlatformData.lens.key,
+    platform: PlatformType.lens,
     displayName: response.name || response.handle,
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
     email: null,

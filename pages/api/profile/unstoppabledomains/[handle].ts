@@ -38,10 +38,9 @@ const fetchUDProfile = async (domain: string) => {
   }).then((res) => res.json());
 };
 
-export const resolveUDHandle = async (handle: string) => {
+export const resolveUDResponse = async (handle: string) => {
   let address;
   let domain;
-  let avatar;
   if (isAddress(handle)) {
     const res = await fetchUDBase(`resolve/reverse/${handle}`);
     if (!res?.meta) {
@@ -59,6 +58,11 @@ export const resolveUDHandle = async (handle: string) => {
     address = res.meta.owner.toLowerCase();
   }
   const metadata = await fetchUDProfile(domain);
+
+  return { address, domain, metadata };
+};
+export const resolveUDHandle = async (handle: string) => {
+  const { address, domain, metadata } = await resolveUDResponse(handle);
   const LINKRES: {
     [key in PlatformType]?: {
       link: string | null;
