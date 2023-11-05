@@ -12,7 +12,7 @@ import {
 } from "@/utils/regexp";
 import { getRelationQuery } from "@/utils/query";
 import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
-interface RequestInterface extends NextApiRequest {
+export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
@@ -101,10 +101,12 @@ const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
   req,
+  ns,
 }: {
   platform: PlatformType;
   handle: string;
   req: RequestInterface;
+  ns?: boolean;
 }) => {
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
@@ -174,7 +176,10 @@ const resolveUniversalRespondFromRelation = async ({
           x.platform === PlatformType.ethereum ? x.displayName : x.identity;
         const resolvedPlatform =
           x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
-        const fetchURL = `${req.nextUrl.origin}/profile/${resolvedPlatform}/${resolvedHandle}`;
+        const fetchURL = `${req.nextUrl.origin}/${
+          ns ? "ns" : "profile"
+        }/${resolvedPlatform.toLocaleLowerCase()}/${resolvedHandle}`;
+
         if (resolvedHandle && resolvedPlatform)
           return fetch(fetchURL).then((res) => res.json());
       }
@@ -212,9 +217,10 @@ const resolveUniversalRespondFromRelation = async ({
       });
     });
 };
-const resolveUniversalHandle = async (
+export const resolveUniversalHandle = async (
   handle: string,
-  req: RequestInterface
+  req: RequestInterface,
+  ns?: boolean
 ) => {
   const handleResolvers = {
     [PlatformType.nextid]: regexAvatar,
@@ -247,6 +253,7 @@ const resolveUniversalHandle = async (
     platform: platformToQuery as PlatformType,
     handle: handleToQuery,
     req,
+    ns,
   });
 };
 

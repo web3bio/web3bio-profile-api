@@ -10,7 +10,7 @@ export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
 };
-interface RecordItem {
+export interface RecordItem {
   key: string;
   label: string;
   value: string;
@@ -19,7 +19,7 @@ interface RecordItem {
 
 const DotbitEndPoint = "https://indexer-v1.did.id/";
 
-const fetchDotbitProfile = async (path: string, payload: string) => {
+export const fetchDotbitProfile = async (path: string, payload: string) => {
   const response = await fetch(DotbitEndPoint + path, {
     method: "POST",
     body: payload,
@@ -27,12 +27,9 @@ const fetchDotbitProfile = async (path: string, payload: string) => {
   return response?.data;
 };
 
-export const resolveDotbitHandle = async (handle: string) => {
-  let address;
+export const resolveDotbitResponse = async (handle: string) => {
   let domain;
-  let avatar;
-  let location;
-  let header;
+  let address;
   if (isAddress(handle)) {
     const res = await fetchDotbitProfile(
       "v1/reverse/record",
@@ -65,10 +62,24 @@ export const resolveDotbitHandle = async (handle: string) => {
     "v1/account/records",
     JSON.stringify({ account: domain })
   );
-  
+
   const recordsMap = new Map<string, RecordItem>(
     recordsResponse?.records?.map((x: RecordItem) => [x.key, { ...x }])
   );
+
+  return {
+    domain,
+    address,
+    recordsMap,
+  };
+};
+
+export const resolveDotbitHandle = async (handle: string) => {
+  let avatar;
+  let location;
+  let header;
+  const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
+
   const linksObj: Record<
     string,
     {
