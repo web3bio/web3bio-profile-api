@@ -20,7 +20,7 @@ const ENSReverseRecordsAddress = "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C";
 const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
 
-const isValidEthereumAddress = (address: string) => {
+export const isValidEthereumAddress = (address: string) => {
   if (!isAddress(address)) return false; // invalid ethereum address
   if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
   return true;
@@ -63,7 +63,7 @@ const getENSRecordsQuery = `
 const ethereumRPCURL =
   process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	";
 
-const resolveAddressFromName = async (name: string) => {
+export const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
   return res?.[0];
@@ -113,7 +113,7 @@ export const getResolverAddressFromName = async (name: string) => {
   return res?.toLowerCase();
 };
 
-const resolveNameFromAddress = async (address: string) => {
+export const resolveNameFromAddress = async (address: string) => {
   const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
   return (
     await fetchEthereumRPC({
@@ -124,7 +124,7 @@ const resolveNameFromAddress = async (address: string) => {
   )?.[0].toLowerCase();
 };
 
-const resolveENSTextValue = async (
+export const resolveENSTextValue = async (
   resolverAddress: string,
   name: string,
   text: string
@@ -157,7 +157,7 @@ export const resolveENSCoinTypesValue = async (
   return encoder(Buffer.from(rr.slice(2), "hex")).toLowerCase();
 };
 
-export const resolveENSHandle = async (handle: string) => {
+export const resolveENSResponse = async (handle: string) => {
   let address = "";
   let ensDomain = "";
   let resolverAddress = "";
@@ -197,8 +197,26 @@ export const resolveENSHandle = async (handle: string) => {
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
   }
 
+  return {
+    address,
+    ensDomain,
+    resolverAddress,
+    gtext,
+  };
+};
+
+export const resolveENSHandle = async (handle: string) => {
+  const {
+    address,
+    ensDomain,
+    resolverAddress,
+    gtext: originGText,
+  } = await resolveENSResponse(handle);
+
   if (!isValidEthereumAddress(resolverAddress))
     throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
+  
+  let gtext = originGText;
 
   gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
   let LINKRES = {};
@@ -239,7 +257,7 @@ export const resolveENSHandle = async (handle: string) => {
     };
     LINKRES = await getLink();
   }
-  
+
   const headerHandle =
     (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
   const avatarHandle =
@@ -247,7 +265,7 @@ export const resolveENSHandle = async (handle: string) => {
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
-    platform: PlatformData.ENS.key,
+    platform: PlatformType.ens,
     displayName:
       (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
       ensDomain,
