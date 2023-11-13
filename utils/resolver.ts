@@ -1,6 +1,7 @@
 import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
 import { resolveIPFS_URL } from "./ipfs";
-import { PlatformType, SocialPlatformMapping } from "./platform";
+import { PlatformType } from "./platform";
+import { SocialPlatformMapping } from "./utils";
 
 const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
 

@@ -510,8 +510,8 @@ export default function Home() {
           "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
           "header": "",
           "links": {
-              "lenster": {
-                  "link": "https://lenster.xyz/u/vitalik",
+              "hey": {
+                  "link": "https://hey.xyz/u/vitalik",
                   "handle": "vitalik"
               }
           }
@@ -663,8 +663,8 @@ export default function Home() {
       "description": "Building @LensProtocol & @AaveAave",
       "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
       "links": {
-          "lenster": {
-              "link": "https://lenster.xyz/u/stani",
+          "hey": {
+              "link": "https://hey.xyz/u/stani",
               "handle": "stani"
           },
           "website": {

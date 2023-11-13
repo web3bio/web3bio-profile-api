@@ -104,8 +104,8 @@ export const resolveLensHandle = async (handle: string) => {
       return _linkRes;
     };
     LINKRES = {
-      [PlatformType.lenster]: {
-        link: getSocialMediaLink(pureHandle, PlatformType.lenster),
+      [PlatformType.hey]: {
+        link: getSocialMediaLink(pureHandle, PlatformType.hey),
         handle: pureHandle,
       },
       ...(await getLink()),

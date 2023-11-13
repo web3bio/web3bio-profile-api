@@ -1,15 +1,8 @@
 import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
-import { handleSearchPlatform, PlatformType } from "@/utils/platform";
-import {
-  regexAvatar,
-  regexDotbit,
-  regexEns,
-  regexEth,
-  regexLens,
-  regexTwitter,
-  regexUniversalFarcaster,
-} from "@/utils/regexp";
+import { PlatformType } from "@/utils/platform";
+import { regexEns } from "@/utils/regexp";
+import { handleSearchPlatform } from "@/utils/utils";
 import { getRelationQuery } from "@/utils/query";
 import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
 export interface RequestInterface extends NextApiRequest {
@@ -222,26 +215,10 @@ export const resolveUniversalHandle = async (
   req: RequestInterface,
   ns?: boolean
 ) => {
-  const handleResolvers = {
-    [PlatformType.nextid]: regexAvatar,
-    [PlatformType.ethereum]: regexEth,
-    [PlatformType.ens]: regexEns,
-    [PlatformType.lens]: regexLens,
-    [PlatformType.dotbit]: regexDotbit,
-    [PlatformType.farcaster]: regexUniversalFarcaster,
-    [PlatformType.twitter]: regexTwitter,
-  };
-  let handleToQuery = "";
-  let platformToQuery = "";
-  for (const [platform, regex] of Object.entries(handleResolvers)) {
-    if (regex.test(handle)) {
-      handleToQuery =
-        regex === regexUniversalFarcaster
-          ? handle.replaceAll(".farcaster", "")
+  const platformToQuery = handleSearchPlatform(handle);
+  const handleToQuery = handle.endsWith(".farcaster")
+          ? handle.substring(0, handle.length - 10)
           : handle;
-      platformToQuery = platform;
-    }
-  }
   if (!handleToQuery || !platformToQuery)
     return errorHandle({
       identity: handle,
