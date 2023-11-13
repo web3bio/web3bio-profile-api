@@ -13,7 +13,7 @@ describe("Test For Lens Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("lens.xyz");
-    expect(json.links.lenster.handle).toBe("stani");
+    expect(json.links.hey.handle).toBe("stani");
     expect(json.displayName).toBe('Stani')
     expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
   });
@@ -24,7 +24,7 @@ describe("Test For Lens Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("sujiyan.lens");
-    expect(json.links.lenster.handle).toBe("sujiyan");
+    expect(json.links.hey.handle).toBe("sujiyan");
   });
   it("It should response 404 for 0xxxxxxxxxx", async () => {
     const res = await queryClient("/profile/lens/0xxxxxxxxxx");
