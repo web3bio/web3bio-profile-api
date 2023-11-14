@@ -1,7 +1,8 @@
 import { PlatformType } from "./platform";
+import { isDomainSearch } from "./utils";
 
 export const getRelationQuery = (platform: PlatformType) => {
-  return [PlatformType.ens].includes(platform)
+  return isDomainSearch(platform)
     ? GET_PROFILES_DOMAIN
     : GET_PROFILES_QUERY;
 };

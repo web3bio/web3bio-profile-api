@@ -63,7 +63,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-twitter.svg",
     label: "Twitter",
     urlPrefix: "https://twitter.com/",
-    ensText: ["com.twitter", "vnd.twitter"],
+    ensText: ["com.twitter", "vnd.twitter", "twitter"],
     dotbitText: ["profile.twitter"],
   },
   [PlatformType.ens]: {
