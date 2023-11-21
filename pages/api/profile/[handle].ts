@@ -76,14 +76,12 @@ const sortByPlatform = (
   const second: Array<ProfileAPIResponse> = [];
   const third: Array<ProfileAPIResponse> = [];
   const forth: Array<ProfileAPIResponse> = [];
-  const fifth: Array<ProfileAPIResponse> = [];
 
   arr.map((x) => {
     if (x.platform === order[0]) first.push(x);
     if (x.platform === order[1]) second.push(x);
     if (x.platform === order[2]) third.push(x);
     if (x.platform === order[3]) forth.push(x);
-    if (x.platform === order[4]) fifth.push(x);
   });
   return [
     first.find((x) => x.identity === handle),
@@ -92,7 +90,6 @@ const sortByPlatform = (
     .concat(second)
     .concat(third)
     .concat(forth)
-    .concat(fifth)
     .filter((x) => !!x);
 };
 const resolveUniversalRespondFromRelation = async ({
