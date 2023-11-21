@@ -1,6 +1,11 @@
 import type { NextApiRequest } from "next";
 import { getAddress, isAddress } from "@ethersproject/address";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -170,7 +175,21 @@ export const resolveENSResponse = async (handle: string) => {
     address = getAddress(handle);
     ensDomain = await resolveNameFromAddress(handle);
     if (!ensDomain) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
+      return {
+        address,
+        earlyReturnJSON: {
+          address: address,
+          identity: address,
+          platform: PlatformType.ethereum,
+          displayName: formatText(address),
+          avatar: null,
+          email: null,
+          description: null,
+          location: null,
+          header: null,
+          links: null,
+        },
+      };
     }
     resolverAddress = await getResolverAddressFromName(ensDomain);
   } else {
@@ -201,6 +220,7 @@ export const resolveENSResponse = async (handle: string) => {
     address,
     ensDomain,
     resolverAddress,
+    earlyReturnJSON: null,
     gtext,
   };
 };
@@ -210,12 +230,15 @@ export const resolveENSHandle = async (handle: string) => {
     address,
     ensDomain,
     resolverAddress,
+    earlyReturnJSON,
     gtext: originGText,
   } = await resolveENSResponse(handle);
-
+  if (earlyReturnJSON) {
+    return earlyReturnJSON;
+  }
   if (!isValidEthereumAddress(resolverAddress))
     throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-  
+
   let gtext = originGText;
 
   gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;

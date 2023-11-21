@@ -5,6 +5,7 @@ import { regexEns } from "@/utils/regexp";
 import { handleSearchPlatform } from "@/utils/utils";
 import { getRelationQuery } from "@/utils/query";
 import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
+import { isValidEthereumAddress } from "./ens/[handle]";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -217,14 +218,24 @@ export const resolveUniversalHandle = async (
 ) => {
   const platformToQuery = handleSearchPlatform(handle);
   const handleToQuery = handle.endsWith(".farcaster")
-          ? handle.substring(0, handle.length - 10)
-          : handle;
+    ? handle.substring(0, handle.length - 10)
+    : handle;
   if (!handleToQuery || !platformToQuery)
     return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
+    });
+  if (
+    platformToQuery === PlatformType.ethereum &&
+    !isValidEthereumAddress(handleToQuery)
+  )
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.ethereum,
+      code: 404,
+      message: ErrorMessages.invalidAddr,
     });
   return await resolveUniversalRespondFromRelation({
     platform: platformToQuery as PlatformType,
