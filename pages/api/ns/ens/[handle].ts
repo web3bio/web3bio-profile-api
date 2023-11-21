@@ -19,14 +19,12 @@ export const resolveENSHandleNS = async (handle: string) => {
     await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return {
-      earlyReturnJSON: {
-        address: address,
-        identity: address,
-        platform: PlatformType.ethereum,
-        displayName: formatText(address),
-        avatar: null,
-        description: null,
-      },
+      address: address,
+      identity: address,
+      platform: PlatformType.ethereum,
+      displayName: formatText(address),
+      avatar: null,
+      description: null,
     };
   }
   if (!isValidEthereumAddress(resolverAddress))
