@@ -1,10 +1,12 @@
-import { PlatformType } from "./platform";
+import { PlatformType, supportedPlatforms } from "./platform";
+import {
+  RelationServiceDomainQueryResponse,
+  RelationServiceIdentityQueryResponse,
+} from "./types";
 import { isDomainSearch } from "./utils";
 
 export const getRelationQuery = (platform: PlatformType) => {
-  return isDomainSearch(platform)
-    ? GET_PROFILES_DOMAIN
-    : GET_PROFILES_QUERY;
+  return isDomainSearch(platform) ? GET_PROFILES_DOMAIN : GET_PROFILES_QUERY;
 };
 const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
@@ -12,25 +14,17 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 		source
 		system
 		name
-		fetcher
+    reverse
 		resolved {
 			identity
 			platform
 			displayName
       uuid
-			neighbor(depth: 5) {
-        sources # Which upstreams provide these connection infos.
-        identity {
-          uuid
-          platform
-          identity
-          displayName
-        }
-      }
 		}
 	}
 }
 `;
+``;
 
 export const GET_PROFILES_QUERY = `
 query GET_PROFILES_QUERY($platform: String, $identity: String) {
@@ -39,21 +33,47 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     identity
     displayName
     uuid
-    ownedBy {
-      uuid
-      platform
-      identity
-      displayName
-    }
-    neighbor(depth: 5) {
-      sources # Which upstreams provide these connection infos.
-      identity {
-        uuid
-        platform
-        identity
-        displayName
-      }
+    reverseDomains{
+      source
+      system
+      name
+      reverse
     }
   }
 }
 `;
+
+export const primaryDomainsResolvedRequestArray = (
+  data: RelationServiceDomainQueryResponse
+) => {
+  if (data.data.domain.reverse) {
+    return supportedPlatforms.map((x) => ({
+      identity: data.data.domain.resolved.identity,
+      platform: x,
+    }));
+  }
+  return [
+    {
+      identity: data.data.domain.name,
+      platform: data.data.domain.system,
+    },
+  ];
+};
+
+export const primaryETHResolvedRequestArray = (
+  data: RelationServiceIdentityQueryResponse
+) => {
+  return (
+    data.data.identity?.reverseDomains
+      .filter((x) => !!x.reverse)
+      .map((x) => ({
+        identity: x.name,
+        platform: x.system,
+      })) || [
+      {
+        identity: data.data.identity.identity,
+        platform: data.data.identity.platform,
+      },
+    ]
+  );
+};

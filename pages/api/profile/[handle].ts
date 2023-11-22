@@ -1,30 +1,20 @@
 import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns } from "@/utils/regexp";
 import { handleSearchPlatform } from "@/utils/utils";
-import { getRelationQuery } from "@/utils/query";
-import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
+import {
+  getRelationQuery,
+  primaryDomainsResolvedRequestArray,
+  primaryETHResolvedRequestArray,
+} from "@/utils/query";
+import { ProfileAPIResponse } from "@/utils/types";
 import { isValidEthereumAddress } from "./ens/[handle]";
+import { isAddress } from "ethers/lib/utils";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
 }
-
-const processArr = (arr: NeighborDetail[]) => {
-  const cache: NeighborDetail[] = [];
-  for (const t of arr) {
-    if (
-      cache.find((c) => c.platform === t.platform && c.identity === t.identity)
-    ) {
-      continue;
-    }
-    cache.push(t);
-  }
-
-  return cache;
-};
 
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
@@ -65,7 +55,6 @@ const sortByPlatform = (
     PlatformType.lens,
     PlatformType.farcaster,
     PlatformType.dotbit,
-    PlatformType.ethereum,
   ];
 
   const order = defaultOrder.includes(platform)
@@ -107,6 +96,10 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+  const resolvedRequestArray = isAddress(handle)
+    ? primaryETHResolvedRequestArray(responseFromRelation)
+    : primaryDomainsResolvedRequestArray(responseFromRelation);
+
   if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
       identity: handle,
@@ -114,72 +107,15 @@ const resolveUniversalRespondFromRelation = async ({
       message: responseFromRelation?.error,
       code: 500,
     });
-  const resolved =
-    responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
-  const originneighbors =
-    resolved?.neighbor || resolved?.resolved?.neighbor || [];
-  const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
 
-  const sourceNeighbor = resolvedIdentity
-    ? {
-        platform: resolvedIdentity.platform,
-        identity: resolvedIdentity.identity,
-        displayName: resolvedIdentity.displayName || resolved.name,
-        uuid: resolvedIdentity.uuid,
-      }
-    : {
-        platform,
-        identity: handle,
-      };
-
-  const neighbors = processArr([
-    ...originneighbors.map((x: { identity: NeighborDetail }) => {
-      return {
-        ...x.identity,
-      };
-    }),
-    sourceNeighbor,
-  ]);
-
-  if (
-    regexEns.test(handle) &&
-    neighbors.filter(
-      (x: { platform: PlatformType }) => x.platform === PlatformType.ethereum
-    ).length === 1
-  )
-    neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
-      if (
-        x.platform === PlatformType.ethereum &&
-        !!x.displayName &&
-        x.displayName !== handle
-      ) {
-        x.displayName = handle;
-      }
-    });
   return await Promise.allSettled([
-    ...neighbors.map((x: NeighborDetail) => {
-      if (
-        [
-          PlatformType.ethereum,
-          PlatformType.farcaster,
-          PlatformType.lens,
-          PlatformType.dotbit,
-        ].includes(x.platform) &&
-        x.identity
-      ) {
-        const resolvedHandle =
-          x.platform === PlatformType.ethereum
-            ? x.displayName || x.identity
-            : x.identity;
-        const resolvedPlatform =
-          x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
+    ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
+      const fetchURL = `${req.nextUrl.origin}/${
+        ns ? "ns" : "profile"
+      }/${x.platform.toLowerCase()}/${x.identity}`;
 
-        const fetchURL = `${req.nextUrl.origin}/${
-          ns ? "ns" : "profile"
-        }/${resolvedPlatform.toLocaleLowerCase()}/${resolvedHandle}`;
-        if (resolvedHandle && resolvedPlatform)
-          return fetch(fetchURL).then((res) => res.json());
-      }
+      if (x.platform && x.identity)
+        return fetch(fetchURL).then((res) => res.json());
     }),
   ])
     .then((responses) => {

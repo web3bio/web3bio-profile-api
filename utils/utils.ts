@@ -39,6 +39,7 @@ export const isDomainSearch = (term: PlatformType) => {
     PlatformType.dotbit,
     PlatformType.unstoppableDomains,
     PlatformType.space_id,
+    PlatformType.lens
   ].includes(term);
 };
 
