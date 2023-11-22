@@ -60,7 +60,7 @@ export interface RelationServiceIdentityQueryResponse {
       identity: string;
       displayName: string[];
       uuid: string;
-      reverseDomains: ReverseRecordItem[];
+      reverseRecords: ReverseRecordItem[];
       neighbor: Neighbor[]
     };
   };

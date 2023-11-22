@@ -4,7 +4,7 @@ import { PlatformType } from "@/utils/platform";
 import { handleSearchPlatform, isDomainSearch } from "@/utils/utils";
 import {
   getRelationQuery,
-  primaryDomainsResolvedRequestArray,
+  primaryDomainResolvedRequestArray,
   primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
@@ -100,7 +100,7 @@ const resolveUniversalRespondFromRelation = async ({
     platform
   );
   const resolvedRequestArray = isDomainSearch(platform)
-    ? primaryDomainsResolvedRequestArray(responseFromRelation)
+    ? primaryDomainResolvedRequestArray(responseFromRelation)
     : primaryIdentityResolvedRequestArray(responseFromRelation);
 
   if (!responseFromRelation || responseFromRelation?.error)
@@ -134,7 +134,7 @@ const resolveUniversalRespondFromRelation = async ({
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       const returnRes = sortByPlatform(responsesToSort, platform, handle);
-      
+
       return returnRes?.length
         ? respondWithCache(JSON.stringify(returnRes))
         : errorHandle({

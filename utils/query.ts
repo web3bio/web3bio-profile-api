@@ -33,7 +33,7 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     identity
     displayName
     uuid
-    reverseDomains{
+    reverseRecords{
       source
       system
       name
@@ -52,10 +52,10 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
 }
 `;
 
-export const primaryDomainsResolvedRequestArray = (
+export const primaryDomainResolvedRequestArray = (
   data: RelationServiceDomainQueryResponse
 ) => {
-  if (data.data.domain.reverse) {
+  if (data?.data?.domain?.reverse) {
     return supportedPlatforms.map((x) => ({
       identity: data.data.domain.resolved.identity,
       platform: x,
@@ -63,8 +63,8 @@ export const primaryDomainsResolvedRequestArray = (
   }
   return [
     {
-      identity: data.data.domain.name,
-      platform: data.data.domain.system,
+      identity: data?.data?.domain?.name,
+      platform: data?.data?.domain?.system,
     },
   ];
 };
@@ -74,34 +74,41 @@ export const primaryIdentityResolvedRequestArray = (
 ) => {
   if (
     [PlatformType.farcaster, PlatformType.nextid].includes(
-      data.data.identity.platform as PlatformType
+      data?.data?.identity?.platform as PlatformType
     )
   ) {
-    const neighborArray = data.data.identity.neighbor.map((x) => ({
-      identity: x.identity.identity,
-      platform:
-        x.identity.platform === PlatformType.ethereum
-          ? PlatformType.ens
-          : x.identity.platform,
-    }));
+    const neighborArray =
+      data?.data?.identity?.neighbor.map((x) => ({
+        identity: x.identity.identity,
+        platform:
+          x.identity.platform === PlatformType.ethereum
+            ? PlatformType.ens
+            : x.identity.platform,
+      })) || [];
     return [
       {
-        identity: data.data.identity.identity,
-        platform: data.data.identity.platform,
+        identity: data?.data?.identity?.identity,
+        platform: data?.data?.identity?.platform,
       },
       ...neighborArray,
     ];
   }
   return (
-    data.data.identity?.reverseDomains
-      .filter((x) => !!x.reverse)
-      .map((x) => ({
-        identity: x.name,
-        platform: x.system,
-      })) || [
+    [
+      ...data?.data?.identity?.reverseRecords
+        .filter((x) => !!x.reverse)
+        .map((x) => ({
+          identity: x.name,
+          platform: x.system,
+        })),
       {
-        identity: data.data.identity.identity,
-        platform: data.data.identity.platform,
+        identity: data?.data?.identity?.identity,
+        platform: PlatformType.farcaster,
+      },
+    ] || [
+      {
+        identity: data?.data?.identity?.identity,
+        platform: data?.data?.identity?.platform,
       },
     ]
   );
