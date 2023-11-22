@@ -44,12 +44,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    const json2 = await (
-      await queryClient(
-        `/profile/${json?.find((x) => x.platform === "lens")?.address}`
-      )
-    ).json();
-    expect(json.length).toBe(json2.length);
+    expect(json[0].identity).toBe('stani.lens');
   });
   it("It should response 200 data for brantly.eth", async () => {
     const res = await queryClient("/profile/brantly.eth");

@@ -1,15 +1,14 @@
 import type { NextApiRequest } from "next";
 import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { handleSearchPlatform } from "@/utils/utils";
+import { handleSearchPlatform, isDomainSearch } from "@/utils/utils";
 import {
   getRelationQuery,
   primaryDomainsResolvedRequestArray,
-  primaryETHResolvedRequestArray,
+  primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
 import { isValidEthereumAddress } from "./ens/[handle]";
-import { isAddress } from "ethers/lib/utils";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -55,6 +54,7 @@ const sortByPlatform = (
     PlatformType.lens,
     PlatformType.farcaster,
     PlatformType.dotbit,
+    PlatformType.unstoppableDomains,
   ];
 
   const order = defaultOrder.includes(platform)
@@ -65,12 +65,14 @@ const sortByPlatform = (
   const second: Array<ProfileAPIResponse> = [];
   const third: Array<ProfileAPIResponse> = [];
   const forth: Array<ProfileAPIResponse> = [];
+  const fifth: Array<ProfileAPIResponse> = [];
 
   arr.map((x) => {
     if (x.platform === order[0]) first.push(x);
     if (x.platform === order[1]) second.push(x);
     if (x.platform === order[2]) third.push(x);
     if (x.platform === order[3]) forth.push(x);
+    if (x.platform === order[4]) fifth.push(x);
   });
   return [
     first.find((x) => x.identity === handle),
@@ -79,6 +81,7 @@ const sortByPlatform = (
     .concat(second)
     .concat(third)
     .concat(forth)
+    .concat(fifth)
     .filter((x) => !!x);
 };
 const resolveUniversalRespondFromRelation = async ({
@@ -96,9 +99,9 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  const resolvedRequestArray = isAddress(handle)
-    ? primaryETHResolvedRequestArray(responseFromRelation)
-    : primaryDomainsResolvedRequestArray(responseFromRelation);
+  const resolvedRequestArray = isDomainSearch(platform)
+    ? primaryDomainsResolvedRequestArray(responseFromRelation)
+    : primaryIdentityResolvedRequestArray(responseFromRelation);
 
   if (!responseFromRelation || responseFromRelation?.error)
     return errorHandle({
@@ -119,7 +122,7 @@ const resolveUniversalRespondFromRelation = async ({
     }),
   ])
     .then((responses) => {
-      const returnRes = responses
+      const responsesToSort = responses
         .filter(
           (response) =>
             response.status === "fulfilled" &&
@@ -130,10 +133,10 @@ const resolveUniversalRespondFromRelation = async ({
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
+      const returnRes = sortByPlatform(responsesToSort, platform, handle);
+      
       return returnRes?.length
-        ? respondWithCache(
-            JSON.stringify(sortByPlatform(returnRes, platform, handle))
-          )
+        ? respondWithCache(JSON.stringify(returnRes))
         : errorHandle({
             identity: handle,
             code: 404,

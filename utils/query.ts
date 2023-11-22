@@ -39,6 +39,15 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
       name
       reverse
     }
+    neighbor(depth: 5) {
+      sources # Which upstreams provide these connection infos.
+      identity {
+        uuid
+        platform
+        identity
+        displayName
+      }
+    }
   }
 }
 `;
@@ -60,9 +69,29 @@ export const primaryDomainsResolvedRequestArray = (
   ];
 };
 
-export const primaryETHResolvedRequestArray = (
+export const primaryIdentityResolvedRequestArray = (
   data: RelationServiceIdentityQueryResponse
 ) => {
+  if (
+    [PlatformType.farcaster, PlatformType.nextid].includes(
+      data.data.identity.platform as PlatformType
+    )
+  ) {
+    const neighborArray = data.data.identity.neighbor.map((x) => ({
+      identity: x.identity.identity,
+      platform:
+        x.identity.platform === PlatformType.ethereum
+          ? PlatformType.ens
+          : x.identity.platform,
+    }));
+    return [
+      {
+        identity: data.data.identity.identity,
+        platform: data.data.identity.platform,
+      },
+      ...neighborArray,
+    ];
+  }
   return (
     data.data.identity?.reverseDomains
       .filter((x) => !!x.reverse)

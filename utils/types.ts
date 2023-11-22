@@ -61,6 +61,7 @@ export interface RelationServiceIdentityQueryResponse {
       displayName: string[];
       uuid: string;
       reverseDomains: ReverseRecordItem[];
+      neighbor: Neighbor[]
     };
   };
 }
