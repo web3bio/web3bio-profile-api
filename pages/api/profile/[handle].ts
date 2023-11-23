@@ -1,5 +1,10 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { handleSearchPlatform, isDomainSearch } from "@/utils/utils";
 import {
@@ -134,7 +139,27 @@ const resolveUniversalRespondFromRelation = async ({
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       const returnRes = sortByPlatform(responsesToSort, platform, handle);
-
+      if (!returnRes?.length && platform === PlatformType.ethereum) {
+        const nsObj = {
+          address: handle,
+          identity: handle,
+          platform: PlatformType.ethereum,
+          displayName: formatText(handle),
+          avatar: null,
+          description: null,
+        };
+        returnRes.push(
+          (ns
+            ? nsObj
+            : {
+                ...nsObj,
+                email: null,
+                location: null,
+                header: null,
+                links: null,
+              }) as ProfileAPIResponse
+        );
+      }
       return returnRes?.length
         ? respondWithCache(JSON.stringify(returnRes))
         : errorHandle({
