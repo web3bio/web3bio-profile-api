@@ -172,16 +172,16 @@ export const resolveENSResponse = async (handle: string) => {
     if (!isValidEthereumAddress(handle))
       throw new Error(ErrorMessages.invalidAddr, { cause: 404 });
 
-    address = getAddress(handle);
+    address = getAddress(handle).toLowerCase();
     ensDomain = await resolveNameFromAddress(handle);
     if (!ensDomain) {
       return {
         address,
         earlyReturnJSON: {
-          address: address.toLowerCase(),
-          identity: address.toLowerCase(),
+          address: address,
+          identity: address,
           platform: PlatformType.ethereum,
-          displayName: formatText(address.toLowerCase()),
+          displayName: formatText(address),
           avatar: null,
           email: null,
           description: null,
