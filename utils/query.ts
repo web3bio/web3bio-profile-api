@@ -57,6 +57,7 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
+  console.log("domain", data.data);
   if (data?.data?.domain?.reverse) {
     return supportedPlatforms.map((x) => ({
       identity: data?.data?.domain?.resolved?.identity || handle,
@@ -74,6 +75,7 @@ export const primaryDomainResolvedRequestArray = (
 export const primaryIdentityResolvedRequestArray = (
   data: RelationServiceIdentityQueryResponse
 ) => {
+  console.log("identity", data.data);
   if (
     [PlatformType.farcaster, PlatformType.nextid].includes(
       data?.data?.identity?.platform as PlatformType

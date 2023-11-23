@@ -128,7 +128,7 @@ const resolveUniversalRespondFromRelation = async ({
     });
   }
   const resolvedRequestArray = isDomainSearch(platform)
-    ? primaryDomainResolvedRequestArray(responseFromRelation,handle,platform)
+    ? primaryDomainResolvedRequestArray(responseFromRelation, handle, platform)
     : primaryIdentityResolvedRequestArray(responseFromRelation);
 
   return await Promise.allSettled([
@@ -145,9 +145,7 @@ const resolveUniversalRespondFromRelation = async ({
       const responsesToSort = responses
         .filter(
           (response) =>
-            response.status === "fulfilled" &&
-            response.value?.address &&
-            response.value?.identity
+            response.status === "fulfilled" && response.value?.identity
         )
         .map(
           (response) =>
