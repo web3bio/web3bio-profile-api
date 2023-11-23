@@ -173,12 +173,12 @@ const resolveUniversalRespondFromRelation = async ({
               }) as ProfileAPIResponse
         );
       }
-      return returnRes?.length
+      return returnRes?.filter((x) => !x?.error)?.length
         ? respondWithCache(JSON.stringify(returnRes))
         : errorHandle({
             identity: handle,
             code: 404,
-            message: ErrorMessages.notFound,
+            message: returnRes[0]?.error || ErrorMessages.notFound,
             platform,
           });
     })

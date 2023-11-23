@@ -57,7 +57,6 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
-  console.log("domain", data.data);
   if (data?.data?.domain?.reverse) {
     return supportedPlatforms.map((x) => ({
       identity: data?.data?.domain?.resolved?.identity || handle,
@@ -96,7 +95,7 @@ export const primaryIdentityResolvedRequestArray = (
       ...neighborArray,
     ];
   }
-  const defaultReturn = data?.data?.identity.reverseRecords.length
+  const defaultReturn = data?.data?.identity?.reverseRecords?.length
     ? [
         ...data?.data?.identity?.reverseRecords
           .filter((x) => !!x.reverse)
