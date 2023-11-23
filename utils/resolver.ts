@@ -21,7 +21,7 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
   if (platform && platform === PlatformType.youtube)
     // match youtube user handle regex
-    return handle.match(/@(.*?)(?=[/]|$)/)?.[0] || "";
+    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
   if (handle && domainRegexp.test(handle)) {
     const arr = handle.split("/");
     return (
