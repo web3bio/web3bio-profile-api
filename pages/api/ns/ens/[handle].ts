@@ -19,10 +19,10 @@ export const resolveENSHandleNS = async (handle: string) => {
     await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return {
-      address: address.toLowerCase(),
-      identity: address.toLowerCase(),
+      address: address,
+      identity: address,
       platform: PlatformType.ethereum,
-      displayName: formatText(address.toLowerCase()),
+      displayName: formatText(address),
       avatar: null,
       description: null,
     };
