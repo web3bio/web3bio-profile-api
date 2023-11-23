@@ -53,18 +53,21 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
 `;
 
 export const primaryDomainResolvedRequestArray = (
-  data: RelationServiceDomainQueryResponse
+  data: RelationServiceDomainQueryResponse,
+  handle: string,
+  platform: PlatformType
 ) => {
+  console.log(data,'relation service domain')
   if (data?.data?.domain?.reverse) {
     return supportedPlatforms.map((x) => ({
-      identity: data.data.domain.resolved.identity,
+      identity: handle,
       platform: x,
     }));
   }
   return [
     {
-      identity: data?.data?.domain?.name,
-      platform: data?.data?.domain?.system,
+      identity: handle,
+      platform: platform,
     },
   ];
 };

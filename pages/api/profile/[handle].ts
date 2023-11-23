@@ -106,22 +106,29 @@ const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  if (responseFromRelation?.error) serverError = true;
+  if (responseFromRelation?.errors) serverError = true;
+  if (serverError)
+    return errorHandle({
+      identity: handle,
+      platform,
+      message: responseFromRelation?.errors[0]?.message,
+      code: 500,
+    });
   if (isDomainSearch(platform)) {
     if (!responseFromRelation?.data?.domain) notFound = true;
   } else {
     if (!responseFromRelation?.data?.identity) notFound = true;
   }
-  if (serverError || notFound) {
+  if (notFound) {
     return errorHandle({
       identity: handle,
       platform,
-      message: notFound ? "Not Found" : responseFromRelation?.error,
-      code: notFound ? 404 : 500,
+      message: ErrorMessages.notFound,
+      code: 404,
     });
   }
   const resolvedRequestArray = isDomainSearch(platform)
-    ? primaryDomainResolvedRequestArray(responseFromRelation)
+    ? primaryDomainResolvedRequestArray(responseFromRelation,handle,platform)
     : primaryIdentityResolvedRequestArray(responseFromRelation);
 
   return await Promise.allSettled([

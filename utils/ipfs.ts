@@ -37,7 +37,6 @@ export function resolveIPFS_URL(
       )!
     );
   }
-
   // a ipfs.io host
   if (cidOrURL.startsWith(IPFS_GATEWAY_HOST) && !disableGateway) {
     // base64 data string
@@ -80,5 +79,7 @@ export function resolveIPFS_URL(
       );
   }
 
-  return cidOrURL;
+  return trimQuery(
+    `${disableGateway ? IPFS_HOST : IPFS_GATEWAY_HOST}/ipfs/${cidOrURL}`
+  );
 }
