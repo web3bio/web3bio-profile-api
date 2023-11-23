@@ -75,7 +75,6 @@ export const primaryDomainResolvedRequestArray = (
 export const primaryIdentityResolvedRequestArray = (
   data: RelationServiceIdentityQueryResponse
 ) => {
-  console.log("identity", data.data);
   if (
     [PlatformType.farcaster, PlatformType.nextid].includes(
       data?.data?.identity?.platform as PlatformType
@@ -97,23 +96,30 @@ export const primaryIdentityResolvedRequestArray = (
       ...neighborArray,
     ];
   }
-  return (
-    [
-      ...data?.data?.identity?.reverseRecords
-        .filter((x) => !!x.reverse)
-        .map((x) => ({
-          identity: x.name,
-          platform: x.system,
-        })),
-      {
-        identity: data?.data?.identity?.identity,
-        platform: PlatformType.farcaster,
-      },
-    ] || [
-      {
-        identity: data?.data?.identity?.identity,
-        platform: data?.data?.identity?.platform,
-      },
-    ]
-  );
+  const defaultReturn = data?.data?.identity.reverseRecords.length
+    ? [
+        ...data?.data?.identity?.reverseRecords
+          .filter((x) => !!x.reverse)
+          .map((x) => ({
+            identity: x.name,
+            platform: x.system,
+          })),
+      ]
+    : [
+        {
+          identity: data?.data?.identity?.identity,
+          platform: data?.data?.identity?.platform.replace(
+            PlatformType.ethereum,
+            PlatformType.ens
+          ),
+        },
+      ];
+
+  return [
+    ...defaultReturn,
+    {
+      identity: data?.data?.identity?.identity,
+      platform: PlatformType.farcaster,
+    },
+  ];
 };
