@@ -57,10 +57,9 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
-  console.log(data,'relation service domain')
   if (data?.data?.domain?.reverse) {
     return supportedPlatforms.map((x) => ({
-      identity: handle,
+      identity: data?.data?.domain?.resolved?.identity || handle,
       platform: x,
     }));
   }
