@@ -178,10 +178,10 @@ export const resolveENSResponse = async (handle: string) => {
       return {
         address,
         earlyReturnJSON: {
-          address: address,
-          identity: address,
+          address: address.toLowerCase(),
+          identity: address.toLowerCase(),
           platform: PlatformType.ethereum,
-          displayName: formatText(address),
+          displayName: formatText(address.toLowerCase()),
           avatar: null,
           email: null,
           description: null,

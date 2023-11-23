@@ -141,10 +141,10 @@ const resolveUniversalRespondFromRelation = async ({
       const returnRes = sortByPlatform(responsesToSort, platform, handle);
       if (!returnRes?.length && platform === PlatformType.ethereum) {
         const nsObj = {
-          address: handle,
-          identity: handle,
+          address: handle.toLowerCase(),
+          identity: handle.toLowerCase(),
           platform: PlatformType.ethereum,
-          displayName: formatText(handle),
+          displayName: formatText(handle.toLowerCase()),
           avatar: null,
           description: null,
         };
