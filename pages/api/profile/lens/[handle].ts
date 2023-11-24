@@ -24,26 +24,26 @@ export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
 };
-const LensGraphQLEndpoint = "https://api.lens.dev/";
+const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
 
 export const getLensProfile = async (handle: string, type: LensParamType) => {
   const query = getLensProfileQuery(type);
-
+  const variables = isAddress(handle)
+    ? { request: { for: handle } }
+    : { request: { forHandle: "lens/" + handle.replace(".lens", "") } };
   try {
     const payload = {
       query,
-      variables: {
-        handle,
-      },
+      variables,
     };
     const fetchRes = await fetch(LensGraphQLEndpoint, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
         "Content-Type": "application/json",
+        "user-agent": "spectaql",
       },
     }).then((res) => res.json());
-
     if (fetchRes)
       return fetchRes.data?.[
         type === LensParamType.address ? "defaultProfile" : "profile"
@@ -57,23 +57,23 @@ export const resolveETHFromLens = async (lens: string) => {
   return response.ownedBy;
 };
 
-export const resolveLensResponse = async (handle:string)=>{
+export const resolveLensResponse = async (handle: string) => {
   let response;
   if (isAddress(handle)) {
     response = await getLensProfile(handle, LensParamType.address);
   } else {
     response = await getLensProfile(handle, LensParamType.domain);
   }
-  return response
-}
+  return response;
+};
 export const resolveLensHandle = async (handle: string) => {
-  const response = await resolveLensResponse(handle)
+  const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
-  const pureHandle = response.handle.replaceAll(".lens", "");
+  const pureHandle = response.handle.localName;
   let LINKRES = {};
-  if (response.attributes) {
-    const linksRecords = response.attributes;
+  if (response.metadata.attributes) {
+    const linksRecords = response.metadata.attributes;
     const linksToFetch = linksRecords.reduce(
       (pre: Array<any>, cur: { key: string }) => {
         if (Object.keys(PlatformData).includes(cur.key)) pre.push(cur.key);
@@ -81,7 +81,6 @@ export const resolveLensHandle = async (handle: string) => {
       },
       []
     );
-
     const getLink = async () => {
       const _linkRes: Partial<Record<string, LinksItem>> = {};
       for (let i = 0; i < linksToFetch.length; i++) {
@@ -113,20 +112,26 @@ export const resolveLensHandle = async (handle: string) => {
   }
 
   const avatarUri =
-    response.picture?.original?.url || response.picture?.uri || null;
+    response.metadata.picture.raw.uri ||
+    response.metadata.picture.optimized.uri ||
+    null;
   const coverPictureUri =
-    response.coverPicture?.original?.url || response.coverPicture?.uri || null;
+    response.metadata.coverPicture?.raw?.url ||
+    response.metadata.coverPicture?.optimized.uri ||
+    null;
   const resJSON = {
-    address: response.ownedBy?.toLowerCase(),
-    identity: response.handle,
+    address: response.ownedBy?.address?.toLowerCase(),
+    identity: response.handle.localName + ".lens",
     platform: PlatformType.lens,
-    displayName: response.name || response.handle,
+    displayName:
+      response.metadata.displayName || response.handle.localName + ".lens",
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
     email: null,
-    description: response.bio || null,
+    description: response.metadata.bio || null,
     location:
-      response.attributes?.find((o: { key: string }) => o.key === "location")
-        ?.value || null,
+      response.metadata.attributes?.find(
+        (o: { key: string }) => o.key === "location"
+      )?.value || null,
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
     links: LINKRES,
   };
