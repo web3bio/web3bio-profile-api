@@ -116,8 +116,8 @@ export const resolveLensHandle = async (handle: string) => {
     response.metadata.picture.optimized.uri ||
     null;
   const coverPictureUri =
-    response.metadata.coverPicture?.raw?.url ||
-    response.metadata.coverPicture?.optimized.uri ||
+    response.metadata.coverPicture?.optimized?.url ||
+    response.metadata.coverPicture?.raw.uri ||
     null;
   const resJSON = {
     address: response.ownedBy?.address?.toLowerCase(),
