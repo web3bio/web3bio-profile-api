@@ -130,7 +130,7 @@ const resolveUniversalRespondFromRelation = async ({
   const resolvedRequestArray = isDomainSearch(platform)
     ? primaryDomainResolvedRequestArray(responseFromRelation, handle, platform)
     : primaryIdentityResolvedRequestArray(responseFromRelation);
-
+    
   return await Promise.allSettled([
     ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
       const fetchURL = `${req.nextUrl.origin}/${

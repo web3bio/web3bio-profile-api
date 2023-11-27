@@ -20,7 +20,7 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			platform
 			displayName
       uuid
-      neighbor(depth: 5) {
+      neighbor(depth: 2) {
         sources # Which upstreams provide these connection infos.
         reverse
         identity {
@@ -50,10 +50,10 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
       name
       reverse
     }
-    neighbor(depth: 5) {
+    neighbor(depth: 1) {
       sources # Which upstreams provide these connection infos.
+      reverse
       identity {
-        reverse
         uuid
         platform
         identity
@@ -69,69 +69,60 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
-  const resolved = data?.data?.domain?.resolved.neighbor
-    .filter((x) => x.reverse || x.identity.platform === PlatformType.farcaster)
-    .map((x) => ({
-      identity: x.identity.identity,
-      platform: x.identity.platform,
-    }));
-  return [
-    ...resolved,
-    {
-      identity: handle,
-      platform: platform,
-    },
-  ];
+  const defaultReturn = {
+    identity: handle,
+    platform: platform,
+  };
+  if (data.data.domain.reverse) {
+    const resolved = data?.data?.domain?.resolved?.neighbor
+      .filter(
+        (x) => x.reverse || x.identity.platform === PlatformType.farcaster
+      )
+      .map((x) => ({
+        identity: x.identity.identity,
+        platform: x.identity.platform,
+      }));
+    return [...(resolved || []), defaultReturn];
+  }
+  return [defaultReturn];
 };
 
 export const primaryIdentityResolvedRequestArray = (
   data: RelationServiceIdentityQueryResponse
 ) => {
-  if (
-    [PlatformType.farcaster, PlatformType.nextid].includes(
-      data?.data?.identity?.platform as PlatformType
-    )
-  ) {
-    const neighborArray =
-      data?.data?.identity?.neighbor.map((x) => ({
-        identity: x.identity.identity,
-        platform:
-          x.identity.platform === PlatformType.ethereum
-            ? PlatformType.ens
-            : x.identity.platform,
-      })) || [];
-    return [
-      {
-        identity: data?.data?.identity?.identity,
-        platform: data?.data?.identity?.platform,
-      },
-      ...neighborArray,
-    ];
-  }
-  const defaultReturn = data?.data?.identity?.reverseRecords?.length
-    ? [
-        ...data?.data?.identity?.reverseRecords
-          .filter((x) => !!x.reverse)
-          .map((x) => ({
-            identity: x.name,
-            platform: x.system,
-          })),
-      ]
-    : [
-        {
-          identity: data?.data?.identity?.identity,
-          platform: data?.data?.identity?.platform.replace(
-            PlatformType.ethereum,
-            PlatformType.ens
-          ),
-        },
-      ];
-
-  return [
-    ...defaultReturn,
-    {
+  if (data.data.identity.platform === PlatformType.ethereum) {
+    const defaultReturn = {
+      identity: data.data.identity.identity,
+      platform: PlatformType.ens,
+    };
+    const reverseFromNeighbor = data.data.identity.neighbor
+      .filter(
+        (x) => x.reverse || x.identity.platform === PlatformType.farcaster
+      )
+      .map((x) => ({
+        identity: data.data.identity.identity,
+        platform: x.identity.platform,
+      }));
+    return [...reverseFromNeighbor, defaultReturn];
+  } else {
+    const defaultReturn = {
       identity: data?.data?.identity?.identity,
-      platform: PlatformType.farcaster,
-    },
-  ];
+      platform: data?.data?.identity?.platform,
+    };
+    const reverseFromNeighbor = data?.data?.identity?.neighbor
+      .filter(
+        (x) =>
+          x.reverse ||
+          (x.identity.platform === PlatformType.ethereum &&
+            x.identity.displayName)
+      )
+      .map((x) => ({
+        identity: x.identity.identity,
+        platform: x.identity.platform.replace(
+          PlatformType.ethereum,
+          PlatformType.ens
+        ),
+      }));
+    return [...reverseFromNeighbor, defaultReturn];
+  }
 };
