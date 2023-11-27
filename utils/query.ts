@@ -44,13 +44,7 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     identity
     displayName
     uuid
-    reverseRecords{
-      source
-      system
-      name
-      reverse
-    }
-    neighbor(depth: 1) {
+    neighbor(depth:2) {
       sources # Which upstreams provide these connection infos.
       reverse
       identity {
@@ -82,7 +76,16 @@ export const primaryDomainResolvedRequestArray = (
         identity: x.identity.identity,
         platform: x.identity.platform,
       }));
-    return [...(resolved || []), defaultReturn];
+    return [
+      ...(resolved || []),
+      {
+        identity: data.data.domain.resolved.identity,
+        platform: data.data.domain.resolved.platform.replace(
+          PlatformType.ethereum,
+          PlatformType.ens
+        ),
+      },
+    ];
   }
   return [defaultReturn];
 };

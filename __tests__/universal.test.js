@@ -13,18 +13,9 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient(
       "/profile/0x02731b4bd27eb1234049ecb082c4dc1f3640bb93d8d9736c898c69ad385dc66a7e"
     );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
+    expect(res.status).toBe(404);
   });
-  it("It should response 200 data for 0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6", async () => {
-    const res = await queryClient(
-      "/profile/0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6"
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
-  });
+
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/sujiyan.eth");
     expect(res.status).toBe(200);
