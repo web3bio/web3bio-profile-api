@@ -13,6 +13,7 @@ export interface NeighborDetail {
 }
 export interface Neighbor {
   source: string[];
+  reverse: boolean | null;
   identity: NeighborDetail;
 }
 
@@ -48,6 +49,7 @@ export interface RelationServiceDomainQueryResponse {
         displayName: string;
         uuid: string;
         platform: string;
+        neighbor: Neighbor[]
       };
     };
   };

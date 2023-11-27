@@ -20,7 +20,18 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			platform
 			displayName
       uuid
+      neighbor(depth: 5) {
+        sources # Which upstreams provide these connection infos.
+        reverse
+        identity {
+          uuid
+          platform
+          identity
+          displayName
+        }
+      }
 		}
+
 	}
 }
 `;
@@ -42,6 +53,7 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     neighbor(depth: 5) {
       sources # Which upstreams provide these connection infos.
       identity {
+        reverse
         uuid
         platform
         identity
@@ -57,13 +69,14 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
-  if (data?.data?.domain?.reverse) {
-    return supportedPlatforms.map((x) => ({
-      identity: data?.data?.domain?.resolved?.identity || handle,
-      platform: x,
+  const resolved = data?.data?.domain?.resolved.neighbor
+    .filter((x) => x.reverse || x.identity.platform === PlatformType.farcaster)
+    .map((x) => ({
+      identity: x.identity.identity,
+      platform: x.identity.platform,
     }));
-  }
   return [
+    ...resolved,
     {
       identity: handle,
       platform: platform,
