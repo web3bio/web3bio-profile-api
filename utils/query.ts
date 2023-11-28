@@ -1,4 +1,4 @@
-import { PlatformType, supportedPlatforms } from "./platform";
+import { PlatformType } from "./platform";
 import {
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
@@ -31,11 +31,9 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
         }
       }
 		}
-
 	}
 }
 `;
-``;
 
 export const GET_PROFILES_QUERY = `
 query GET_PROFILES_QUERY($platform: String, $identity: String) {
@@ -67,7 +65,10 @@ export const primaryDomainResolvedRequestArray = (
     identity: handle,
     platform: platform,
   };
-  if (data.data.domain.reverse) {
+  if (
+    data.data.domain.reverse ||
+    data.data.domain.system === PlatformType.lens
+  ) {
     const resolved = data?.data?.domain?.resolved?.neighbor
       .filter(
         (x) =>
@@ -111,7 +112,7 @@ export const primaryIdentityResolvedRequestArray = (
           )
       )
       .map((x) => ({
-        identity: data.data.identity.identity,
+        identity: x.identity.identity,
         platform: x.identity.platform,
       }));
     return [...reverseFromNeighbor, defaultReturn];
