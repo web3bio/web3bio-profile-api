@@ -20,7 +20,7 @@ query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
 			platform
 			displayName
       uuid
-      neighbor(depth: 2) {
+      neighbor(depth:3) {
         sources # Which upstreams provide these connection infos.
         reverse
         identity {
@@ -42,7 +42,7 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     identity
     displayName
     uuid
-    neighbor(depth:2) {
+    neighbor(depth:3) {
       sources # Which upstreams provide these connection infos.
       reverse
       identity {
@@ -75,11 +75,16 @@ export const primaryDomainResolvedRequestArray = (
           x.reverse ||
           [PlatformType.farcaster, PlatformType.lens].includes(
             x.identity.platform
-          )
+          ) ||
+          (x.identity.platform === PlatformType.ethereum &&
+            x.identity.displayName)
       )
       .map((x) => ({
         identity: x.identity.identity,
-        platform: x.identity.platform,
+        platform: x.identity.platform.replace(
+          PlatformType.ethereum,
+          PlatformType.ens
+        ),
       }));
     return [
       ...(resolved || []),
