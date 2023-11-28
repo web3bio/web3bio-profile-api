@@ -76,6 +76,7 @@ export const primaryDomainResolvedRequestArray = (
           [PlatformType.farcaster, PlatformType.lens].includes(
             x.identity.platform
           ) ||
+          // todo: kill this when ethereum reverse is done
           (x.identity.platform === PlatformType.ethereum &&
             x.identity.displayName)
       )
