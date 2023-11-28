@@ -132,7 +132,7 @@ export const primaryIdentityResolvedRequestArray = (
         (x) =>
           x.reverse ||
           x.identity.platform === PlatformType.lens ||
-          (x.identity.platform === PlatformType.ens && x.identity.displayName)
+          (x.identity.platform === PlatformType.ethereum && x.identity.displayName)
       )
       .map((x) => ({
         identity: x.identity.identity,
