@@ -79,7 +79,7 @@ export const resolveUDHandle = async (handle: string) => {
     LINKRES[PlatformType.url] = {
       handle: domain,
       link:
-        resolveIPFS_URL(metadata.records?.["ipfs.html.value"], true) || null,
+        resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
   }
   if (metadata.socialAccounts) {
