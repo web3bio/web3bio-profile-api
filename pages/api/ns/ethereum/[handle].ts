@@ -10,7 +10,7 @@ export default async function handler(req: NextApiRequest) {
   if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
       identity: lowercaseName,
-      platform: PlatformType.ens,
+      platform: PlatformType.ethereum,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });

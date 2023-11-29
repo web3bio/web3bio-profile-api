@@ -98,7 +98,7 @@ export const primaryIdentityResolvedRequestArray = (
   if (data.data.identity.platform === PlatformType.ethereum) {
     const defaultReturn = {
       identity: data.data.identity.identity,
-      platform: PlatformType.ens,
+      platform: PlatformType.ethereum,
     };
     const reverseFromNeighbor = data.data.identity.neighbor
       .filter(
