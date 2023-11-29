@@ -130,8 +130,6 @@ const resolveUniversalRespondFromRelation = async ({
   const resolvedRequestArray = isDomainSearch(platform)
     ? primaryDomainResolvedRequestArray(responseFromRelation, handle, platform)
     : primaryIdentityResolvedRequestArray(responseFromRelation);
-    // todo: delete this debug
-    console.log(resolvedRequestArray,'request length', resolvedRequestArray.length)
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,
