@@ -48,7 +48,7 @@ export const resolveENSHandleNS = async (handle: string) => {
   return resJSON;
 };
 
-const resolveENSRespondNS = async (handle: string) => {
+export const resolveENSRespondNS = async (handle: string) => {
   try {
     const json = await resolveENSHandleNS(handle);
     return respondWithCache(JSON.stringify(json));

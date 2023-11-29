@@ -326,7 +326,7 @@ export const getENSProfile = async (name: string) => {
   }
 };
 
-const resolveENSRespond = async (handle: string) => {
+export const resolveENSRespond = async (handle: string) => {
   try {
     const json = await resolveENSHandle(handle);
     return respondWithCache(JSON.stringify(json));

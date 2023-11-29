@@ -75,26 +75,17 @@ export const primaryDomainResolvedRequestArray = (
           x.reverse ||
           [PlatformType.farcaster, PlatformType.lens].includes(
             x.identity.platform
-          ) ||
-          // todo: kill this when ethereum reverse is done
-          (x.identity.platform === PlatformType.ethereum &&
-            x.identity.displayName)
+          )
       )
       .map((x) => ({
         identity: x.identity.identity,
-        platform: x.identity.platform.replace(
-          PlatformType.ethereum,
-          PlatformType.ens
-        ),
+        platform: x.identity.platform,
       }));
     return [
       ...(resolved || []),
       {
         identity: data.data.domain.resolved.identity,
-        platform: data.data.domain.resolved.platform.replace(
-          PlatformType.ethereum,
-          PlatformType.ens
-        ),
+        platform: data.data.domain.resolved.platform,
       },
     ];
   }
@@ -132,14 +123,12 @@ export const primaryIdentityResolvedRequestArray = (
         (x) =>
           x.reverse ||
           x.identity.platform === PlatformType.lens ||
-          (x.identity.platform === PlatformType.ethereum && x.identity.displayName)
+          (x.identity.platform === PlatformType.ethereum &&
+            x.identity.displayName)
       )
       .map((x) => ({
         identity: x.identity.identity,
-        platform: x.identity.platform.replace(
-          PlatformType.ethereum,
-          PlatformType.ens
-        ),
+        platform: x.identity.platform,
       }));
     return [...reverseFromNeighbor, defaultReturn];
   }
