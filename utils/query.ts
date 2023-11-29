@@ -122,7 +122,9 @@ export const primaryIdentityResolvedRequestArray = (
       .filter(
         (x) =>
           x.reverse ||
-          x.identity.platform === PlatformType.lens ||
+          [PlatformType.farcaster, PlatformType.lens].includes(
+            x.identity.platform
+          ) ||
           (x.identity.platform === PlatformType.ethereum &&
             x.identity.displayName)
       )
