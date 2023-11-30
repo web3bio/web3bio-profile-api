@@ -31,7 +31,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/mcdonalds.eth");
     expect(res.status).toBe(404);
     const json = await res.json();
-    expect(json.error).toBe("Invalid Resolver Address");
+    expect(json.error).toBe("Not Found");
   });
   it("It should response 200 data for stani.lens", async () => {
     const res = await queryClient("/profile/stani.lens");
