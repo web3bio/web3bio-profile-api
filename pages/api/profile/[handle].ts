@@ -151,7 +151,9 @@ const resolveUniversalRespondFromRelation = async ({
       const responsesToSort = responses
         .filter(
           (response) =>
-            response.status === "fulfilled" && response.value?.identity
+            response.status === "fulfilled" &&
+            response.value?.identity &&
+            !response.value?.error
         )
         .map(
           (response) =>
