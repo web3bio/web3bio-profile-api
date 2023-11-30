@@ -85,12 +85,15 @@ const resolveFarcasterLinks = (
   return LINKRES;
 };
 
-export const resolveFarcasterResponse = async(handle:string)=>{
+export const resolveFarcasterResponse = async (handle: string) => {
   let response;
   if (isAddress(handle)) {
+    const user = (await fetchWarpcastWithAddress(handle))?.result?.user;
+    const firstAddress = (await fetchAddressesFromWarpcastWithFid(user?.fid))
+      ?.result?.verifications?.[0]?.address;
     response = {
-      address: handle.toLowerCase(),
-      ...(await fetchWarpcastWithAddress(handle))?.result?.user,
+      address: firstAddress || handle.toLowerCase(),
+      ...user,
     };
     if (!response?.username)
       throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -103,17 +106,16 @@ export const resolveFarcasterResponse = async(handle:string)=>{
       ?.result?.verifications?.[0]?.address;
     response = {
       address:
-        firstAddress?.toLowerCase() || (regexEns.test(handle)
-          ? await resolveENSHandleAddress(handle)
-          : null),
+        firstAddress?.toLowerCase() ||
+        (regexEns.test(handle) ? await resolveENSHandleAddress(handle) : null),
       ...rawUser,
     };
   }
-  return response
-}
+  return response;
+};
 
 export const resolveFarcasterHandle = async (handle: string) => {
-  const response = await resolveFarcasterResponse(handle)
+  const response = await resolveFarcasterResponse(handle);
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);

@@ -43,7 +43,10 @@ export const getLensProfile = async (handle: string, type: LensParamType) => {
         "Content-Type": "application/json",
       },
     }).then((res) => res.json());
-
+    if (fetchRes.error)
+      return {
+        error: fetchRes.error,
+      };
     if (fetchRes)
       return fetchRes.data?.[
         type === LensParamType.address ? "defaultProfile" : "profile"
@@ -57,19 +60,19 @@ export const resolveETHFromLens = async (lens: string) => {
   return response.ownedBy;
 };
 
-export const resolveLensResponse = async (handle:string)=>{
+export const resolveLensResponse = async (handle: string) => {
   let response;
   if (isAddress(handle)) {
     response = await getLensProfile(handle, LensParamType.address);
   } else {
     response = await getLensProfile(handle, LensParamType.domain);
   }
-  return response
-}
+  return response;
+};
 export const resolveLensHandle = async (handle: string) => {
-  const response = await resolveLensResponse(handle)
+  const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
-
+  if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.replaceAll(".lens", "");
   let LINKRES = {};
   if (response.attributes) {
