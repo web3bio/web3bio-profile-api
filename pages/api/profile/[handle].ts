@@ -14,6 +14,7 @@ import {
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
 import { isValidEthereumAddress } from "./ens/[handle]";
+import _ from "lodash";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -127,9 +128,16 @@ const resolveUniversalRespondFromRelation = async ({
       code: 404,
     });
   }
-  const resolvedRequestArray = isDomainSearch(platform)
-    ? primaryDomainResolvedRequestArray(responseFromRelation, handle, platform)
-    : primaryIdentityResolvedRequestArray(responseFromRelation);
+  const resolvedRequestArray = _.sortBy(
+    isDomainSearch(platform)
+      ? primaryDomainResolvedRequestArray(
+          responseFromRelation,
+          handle,
+          platform
+        )
+      : primaryIdentityResolvedRequestArray(responseFromRelation),
+    [(x) => !x.reverse]
+  );
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,
