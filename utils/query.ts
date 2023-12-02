@@ -1,3 +1,4 @@
+import _ from "lodash";
 import { PlatformType } from "./platform";
 import {
   RelationServiceDomainQueryResponse,
@@ -64,6 +65,7 @@ export const primaryDomainResolvedRequestArray = (
   const defaultReturn = {
     identity: handle,
     platform: platform,
+    reverse: data.data.domain.reverse
   };
   if (
     data.data.domain.reverse ||
@@ -80,12 +82,14 @@ export const primaryDomainResolvedRequestArray = (
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
+        reverse: x.reverse,
       }));
     return [
       ...(resolved || []),
       {
         identity: data.data.domain.resolved.identity,
         platform: data.data.domain.resolved.platform,
+        reverse: null,
       },
     ];
   }
@@ -99,24 +103,26 @@ export const primaryIdentityResolvedRequestArray = (
     const defaultReturn = {
       identity: data.data.identity.identity,
       platform: PlatformType.ethereum,
+      reverse: null,
     };
-    const reverseFromNeighbor = data.data.identity.neighbor
-      .filter(
+    const reverseFromNeighbor =
+      data.data.identity.neighbor.filter(
         (x) =>
           x.reverse ||
           [PlatformType.farcaster, PlatformType.lens].includes(
             x.identity.platform
           )
-      )
-      .map((x) => ({
-        identity: x.identity.identity,
-        platform: x.identity.platform,
-      }));
+    ).map((x) => ({
+      identity: x.identity.identity,
+      platform: x.identity.platform,
+      reverse: x.reverse,
+    }));
     return [...reverseFromNeighbor, defaultReturn];
   } else {
     const defaultReturn = {
       identity: data?.data?.identity?.identity,
       platform: data?.data?.identity?.platform,
+      reverse: null,
     };
     const reverseFromNeighbor = data?.data?.identity?.neighbor
       .filter(
@@ -131,6 +137,7 @@ export const primaryIdentityResolvedRequestArray = (
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
+        reverse: x.reverse,
       }));
     return [...reverseFromNeighbor, defaultReturn];
   }
