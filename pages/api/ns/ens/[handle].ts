@@ -1,4 +1,9 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
@@ -10,10 +15,18 @@ import {
 } from "../../profile/ens/[handle]";
 
 export const resolveENSHandleNS = async (handle: string) => {
-  const { address, ensDomain, resolverAddress } = await resolveENSResponse(
-    handle
-  );
-
+  const { address, ensDomain, resolverAddress, earlyReturnJSON } =
+    await resolveENSResponse(handle);
+  if (earlyReturnJSON) {
+    return {
+      address: address,
+      identity: address,
+      platform: PlatformType.ethereum,
+      displayName: formatText(address),
+      avatar: null,
+      description: null,
+    };
+  }
   if (!isValidEthereumAddress(resolverAddress))
     throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
 
@@ -35,7 +48,7 @@ export const resolveENSHandleNS = async (handle: string) => {
   return resJSON;
 };
 
-const resolveENSRespondNS = async (handle: string) => {
+export const resolveENSRespondNS = async (handle: string) => {
   try {
     const json = await resolveENSHandleNS(handle);
     return respondWithCache(JSON.stringify(json));

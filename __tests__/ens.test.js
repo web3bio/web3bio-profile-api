@@ -56,9 +56,9 @@ describe("Test For ENS Profile API", () => {
     const res = await queryClient(
       "/profile/ens/0xcee81f7dd39d817f699a5c9eb93e3e6520f5b996"
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json.identity).toBe("0xcee81f7dd39d817f699a5c9eb93e3e6520f5b996");
   });
   it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(

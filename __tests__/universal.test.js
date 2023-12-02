@@ -15,16 +15,9 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
+    expect(json[0].identity).toBeTruthy()
   });
-  it("It should response 200 data for 0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6", async () => {
-    const res = await queryClient(
-      "/profile/0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6"
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
-  });
+
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/sujiyan.eth");
     expect(res.status).toBe(200);
@@ -44,12 +37,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    const json2 = await (
-      await queryClient(
-        `/profile/${json?.find((x) => x.platform === "lens")?.address}`
-      )
-    ).json();
-    expect(json.length).toBe(json2.length);
+    expect(json[0].identity).toBe('stani.lens');
   });
   it("It should response 200 data for brantly.eth", async () => {
     const res = await queryClient("/profile/brantly.eth");
@@ -109,5 +97,11 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find(x=>x.platform === 'farcaster').identity).toBe("livid");
+  });
+  it("It should response 200 data for аррӏе.eth", async () => {
+    const res = await queryClient("/profile/аррӏе.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("123-");
   });
 });

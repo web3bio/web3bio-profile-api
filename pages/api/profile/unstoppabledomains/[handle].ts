@@ -79,14 +79,14 @@ export const resolveUDHandle = async (handle: string) => {
     LINKRES[PlatformType.url] = {
       handle: domain,
       link:
-        resolveIPFS_URL(metadata.records?.["ipfs.html.value"], true) || null,
+        resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
   }
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
       if (item) {
-        const resolvedHandle = resolveHandle(item?.location);
+        const resolvedHandle = resolveHandle(item?.location, x);
         LINKRES[x] = {
           handle: resolvedHandle,
           link: getSocialMediaLink(resolvedHandle, x),

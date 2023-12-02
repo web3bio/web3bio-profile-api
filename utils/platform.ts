@@ -392,3 +392,12 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     urlPrefix: "https://firefly.land/",
   },
 };
+
+
+export const supportedPlatforms = [
+  PlatformType.ens,
+  PlatformType.lens,
+  PlatformType.farcaster,
+  PlatformType.dotbit,
+  PlatformType.unstoppableDomains,
+];
