@@ -5,7 +5,7 @@ import Script from "next/script";
 export default function Home() {
   const endpointItem = {
       alignItems: "center",
-      flexWrap: "wrap",
+      FlexWrap: "wrap",
       border: "1px solid #ececec",
       textDecoration: "none",
     },
