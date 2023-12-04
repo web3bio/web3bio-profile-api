@@ -85,7 +85,7 @@ export const resolveUDHandle = async (handle: string) => {
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
-      if (item) {
+      if (item && item.location) {
         const resolvedHandle = resolveHandle(item?.location, x);
         LINKRES[x] = {
           handle: resolvedHandle,
