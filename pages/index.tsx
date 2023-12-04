@@ -5,6 +5,7 @@ import Script from "next/script";
 export default function Home() {
   const endpointItem = {
       alignItems: "center",
+      flexWrap: "wrap",
       border: "1px solid #ececec",
       textDecoration: "none",
     },
@@ -13,7 +14,7 @@ export default function Home() {
       display: "flex",
     },
     endpointRight = {
-      marginLeft: "auto",
+      marginRight: "auto",
     };
 
   return (
@@ -488,17 +489,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
+                <div className="label text-small">
                   Retrieve universal profiles across platforms
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
                 </div>
               </div>
             </a>
@@ -510,17 +507,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/ens/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
+                <div className="label text-small">
                   Retrieve an ENS profile
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
                 </div>
               </div>
             </a>
@@ -532,17 +525,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/lens/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-">
+                <div className="label text-small">
                   Retrieve a Lens profile
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
                 </div>
               </div>
             </a>
@@ -554,17 +543,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-">
+                <div className="label text-small">
                   Retrieve a Farcaster profile
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
                 </div>
               </div>
             </a>
@@ -577,17 +562,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-">
+                <div className="label text-small">
                   Retrieve a .bit profile
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
                 </div>
               </div>
             </a>
@@ -599,17 +580,13 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/unstoppabledomains/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-">
-                  Retrieve a unstoppabledomains profile
-                  <div
-                    className="icon icon-arrow-down ml-2"
-                    style={{ fontSize: ".75rem" }}
-                  ></div>
+                <div className="label text-small">
+                  Retrieve an Unstoppable Domains profile
                 </div>
               </div>
             </a>
@@ -631,7 +608,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/{"{"}identity{"}"}
                 </div>
               </div>
@@ -641,8 +618,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 - An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), a .bit domain, or a Next.ID
-                address.
+                username (ends with .farcaster), a .bit domain, a Next.ID address, or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">Examples</h3>
@@ -684,12 +660,21 @@ export default function Home() {
                 </a>
               </li>
               <li>
+                <span className="label">Unstoppable Domains</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/sandy.nft"
+                  target="_blank"
+                >
+                  /profile/sandy.nft
+                </a>
+              </li>
+              <li>
                 <span className="label">Next.ID</span>{" "}
                 <a
                   href="https://api.web3.bio/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50"
                   target="_blank"
                 >
-                  /profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50
+                  /profile/0x028f......3e50
                 </a>
               </li>
               <li>
@@ -781,7 +766,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/ens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -862,7 +847,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/lens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -941,7 +926,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1021,7 +1006,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1101,9 +1086,9 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
-              UnstoppableDomains Profile API
+              Unstoppable Domains Profile API
             </h2>
-            <p>Retrieve a UnstoppableDomains profile</p>
+            <p>Retrieve an Unstoppable Domains profile</p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1111,7 +1096,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/unstoppabledomains/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1253,13 +1238,23 @@ export default function Home() {
               .
             </p>
             <h3 className="text-bold h6 mt-4">
-              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span>{" "}
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
+              November Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added Unstoppable Domains query
+                support to the Profile APIs.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
               October Update
             </h3>
             <ul>
               <li>
-                <span className="label">Change</span> Deprecated{" "}
-                <code>addresses</code> field for faster API queries.
+                <span className="label label-primary">Change</span> Deprecated{" "}
+                <code>addresses</code> field for faster ENS API queries.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1268,11 +1263,11 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label">Feature</span> Added .bit query support
+                <span className="label label-primary">Feature</span> Added .bit query support
                 to the Profile APIs.
               </li>
               <li>
-                <span className="label">Update</span> Added ENS username support
+                <span className="label label-primary">Update</span> Added ENS username support
                 in the Farcaster Profile API.
               </li>
             </ul>
@@ -1282,7 +1277,7 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label">Feature</span> Added Next.ID query
+                <span className="label label-primary">Feature</span> Added Next.ID query
                 support to the Profile APIs.
               </li>
             </ul>
@@ -1292,7 +1287,7 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label">Feature</span> Added Universal Profile
+                <span className="label label-primary">Feature</span> Added Universal Profile
                 API. Developers can retrieve universal profiles across supported
                 platforms with a single query.
               </li>
@@ -1303,7 +1298,7 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label">Feature</span> Added Ethereum Name
+                <span className="label label-primary">Feature</span> Added Ethereum Name
                 Service (ENS), Lens, and Farcaster support to the Profile APIs.
               </li>
             </ul>
