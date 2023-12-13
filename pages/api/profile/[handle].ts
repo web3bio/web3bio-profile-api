@@ -168,11 +168,12 @@ const resolveUniversalRespondFromRelation = async ({
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       const returnRes = sortByPlatform(responsesToSort, platform, handle);
+
       if (
         platform === PlatformType.ethereum &&
-        !returnRes.some((x) => x?.identity === handle)
+        !returnRes.some((x) => x?.address === handle)
       ) {
-        returnRes.unshift(responsesToSort.find((x) => x?.identity === handle));
+        returnRes.unshift(responsesToSort.find((x) => x?.address === handle));
       }
       if (!returnRes?.length && platform === PlatformType.ethereum) {
         const nsObj = {
