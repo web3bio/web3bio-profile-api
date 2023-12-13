@@ -57,8 +57,8 @@ const sortByPlatform = (
 ) => {
   const defaultOrder = [
     PlatformType.ens,
-    PlatformType.lens,
     PlatformType.farcaster,
+    PlatformType.lens,
     PlatformType.dotbit,
     PlatformType.unstoppableDomains,
   ];
@@ -168,6 +168,12 @@ const resolveUniversalRespondFromRelation = async ({
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
       const returnRes = sortByPlatform(responsesToSort, platform, handle);
+      if (
+        platform === PlatformType.ethereum &&
+        !returnRes.some((x) => x?.identity === handle)
+      ) {
+        returnRes.unshift(responsesToSort.find((x) => x?.identity === handle));
+      }
       if (!returnRes?.length && platform === PlatformType.ethereum) {
         const nsObj = {
           address: handle,
