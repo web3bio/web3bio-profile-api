@@ -15,7 +15,47 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBeTruthy()
+    expect(json[0].identity).toBeTruthy();
+  });
+  it("It should response 200 data for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
+    const res = await queryClient(
+      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
+  });
+  it("It should response 200 data for lilgho.lens", async () => {
+    const res = await queryClient("/profile/lilgho.lens");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("lilgho.lens");
+    expect(json.length).toBe(3);
+  });
+  it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
+    const res = await queryClient(
+      "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("stani.lens");
+    expect(json.length).toBe(3);
+  });
+  it("It should response 200 data for noun124.eth", async () => {
+    const res = await queryClient("/profile/noun124.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("noun124.eth");
+    expect(json.find((x) => x.identity === "dwr.eth")).toBeTruthy();
+  });
+  it("It should response 200 data for 0x3ddfa8ec3052539b6c9549f12cea2c295cff5296", async () => {
+    const res = await queryClient(
+      "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].address).toBe("0x3ddfa8ec3052539b6c9549f12cea2c295cff5296");
+    expect(json.length).toBe(1);
   });
 
   it("It should response 200 for sujiyan.eth", async () => {
@@ -37,7 +77,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe('stani.lens');
+    expect(json[0].identity).toBe("stani.lens");
   });
   it("It should response 200 data for brantly.eth", async () => {
     const res = await queryClient("/profile/brantly.eth");
@@ -96,12 +136,12 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/livid.farcaster");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("livid");
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
   });
   it("It should response 200 data for аррӏе.eth", async () => {
     const res = await queryClient("/profile/аррӏе.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("123-");
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
   });
 });
