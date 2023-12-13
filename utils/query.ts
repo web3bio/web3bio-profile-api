@@ -65,7 +65,7 @@ export const primaryDomainResolvedRequestArray = (
   const defaultReturn = {
     identity: handle,
     platform: platform,
-    reverse: data.data.domain.reverse
+    reverse: data.data.domain.reverse,
   };
   if (
     data.data.domain.reverse ||
@@ -105,19 +105,20 @@ export const primaryIdentityResolvedRequestArray = (
       platform: PlatformType.ethereum,
       reverse: null,
     };
-    const reverseFromNeighbor =
-      data.data.identity.neighbor.filter(
+    const reverseFromNeighbor = data.data.identity.neighbor
+      .filter(
         (x) =>
           x.reverse ||
           [PlatformType.farcaster, PlatformType.lens].includes(
             x.identity.platform
           )
-    ).map((x) => ({
-      identity: x.identity.identity,
-      platform: x.identity.platform,
-      reverse: x.reverse,
-    }));
-    return [...reverseFromNeighbor, defaultReturn];
+      )
+      .map((x) => ({
+        identity: x.identity.identity,
+        platform: x.identity.platform,
+        reverse: x.reverse,
+      }));
+    return [defaultReturn, ...reverseFromNeighbor];
   } else {
     const defaultReturn = {
       identity: data?.data?.identity?.identity,
