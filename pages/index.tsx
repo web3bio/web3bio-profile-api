@@ -52,7 +52,6 @@ export default function Home() {
       <main className="web3bio-container p-4 mt-4 mb-4">
         <div className="container grid-md">
           <h1 className="h2 mt-4 mb-4 pt-4 pb-4">
-            Hello from{" "}
             <strong className="text-bold">Web3.bio Profile APIs</strong>
           </h1>
           <section className="pt-4 pb-4">
@@ -694,58 +693,58 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/vitalik.eth`}</span>
                 <br />
-                {`[
-      {
-          "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-          "identity": "vitalik.eth",
-          "platform": "ENS",
-          "displayName": "vitalik.eth",
-          "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-          "email": null,
-          "description": null,
-          "location": null,
-          "header": null,
-          "links": {
-              "website": {
-                  "link": "https://vitalik.ca",
-                  "handle": "vitalik.ca"
-              }
-          }
-      },
-      {
-          "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-          "identity": "vbuterin",
-          "platform": "farcaster",
-          "displayName": "Vitalik Buterin",
-          "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
-          "email": null,
-          "description": "hullo",
-          "location": null,
-          "header": null,
-          "links": {
-              "farcaster": {
-                  "link": "https://warpcast.com/vbuterin",
-                  "handle": "vbuterin"
-              }
-          }
-      },
-      {
-          "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-          "identity": "vitalik.lens",
-          "platform": "lens",
-          "displayName": "Vitalik Buterin",
-          "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
-          "email": null,
-          "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
-          "header": "",
-          "links": {
-              "hey": {
-                  "link": "https://hey.xyz/u/vitalik",
-                  "handle": "vitalik"
-              }
-          }
-      }
-  ]`}
+{`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ENS",
+        "displayName": "vitalik.eth",
+        "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+        "email": null,
+        "description": null,
+        "location": null,
+        "header": null,
+        "links": {
+            "website": {
+                "link": "https://vitalik.ca",
+                "handle": "vitalik.ca"
+            }
+        }
+    },
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vbuterin",
+        "platform": "farcaster",
+        "displayName": "Vitalik Buterin",
+        "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
+        "email": null,
+        "description": "hullo",
+        "location": null,
+        "header": null,
+        "links": {
+            "farcaster": {
+                "link": "https://warpcast.com/vbuterin",
+                "handle": "vbuterin"
+            }
+        }
+    },
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.lens",
+        "platform": "lens",
+        "displayName": "Vitalik Buterin",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
+        "email": null,
+        "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
+        "header": "",
+        "links": {
+            "hey": {
+                "link": "https://hey.xyz/u/vitalik",
+                "handle": "vitalik"
+            }
+        }
+    }
+]`}
               </code>
             </pre>
           </section>
@@ -810,23 +809,23 @@ export default function Home() {
                   {`// https://api.web3.bio/profile/ens/vitalik.eth`}{" "}
                 </span>
                 <br />
-                {`{
-      "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-      "identity": "vitalik.eth",
-      "platform": "ENS",
-      "displayName": "vitalik.eth",
-      "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-      "email": null,
-      "description": null,
-      "location": null,
-      "header": null,
-      "links": {
-          "website": {
-              "link": "https://vitalik.ca",
-              "handle": "vitalik.ca"
-          }
-      }
-  }`}
+{`{
+    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    "identity": "vitalik.eth",
+    "platform": "ENS",
+    "displayName": "vitalik.eth",
+    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+    "email": null,
+    "description": null,
+    "location": null,
+    "header": null,
+    "links": {
+        "website": {
+            "link": "https://vitalik.ca",
+            "handle": "vitalik.ca"
+        }
+    }
+}`}
               </code>
             </pre>
           </section>
@@ -886,26 +885,26 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/lens/stani.lens`}</span>
                 <br />
-                {`{
-      "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-      "identity": "stani.lens",
-      "platform": "lens",
-      "displayName": "Stani",
-      "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-      "email": null,
-      "description": "Building @LensProtocol & @AaveAave",
-      "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
-      "links": {
-          "hey": {
-              "link": "https://hey.xyz/u/stani",
-              "handle": "stani"
-          },
-          "website": {
-              "link": "https://lens.xyz",
-              "handle": "lens.xyz"
-          }
-      }
-  }`}
+{`{
+    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+    "identity": "stani.lens",
+    "platform": "lens",
+    "displayName": "Stani",
+    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
+    "email": null,
+    "description": "Building @LensProtocol & @AaveAave",
+    "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
+    "links": {
+        "hey": {
+            "link": "https://hey.xyz/u/stani",
+            "handle": "stani"
+        },
+        "website": {
+            "link": "https://lens.xyz",
+            "handle": "lens.xyz"
+        }
+    }
+}`}
               </code>
             </pre>
           </section>
@@ -965,7 +964,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/suji`}</span>
                 <br />
-                {`{
+{`{
     "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
     "identity": "suji",
     "platform": "farcaster",
@@ -1045,7 +1044,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/dotbit/bestcase.bit`}</span>
                 <br />
-                {`{
+{`{
     "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
     "identity": "bestcase.bit",
     "platform": "dotbit",
@@ -1105,7 +1104,7 @@ export default function Home() {
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
-                - An Ethereum address or an UnstoppableDomains username.
+                - An Ethereum address or an Unstoppable Domains username.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">Examples</h3>
@@ -1120,7 +1119,7 @@ export default function Home() {
                 </a>
               </li>
               <li>
-                <span className="label">UnstoppableDomains</span>{" "}
+                <span className="label">Unstoppable Domains</span>{" "}
                 <a
                   href="https://api.web3.bio/profile/unstoppabledomains/sandy.nft"
                   target="_blank"
@@ -1135,7 +1134,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/sandy.nft`}</span>
                 <br />
-                {`{
+{`{
     "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
     "identity": "sandy.nft",
     "platform": "unstoppabledomains",
@@ -1197,7 +1196,7 @@ export default function Home() {
               <code>
                 <span className="text-gray">{`// https://api.web3.bio/profile/web3bio_example.eth`}</span>
                 <br />
-                {`{
+{`{
     "address": null,
     "identity": "web3bio_example.eth",
     "platform": "ENS",
