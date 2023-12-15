@@ -477,7 +477,7 @@ export default function Home() {
             <h2 className="text-bold h4">API Endpoints</h2>
             <p>
               The main public API endpoint domain for Web3.bio Profile APIs is{" "}
-              <span className="label">api.web3.bio</span>, and the testnet
+              <span className="label">api.web3.bio</span>, and the staging
               domain is <span className="label">api-staging.web3.bio</span>.
             </p>
             <a
@@ -554,24 +554,6 @@ export default function Home() {
             </a>
 
             <a
-              href="#dotbit-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
-                  /profile/dotbit/{"{"}identity{"}"}
-                </div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  Retrieve a .bit profile
-                </div>
-              </div>
-            </a>
-            <a
               href="#unstoppabledomains-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -589,6 +571,31 @@ export default function Home() {
                 </div>
               </div>
             </a>
+
+            <a
+              href="#dotbit-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /profile/dotbit/{"{"}identity{"}"}
+                </div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="label text-small">
+                  Retrieve a .bit profile
+                </div>
+              </div>
+            </a>
+
+            <p>
+              Web3.bio Profile APIs also provide basic profiles for name service resolution under {" "}
+              <span className="label">api.web3.bio/ns</span> (Replace <span className="label">profile</span> with <span className="label">ns</span>).
+            </p>
+
           </section>
 
           <section
@@ -599,7 +606,7 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Universal Profile API
             </h2>
-            <p>Retrieve Universal profiles across platforms </p>
+            <p>Retrieve Universal profiles or name service resolution across platforms </p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -609,6 +616,18 @@ export default function Home() {
                 <div className="mr-2">
                   <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/{"{"}identity{"}"}
                 </div>
               </div>
             </div>
@@ -700,8 +719,8 @@ export default function Home() {
         "platform": "ENS",
         "displayName": "vitalik.eth",
         "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-        "email": null,
         "description": null,
+        "email": null,
         "location": null,
         "header": null,
         "links": {
@@ -717,8 +736,8 @@ export default function Home() {
         "platform": "farcaster",
         "displayName": "Vitalik Buterin",
         "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
-        "email": null,
         "description": "hullo",
+        "email": null,
         "location": null,
         "header": null,
         "links": {
@@ -734,8 +753,8 @@ export default function Home() {
         "platform": "lens",
         "displayName": "Vitalik Buterin",
         "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
-        "email": null,
         "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
+        "email": null,
         "header": "",
         "links": {
             "hey": {
@@ -743,6 +762,37 @@ export default function Home() {
                 "handle": "vitalik"
             }
         }
+    }
+]`}
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/vitalik.eth`}</span>
+                <br />
+{`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ENS",
+        "displayName": "vitalik.eth",
+        "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+        "description": null
+    },
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vbuterin",
+        "platform": "farcaster",
+        "displayName": "Vitalik Buterin",
+        "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
+        "description": "hullo"
+    },
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.lens",
+        "platform": "lens",
+        "displayName": "Vitalik Buterin",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
+        "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds"
     }
 ]`}
               </code>
@@ -757,7 +807,7 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               ENS Profile API
             </h2>
-            <p>Retrieve an ENS profile</p>
+            <p>Retrieve an ENS profile or name service resolution</p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -767,6 +817,18 @@ export default function Home() {
                 <div className="mr-2">
                   <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/ens/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/ens/{"{"}identity{"}"}
                 </div>
               </div>
             </div>
@@ -815,8 +877,8 @@ export default function Home() {
     "platform": "ENS",
     "displayName": "vitalik.eth",
     "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-    "email": null,
     "description": null,
+    "email": null,
     "location": null,
     "header": null,
     "links": {
@@ -825,6 +887,23 @@ export default function Home() {
             "handle": "vitalik.ca"
         }
     }
+}`}
+                <br /><br />
+                <span className="text-gray">
+                  {`// https://api.web3.bio/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// https://api.web3.bio/ns/ens/vitalik.eth`}{" "}
+                </span>
+                <br />
+{`{
+    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    "identity": "vitalik.eth",
+    "platform": "ENS",
+    "displayName": "vitalik.eth",
+    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+    "description": null
 }`}
               </code>
             </pre>
@@ -838,7 +917,7 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Lens Profile API
             </h2>
-            <p>Retrieve a Lens profile</p>
+            <p>Retrieve a Lens profile or name service resolution</p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -848,6 +927,18 @@ export default function Home() {
                 <div className="mr-2">
                   <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/lens/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/lens/{"{"}identity{"}"}
                 </div>
               </div>
             </div>
@@ -891,8 +982,9 @@ export default function Home() {
     "platform": "lens",
     "displayName": "Stani",
     "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-    "email": null,
     "description": "Building @LensProtocol & @AaveAave",
+    "email": null,
+    "location": null,
     "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
     "links": {
         "hey": {
@@ -904,6 +996,19 @@ export default function Home() {
             "handle": "lens.xyz"
         }
     }
+}`}
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/lens/stani.lens`}</span>
+                <br />
+{`{
+    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+    "identity": "stani.lens",
+    "platform": "lens",
+    "displayName": "Stani",
+    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
+    "description": "Building @LensProtocol & @AaveAave"
 }`}
               </code>
             </pre>
@@ -917,7 +1022,7 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Farcaster Profile API
             </h2>
-            <p>Retrieve a Farcaster profile</p>
+            <p>Retrieve a Farcaster profile or name service resolution</p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -927,6 +1032,18 @@ export default function Home() {
                 <div className="mr-2">
                   <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/farcaster/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
             </div>
@@ -970,8 +1087,8 @@ export default function Home() {
     "platform": "farcaster",
     "displayName": "Suji Yan",
     "avatar": "https://i.seadn.io/gae/ILVYPJ4U951KDc4F2XszloLR0CyAS7odjfr_8GjnrRT-Mdw_BPOMZOou4MStp-imxIIUGoysFZImHAksLQMzcOy1zGIC8T6gxqx-jg?w=500&auto=format",
-    "email": null,
     "description": "Mask.io / suji_yan.twitter",
+    "email": null,
     "location": null,
     "header": null,
     "links": {
@@ -985,6 +1102,140 @@ export default function Home() {
         }
     }
 }`}
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/farcaster/suji`}</span>
+                <br />
+{`{
+    "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+    "identity": "suji",
+    "platform": "farcaster",
+    "displayName": "Suji Yan",
+    "avatar": "https://i.seadn.io/gae/ILVYPJ4U951KDc4F2XszloLR0CyAS7odjfr_8GjnrRT-Mdw_BPOMZOou4MStp-imxIIUGoysFZImHAksLQMzcOy1zGIC8T6gxqx-jg?w=500&auto=format",
+    "description": "Mask.io / suji_yan.twitter"
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="unstoppabledomains-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
+              Unstoppable Domains Profile API
+            </h2>
+            <p>Retrieve an Unstoppable Domains profile or name service resolution</p>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /profile/unstoppabledomains/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/unstoppabledomains/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6 mt-4">Parameter</h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                - An Ethereum address or an Unstoppable Domains username.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">Examples</h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23"
+                  target="_blank"
+                >
+                  /profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
+                </a>
+              </li>
+              <li>
+                <span className="label">Unstoppable Domains</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/unstoppabledomains/sandy.nft"
+                  target="_blank"
+                >
+                  /profile/unstoppabledomains/sandy.nft
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/sandy.nft`}</span>
+                <br />
+{`{
+    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+    "identity": "sandy.nft",
+    "platform": "unstoppabledomains",
+    "displayName": "Pink Mamba",
+    "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
+    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
+    "email": null,
+    "location": "Metaverse",
+    "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
+    "links": {
+        "url": {
+          "handle": "sandy.nft",
+          "link": "https://gateway.pinata.cloud/ipfs/Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7"
+        },
+        "twitter": {
+          "handle": "Sandy_carter",
+          "link": "https://twitter.com/Sandy_carter"
+        },
+        "discord": {
+          "handle": "SandyCarter#6286",
+          "link": ""
+        },
+        "lens": {
+          "handle": "sandracarter.lens",
+          "link": "https://hey.xyz/sandracarter.lens"
+        },
+        "telegram": {
+          "handle": "sandycarter",
+          "link": "https://t.me/sandycarter"
+        },
+        "youtube": {
+          "handle": "@sandycarter3993",
+          "link": "https://www.youtube.com/@sandycarter3993"
+        }
+    }
+}`}
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/unstoppabledomains/sandy.nft`}</span>
+                <br />
+{`{
+    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+    "identity": "sandy.nft",
+    "platform": "unstoppabledomains",
+    "displayName": "Pink Mamba",
+    "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
+    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
+}`}
               </code>
             </pre>
           </section>
@@ -997,7 +1248,7 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               .bit Profile API
             </h2>
-            <p>Retrieve a .bit profile</p>
+            <p>Retrieve a .bit profile or name service resolution</p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1007,6 +1258,18 @@ export default function Home() {
                 <div className="mr-2">
                   <span className="text-gray hide-sm">https://api.web3.bio</span>
                   /profile/dotbit/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
             </div>
@@ -1051,6 +1314,7 @@ export default function Home() {
     "displayName": "bestcase.bit",
     "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
     "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world.",
+    "email": null,
     "location": null,
     "header": null,
     "links": {
@@ -1076,104 +1340,23 @@ export default function Home() {
         }
     }
 }`}
-              </code>
-            </pre>
-          </section>
-          <section
-            className="pt-4 pb-4"
-            id="unstoppabledomains-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
-              Unstoppable Domains Profile API
-            </h2>
-            <p>Retrieve an Unstoppable Domains profile</p>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
-                  /profile/unstoppabledomains/{"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6 mt-4">Parameter</h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                - An Ethereum address or an Unstoppable Domains username.
-              </li>
-            </ul>
-            <h3 className="text-bold h6 mt-4">Examples</h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href="https://api.web3.bio/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23"
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
-                </a>
-              </li>
-              <li>
-                <span className="label">Unstoppable Domains</span>{" "}
-                <a
-                  href="https://api.web3.bio/profile/unstoppabledomains/sandy.nft"
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/sandy.nft
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
                 <br />
-                <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/sandy.nft`}</span>
+                <span className="text-gray">{`// https://api.web3.bio/ns/dotbit/bestcase.bit`}</span>
                 <br />
 {`{
-    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-    "identity": "sandy.nft",
-    "platform": "unstoppabledomains",
-    "displayName": "Pink Mamba",
-    "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
-    "email": null,
-    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
-    "location": "Metaverse",
-    "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
-    "links": {
-        "url": {
-          "handle": "sandy.nft",
-          "link": "https://gateway.pinata.cloud/ipfs/Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7"
-        },
-        "twitter": {
-          "handle": "Sandy_carter",
-          "link": "https://twitter.com/Sandy_carter"
-        },
-        "discord": {
-          "handle": "SandyCarter#6286",
-          "link": ""
-        },
-        "lens": {
-          "handle": "sandracarter.lens",
-          "link": "https://hey.xyz/sandracarter.lens"
-        },
-        "telegram": {
-          "handle": "sandycarter",
-          "link": "https://t.me/sandycarter"
-        },
-        "youtube": {
-          "handle": "@sandycarter3993",
-          "link": "https://www.youtube.com/@sandycarter3993"
-        }
-    }
+    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+    "identity": "bestcase.bit",
+    "platform": "dotbit",
+    "displayName": "bestcase.bit",
+    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
+    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world."
 }`}
               </code>
             </pre>
           </section>
+          
           <section
             className="pt-4 pb-4"
             id="errors"
@@ -1243,6 +1426,10 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added Unstoppable Domains query
+                support to the Profile APIs.
+              </li>
+              <li>
+                <span className="label label-primary">Feature</span> Added <code>ns</code> basic profile resolution query
                 support to the Profile APIs.
               </li>
             </ul>
