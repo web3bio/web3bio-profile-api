@@ -125,8 +125,8 @@ export const resolveLensHandle = async (handle: string) => {
     platform: PlatformType.lens,
     displayName: response.name || response.handle,
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
-    email: null,
     description: response.bio || null,
+    email: null,
     location:
       response.attributes?.find((o: { key: string }) => o.key === "location")
         ?.value || null,

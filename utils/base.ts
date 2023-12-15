@@ -5,26 +5,6 @@ export type LinksItem = {
   link: string | null;
   handle: string | null;
 };
-export type LinksData = {
-  [index: string | Partial<PlatformType>]: LinksItem | undefined;
-};
-export type HandleResponseData = {
-  owner: string | null;
-  identity: string | null;
-  displayName: string | null;
-  avatar: string | null;
-  email: string | null;
-  description: string | null;
-  location: string | null;
-  header: string | null;
-  links: LinksData;
-  error?: string;
-};
-
-export type HandleNotFoundResponseData = {
-  identity: string | null;
-  error: string;
-};
 
 interface errorHandleProps {
   identity: string | null;
