@@ -183,8 +183,8 @@ export const resolveENSResponse = async (handle: string) => {
           platform: PlatformType.ethereum,
           displayName: formatText(address),
           avatar: null,
-          email: null,
           description: null,
+          email: null,
           location: null,
           header: null,
           links: null,
@@ -293,11 +293,11 @@ export const resolveENSHandle = async (handle: string) => {
       (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
       ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
-    email:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "email")) || null,
     description:
       (await resolveENSTextValue(resolverAddress, ensDomain, "description")) ||
       null,
+    email:
+      (await resolveENSTextValue(resolverAddress, ensDomain, "email")) || null,
     location:
       (await resolveENSTextValue(resolverAddress, ensDomain, "location")) ||
       null,
