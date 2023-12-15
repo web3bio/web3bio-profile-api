@@ -651,12 +651,30 @@ export default function Home() {
                 </a>
               </li>
               <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href="https://api.web3.bio/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                  target="_blank"
+                >
+                  /ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                </a>
+              </li>
+              <li>
                 <span className="label">ENS</span>{" "}
                 <a
                   href="https://api.web3.bio/profile/vitalik.eth"
                   target="_blank"
                 >
                   /profile/vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a
+                  href="https://api.web3.bio/ns/vitalik.eth"
+                  target="_blank"
+                >
+                  /ns/vitalik.eth
                 </a>
               </li>
               <li>
@@ -851,12 +869,30 @@ export default function Home() {
                 </a>
               </li>
               <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href="https://api.web3.bio/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                  target="_blank"
+                >
+                  /ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                </a>
+              </li>
+              <li>
                 <span className="label">ENS</span>{" "}
                 <a
                   href="https://api.web3.bio/profile/ens/vitalik.eth"
                   target="_blank"
                 >
                   /profile/ens/vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a
+                  href="https://api.web3.bio/ns/ens/vitalik.eth"
+                  target="_blank"
+                >
+                  /ns/ens/vitalik.eth
                 </a>
               </li>
             </ul>
@@ -1059,47 +1095,43 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href="https://api.web3.bio/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649"
+                  href="https://api.web3.bio/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea"
                   target="_blank"
                 >
-                  /profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649
+                  /profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
                 </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
                 <a
-                  href="https://api.web3.bio/profile/farcaster/suji"
+                  href="https://api.web3.bio/profile/farcaster/dwr.eth"
                   target="_blank"
                 >
-                  /profile/farcaster/suji
+                  /profile/farcaster/dwr.eth
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649`}</span>
+                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
                 <br />
-                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/suji`}</span>
+                <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/dwr.eth`}</span>
                 <br />
 {`{
-    "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-    "identity": "suji",
+    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
+    "identity": "dwr.eth",
     "platform": "farcaster",
-    "displayName": "Suji Yan",
-    "avatar": "https://i.seadn.io/gae/ILVYPJ4U951KDc4F2XszloLR0CyAS7odjfr_8GjnrRT-Mdw_BPOMZOou4MStp-imxIIUGoysFZImHAksLQMzcOy1zGIC8T6gxqx-jg?w=500&auto=format",
-    "description": "Mask.io / suji_yan.twitter",
+    "displayName": "Dan Romero",
+    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
+    "description": "Working on Farcaster and Warpcast.",
     "email": null,
-    "location": null,
+    "location": "Los Angeles, CA, USA",
     "header": null,
     "links": {
-        "farcaster": {
-            "link": "https://warpcast.com/suji",
-            "handle": "suji"
-        },
-        "twitter": {
-            "link": "https://twitter.com/suji_yan",
-            "handle": "suji_yan"
-        }
+      "farcaster": {
+        "link": "https://warpcast.com/dwr.eth",
+        "handle": "dwr.eth"
+      }
     }
 }`}
                 <br /><br />
@@ -1108,12 +1140,12 @@ export default function Home() {
                 <span className="text-gray">{`// https://api.web3.bio/ns/farcaster/suji`}</span>
                 <br />
 {`{
-    "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-    "identity": "suji",
+    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
+    "identity": "dwr.eth",
     "platform": "farcaster",
-    "displayName": "Suji Yan",
-    "avatar": "https://i.seadn.io/gae/ILVYPJ4U951KDc4F2XszloLR0CyAS7odjfr_8GjnrRT-Mdw_BPOMZOou4MStp-imxIIUGoysFZImHAksLQMzcOy1zGIC8T6gxqx-jg?w=500&auto=format",
-    "description": "Mask.io / suji_yan.twitter"
+    "displayName": "Dan Romero",
+    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
+    "description": "Working on Farcaster and Warpcast."
 }`}
               </code>
             </pre>
@@ -1421,6 +1453,16 @@ export default function Home() {
             </p>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
+              December Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added <code>ns</code> basic profile resolution query
+                support to the Profile APIs.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
               November Update
             </h3>
             <ul>
@@ -1429,8 +1471,8 @@ export default function Home() {
                 support to the Profile APIs.
               </li>
               <li>
-                <span className="label label-primary">Feature</span> Added <code>ns</code> basic profile resolution query
-                support to the Profile APIs.
+                <span className="label label-primary">Update</span> Added Ethereum address query
+                support to all Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
