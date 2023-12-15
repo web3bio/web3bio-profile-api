@@ -37,14 +37,22 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
+  if (
+    !regexFarcaster.test(lowercaseName) &&
+    !regexEth.test(lowercaseName) &&
+    !lowercaseName.endsWith(".farcaster")
+  )
     return errorHandle({
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveFarcasterRespondNS(lowercaseName);
+
+  const queryInput = lowercaseName.endsWith(".farcaster")
+    ? lowercaseName.replace(".farcaster", "")
+    : lowercaseName;
+  return resolveFarcasterRespondNS(queryInput);
 }
 
 export const config = {

@@ -125,8 +125,8 @@ export const resolveFarcasterHandle = async (handle: string) => {
     platform: PlatformType.farcaster,
     displayName: response.displayName || response.username,
     avatar: response.pfp.url,
-    email: null,
     description: response.profile.bio.text || null,
+    email: null,
     location: response?.profile.location.description || null,
     header: null,
     links: links,
@@ -153,14 +153,22 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
+  if (
+    !regexFarcaster.test(lowercaseName) &&
+    !regexEth.test(lowercaseName) &&
+    !lowercaseName.endsWith(".farcaster")
+  )
     return errorHandle({
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveFarcasterRespond(lowercaseName);
+  const queryInput = lowercaseName.endsWith(".farcaster")
+    ? lowercaseName.replace(".farcaster", "")
+    : lowercaseName;
+    
+  return resolveFarcasterRespond(queryInput);
 }
 
 export const config = {

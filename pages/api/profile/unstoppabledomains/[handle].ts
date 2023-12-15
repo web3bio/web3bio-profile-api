@@ -33,7 +33,7 @@ const fetchUDBase = async (path: string) => {
   }).then((res) => res.json());
 };
 const fetchUDProfile = async (domain: string) => {
-  return fetch(`${UDProfileEndpoint}/${domain}`, {
+  return fetch(`${UDProfileEndpoint}/${domain}?fields=profile,records,socialAccounts`, {
     method: "GET",
   }).then((res) => res.json());
 };
@@ -100,9 +100,9 @@ export const resolveUDHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.unstoppableDomains,
     displayName: metadata.profile.displayName || handle,
-    avatar: metadata.profile.imagePath || null,
-    email: null,
+    avatar: metadata.profile.imageType === "default" ? null : metadata.profile.imagePath || null,
     description: metadata.profile.description || null,
+    email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
     links: LINKRES || null,
