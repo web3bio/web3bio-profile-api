@@ -5,7 +5,7 @@ import Avatar, { AvatarProps } from "boring-avatars";
 
 // use case http://localhost:3000/avatar/sujiyan.eth?colors=264653,2a9d8f,e9c46a,f4a261,e76f51&size=160&variant=sunset
 
-export default function handler(req: NextApiRequest) {
+export default async function handler(req: NextApiRequest) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const name = searchParams.get("handle") || "";
   console.log(name, " handle");
