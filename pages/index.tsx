@@ -61,6 +61,7 @@ export default function Home() {
               <span className="text-underline">Ethereum (ENS)</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
+              <span className="text-underline">Unstoppable Domains</span>,{" "}
               <span className="text-underline">.bit</span> and{" "}
               <span className="text-underline">Next.ID</span> into their
               applications. These APIs are already integrated into{" "}
@@ -647,16 +648,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
                   target="_blank"
                 >
-                  /profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                  /profile/0xd8da...6045
                 </a>
-              </li>
-              <li>
-                <span className="label">Ethereum</span>{" "}
+                <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href="https://api.web3.bio/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
                   target="_blank"
                 >
-                  /ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                  /ns/0xd8da...6045
                 </a>
               </li>
               <li>
@@ -667,9 +666,7 @@ export default function Home() {
                 >
                   /profile/vitalik.eth
                 </a>
-              </li>
-              <li>
-                <span className="label">ENS</span>{" "}
+                <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href="https://api.web3.bio/ns/vitalik.eth"
                   target="_blank"
@@ -685,6 +682,13 @@ export default function Home() {
                 >
                   /profile/stani.lens
                 </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/stani.lens"
+                  target="_blank"
+                >
+                  /ns/stani.lens
+                </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
@@ -693,6 +697,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/dwr.eth.farcaster
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/dwr.eth.farcaster"
+                  target="_blank"
+                >
+                  /ns/dwr.eth.farcaster
                 </a>
               </li>
               <li>
@@ -703,6 +714,13 @@ export default function Home() {
                 >
                   /profile/sandy.nft
                 </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/sandy.nft"
+                  target="_blank"
+                >
+                  /ns/sandy.nft
+                </a>
               </li>
               <li>
                 <span className="label">Next.ID</span>{" "}
@@ -712,6 +730,13 @@ export default function Home() {
                 >
                   /profile/0x028f......3e50
                 </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50"
+                  target="_blank"
+                >
+                  /ns/0x028f......3e50
+                </a>
               </li>
               <li>
                 <span className="label">.bit</span>{" "}
@@ -720,6 +745,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/jeffx.bit
+                </a>
+                <span className="text-gray ml-2 mr-2">or</span>
+                <a
+                  href="https://api.web3.bio/ns/jeffx.bit"
+                  target="_blank"
+                >
+                  /ns/jeffx.bit
                 </a>
               </li>
             </ul>
@@ -865,16 +897,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
                   target="_blank"
                 >
-                  /profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                  /profile/ens/0xd8da...6045
                 </a>
-              </li>
-              <li>
-                <span className="label">Ethereum</span>{" "}
+                <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href="https://api.web3.bio/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
                   target="_blank"
                 >
-                  /ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                  /ns/ens/0xd8da...6045
                 </a>
               </li>
               <li>
@@ -885,9 +915,7 @@ export default function Home() {
                 >
                   /profile/ens/vitalik.eth
                 </a>
-              </li>
-              <li>
-                <span className="label">ENS</span>{" "}
+                <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href="https://api.web3.bio/ns/ens/vitalik.eth"
                   target="_blank"
@@ -993,7 +1021,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff"
                   target="_blank"
                 >
-                  /profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
+                  /profile/lens/0x7241...9dff
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+                  target="_blank"
+                >
+                  /ns/lens/0x7241...9dff
                 </a>
               </li>
               <li>
@@ -1003,6 +1038,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/lens/stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/lens/stani.lens"
+                  target="_blank"
+                >
+                  /ns/lens/stani.lens
                 </a>
               </li>
             </ul>
@@ -1098,7 +1140,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea"
                   target="_blank"
                 >
-                  /profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
+                  /profile/farcaster/0x8fc5...a2ea
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea"
+                  target="_blank"
+                >
+                  /ns/farcaster/0x8fc5...a2ea
                 </a>
               </li>
               <li>
@@ -1108,6 +1157,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/farcaster/dwr.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/farcaster/dwr.eth"
+                  target="_blank"
+                >
+                  /ns/farcaster/dwr.eth
                 </a>
               </li>
             </ul>
@@ -1199,7 +1255,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23"
                   target="_blank"
                 >
-                  /profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
+                  /profile/unstoppabledomains/0x94ef...ab23
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23"
+                  target="_blank"
+                >
+                  /ns/unstoppabledomains/0x94ef...ab23
                 </a>
               </li>
               <li>
@@ -1209,6 +1272,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/unstoppabledomains/sandy.nft
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/unstoppabledomains/sandy.nft"
+                  target="_blank"
+                >
+                  /ns/unstoppabledomains/sandy.nft
                 </a>
               </li>
             </ul>
@@ -1320,7 +1390,14 @@ export default function Home() {
                   href="https://api.web3.bio/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d"
                   target="_blank"
                 >
-                  /profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d
+                  /profile/dotbit/0xfa8f...7f1d
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d"
+                  target="_blank"
+                >
+                  /ns/dotbit/0xfa8f...7f1d
                 </a>
               </li>
               <li>
@@ -1330,6 +1407,13 @@ export default function Home() {
                   target="_blank"
                 >
                   /profile/dotbit/bestcase.bit
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/dotbit/bestcase.bit"
+                  target="_blank"
+                >
+                  /ns/dotbit/bestcase.bit
                 </a>
               </li>
             </ul>
