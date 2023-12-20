@@ -3,20 +3,15 @@ import ReactDOMServer from "react-dom/server";
 import type { NextApiRequest } from "next";
 import Avatar, { AvatarProps } from "boring-avatars";
 
-// use case http://localhost:3000/avatar/sujiyan.eth?colors=264653,2a9d8f,e9c46a,f4a261,e76f51&size=160&variant=sunset
+// Demo: http://localhost:3000/avatar/vitalik.eth
 
 export default async function handler(req: NextApiRequest) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const name = searchParams.get("handle") || "";
-  console.log(name, " handle");
-  const size = searchParams.get("size") || 80;
-  const variant = searchParams.get("variant") || "marble";
-  const colors = searchParams.get("colors")
-    ? searchParams
-        .get("colors")
-        ?.split(",")
-        .map((color) => `#${color}`)
-    : undefined;
+  const size = searchParams.get("size") || 160;
+  const variant = searchParams.get("variant") || "bauhaus";
+  const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
+  
   const avatarHtml = ReactDOMServer.renderToString(
     <Avatar
       {...{
