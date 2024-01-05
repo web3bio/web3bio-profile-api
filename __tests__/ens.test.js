@@ -16,6 +16,13 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(404);
     expect((await res.json()).error).toBe("Invalid Resolver Address");
   });
+  it("It should response 200 for dr3a.eth", async () => {
+    const res = await queryClient("/profile/ens/dr3a.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json()
+    expect(json.links.lens).toBeTruthy()
+    expect(json.links.farcaster).toBeTruthy()
+  });
   it("It should response 404 for xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth", async () => {
     const res = await queryClient(
       "/profile/ens/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth"
