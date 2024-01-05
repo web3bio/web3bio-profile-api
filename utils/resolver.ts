@@ -17,12 +17,14 @@ export const resolveMediaURL = (url: string) => {
 
 export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
-  if (platform && platform === PlatformType.website)
+  if (platform === PlatformType.lens && handle.endsWith(".lens"))
+    return handle.replace(".lens", "");
+  if (platform === PlatformType.website)
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
-  if (platform && platform === PlatformType.youtube)
+  if (platform === PlatformType.youtube)
     // match youtube user handle regex
     return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
-  if (handle && domainRegexp.test(handle)) {
+  if (domainRegexp.test(handle)) {
     const arr = handle.split("/");
     return (
       handle.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
