@@ -17,7 +17,13 @@ export const resolveMediaURL = (url: string) => {
 
 export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
-  if (platform === PlatformType.lens && handle.endsWith(".lens"))
+  if (
+    platform &&
+    [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
+      platform
+    ) &&
+    handle.endsWith(".lens")
+  )
     return handle.replace(".lens", "");
   if (platform === PlatformType.website)
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
