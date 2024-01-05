@@ -19,6 +19,7 @@ export enum PlatformType {
   reddit = "reddit",
   github = "github",
   unstoppableDomains = "unstoppabledomains",
+  ckb = "ckb",
   farcaster = "farcaster",
   space_id = "space_id",
   telegram = "telegram",
@@ -32,6 +33,7 @@ export enum PlatformType {
   website = "website",
   linkedin = "linkedin",
   dns = "dns",
+  tron = "tron",
   lenster = "lenster",
   hey = "hey",
   facebook = "facebook",
@@ -53,7 +55,7 @@ export enum PlatformType {
   twitter_hexagon = "twitter_hexagon",
   uniswap = "uniswap",
   degenscore = "degenscore",
-  firefly="firefly",
+  firefly = "firefly",
 }
 
 export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
@@ -86,6 +88,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-farcaster.svg",
     label: "Farcaster",
     urlPrefix: "https://warpcast.com/",
+    ensText: ["farcaster"],
   },
   [PlatformType.github]: {
     key: PlatformType.github,
@@ -110,6 +113,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-lens.svg",
     label: "Lens",
     urlPrefix: "https://hey.xyz/",
+    ensText: ["lens"],
   },
   [PlatformType.nextid]: {
     key: PlatformType.nextid,
@@ -141,6 +145,13 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-unstoppabledomains.svg",
     label: "Unstoppable Domains",
     urlPrefix: "https://unstoppabledomains.com/search?searchTerm=",
+  },
+  [PlatformType.ckb]: {
+    key: PlatformType.ckb,
+    color: "#000000",
+    icon: "icons/icon-ckb.svg",
+    label: "Nervos",
+    urlPrefix: "https://explorer.nervos.org/address/",
   },
   [PlatformType.telegram]: {
     key: PlatformType.telegram,
@@ -185,6 +196,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     color: "#000000",
     icon: "icons/icon-cyberconnect.svg",
     label: "CyberConnect",
+    urlPrefix: "https://link3.to/",
   },
   [PlatformType.opensea]: {
     key: PlatformType.opensea,
@@ -206,6 +218,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     color: "#5865f2",
     icon: "icons/icon-discord.svg",
     label: "Discord",
+    urlPrefix: "",
     ensText: ["com.discord"],
     dotbitText: ["profile.discord"],
   },
@@ -214,12 +227,14 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-web.svg",
     color: "#121212",
     label: "Website",
+    urlPrefix: "",
   },
   [PlatformType.website]: {
     key: PlatformType.website,
     icon: "icons/icon-web.svg",
     color: "#121212",
     label: "Website",
+    urlPrefix: "",
     ensText: ["url"],
     dotbitText: ["profile.website"],
   },
@@ -237,6 +252,14 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-web.svg",
     color: "#000000",
     label: "DNS",
+    urlPrefix: "https://",
+  },
+  [PlatformType.tron]: {
+    key: PlatformType.tron,
+    color: "#EB0029",
+    icon: "icons/icon-tron.svg",
+    label: "Tron",
+    urlPrefix: "https://tronscan.org/#/address/",
   },
   [PlatformType.lenster]: {
     key: PlatformType.lenster,
@@ -392,7 +415,6 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     urlPrefix: "https://firefly.land/",
   },
 };
-
 
 export const supportedPlatforms = [
   PlatformType.ens,
