@@ -17,6 +17,11 @@ export const resolveMediaURL = (url: string) => {
 
 export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
+  let handleToResolve = handle;
+  if (platform === PlatformType.website)
+    return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
+  if (platform === PlatformType.youtube)
+    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
   if (
     platform &&
     [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
@@ -24,19 +29,15 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
     ) &&
     handle.endsWith(".lens")
   )
-    return handle.replace(".lens", "");
-  if (platform === PlatformType.website)
-    return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
-  if (platform === PlatformType.youtube)
-    // match youtube user handle regex
-    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
-  if (domainRegexp.test(handle)) {
-    const arr = handle.split("/");
+    handleToResolve = handle.replace(".lens", "");
+  if (domainRegexp.test(handleToResolve)) {
+    const arr = handleToResolve.split("/");
     return (
-      handle.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
+      handleToResolve.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
     ).replaceAll("@", "");
   }
-  return handle.replaceAll("@", "");
+
+  return handleToResolve.replaceAll("@", "");
 };
 
 export const getSocialMediaLink = (
