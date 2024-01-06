@@ -12,7 +12,7 @@ describe("Test For Unstoppable Domains Profile API", () => {
     const res = await queryClient("/profile/unstoppabledomains/sandy.x");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.links.lens.handle).toBe("sandracarter.lens");
+    expect(json.links.lens.handle).toBe("sandracarter");
   });
   it("It should response 200 for al.x", async () => {
     const res = await queryClient("/profile/unstoppabledomains/al.x");

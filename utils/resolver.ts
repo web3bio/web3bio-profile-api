@@ -17,18 +17,27 @@ export const resolveMediaURL = (url: string) => {
 
 export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
-  if (platform && platform === PlatformType.website)
+  let handleToResolve = handle;
+  if (platform === PlatformType.website)
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
-  if (platform && platform === PlatformType.youtube)
-    // match youtube user handle regex
+  if (platform === PlatformType.youtube)
     return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
-  if (handle && domainRegexp.test(handle)) {
-    const arr = handle.split("/");
+  if (
+    platform &&
+    [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
+      platform
+    ) &&
+    handle.endsWith(".lens")
+  )
+    handleToResolve = handle.replace(".lens", "");
+  if (domainRegexp.test(handleToResolve)) {
+    const arr = handleToResolve.split("/");
     return (
-      handle.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
+      handleToResolve.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
     ).replaceAll("@", "");
   }
-  return handle.replaceAll("@", "");
+
+  return handleToResolve.replaceAll("@", "");
 };
 
 export const getSocialMediaLink = (
@@ -58,7 +67,7 @@ export function resolveSocialMediaLink(
     case PlatformType.website:
       return `https://${name}`;
     case PlatformType.discord:
-      if (!name.includes("#"))
+      if (name.includes("https://"))
         return SocialPlatformMapping(type).urlPrefix + name;
       return "";
     default:
