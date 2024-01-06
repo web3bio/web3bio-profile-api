@@ -83,8 +83,8 @@ export const resolveDotbitHandle = async (handle: string) => {
   const linksObj: Record<
     string,
     {
-      handle: string;
       link: string;
+      handle: string;
     }
   > = {};
   recordsMap.forEach((x) => {
@@ -96,8 +96,8 @@ export const resolveDotbitHandle = async (handle: string) => {
       if (!["description", "email", "avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value, platform as PlatformType)!;
         linksObj[platform] = {
-          handle: _handle,
           link: getSocialMediaLink(x.value, platform as PlatformType)!,
+          handle: _handle,
         };
       }
     }
