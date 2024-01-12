@@ -21,15 +21,11 @@ import { formatsByCoinType } from "@ensdomains/address-encoder";
 
 const ENSRegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
 const ENSReverseRecordsAddress = "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C";
-
+const ethereumRPCURL =
+  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	";
 const iface = new ethers.utils.Interface(base);
 const resolverFace = new ethers.utils.Interface(resolverABI);
-
-export const isValidEthereumAddress = (address: string) => {
-  if (!isAddress(address)) return false; // invalid ethereum address
-  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
-  return true;
-};
+const provider = new ethers.providers.JsonRpcProvider(ethereumRPCURL)
 
 const ensSubGraphBaseURL =
   "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
@@ -65,12 +61,20 @@ const getENSRecordsQuery = `
   }
 `;
 
-const ethereumRPCURL =
-  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	";
+
+export const isValidEthereumAddress = (address: string) => {
+  if (!isAddress(address)) return false; // invalid ethereum address
+  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
+  return true;
+};
+
+
 
 export const resolveAddressFromName = async (name: string) => {
   if (!name) return null;
   const res = await getENSProfile(name);
+  const offChianRes = await getOffChainENSProfile(name);
+  console.log(offChianRes,'offChainRes')
   return res?.[0];
 };
 
@@ -321,6 +325,19 @@ export const getENSProfile = async (name: string) => {
     }).then((res) => res.json());
 
     if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
+  } catch (e) {
+    return null;
+  }
+};
+
+const getOffChainENSProfile = async (name: string) => {
+  try {
+    const resolver = await provider.getResolver("1.offchainexample.eth");
+    console.log(resolver,'resolverAddress')
+    if(!resolver) return null
+    const address = await provider.resolveName(name);
+    const email = await resolver.getText("email");
+    console.log(address, "email", email);
   } catch (e) {
     return null;
   }
