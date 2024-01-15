@@ -4,22 +4,19 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
 import { isAddress } from "ethers/lib/utils";
-import {
-  getResolverAddressFromName,
-  resolveENSCoinTypesValue,
-} from "../ens/[handle]";
-import { CoinType } from "@/utils/cointype";
+import { createPublicClient, http } from "viem";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
+
+const client = createPublicClient({
+  chain: mainnet,
+  transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
+}) as any;
 
 export const enum FarcasterQueryParamType {
   username = "username",
   connected_address = "connected_address",
 }
-
-const resolveENSHandleAddress = async (handle: string) => {
-  const resolver = await getResolverAddressFromName(handle);
-  if (!resolver) return null;
-  return await resolveENSCoinTypesValue(resolver, handle, CoinType.eth);
-};
 
 const originBase = "https://api.warpcast.com/v2/";
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
@@ -107,7 +104,11 @@ export const resolveFarcasterResponse = async (handle: string) => {
     response = {
       address:
         firstAddress?.toLowerCase() ||
-        (regexEns.test(handle) ? await resolveENSHandleAddress(handle) : null),
+        (regexEns.test(handle)
+          ? await client.getEnsAddress({
+              name: normalize(handle),
+            })
+          : null),
       ...rawUser,
     };
   }
@@ -167,7 +168,7 @@ export default async function handler(req: NextApiRequest) {
   const queryInput = lowercaseName.endsWith(".farcaster")
     ? lowercaseName.replace(".farcaster", "")
     : lowercaseName;
-    
+
   return resolveFarcasterRespond(queryInput);
 }
 
