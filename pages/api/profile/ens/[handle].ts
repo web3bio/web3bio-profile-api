@@ -110,9 +110,10 @@ export const resolveENSResponse = async (handle: string) => {
     address = resolvedAddress;
 
     resolver = (await getENSProfile(ensDomain))?.[0];
-    if (!resolver?.resolver)
+    
+    if (!resolver?.resolver && !address)
       throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-    if (resolver.message) throw new Error(resolver.message);
+    if (resolver?.message) throw new Error(resolver.message);
   }
 
   return {
