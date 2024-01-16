@@ -3,6 +3,7 @@ import {
   errorHandle,
   ErrorMessages,
   formatText,
+  isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
@@ -13,7 +14,6 @@ import {
   primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
-import { isValidEthereumAddress } from "./ens/[handle]";
 import _ from "lodash";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
@@ -29,7 +29,7 @@ const nextidGraphQLEndpoint =
 
 const resolveHandleFromRelationService = (
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)
+  platform: PlatformType = handleSearchPlatform(handle)!
 ) => {
   const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
@@ -251,6 +251,14 @@ export const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
+  if (!inputName || !handleSearchPlatform(inputName)) {
+    return errorHandle({
+      identity: inputName,
+      code: 404,
+      platform: null,
+      message: ErrorMessages.invalidIdentity,
+    });
+  }
   return await resolveUniversalHandle(inputName, req);
 }
 

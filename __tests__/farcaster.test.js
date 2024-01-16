@@ -33,7 +33,7 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
   });
-  it("It should response 404 for dwr", async () => {
+  it("It should response 200 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");
     expect(res.status).toBe(200);
     const json = await res.json();

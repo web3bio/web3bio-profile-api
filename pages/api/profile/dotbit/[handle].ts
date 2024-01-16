@@ -1,9 +1,8 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { CoinType } from "@/utils/cointype";
 
 export const config = {
@@ -30,7 +29,7 @@ export const fetchDotbitProfile = async (path: string, payload: string) => {
 export const resolveDotbitResponse = async (handle: string) => {
   let domain;
   let address;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     const res = await fetchDotbitProfile(
       "v1/reverse/record",
       JSON.stringify({

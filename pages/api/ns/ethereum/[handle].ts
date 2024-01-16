@@ -22,7 +22,5 @@ export const config = {
   regions: ["sfo1", "hnd1", "sin1"],
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
   ],
 };

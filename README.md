@@ -14,16 +14,14 @@ The supported platforms are:
 - Ethereum Name Service (ENS)
 - Lens Protocol
 - Farcaster
+- Unstoppable Domains
+- .bit
 
-Queries can be found in `pages/api/profile/`. Expect new platform support updates!
+Queries can be found in `pages/api/profile/` and `pages/api/ns/`.
 
 ## Local Dev
 
 To run the development server, use:
-
-```
-npm i && npm run dev
-```
 
 ```
 yarn && yarn dev

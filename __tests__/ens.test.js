@@ -14,14 +14,14 @@ describe("Test For ENS Profile API", () => {
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/ens/mcdonalds.eth");
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Invalid Resolver Address");
+    expect((await res.json()).error).toBe("Does Not Exist");
   });
   it("It should response 200 for dr3a.eth", async () => {
     const res = await queryClient("/profile/ens/dr3a.eth");
     expect(res.status).toBe(200);
-    const json = await res.json()
-    expect(json.links.hey).toBeTruthy()
-    expect(json.links.farcaster).toBeTruthy()
+    const json = await res.json();
+    expect(json.links.hey).toBeTruthy();
+    expect(json.links.farcaster).toBeTruthy();
   });
   it("It should response 404 for xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth", async () => {
     const res = await queryClient(
@@ -35,7 +35,7 @@ describe("Test For ENS Profile API", () => {
   it("It should response 404 for solperdev.eth", async () => {
     const res = await queryClient("/profile/ens/solperdev.eth");
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Invalid Resolved Address");
+    expect((await res.json()).error).toBe("Does Not Exist");
   });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/ens/sujiyan.eth");
@@ -81,7 +81,7 @@ describe("Test For ENS Profile API", () => {
     );
     expect(res.status).toBe(404);
     const json = await res.json();
-    expect(json.error).toBe("Invalid Address");
+    expect(json.error).toBe("Invalid Identity or Domain");
   });
   it("It should response 404 for sujiyan.lens", async () => {
     const res = await queryClient("/profile/ens/sujiyan.lens");
@@ -94,5 +94,12 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("linktr.ee/starcaster12");
+  });
+  it("It should response 200 for offchainexample.eth", async () => {
+    const res = await queryClient("/profile/ens/offchainexample.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBe("0xd8da6bf26964af9d7eed9e03e53415d37aa96045");
+    expect(json.email).toBeTruthy();
   });
 });

@@ -1,8 +1,7 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import _ from "lodash";
 import { resolveIPFS_URL } from "@/utils/ipfs";
@@ -41,7 +40,7 @@ const fetchUDProfile = async (domain: string) => {
 export const resolveUDResponse = async (handle: string) => {
   let address;
   let domain;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     const res = await fetchUDBase(`resolve/reverse/${handle}`);
     if (!res?.meta) {
       throw new Error(ErrorMessages.notFound, { cause: 404 });

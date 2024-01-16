@@ -10,10 +10,10 @@ import {
   errorHandle,
   ErrorMessages,
   respondWithCache,
+  isValidEthereumAddress,
 } from "@/utils/base";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 
 export const enum LensParamType {
   domain = "domain",
@@ -62,7 +62,7 @@ export const resolveETHFromLens = async (lens: string) => {
 
 export const resolveLensResponse = async (handle: string) => {
   let response;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     response = await getLensProfile(handle, LensParamType.address);
   } else {
     response = await getLensProfile(handle, LensParamType.domain);

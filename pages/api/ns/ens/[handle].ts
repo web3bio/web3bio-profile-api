@@ -9,14 +9,14 @@ import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { NextApiRequest } from "next";
 import {
-  isValidEthereumAddress,
   resolveENSResponse,
   resolveENSTextValue,
 } from "../../profile/ens/[handle]";
 
 export const resolveENSHandleNS = async (handle: string) => {
-  const { address, ensDomain, resolverAddress, earlyReturnJSON } =
-    await resolveENSResponse(handle);
+  const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
+    handle
+  );
   if (earlyReturnJSON) {
     return {
       address: address,
@@ -27,23 +27,16 @@ export const resolveENSHandleNS = async (handle: string) => {
       description: null,
     };
   }
-  if (!isValidEthereumAddress(resolverAddress))
-    throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
 
-  const avatarHandle =
-    (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
+  const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
     platform: PlatformType.ens,
-    displayName:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
-      ensDomain,
+    displayName: (await resolveENSTextValue(ensDomain, "name")) || ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
 
-    description:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "description")) ||
-      null,
+    description: (await resolveENSTextValue(ensDomain, "description")) || null,
   };
   return resJSON;
 };
