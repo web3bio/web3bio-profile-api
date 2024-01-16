@@ -24,7 +24,5 @@ export const config = {
   maxDuration: 45,
   unstable_allowDynamic: [
     "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
   ],
 };

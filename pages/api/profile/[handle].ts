@@ -29,7 +29,7 @@ const nextidGraphQLEndpoint =
 
 const resolveHandleFromRelationService = (
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)
+  platform: PlatformType = handleSearchPlatform(handle)!
 ) => {
   const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
@@ -251,6 +251,14 @@ export const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
+  if (!inputName || !handleSearchPlatform(inputName)) {
+    return errorHandle({
+      identity: inputName,
+      code: 500,
+      platform: PlatformType.nextid,
+      message: ErrorMessages.invalidIdentity,
+    });
+  }
   return await resolveUniversalHandle(inputName, req);
 }
 
