@@ -3,6 +3,7 @@ import {
   errorHandle,
   ErrorMessages,
   formatText,
+  isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
@@ -13,7 +14,6 @@ import {
   primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
-import { isValidEthereumAddress } from "./ens/[handle]";
 import _ from "lodash";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {

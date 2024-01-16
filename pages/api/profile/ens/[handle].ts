@@ -1,9 +1,9 @@
 import type { NextApiRequest } from "next";
-import { getAddress, isAddress } from "@ethersproject/address";
 import {
   errorHandle,
   ErrorMessages,
   formatText,
+  isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import {
@@ -56,11 +56,7 @@ const getENSRecordsQuery = `
   }
 `;
 
-export const isValidEthereumAddress = (address: string) => {
-  if (!isAddress(address)) return false; // invalid ethereum address
-  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
-  return true;
-};
+
 
 export const resolveENSTextValue = async (name: string, text: string) => {
   return await client.getEnsText({
@@ -72,14 +68,17 @@ export const resolveENSTextValue = async (name: string, text: string) => {
 export const resolveENSResponse = async (handle: string) => {
   let address = "";
   let ensDomain = "";
-
-  if (isAddress(handle)) {
+  let resolver = null;
+  if (isValidEthereumAddress(handle)) {
     if (!isValidEthereumAddress(handle))
       throw new Error(ErrorMessages.invalidAddr, { cause: 404 });
-    address = getAddress(handle).toLowerCase();
-    ensDomain = await client.getEnsName({
-      address,
-    });
+    address = handle.toLowerCase();
+    ensDomain = normalize(
+      (await client.getEnsName({
+        address,
+      })) || ""
+    );
+    resolver = (await getENSProfile(ensDomain))?.[0];
     if (!ensDomain) {
       return {
         address,
@@ -99,38 +98,40 @@ export const resolveENSResponse = async (handle: string) => {
     }
   } else {
     if (!regexEns.test(handle))
-      throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
+      throw Error(ErrorMessages.invalidIdentity, { cause: 404 });
     ensDomain = handle;
-    const resolvedAddr = await client.getEnsAddress({
+    const resolvedAddress = await client.getEnsAddress({
       name: normalize(ensDomain),
     });
+    if (!resolvedAddress)
+      throw new Error(ErrorMessages.notExist, { cause: 404 });
+    if (!isValidEthereumAddress(resolvedAddress))
+      throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+    address = resolvedAddress;
 
-    if (!resolvedAddr || !isValidEthereumAddress(resolvedAddr))
+    resolver = (await getENSProfile(ensDomain))?.[0];
+    if (!resolver?.resolver)
       throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-    address = resolvedAddr;
+    if (resolver.message) throw new Error(resolver.message);
   }
-  const response = (await getENSProfile(handle))?.[0];
-  if (!response) throw new Error(ErrorMessages.notExist, { cause: 404 });
-  if (response.message) throw new Error(response.message);
 
   return {
     address,
     ensDomain,
     earlyReturnJSON: null,
-    gtext: [response],
+    textRecords: resolver?.resolver?.texts,
   };
 };
 
 export const resolveENSHandle = async (handle: string) => {
-  const { address, ensDomain, earlyReturnJSON, gtext } =
+  const { address, ensDomain, earlyReturnJSON, textRecords } =
     await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return earlyReturnJSON;
   }
   let LINKRES = {};
-  if (gtext && gtext[0].resolver.texts) {
-    const linksRecords = gtext[0]?.resolver?.texts;
-    const linksToFetch = linksRecords.reduce(
+  if (textRecords?.length > 0) {
+    const linksToFetch = textRecords.reduce(
       (pre: Array<string>, cur: string) => {
         if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
         return pre;
@@ -232,5 +233,6 @@ export default async function handler(req: NextApiRequest) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
-  maxDuration: 60,
+  maxDuration: 45,
+  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
 };

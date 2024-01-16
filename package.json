@@ -12,14 +12,13 @@
   "dependencies": {
     "boring-avatars": "^1.10.1",
     "dotenv": "^16.1.4",
-    "ethers": "^5.7.2",
     "graphql": "^15.8.0",
     "lodash": "^4.17.21",
     "next": "13.5.4",
     "react": "18.2.0",
     "react-dom": "18.2.0",
-    "typescript": "4.8.2",
-    "viem": "^2.0.10"
+    "typescript": "5.0.4",
+    "viem": "^2.1.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.14.194",

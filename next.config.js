@@ -2,6 +2,9 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
+  experimental: {
+    forceSwcTransforms: true,
+  },
   rewrites: async () => [
     {
       source: "/:path*",

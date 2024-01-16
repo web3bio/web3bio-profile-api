@@ -1,9 +1,8 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
@@ -84,7 +83,7 @@ const resolveFarcasterLinks = (
 
 export const resolveFarcasterResponse = async (handle: string) => {
   let response;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     const user = (await fetchWarpcastWithAddress(handle))?.result?.user;
     const firstAddress = (await fetchAddressesFromWarpcastWithFid(user?.fid))
       ?.result?.verifications?.[0]?.address;
@@ -101,14 +100,13 @@ export const resolveFarcasterResponse = async (handle: string) => {
 
     const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
       ?.result?.verifications?.[0]?.address;
+    const ethAddress = regexEns.test(handle)
+      ? await client.getEnsAddress({
+          name: normalize(handle),
+        })
+      : null;
     response = {
-      address:
-        firstAddress?.toLowerCase() ||
-        (regexEns.test(handle)
-          ? await client.getEnsAddress({
-              name: normalize(handle),
-            })
-          : null),
+      address: (firstAddress || ethAddress)?.toLowerCase(),
       ...rawUser,
     };
   }
@@ -175,9 +173,5 @@ export default async function handler(req: NextApiRequest) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
+  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
 };
