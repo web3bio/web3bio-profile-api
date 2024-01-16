@@ -8,9 +8,9 @@ export type LinksItem = {
 
 interface errorHandleProps {
   identity: string | null;
-  platform: PlatformType;
   code: number;
   message: ErrorMessages | string;
+  platform: PlatformType | null;
   headers?: HeadersInit;
 }
 

@@ -254,8 +254,8 @@ export default async function handler(req: RequestInterface) {
   if (!inputName || !handleSearchPlatform(inputName)) {
     return errorHandle({
       identity: inputName,
-      code: 500,
-      platform: PlatformType.nextid,
+      code: 404,
+      platform: null,
       message: ErrorMessages.invalidIdentity,
     });
   }
