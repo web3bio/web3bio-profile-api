@@ -11,7 +11,6 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import _ from "lodash";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
@@ -55,8 +54,6 @@ const getENSRecordsQuery = `
     }
   }
 `;
-
-
 
 export const resolveENSTextValue = async (name: string, text: string) => {
   return await client.getEnsText({
@@ -110,7 +107,7 @@ export const resolveENSResponse = async (handle: string) => {
     address = resolvedAddress;
 
     resolver = (await getENSProfile(ensDomain))?.[0];
-    
+
     if (!resolver?.resolver && !address)
       throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
     if (resolver?.message) throw new Error(resolver.message);
@@ -145,10 +142,9 @@ export const resolveENSHandle = async (handle: string) => {
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
         const key =
-          _.findKey(PlatformData, (o) => {
-            return o.ensText?.includes(recordText.toLowerCase());
-          }) || recordText;
-
+          Object.values(PlatformData).find((o) =>
+            o.ensText?.includes(recordText.toLowerCase())
+          )?.key || recordText;
         const textValue = await resolveENSTextValue(ensDomain, recordText);
         const handle = resolveHandle(textValue, key as PlatformType);
 
@@ -233,7 +229,6 @@ export default async function handler(req: NextApiRequest) {
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
   maxDuration: 45,
-  unstable_allowDynamic: ["**/node_modules/lodash/**/*.js"],
 };

@@ -1,4 +1,3 @@
-import _ from "lodash";
 import { PlatformType } from "./platform";
 import {
   RelationServiceDomainQueryResponse,
