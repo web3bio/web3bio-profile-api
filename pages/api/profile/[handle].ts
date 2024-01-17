@@ -150,15 +150,12 @@ const resolveUniversalRespondFromRelation = async ({
     });
   return await Promise.allSettled([
     ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
-      const fetchURL = `${req.nextUrl.origin}/${
-        ns ? "ns" : "profile"
-      }/${x.platform.toLowerCase()}/${x.identity}`;
-      if (
-        x.platform &&
-        x.identity &&
-        shouldPlatformFetch(x.platform as PlatformType)
-      )
+      if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
+        const fetchURL = `${req.nextUrl.origin}/${
+          ns ? "ns" : "profile"
+        }/${x.platform.toLowerCase()}/${x.identity}`;
         return fetch(fetchURL).then((res) => res.json());
+      }
     }),
   ])
     .then((responses) => {
