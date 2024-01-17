@@ -12,7 +12,7 @@ import { resolveIPFS_URL } from "@/utils/ipfs";
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
 };
 
 const UDSocialAccountsList = [
