@@ -15,7 +15,7 @@ export const resolveMediaURL = (url: string) => {
       return url;
     case url.startsWith("ar://"):
       return url.replaceAll("ar://", ArweaveAssetPrefix);
-    case isIPFS_Resource(url) || url.includes("ipfs:"):
+    case url.startsWith("ipfs://") || isIPFS_Resource(url):
       return resolveIPFS_URL(url);
     default:
       return url;
