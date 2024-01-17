@@ -153,8 +153,11 @@ const resolveUniversalRespondFromRelation = async ({
       const fetchURL = `${req.nextUrl.origin}/${
         ns ? "ns" : "profile"
       }/${x.platform.toLowerCase()}/${x.identity}`;
-
-      if (x.platform && x.identity)
+      if (
+        x.platform &&
+        x.identity &&
+        shouldPlatformFetch(x.platform as PlatformType)
+      )
         return fetch(fetchURL).then((res) => res.json());
     }),
   ])
