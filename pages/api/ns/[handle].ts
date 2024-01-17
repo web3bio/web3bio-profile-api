@@ -14,7 +14,7 @@ export default async function handler(req: RequestInterface) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, req, true);
+  return await resolveUniversalHandle(inputName, req, platform, true);
 }
 
 export const config = {

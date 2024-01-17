@@ -101,20 +101,19 @@ const resolveUniversalRespondFromRelation = async ({
   req: RequestInterface;
   ns?: boolean;
 }) => {
-  let serverError = false;
   let notFound = false;
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
   );
-  if (responseFromRelation?.errors) serverError = true;
-  if (serverError)
+  if (responseFromRelation?.errors)
     return errorHandle({
       identity: handle,
       platform,
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
     });
+
   if (isDomainSearch(platform)) {
     if (!responseFromRelation?.data?.domain) notFound = true;
   } else {
@@ -221,13 +220,13 @@ const resolveUniversalRespondFromRelation = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface,
+  platform: PlatformType,
   ns?: boolean
 ) => {
-  const platformToQuery = handleSearchPlatform(handle);
   const handleToQuery = handle.endsWith(".farcaster")
     ? handle.substring(0, handle.length - 10)
     : handle;
-  if (!handleToQuery || !platformToQuery)
+  if (!handleToQuery || !platform)
     return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
@@ -235,7 +234,7 @@ export const resolveUniversalHandle = async (
       message: ErrorMessages.invalidIdentity,
     });
   if (
-    platformToQuery === PlatformType.ethereum &&
+    platform === PlatformType.ethereum &&
     !isValidEthereumAddress(handleToQuery)
   )
     return errorHandle({
@@ -245,7 +244,7 @@ export const resolveUniversalHandle = async (
       message: ErrorMessages.invalidAddr,
     });
   return await resolveUniversalRespondFromRelation({
-    platform: platformToQuery as PlatformType,
+    platform,
     handle: handleToQuery,
     req,
     ns,
@@ -264,7 +263,7 @@ export default async function handler(req: RequestInterface) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, req);
+  return await resolveUniversalHandle(inputName, req, platform, false);
 }
 
 export const config = {
