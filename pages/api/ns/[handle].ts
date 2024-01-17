@@ -1,11 +1,12 @@
 import { handleSearchPlatform } from "@/utils/utils";
 import { RequestInterface, resolveUniversalHandle } from "../profile/[handle]";
-import { ErrorMessages, errorHandle } from "@/utils/base";
+import { ErrorMessages, errorHandle, shouldPlatformFetch } from "@/utils/base";
 
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  if (!inputName || !handleSearchPlatform(inputName)) {
+  const platform = handleSearchPlatform(inputName);
+  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
     return errorHandle({
       identity: inputName,
       code: 404,
@@ -19,9 +20,4 @@ export default async function handler(req: RequestInterface) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
 };

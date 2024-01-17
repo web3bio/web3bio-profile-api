@@ -76,3 +76,17 @@ export const isValidEthereumAddress = (address: string) => {
   if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
   return true;
 };
+
+export const shouldPlatformFetch = (platform?: PlatformType | null)=>{
+  if(!platform) return false
+  if([
+    PlatformType.ens,
+    PlatformType.ethereum,
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.unstoppableDomains,
+    PlatformType.dotbit,
+    PlatformType.nextid
+  ].includes(platform)) return true
+  return false
+}

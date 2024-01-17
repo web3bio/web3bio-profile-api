@@ -1,9 +1,13 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import _ from "lodash";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 
 export const config = {
@@ -32,9 +36,12 @@ const fetchUDBase = async (path: string) => {
   }).then((res) => res.json());
 };
 const fetchUDProfile = async (domain: string) => {
-  return fetch(`${UDProfileEndpoint}/${domain}?fields=profile,records,socialAccounts`, {
-    method: "GET",
-  }).then((res) => res.json());
+  return fetch(
+    `${UDProfileEndpoint}/${domain}?fields=profile,records,socialAccounts`,
+    {
+      method: "GET",
+    }
+  ).then((res) => res.json());
 };
 
 export const resolveUDResponse = async (handle: string) => {
@@ -77,8 +84,7 @@ export const resolveUDHandle = async (handle: string) => {
   if (metadata.records?.["ipfs.html.value"]) {
     LINKRES[PlatformType.url] = {
       handle: domain,
-      link:
-        resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
+      link: resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
   }
   if (metadata.socialAccounts) {
@@ -99,7 +105,10 @@ export const resolveUDHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.unstoppableDomains,
     displayName: metadata.profile.displayName || handle,
-    avatar: metadata.profile.imageType === "default" ? null : metadata.profile.imagePath || null,
+    avatar:
+      metadata.profile.imageType === "default"
+        ? null
+        : metadata.profile.imagePath || null,
     description: metadata.profile.description || null,
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,

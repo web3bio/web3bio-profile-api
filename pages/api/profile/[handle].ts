@@ -14,7 +14,7 @@ import {
   primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
-import _ from "lodash";
+import { shouldPlatformFetch } from "../../../utils/base";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -128,16 +128,20 @@ const resolveUniversalRespondFromRelation = async ({
       code: 404,
     });
   }
-  const resolvedRequestArray = _.sortBy(
+  const resolvedRequestArray = (
     isDomainSearch(platform)
       ? primaryDomainResolvedRequestArray(
           responseFromRelation,
           handle,
           platform
         )
-      : primaryIdentityResolvedRequestArray(responseFromRelation),
-    [(x) => !x.reverse]
-  );
+      : primaryIdentityResolvedRequestArray(responseFromRelation)
+  ).sort((a, b) => {
+    if (a.reverse && b.reverse) return 0;
+    if (a.reverse && !b.reverse) return -1;
+    if (!a.reverse && b.reverse) return 1;
+    return 0;
+  });
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,
@@ -251,7 +255,8 @@ export const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  if (!inputName || !handleSearchPlatform(inputName)) {
+  const platform = handleSearchPlatform(inputName);
+  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
     return errorHandle({
       identity: inputName,
       code: 404,
@@ -266,9 +271,4 @@ export const config = {
   runtime: "edge",
   regions: ["sfo1", "hnd1", "sin1"],
   maxDuration: 45,
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
 };
