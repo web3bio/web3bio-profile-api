@@ -1,9 +1,9 @@
 import type { NextApiRequest } from "next";
-import { getAddress, isAddress } from "@ethersproject/address";
 import {
   errorHandle,
   ErrorMessages,
   formatText,
+  isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import {
@@ -11,26 +11,16 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import _ from "lodash";
 import { PlatformType, PlatformData } from "@/utils/platform";
-import { CoinType } from "@/utils/cointype";
 import { regexEns, regexEth } from "@/utils/regexp";
-import { ethers } from "ethers";
-import { base, resolverABI } from "../../../../utils/resolverABI";
-import { formatsByCoinType } from "@ensdomains/address-encoder";
+import { createPublicClient, http } from "viem";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
 
-const ENSRegistryAddress = "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e";
-const ENSReverseRecordsAddress = "0x3671aE578E63FdF66ad4F3E12CC0c0d71Ac7510C";
-
-const iface = new ethers.utils.Interface(base);
-const resolverFace = new ethers.utils.Interface(resolverABI);
-
-export const isValidEthereumAddress = (address: string) => {
-  if (!isAddress(address)) return false; // invalid ethereum address
-  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
-  return true;
-};
-
+const client = createPublicClient({
+  chain: mainnet,
+  transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
+}) as any;
 const ensSubGraphBaseURL =
   "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
 
@@ -65,115 +55,27 @@ const getENSRecordsQuery = `
   }
 `;
 
-const ethereumRPCURL =
-  process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL || "https://rpc.ankr.com/eth	";
-
-export const resolveAddressFromName = async (name: string) => {
-  if (!name) return null;
-  const res = await getENSProfile(name);
-  return res?.[0];
-};
-
-const fetchEthereumRPC = async ({
-  data,
-  to,
-  decodeType,
-}: {
-  data: string;
-  to: string;
-  decodeType: string;
-}) => {
-  try {
-    const resp = await fetch(ethereumRPCURL, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        jsonrpc: "2.0",
-        id: "1",
-        method: "eth_call",
-        params: [{ to, data }, "latest"],
-      }),
-    });
-    const res = await resp.text();
-
-    const rr = ethers.utils.defaultAbiCoder.decode(
-      [ethers.utils.ParamType.from(decodeType)],
-      JSON.parse(res)?.result
-    );
-    return rr[0];
-  } catch (e) {
-    return null;
-  }
-};
-export const getResolverAddressFromName = async (name: string) => {
-  const node = ethers.utils.namehash(name);
-  const data = iface.encodeFunctionData("resolver", [node]);
-  const res = await fetchEthereumRPC({
-    data: data,
-    to: ENSRegistryAddress,
-    decodeType: "address",
+export const resolveENSTextValue = async (name: string, text: string) => {
+  return await client.getEnsText({
+    name: normalize(name),
+    key: text,
   });
-  return res?.toLowerCase();
-};
-
-export const resolveNameFromAddress = async (address: string) => {
-  const data = iface.encodeFunctionData("getNames", [[address.substring(2)]]);
-  return (
-    await fetchEthereumRPC({
-      data: data,
-      to: ENSReverseRecordsAddress,
-      decodeType: "string[]",
-    })
-  )?.[0].toLowerCase();
-};
-
-export const resolveENSTextValue = async (
-  resolverAddress: string,
-  name: string,
-  text: string
-) => {
-  const nodeHash = ethers.utils.namehash(name);
-  const data = resolverFace.encodeFunctionData("text", [nodeHash, text]);
-  return await fetchEthereumRPC({
-    data: data,
-    to: resolverAddress,
-    decodeType: "string",
-  });
-};
-
-export const resolveENSCoinTypesValue = async (
-  resolverAddress: string,
-  name: string,
-  coinType: string | number
-) => {
-  if (!resolverAddress) return null;
-  const nodeHash = ethers.utils.namehash(name);
-  const { encoder } = formatsByCoinType[coinType];
-  const data = resolverFace.encodeFunctionData("addr", [nodeHash, coinType]);
-  const rr = await fetchEthereumRPC({
-    data: data,
-    to: resolverAddress,
-    decodeType: "bytes",
-  });
-  if (!rr || rr === "0x") return null;
-
-  return encoder(Buffer.from(rr.slice(2), "hex")).toLowerCase();
 };
 
 export const resolveENSResponse = async (handle: string) => {
   let address = "";
   let ensDomain = "";
-  let resolverAddress = "";
-  let gtext = [] as any;
-
-  if (isAddress(handle)) {
+  let resolver = null;
+  if (isValidEthereumAddress(handle)) {
     if (!isValidEthereumAddress(handle))
       throw new Error(ErrorMessages.invalidAddr, { cause: 404 });
-
-    address = getAddress(handle).toLowerCase();
-    ensDomain = await resolveNameFromAddress(handle);
+    address = handle.toLowerCase();
+    ensDomain = normalize(
+      (await client.getEnsName({
+        address,
+      })) || ""
+    );
+    resolver = (await getENSProfile(ensDomain))?.[0];
     if (!ensDomain) {
       return {
         address,
@@ -191,61 +93,43 @@ export const resolveENSResponse = async (handle: string) => {
         },
       };
     }
-    resolverAddress = await getResolverAddressFromName(ensDomain);
   } else {
     if (!regexEns.test(handle))
-      throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
-
+      throw Error(ErrorMessages.invalidIdentity, { cause: 404 });
     ensDomain = handle;
-    const response = await resolveAddressFromName(handle);
-    if (!response) throw new Error(ErrorMessages.notExist, { cause: 404 });
-
-    if (response.message) throw new Error(response.message);
-    resolverAddress = await getResolverAddressFromName(handle);
-
-    if (!isValidEthereumAddress(resolverAddress))
-      throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-
-    gtext = [response];
-    address = await resolveENSCoinTypesValue(
-      resolverAddress,
-      handle,
-      CoinType.eth
-    );
-    if (!address || !isValidEthereumAddress(address))
+    const resolvedAddress = await client.getEnsAddress({
+      name: normalize(ensDomain),
+    });
+    if (!resolvedAddress)
+      throw new Error(ErrorMessages.notExist, { cause: 404 });
+    if (!isValidEthereumAddress(resolvedAddress))
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+    address = resolvedAddress;
+
+    resolver = (await getENSProfile(ensDomain))?.[0];
+
+    if (!resolver?.resolver && !address)
+      throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
+    if (resolver?.message) throw new Error(resolver.message);
   }
 
   return {
     address,
     ensDomain,
-    resolverAddress,
     earlyReturnJSON: null,
-    gtext,
+    textRecords: resolver?.resolver?.texts,
   };
 };
 
 export const resolveENSHandle = async (handle: string) => {
-  const {
-    address,
-    ensDomain,
-    resolverAddress,
-    earlyReturnJSON,
-    gtext: originGText,
-  } = await resolveENSResponse(handle);
+  const { address, ensDomain, earlyReturnJSON, textRecords } =
+    await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return earlyReturnJSON;
   }
-  if (!isValidEthereumAddress(resolverAddress))
-    throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-
-  let gtext = originGText;
-
-  gtext = !gtext?.length ? await getENSProfile(ensDomain) : gtext;
   let LINKRES = {};
-  if (gtext && gtext[0].resolver.texts) {
-    const linksRecords = gtext[0]?.resolver?.texts;
-    const linksToFetch = linksRecords.reduce(
+  if (textRecords?.length > 0) {
+    const linksToFetch = textRecords.reduce(
       (pre: Array<string>, cur: string) => {
         if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
         return pre;
@@ -257,17 +141,14 @@ export const resolveENSHandle = async (handle: string) => {
       const _linkRes: { [index: string]: any } = {};
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
-        const key = _.findKey(PlatformData, (o) => {
-          return o.ensText?.includes(recordText.toLowerCase());
-        });
-        const textValue = await resolveENSTextValue(
-          resolverAddress,
-          ensDomain,
-          recordText
-        );
+        const key =
+          Object.values(PlatformData).find((o) =>
+            o.ensText?.includes(recordText.toLowerCase())
+          )?.key || recordText;
+        const textValue = await resolveENSTextValue(ensDomain, recordText);
         const handle = resolveHandle(textValue, key as PlatformType);
 
-        if (key && handle) {
+        if (textValue && handle) {
           const resolvedKey =
             key === PlatformType.url ? PlatformType.website : key;
           _linkRes[resolvedKey] = {
@@ -281,26 +162,17 @@ export const resolveENSHandle = async (handle: string) => {
     LINKRES = await getLink();
   }
 
-  const headerHandle =
-    (await resolveENSTextValue(resolverAddress, ensDomain, "header")) || null;
-  const avatarHandle =
-    (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
+  const headerHandle = (await resolveENSTextValue(ensDomain, "header")) || null;
+  const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
     platform: PlatformType.ens,
-    displayName:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
-      ensDomain,
+    displayName: (await resolveENSTextValue(ensDomain, "name")) || ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
-    description:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "description")) ||
-      null,
-    email:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "email")) || null,
-    location:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "location")) ||
-      null,
+    description: (await resolveENSTextValue(ensDomain, "description")) || null,
+    email: (await resolveENSTextValue(ensDomain, "email")) || null,
+    location: (await resolveENSTextValue(ensDomain, "location")) || null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
     links: LINKRES,
   };
@@ -344,6 +216,7 @@ export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle") || "";
   const lowercaseName = inputName?.toLowerCase();
+
   if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
       identity: lowercaseName,
@@ -356,11 +229,6 @@ export default async function handler(req: NextApiRequest) {
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
   maxDuration: 45,
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
 };

@@ -3,6 +3,7 @@ import {
   errorHandle,
   ErrorMessages,
   formatText,
+  isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
@@ -13,8 +14,7 @@ import {
   primaryIdentityResolvedRequestArray,
 } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
-import { isValidEthereumAddress } from "./ens/[handle]";
-import _ from "lodash";
+import { shouldPlatformFetch } from "../../../utils/base";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
@@ -29,7 +29,7 @@ const nextidGraphQLEndpoint =
 
 const resolveHandleFromRelationService = (
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)
+  platform: PlatformType = handleSearchPlatform(handle)!
 ) => {
   const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
@@ -101,20 +101,19 @@ const resolveUniversalRespondFromRelation = async ({
   req: RequestInterface;
   ns?: boolean;
 }) => {
-  let serverError = false;
   let notFound = false;
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
   );
-  if (responseFromRelation?.errors) serverError = true;
-  if (serverError)
+  if (responseFromRelation?.errors)
     return errorHandle({
       identity: handle,
       platform,
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
     });
+
   if (isDomainSearch(platform)) {
     if (!responseFromRelation?.data?.domain) notFound = true;
   } else {
@@ -128,16 +127,20 @@ const resolveUniversalRespondFromRelation = async ({
       code: 404,
     });
   }
-  const resolvedRequestArray = _.sortBy(
+  const resolvedRequestArray = (
     isDomainSearch(platform)
       ? primaryDomainResolvedRequestArray(
           responseFromRelation,
           handle,
           platform
         )
-      : primaryIdentityResolvedRequestArray(responseFromRelation),
-    [(x) => !x.reverse]
-  );
+      : primaryIdentityResolvedRequestArray(responseFromRelation)
+  ).sort((a, b) => {
+    if (a.reverse && b.reverse) return 0;
+    if (a.reverse && !b.reverse) return -1;
+    if (!a.reverse && b.reverse) return 1;
+    return 0;
+  });
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,
@@ -217,13 +220,13 @@ const resolveUniversalRespondFromRelation = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface,
+  platform: PlatformType,
   ns?: boolean
 ) => {
-  const platformToQuery = handleSearchPlatform(handle);
   const handleToQuery = handle.endsWith(".farcaster")
     ? handle.substring(0, handle.length - 10)
     : handle;
-  if (!handleToQuery || !platformToQuery)
+  if (!handleToQuery || !platform)
     return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
@@ -231,7 +234,7 @@ export const resolveUniversalHandle = async (
       message: ErrorMessages.invalidIdentity,
     });
   if (
-    platformToQuery === PlatformType.ethereum &&
+    platform === PlatformType.ethereum &&
     !isValidEthereumAddress(handleToQuery)
   )
     return errorHandle({
@@ -241,7 +244,7 @@ export const resolveUniversalHandle = async (
       message: ErrorMessages.invalidAddr,
     });
   return await resolveUniversalRespondFromRelation({
-    platform: platformToQuery as PlatformType,
+    platform,
     handle: handleToQuery,
     req,
     ns,
@@ -251,16 +254,20 @@ export const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  return await resolveUniversalHandle(inputName, req);
+  const platform = handleSearchPlatform(inputName);
+  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
+    return errorHandle({
+      identity: inputName,
+      code: 404,
+      platform: null,
+      message: ErrorMessages.invalidIdentity,
+    });
+  }
+  return await resolveUniversalHandle(inputName, req, platform, false);
 }
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
   maxDuration: 45,
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
 };

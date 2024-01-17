@@ -1,4 +1,4 @@
-import { isAddress } from "ethers/lib/utils";
+import { isAddress } from "viem";
 import { PlatformType } from "./platform";
 
 export type LinksItem = {
@@ -8,9 +8,9 @@ export type LinksItem = {
 
 interface errorHandleProps {
   identity: string | null;
-  platform: PlatformType;
   code: number;
   message: ErrorMessages | string;
+  platform: PlatformType | null;
   headers?: HeadersInit;
 }
 
@@ -25,16 +25,16 @@ export enum ErrorMessages {
 }
 
 export const errorHandle = (props: errorHandleProps) => {
-  const _isAddress = isAddress(props.identity || "");
+  const isValidAddress = isValidEthereumAddress(props.identity || "");
   return new Response(
     JSON.stringify({
-      address: _isAddress ? props.identity : null,
-      identity: !_isAddress ? props.identity : null,
+      address: isValidAddress ? props.identity : null,
+      identity: !isValidAddress ? props.identity : null,
       platform: props.platform,
       error: props.message,
     }),
     {
-      status: props.code,
+      status: isNaN(props.code) ? 500 : props.code,
       headers: {
         "Cache-Control": "no-store",
         ...props.headers,
@@ -51,7 +51,7 @@ export const respondWithCache = (json: string) => {
   });
 };
 
-export const formatText = (string:string, length?: number) => {
+export const formatText = (string: string, length?: number) => {
   if (!string) return "";
   const len = length ?? 12;
   if (string.length <= len) {
@@ -70,3 +70,23 @@ export const formatText = (string:string, length?: number) => {
   }
   return string;
 };
+
+export const isValidEthereumAddress = (address: string) => {
+  if (!isAddress(address)) return false; // invalid ethereum address
+  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
+  return true;
+};
+
+export const shouldPlatformFetch = (platform?: PlatformType | null)=>{
+  if(!platform) return false
+  if([
+    PlatformType.ens,
+    PlatformType.ethereum,
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.unstoppableDomains,
+    PlatformType.dotbit,
+    PlatformType.nextid
+  ].includes(platform)) return true
+  return false
+}

@@ -30,6 +30,8 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("lilgho.lens");
+    // sort check
+    expect(json[1].identity).toBe("stani.lens");
     expect(json.length).toBe(3);
   });
   it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
@@ -143,5 +145,11 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
+  });
+  it("It should response 404 data for sujiyan.bnb", async () => {
+    const res = await queryClient("/profile/sujiyan.bnb");
+    expect(res.status).toBe(404);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid Identity or Domain");
   });
 });
