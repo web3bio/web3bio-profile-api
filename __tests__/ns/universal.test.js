@@ -24,7 +24,7 @@ describe("Test For Universal NS API", () => {
     const res = await queryClient("/ns/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe('stani.lens');
+    expect(json[0].identity).toBe("stani.lens");
   });
 
   it("It should response 200 data for jeffx.bit", async () => {
@@ -45,5 +45,13 @@ describe("Test For Universal NS API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
+  });
+  it("It should response 200 data for freeguy.eth", async () => {
+    const res = await queryClient("/ns/freeguy.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find((x) => x.platform === "ENS").address).toBe(
+      "0x18dbd0bfd810ac8cf6d1eee77fc3905db4c1bf48"
+    );
   });
 });
