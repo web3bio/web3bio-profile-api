@@ -31,6 +31,12 @@ describe("Test For Dotbit Profile API", () => {
     const res = await queryClient("/profile/dotbit/mitchatmask.bit");
     expect(res.status).toBe(404);
   });
+  it("It should response 200 for satoshi.bit", async () => {
+    const res = await queryClient("/profile/dotbit/satoshi.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBe("0xee8738e3d3e80482526b33c91dd343caef68e41a");
+  });
   it("It should response 200 for phone.bit", async () => {
     const res = await queryClient("/profile/dotbit/phone.bit");
     expect(res.status).toBe(200);
