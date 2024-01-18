@@ -86,8 +86,8 @@ export const primaryDomainResolvedRequestArray = (
     return [
       ...(resolved || []),
       {
-        identity: data.data.domain.resolved.identity,
-        platform: data.data.domain.resolved.platform,
+        identity: data?.data?.domain?.resolved?.identity,
+        platform: data?.data?.domain?.resolved?.platform,
         reverse: null,
       },
     ];

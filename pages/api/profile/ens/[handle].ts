@@ -97,12 +97,14 @@ export const resolveENSResponse = async (handle: string) => {
     if (!regexEns.test(handle))
       throw Error(ErrorMessages.invalidIdentity, { cause: 404 });
     ensDomain = handle;
-    const resolvedAddress = await client.getEnsAddress({
-      name: normalize(ensDomain),
-    });
-    if (!resolvedAddress)
-      throw new Error(ErrorMessages.notExist, { cause: 404 });
-    if (!isValidEthereumAddress(resolvedAddress))
+    const resolvedAddress = await client
+      .getEnsAddress({
+        name: normalize(ensDomain),
+      })
+      .then((res: string) => res)
+      .catch((e: any) => null);
+
+    if (!isValidEthereumAddress(resolvedAddress) || !resolvedAddress)
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     address = resolvedAddress;
 
