@@ -152,4 +152,10 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json.error).toBe("Invalid Identity or Domain");
   });
+  it("It should response 200 data for shoni.eth", async () => {
+    const res = await queryClient("/profile/shoni.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.filter(x=>x.platform === 'farcaster').length).toBe(1);
+  });
 });

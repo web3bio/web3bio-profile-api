@@ -14,7 +14,7 @@ describe("Test For ENS Profile API", () => {
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/ens/mcdonalds.eth");
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Does Not Exist");
+    expect((await res.json()).error).toBe("Invalid Resolved Address");
   });
   it("It should response 200 for dr3a.eth", async () => {
     const res = await queryClient("/profile/ens/dr3a.eth");
@@ -30,12 +30,12 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.address).toBe(null);
-    expect(json.error).toBe("Does Not Exist");
+    expect(json.error).toBe("Invalid Resolved Address");
   });
   it("It should response 404 for solperdev.eth", async () => {
     const res = await queryClient("/profile/ens/solperdev.eth");
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Does Not Exist");
+    expect((await res.json()).error).toBe("Invalid Resolved Address");
   });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/ens/sujiyan.eth");

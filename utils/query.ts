@@ -83,14 +83,7 @@ export const primaryDomainResolvedRequestArray = (
         platform: x.identity.platform,
         reverse: x.reverse,
       }));
-    return [
-      ...(resolved || []),
-      {
-        identity: data.data.domain.resolved.identity,
-        platform: data.data.domain.resolved.platform,
-        reverse: null,
-      },
-    ];
+    return [...(resolved || []), defaultReturn];
   }
   return [defaultReturn];
 };
