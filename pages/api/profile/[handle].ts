@@ -150,12 +150,12 @@ const resolveUniversalRespondFromRelation = async ({
     });
   return await Promise.allSettled([
     ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
-      const fetchURL = `${req.nextUrl.origin}/${
-        ns ? "ns" : "profile"
-      }/${x.platform.toLowerCase()}/${x.identity}`;
-
-      if (x.platform && x.identity)
+      if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
+        const fetchURL = `${req.nextUrl.origin}/${
+          ns ? "ns" : "profile"
+        }/${x.platform.toLowerCase()}/${x.identity}`;
         return fetch(fetchURL).then((res) => res.json());
+      }
     }),
   ])
     .then((responses) => {
@@ -199,12 +199,23 @@ const resolveUniversalRespondFromRelation = async ({
               }) as ProfileAPIResponse
         );
       }
-      return returnRes?.filter((x) => !x?.error)?.length
-        ? respondWithCache(JSON.stringify(returnRes))
+      const uniqRes = returnRes.reduce((pre, cur) => {
+        if (
+          cur &&
+          !pre.find(
+            (x) => x.platform === cur.platform && x.identity === cur.identity
+          )
+        ) {
+          pre.push(cur);
+        }
+        return pre;
+      }, [] as ProfileAPIResponse[]);
+      return uniqRes?.filter((x) => !x?.error)?.length
+        ? respondWithCache(JSON.stringify(uniqRes))
         : errorHandle({
             identity: handle,
             code: 404,
-            message: returnRes[0]?.error || ErrorMessages.notFound,
+            message: uniqRes[0]?.error || ErrorMessages.notFound,
             platform,
           });
     })
