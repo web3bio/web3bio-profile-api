@@ -15,7 +15,6 @@ import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
-import { normalize } from "viem/ens";
 
 const client = createPublicClient({
   chain: mainnet,
@@ -57,7 +56,7 @@ const getENSRecordsQuery = `
 
 export const resolveENSTextValue = async (name: string, text: string) => {
   return await client.getEnsText({
-    name: normalize(name),
+    name: name,
     key: text,
   });
 };
@@ -70,11 +69,11 @@ export const resolveENSResponse = async (handle: string) => {
     if (!isValidEthereumAddress(handle))
       throw new Error(ErrorMessages.invalidAddr, { cause: 404 });
     address = handle.toLowerCase();
-    ensDomain = normalize(
+    ensDomain =
       (await client.getEnsName({
         address,
-      })) || ""
-    );
+      })) || "";
+
     resolver = (await getENSProfile(ensDomain))?.[0];
     if (!ensDomain) {
       return {
@@ -97,16 +96,18 @@ export const resolveENSResponse = async (handle: string) => {
     if (!regexEns.test(handle))
       throw Error(ErrorMessages.invalidIdentity, { cause: 404 });
     ensDomain = handle;
-    const resolvedAddress = await client
-      .getEnsAddress({
-        name: normalize(ensDomain),
-      })
-      .then((res: string) => res)
-      .catch((e: any) => null);
+    try {
+      address = await client
+        .getEnsAddress({
+          name: ensDomain,
+        })
+        .then((res: string) => res);
+    } catch (e) {
+      console.log("error", e);
+    }
 
-    if (!isValidEthereumAddress(resolvedAddress) || !resolvedAddress)
+    if (!isValidEthereumAddress(address) || !address)
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
-    address = resolvedAddress;
 
     resolver = (await getENSProfile(ensDomain))?.[0];
 
