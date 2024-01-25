@@ -15,7 +15,6 @@ import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
-import { getContenthashFeedURL } from "@/utils/query";
 
 const client = createPublicClient({
   chain: mainnet,
@@ -50,6 +49,7 @@ const getENSRecordsQuery = `
       resolver {
         texts
         coinTypes
+        contentHash
       }
     }
   }
@@ -123,11 +123,12 @@ export const resolveENSResponse = async (handle: string) => {
     ensDomain,
     earlyReturnJSON: null,
     textRecords: resolver?.resolver?.texts,
+    contentHash: resolver?.resolver?.contentHash,
   };
 };
 
 export const resolveENSHandle = async (handle: string) => {
-  const { address, ensDomain, earlyReturnJSON, textRecords } =
+  const { address, ensDomain, earlyReturnJSON, textRecords, contentHash } =
     await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return earlyReturnJSON;
@@ -169,6 +170,7 @@ export const resolveENSHandle = async (handle: string) => {
 
   const headerHandle = (await resolveENSTextValue(ensDomain, "header")) || null;
   const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
+
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
@@ -179,7 +181,7 @@ export const resolveENSHandle = async (handle: string) => {
     email: (await resolveENSTextValue(ensDomain, "email")) || null,
     location: (await resolveENSTextValue(ensDomain, "location")) || null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
-    contenthash: (await getContenthashFeedURL(ensDomain)) || null,
+    contenthash: contentHash,
     links: LINKRES,
   };
   return resJSON;

@@ -7,6 +7,7 @@ describe("Test For Unstoppable Domains Profile API", () => {
     const json = await res.json();
     expect(json.links.twitter.handle).toBe("bgm38");
     expect(json.address).toBe("0x0da0ee86269797618032e56a69b1aad095c581fc");
+    expect(json.contenthash).toBeTruthy();
   });
   it("It should response 200 for sandy.x", async () => {
     const res = await queryClient("/profile/unstoppabledomains/sandy.x");

@@ -9,7 +9,6 @@ import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { resolveIPFS_URL } from "@/utils/ipfs";
-import { getContenthashFeedURL } from "@/utils/query";
 
 export const config = {
   runtime: "edge",
@@ -113,10 +112,9 @@ export const resolveUDHandle = async (handle: string) => {
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
-    contenthash:
-      (await getContenthashFeedURL(
-        LINKRES?.website?.link || LINKRES?.url?.link || ""
-      )) || null,
+    contenthash: LINKRES.url?.link
+      ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
+      : null,
     links: LINKRES || null,
   };
 };
