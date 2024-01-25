@@ -157,7 +157,7 @@ export const getContenthashFeedURL = async (query: string) => {
     const url =
       "https://public-api.wordpress.com/rest/v1.1/read/feed/?url=" + fetchParam;
     const res = await fetch(url).then((response) => response.json());
-    console.log(res, url, "kkkk");
+    
     return res.feeds?.[0].subscribe_URL;
   } catch (e) {
     console.log(e, "error occurs when fetching rss url");

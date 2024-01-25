@@ -100,7 +100,6 @@ export const resolveUDHandle = async (handle: string) => {
       }
     });
   }
-
   return {
     address,
     identity: domain,
@@ -115,7 +114,9 @@ export const resolveUDHandle = async (handle: string) => {
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
     contenthash:
-      (await getContenthashFeedURL(LINKRES?.url?.link || "")) || null,
+      (await getContenthashFeedURL(
+        LINKRES?.website?.link || LINKRES?.url?.link || ""
+      )) || null,
     links: LINKRES || null,
   };
 };
