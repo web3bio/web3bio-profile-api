@@ -78,7 +78,6 @@ export const resolveDotbitHandle = async (handle: string) => {
   let location;
   let header;
   const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
-
   const linksObj: Record<
     string,
     {
@@ -111,7 +110,7 @@ export const resolveDotbitHandle = async (handle: string) => {
     email: recordsMap.get("profile.email")?.value || null,
     location: location || null,
     header: header || null,
-    contenthash: null,
+    contenthash: `https://${domain}.cc`,
     links: linksObj,
   };
 };
