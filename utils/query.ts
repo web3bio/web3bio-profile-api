@@ -1,4 +1,5 @@
 import { PlatformType } from "./platform";
+import { regexDomain, regexDotbit, regexEns } from "./regexp";
 import {
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
@@ -133,5 +134,33 @@ export const primaryIdentityResolvedRequestArray = (
         reverse: x.reverse,
       }));
     return [...reverseFromNeighbor, defaultReturn];
+  }
+};
+
+export const getContenthashFeedURL = async (query: string) => {
+  if (!query) return null;
+  const fetchParam = (() => {
+    switch (!!query) {
+      case regexEns.test(query):
+        return query + ".limo";
+      case regexDotbit.test(query):
+        return query + ".cc";
+      case regexDomain.test(query):
+        return query.startsWith("https://") || query.startsWith("http://")
+          ? query
+          : "https://" + query;
+      default:
+        return query;
+    }
+  })();
+  try {
+    const url =
+      "https://public-api.wordpress.com/rest/v1.1/read/feed/?url=" + fetchParam;
+    const res = await fetch(url).then((response) => response.json());
+    console.log(res, url, "kkkk");
+    return res.feeds?.[0].subscribe_URL;
+  } catch (e) {
+    console.log(e, "error occurs when fetching rss url");
+    return null;
   }
 };

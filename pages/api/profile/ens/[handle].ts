@@ -15,6 +15,7 @@ import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
+import { getContenthashFeedURL } from "@/utils/query";
 
 const client = createPublicClient({
   chain: mainnet,
@@ -88,6 +89,7 @@ export const resolveENSResponse = async (handle: string) => {
           email: null,
           location: null,
           header: null,
+          contenthash: null,
           links: null,
         },
       };
@@ -177,6 +179,7 @@ export const resolveENSHandle = async (handle: string) => {
     email: (await resolveENSTextValue(ensDomain, "email")) || null,
     location: (await resolveENSTextValue(ensDomain, "location")) || null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
+    contenthash: (await getContenthashFeedURL(ensDomain)) || null,
     links: LINKRES,
   };
   return resJSON;

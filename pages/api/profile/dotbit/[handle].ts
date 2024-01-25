@@ -4,6 +4,7 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { CoinType } from "@/utils/cointype";
+import { getContenthashFeedURL } from "@/utils/query";
 
 export const config = {
   runtime: "edge",
@@ -111,6 +112,7 @@ export const resolveDotbitHandle = async (handle: string) => {
     email: recordsMap.get("profile.email")?.value || null,
     location: location || null,
     header: header || null,
+    contenthash: (await getContenthashFeedURL(domain)) || null,
     links: linksObj,
   };
 };
