@@ -42,7 +42,7 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
-    expect(json.contenthash).toBeTruthy();
+    expect(json.contenthash.startsWith('ipns')).toBeTruthy();
   });
   it("It should response 200 for vitalik.eth", async () => {
     const res = await queryClient("/profile/ens/vitalik.eth");

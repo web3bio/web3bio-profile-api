@@ -7,6 +7,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import {
+  decodeContenthash,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
@@ -170,7 +171,6 @@ export const resolveENSHandle = async (handle: string) => {
 
   const headerHandle = (await resolveENSTextValue(ensDomain, "header")) || null;
   const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
-
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
@@ -181,7 +181,7 @@ export const resolveENSHandle = async (handle: string) => {
     email: (await resolveENSTextValue(ensDomain, "email")) || null,
     location: (await resolveENSTextValue(ensDomain, "location")) || null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
-    contenthash: contentHash,
+    contenthash: decodeContenthash(contentHash),
     links: LINKRES,
   };
   return resJSON;
