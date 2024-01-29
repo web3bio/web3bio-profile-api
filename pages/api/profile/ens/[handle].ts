@@ -159,17 +159,18 @@ export const resolveENSHandle = async (handle: string) => {
         const key =
           Object.values(PlatformData).find((o) =>
             o.ensText?.includes(recordText.toLowerCase())
-          )?.key || recordText;
-        const textValue = await resolveENSTextValue(ensDomain, recordText);
-        const handle = resolveHandle(textValue, key as PlatformType);
-
-        if (textValue && handle) {
-          const resolvedKey =
-            key === PlatformType.url ? PlatformType.website : key;
-          _linkRes[resolvedKey] = {
-            link: getSocialMediaLink(handle, resolvedKey),
-            handle: handle,
-          };
+          )?.key || null;
+        if (key) {
+          const textValue = await resolveENSTextValue(ensDomain, recordText);
+          const handle = resolveHandle(textValue, key as PlatformType);
+          if (textValue && handle) {
+            const resolvedKey =
+              key === PlatformType.url ? PlatformType.website : key;
+            _linkRes[resolvedKey] = {
+              link: getSocialMediaLink(handle, resolvedKey),
+              handle: handle,
+            };
+          }
         }
       }
       return _linkRes;

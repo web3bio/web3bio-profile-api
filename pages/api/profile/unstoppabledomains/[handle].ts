@@ -5,7 +5,7 @@ import {
   isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { resolveIPFS_URL } from "@/utils/ipfs";
@@ -90,7 +90,7 @@ export const resolveUDHandle = async (handle: string) => {
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
-      if (item && item.location) {
+      if (item && item.location && PlatformData[x]) {
         const resolvedHandle = resolveHandle(item?.location, x);
         LINKRES[x] = {
           handle: resolvedHandle,
