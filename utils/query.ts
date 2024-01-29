@@ -66,9 +66,11 @@ export const primaryDomainResolvedRequestArray = (
     platform: platform,
     reverse: data.data.domain.reverse,
   };
+
   if (
-    data.data.domain.reverse ||
-    data.data.domain.system === PlatformType.lens
+    (data.data.domain.reverse ||
+      data.data.domain.system === PlatformType.lens) &&
+    data.data.domain.resolved
   ) {
     const resolved = data?.data?.domain?.resolved?.neighbor
       .filter(
@@ -83,7 +85,14 @@ export const primaryDomainResolvedRequestArray = (
         platform: x.identity.platform,
         reverse: x.reverse,
       }));
-    return [...(resolved || []), defaultReturn];
+    return [
+      ...(resolved || []),
+      {
+        identity: data.data.domain.resolved.identity,
+        platform: data.data.domain.resolved.platform,
+        reverse: data.data.domain.reverse,
+      },
+    ];
   }
   return [defaultReturn];
 };
