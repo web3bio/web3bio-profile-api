@@ -41,6 +41,7 @@ const ensRecordsDefaultOrShouldSkipText = [
   "notice",
   "keywords",
   "location",
+  "banner",
 ];
 
 const getENSRecordsQuery = `
@@ -59,6 +60,16 @@ export const resolveENSTextValue = async (name: string, text: string) => {
     name: name,
     key: text,
   });
+};
+
+const getHeaderTextValue = async (texts: string[], domain: string) => {
+  if (texts.includes("header")) {
+    return resolveENSTextValue(domain, "header");
+  }
+  if (texts.includes("banner")) {
+    return resolveENSTextValue(domain, "banner");
+  }
+  return null;
 };
 
 export const resolveENSResponse = async (handle: string) => {
@@ -165,7 +176,7 @@ export const resolveENSHandle = async (handle: string) => {
     LINKRES = await getLink();
   }
 
-  const headerHandle = (await resolveENSTextValue(ensDomain, "header")) || null;
+  const headerHandle = await getHeaderTextValue(textRecords, ensDomain);
   const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
   const resJSON = {
     address: address.toLowerCase(),
