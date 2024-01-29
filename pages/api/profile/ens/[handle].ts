@@ -41,6 +41,7 @@ const ensRecordsDefaultOrShouldSkipText = [
   "notice",
   "keywords",
   "location",
+  "banner",
 ];
 
 const getENSRecordsQuery = `
@@ -59,6 +60,17 @@ export const resolveENSTextValue = async (name: string, text: string) => {
     name: name,
     key: text,
   });
+};
+
+const getHeaderTextValue = async (texts: string[], domain: string) => {
+  if (!texts?.length) return null;
+  if (texts.includes("header")) {
+    return resolveENSTextValue(domain, "header");
+  }
+  if (texts.includes("banner")) {
+    return resolveENSTextValue(domain, "banner");
+  }
+  return null;
 };
 
 export const resolveENSResponse = async (handle: string) => {
@@ -147,17 +159,18 @@ export const resolveENSHandle = async (handle: string) => {
         const key =
           Object.values(PlatformData).find((o) =>
             o.ensText?.includes(recordText.toLowerCase())
-          )?.key || recordText;
-        const textValue = await resolveENSTextValue(ensDomain, recordText);
-        const handle = resolveHandle(textValue, key as PlatformType);
-
-        if (textValue && handle) {
-          const resolvedKey =
-            key === PlatformType.url ? PlatformType.website : key;
-          _linkRes[resolvedKey] = {
-            link: getSocialMediaLink(handle, resolvedKey),
-            handle: handle,
-          };
+          )?.key || null;
+        if (key) {
+          const textValue = await resolveENSTextValue(ensDomain, recordText);
+          const handle = resolveHandle(textValue, key as PlatformType);
+          if (textValue && handle) {
+            const resolvedKey =
+              key === PlatformType.url ? PlatformType.website : key;
+            _linkRes[resolvedKey] = {
+              link: getSocialMediaLink(handle, resolvedKey),
+              handle: handle,
+            };
+          }
         }
       }
       return _linkRes;
@@ -165,7 +178,7 @@ export const resolveENSHandle = async (handle: string) => {
     LINKRES = await getLink();
   }
 
-  const headerHandle = (await resolveENSTextValue(ensDomain, "header")) || null;
+  const headerHandle = await getHeaderTextValue(textRecords, ensDomain);
   const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
   const resJSON = {
     address: address.toLowerCase(),
