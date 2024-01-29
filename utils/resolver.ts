@@ -28,7 +28,7 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (platform === PlatformType.website)
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
   if (platform === PlatformType.youtube)
-    return handle.match(/@(.*?)(?=[\/]|$)/)?.[1] || "";
+    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
   if (
     platform &&
     [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
