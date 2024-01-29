@@ -63,6 +63,7 @@ export const resolveENSTextValue = async (name: string, text: string) => {
 };
 
 const getHeaderTextValue = async (texts: string[], domain: string) => {
+  if (!texts?.length) return null;
   if (texts.includes("header")) {
     return resolveENSTextValue(domain, "header");
   }

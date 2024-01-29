@@ -10,8 +10,8 @@ describe("Test For Universal NS API", () => {
     expect(json[0].identity).toBeTruthy();
   });
 
-  it("It should response 200 for sujiyan.eth", async () => {
-    const res = await queryClient("/ns/sujiyan.eth");
+  it("It should response 200 for sujiyan.lens", async () => {
+    const res = await queryClient("/ns/sujiyan.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(

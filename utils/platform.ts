@@ -295,7 +295,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-youtube.svg",
     color: "#FF0000",
     label: "Youtube",
-    urlPrefix: "https://www.youtube.com/",
+    urlPrefix: "https://www.youtube.com/@",
     dotbitText: ["profile.youtube"],
   },
   [PlatformType.tiktok]: {
