@@ -8,18 +8,18 @@ describe("Test For Unstoppable Domains Profile API", () => {
     expect(json.links.twitter.handle).toBe("bgm38");
     expect(json.address).toBe("0x0da0ee86269797618032e56a69b1aad095c581fc");
   });
-  it("It should response 200 for sandy.nft", async () => {
-    const res = await queryClient("/profile/unstoppabledomains/sandy.nft");
+  it("It should response 200 for sandy.x", async () => {
+    const res = await queryClient("/profile/unstoppabledomains/sandy.x");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.lens.handle).toBe("sandracarter");
-    expect(json.contenthash).toBeTruthy();
   });
   it("It should response 200 for al.x", async () => {
     const res = await queryClient("/profile/unstoppabledomains/al.x");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0x2ccff304ef578b238ee82e1d1d53c34e80b48ad6");
+    expect(json.contenthash).toBeTruthy();
   });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/unstoppabledomains/sujiyan.eth");
