@@ -99,7 +99,6 @@ export const resolveUDHandle = async (handle: string) => {
       }
     });
   }
-
   return {
     address,
     identity: domain,
@@ -113,6 +112,9 @@ export const resolveUDHandle = async (handle: string) => {
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
+    contenthash: LINKRES.url?.link
+      ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
+      : null,
     links: LINKRES || null,
   };
 };

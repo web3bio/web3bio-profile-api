@@ -1,4 +1,5 @@
 import { PlatformType } from "./platform";
+import { regexDomain, regexDotbit, regexEns } from "./regexp";
 import {
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
@@ -144,3 +145,4 @@ export const primaryIdentityResolvedRequestArray = (
     return [...reverseFromNeighbor, defaultReturn];
   }
 };
+

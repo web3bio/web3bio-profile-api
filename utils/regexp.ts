@@ -7,4 +7,6 @@ export const regexEns = /.*\.(eth|xyz|app|luxe|kred|art|ceo|club)$/i,
   regexUnstoppableDomains =
     /.*\.(crypto|888|nft|blockchain|bitcoin|dao|x|klever|hi|zil|kresus|polygon|wallet|binanceus|anime|go|manga|eth)$/i,
   regexSpaceid = /.*\.(bnb|arb)$/i,
-  regexAvatar = /^0x[a-f0-9]{66}$/i;
+  regexAvatar = /^0x[a-f0-9]{66}$/i,
+  regexDomain =
+    /(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z0-9][a-z0-9-]{0,61}[a-z0-9]/g;
