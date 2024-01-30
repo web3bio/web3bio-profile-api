@@ -49,4 +49,10 @@ describe("Test For Dotbit Profile API", () => {
     const json = await res.json();
     expect(json.avatar).toBeTruthy();
   });
+  it("It should response 200 for bestcase.bit", async () => {
+    const res = await queryClient("/profile/dotbit/bestcase.bit");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.contenthash).toBeTruthy();
+  });
 });
