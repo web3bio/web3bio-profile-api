@@ -20,15 +20,15 @@ export default function Home() {
   return (
     <div>
       <Head>
-        <title>Web3.bio Profile APIs - Web3 Universal Profiles</title>
+        <title>Web3.bio Profile API - Web3 Universal Profiles</title>
         <meta
           name="description"
-          content="The Web3.bio Profile APIs enable developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
+          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
         />
-        <meta property="og:title" content="Web3.bio Profile APIs" />
+        <meta property="og:title" content="Web3.bio Profile API" />
         <meta
           property="og:description"
-          content="The Web3.bio Profile APIs enable developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
+          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
         />
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -52,11 +52,11 @@ export default function Home() {
       <main className="web3bio-container p-4 mt-4 mb-4">
         <div className="container grid-md">
           <h1 className="h2 mt-4 mb-4 pt-4 pb-4">
-            <strong className="text-bold">Web3.bio Profile APIs</strong>
+            <strong className="text-bold">Web3.bio Profile API</strong>
           </h1>
           <section className="pt-4 pb-4">
             <p>
-              The Web3.bio Profile APIs enable developers to easily and quickly
+              The Web3.bio Profile API enables developers to easily and quickly
               integrate Web3 universal profiles from{" "}
               <span className="text-underline">Ethereum (ENS)</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
@@ -477,7 +477,7 @@ export default function Home() {
           <section className="pt-4 pb-4">
             <h2 className="text-bold h4">API Endpoints</h2>
             <p>
-              The main public API endpoint domain for Web3.bio Profile APIs is{" "}
+              The main public API endpoint domain for Web3.bio Profile API is{" "}
               <span className="label">api.web3.bio</span>, and the staging
               domain is <span className="label">api-staging.web3.bio</span>.
             </p>
@@ -593,7 +593,7 @@ export default function Home() {
             </a>
 
             <p>
-              Web3.bio Profile APIs also provide basic profiles for name service resolution under {" "}
+              Web3.bio Profile API also provides basic profiles for name service resolution under {" "}
               <span className="label">api.web3.bio/ns</span> (Replace <span className="label">profile</span> with <span className="label">ns</span>).
             </p>
 
@@ -773,6 +773,7 @@ export default function Home() {
         "email": null,
         "location": null,
         "header": null,
+        "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
         "links": {
             "website": {
                 "link": "https://vitalik.ca",
@@ -790,6 +791,7 @@ export default function Home() {
         "email": null,
         "location": null,
         "header": null,
+        "contenthash": null,
         "links": {
             "farcaster": {
                 "link": "https://warpcast.com/vbuterin",
@@ -806,6 +808,7 @@ export default function Home() {
         "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
         "email": null,
         "header": "",
+        "contenthash": null,
         "links": {
             "hey": {
                 "link": "https://hey.xyz/u/vitalik",
@@ -945,6 +948,7 @@ export default function Home() {
     "email": null,
     "location": null,
     "header": null,
+    "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
     "links": {
         "website": {
             "link": "https://vitalik.ca",
@@ -1064,6 +1068,7 @@ export default function Home() {
     "email": null,
     "location": null,
     "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
+    "contenthash": null,
     "links": {
         "hey": {
             "link": "https://hey.xyz/u/stani",
@@ -1183,6 +1188,7 @@ export default function Home() {
     "email": null,
     "location": "Los Angeles, CA, USA",
     "header": null,
+    "contenthash": null,
     "links": {
       "farcaster": {
         "link": "https://warpcast.com/dwr.eth",
@@ -1298,6 +1304,7 @@ export default function Home() {
     "email": null,
     "location": "Metaverse",
     "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
+    "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
     "links": {
         "url": {
           "handle": "sandy.nft",
@@ -1433,6 +1440,7 @@ export default function Home() {
     "email": null,
     "location": null,
     "header": null,
+    "contenthash": "ipns://libp2p.io",
     "links": {
         "twitter": {
             "handle": "dotbitHQ",
@@ -1514,7 +1522,7 @@ export default function Home() {
               Release Notes
             </h2>
             <p>
-              We are gradually making updates to Web3.bio Profile APIs. You may
+              We are gradually making updates to Web3.bio Profile API. You may
               expect new features, improvements and bug fixes. If you have any
               feedback on the features or want to report a bug, please reach out
               to us on{" "}
@@ -1535,6 +1543,18 @@ export default function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
+              January Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Update</span> Added <code>contenthash</code> field for more complete ENS, Unstoppable Domains and .bit Profile API queries.
+              </li>
+              <li>
+                <span className="label label-primary">Update</span> Added offchain query support for ENS Profile API.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
               December Update

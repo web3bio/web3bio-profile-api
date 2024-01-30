@@ -2,11 +2,11 @@
 
 Web3.bio Profile API is a Web3 Profile data service powered by Web3.bio. When searching for any Ethereum address, ENS domain, Lens profile, or Farcaster usernames, it provides a user-friendly structure of profile data.
 
-We are constantly updating the Web3.bio Profile API, so expect new features and data sources.
+The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, Unstoppable Domains, .bit and Next.ID into their applications. These APIs are already integrated into Web3.bio search and profile services. We are constantly updating the Web3.bio Profile API, so expect new features and data sources.
 
 ## What are the data sources?
 
-Web3.bio Profile API indexes all identity data from public verifiable connections and on-chain records.
+Web3.bio Profile API index all identity data from public verifiable connections and on-chain records.
 
 The supported platforms are:
 

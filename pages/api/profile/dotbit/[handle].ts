@@ -1,5 +1,10 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
@@ -78,7 +83,6 @@ export const resolveDotbitHandle = async (handle: string) => {
   let location;
   let header;
   const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
-
   const linksObj: Record<
     string,
     {
@@ -101,6 +105,10 @@ export const resolveDotbitHandle = async (handle: string) => {
       }
     }
   });
+  const contenthashItem = Array.from(recordsMap).find((x) =>
+    x[0].startsWith("dweb")
+  )?.[1];
+
   return {
     address,
     identity: domain,
@@ -111,6 +119,9 @@ export const resolveDotbitHandle = async (handle: string) => {
     email: recordsMap.get("profile.email")?.value || null,
     location: location || null,
     header: header || null,
+    contenthash: contenthashItem
+      ? `${contenthashItem.key.replace("dweb.", "")}://${contenthashItem.value}`
+      : null,
     links: linksObj,
   };
 };

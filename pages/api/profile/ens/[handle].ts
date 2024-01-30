@@ -7,6 +7,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import {
+  decodeContenthash,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
@@ -50,6 +51,7 @@ const getENSRecordsQuery = `
       resolver {
         texts
         coinTypes
+        contentHash
       }
     }
   }
@@ -100,6 +102,7 @@ export const resolveENSResponse = async (handle: string) => {
           email: null,
           location: null,
           header: null,
+          contenthash: null,
           links: null,
         },
       };
@@ -133,11 +136,12 @@ export const resolveENSResponse = async (handle: string) => {
     ensDomain,
     earlyReturnJSON: null,
     textRecords: resolver?.resolver?.texts,
+    contentHash: resolver?.resolver?.contentHash,
   };
 };
 
 export const resolveENSHandle = async (handle: string) => {
-  const { address, ensDomain, earlyReturnJSON, textRecords } =
+  const { address, ensDomain, earlyReturnJSON, textRecords, contentHash } =
     await resolveENSResponse(handle);
   if (earlyReturnJSON) {
     return earlyReturnJSON;
@@ -190,6 +194,7 @@ export const resolveENSHandle = async (handle: string) => {
     email: (await resolveENSTextValue(ensDomain, "email")) || null,
     location: (await resolveENSTextValue(ensDomain, "location")) || null,
     header: (await resolveEipAssetURL(headerHandle)) || null,
+    contenthash: decodeContenthash(contentHash),
     links: LINKRES,
   };
   return resJSON;

@@ -3,6 +3,7 @@ import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType } from "./platform";
 import { SocialPlatformMapping } from "./utils";
+import * as contentHash from "@ensdomains/content-hash";
 
 const ArweaveAssetPrefix = "https://arweave.net/";
 const eipRegexp = /^eip155:(\d+)\/(erc1155|erc721):(.*)\/(.*)$/;
@@ -93,7 +94,7 @@ export const resolveEipAssetURL = async (source: string) => {
       const contractAddress = match?.[3];
       const tokenId = match?.[4];
       const network = chainIdToNetwork(chainId);
-      
+
       if (contractAddress && tokenId && network) {
         const fetchURL =
           SIMPLE_HASH_URL +
@@ -111,4 +112,22 @@ export const resolveEipAssetURL = async (source: string) => {
   } catch (e) {
     return null;
   }
+};
+
+export const decodeContenthash = (encoded: string) => {
+  let decoded;
+  if (
+    !encoded ||
+    ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
+  ) {
+    return null;
+  }
+  const codec = contentHash.getCodec(encoded);
+  const decodedId = contentHash.decode(encoded);
+  try {
+    decoded = `${codec}://${decodedId}`;
+  } catch (e) {
+    decoded = null;
+  }
+  return decoded;
 };

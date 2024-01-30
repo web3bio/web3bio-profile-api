@@ -119,6 +119,7 @@ export const resolveLensHandle = async (handle: string) => {
     response.picture?.original?.url || response.picture?.uri || null;
   const coverPictureUri =
     response.coverPicture?.original?.url || response.coverPicture?.uri || null;
+
   const resJSON = {
     address: response.ownedBy?.toLowerCase(),
     identity: response.handle,
@@ -131,6 +132,7 @@ export const resolveLensHandle = async (handle: string) => {
       response.attributes?.find((o: { key: string }) => o.key === "location")
         ?.value || null,
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
+    contenthash: null,
     links: LINKRES,
   };
   return resJSON;

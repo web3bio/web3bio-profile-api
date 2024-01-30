@@ -1,5 +1,10 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, isValidEthereumAddress, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
@@ -128,6 +133,7 @@ export const resolveFarcasterHandle = async (handle: string) => {
     email: null,
     location: response?.profile.location.description || null,
     header: null,
+    contenthash: null,
     links: links,
   };
   return resJSON;
