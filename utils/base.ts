@@ -1,36 +1,16 @@
-import { isAddress } from "ethers/lib/utils";
+import { isAddress } from "viem";
 import { PlatformType } from "./platform";
 
 export type LinksItem = {
   link: string | null;
   handle: string | null;
 };
-export type LinksData = {
-  [index: string | Partial<PlatformType>]: LinksItem | undefined;
-};
-export type HandleResponseData = {
-  owner: string | null;
-  identity: string | null;
-  displayName: string | null;
-  avatar: string | null;
-  email: string | null;
-  description: string | null;
-  location: string | null;
-  header: string | null;
-  links: LinksData;
-  error?: string;
-};
-
-export type HandleNotFoundResponseData = {
-  identity: string | null;
-  error: string;
-};
 
 interface errorHandleProps {
   identity: string | null;
-  platform: PlatformType;
   code: number;
   message: ErrorMessages | string;
+  platform: PlatformType | null;
   headers?: HeadersInit;
 }
 
@@ -45,16 +25,16 @@ export enum ErrorMessages {
 }
 
 export const errorHandle = (props: errorHandleProps) => {
-  const _isAddress = isAddress(props.identity || "");
+  const isValidAddress = isValidEthereumAddress(props.identity || "");
   return new Response(
     JSON.stringify({
-      address: _isAddress ? props.identity : null,
-      identity: !_isAddress ? props.identity : null,
+      address: isValidAddress ? props.identity : null,
+      identity: !isValidAddress ? props.identity : null,
       platform: props.platform,
       error: props.message,
     }),
     {
-      status: props.code,
+      status: isNaN(props.code) ? 500 : props.code,
       headers: {
         "Cache-Control": "no-store",
         ...props.headers,
@@ -70,3 +50,43 @@ export const respondWithCache = (json: string) => {
     },
   });
 };
+
+export const formatText = (string: string, length?: number) => {
+  if (!string) return "";
+  const len = length ?? 12;
+  if (string.length <= len) {
+    return string;
+  }
+  if (string.startsWith("0x") && string.length >= 42) {
+    const oriAddr = string,
+      chars = length || 4;
+    return `${oriAddr.substring(0, chars + 2)}...${oriAddr.substring(
+      oriAddr.length - chars
+    )}`;
+  } else {
+    if (string.length > len) {
+      return `${string.substr(0, len)}...`;
+    }
+  }
+  return string;
+};
+
+export const isValidEthereumAddress = (address: string) => {
+  if (!isAddress(address)) return false; // invalid ethereum address
+  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
+  return true;
+};
+
+export const shouldPlatformFetch = (platform?: PlatformType | null)=>{
+  if(!platform) return false
+  if([
+    PlatformType.ens,
+    PlatformType.ethereum,
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.unstoppableDomains,
+    PlatformType.dotbit,
+    PlatformType.nextid
+  ].includes(platform)) return true
+  return false
+}

@@ -13,6 +13,7 @@ export interface NeighborDetail {
 }
 export interface Neighbor {
   source: string[];
+  reverse: boolean | null;
   identity: NeighborDetail;
 }
 
@@ -26,7 +27,7 @@ export interface ProfileAPIResponse {
   header: string | null;
   identity: string;
   location: string | null;
-  error?: string
+  error?: string;
   links: Record<
     PlatformType,
     {
@@ -34,4 +35,42 @@ export interface ProfileAPIResponse {
       handle: string;
     }
   >;
+}
+
+export interface RelationServiceDomainQueryResponse {
+  data: {
+    domain: {
+      name: string;
+      system: string;
+      source: string[];
+      reverse: boolean;
+      resolved: {
+        identity: string;
+        displayName: string;
+        uuid: string;
+        platform: string;
+        neighbor: Neighbor[]
+      };
+    };
+  };
+}
+
+export interface RelationServiceIdentityQueryResponse {
+  data: {
+    identity: {
+      platform: string;
+      identity: string;
+      displayName: string[];
+      uuid: string;
+      reverseRecords: ReverseRecordItem[];
+      neighbor: Neighbor[]
+    };
+  };
+}
+
+export interface ReverseRecordItem {
+  source: string;
+  system: string;
+  name: string;
+  reverse: boolean;
 }

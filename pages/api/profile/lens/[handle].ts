@@ -10,10 +10,10 @@ import {
   errorHandle,
   ErrorMessages,
   respondWithCache,
+  isValidEthereumAddress,
 } from "@/utils/base";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 
 export const enum LensParamType {
   domain = "domain",
@@ -22,7 +22,8 @@ export const enum LensParamType {
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
+  maxDuration: 45,
 };
 const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
 
@@ -44,6 +45,10 @@ export const getLensProfile = async (handle: string, type: LensParamType) => {
         "user-agent": "spectaql",
       },
     }).then((res) => res.json());
+    if (fetchRes.error)
+      return {
+        error: fetchRes.error,
+      };
     if (fetchRes)
       return fetchRes.data?.[
         type === LensParamType.address ? "defaultProfile" : "profile"
@@ -59,7 +64,7 @@ export const resolveETHFromLens = async (lens: string) => {
 
 export const resolveLensResponse = async (handle: string) => {
   let response;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     response = await getLensProfile(handle, LensParamType.address);
   } else {
     response = await getLensProfile(handle, LensParamType.domain);
@@ -69,7 +74,7 @@ export const resolveLensResponse = async (handle: string) => {
 export const resolveLensHandle = async (handle: string) => {
   const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
-
+  if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
   let LINKRES = {};
   if (response.metadata.attributes) {
@@ -133,6 +138,7 @@ export const resolveLensHandle = async (handle: string) => {
         (o: { key: string }) => o.key === "location"
       )?.value || null,
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
+    contenthash: null,
     links: LINKRES,
   };
   return resJSON;

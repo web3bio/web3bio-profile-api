@@ -1,14 +1,18 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { CoinType } from "@/utils/cointype";
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
 };
 export interface RecordItem {
   key: string;
@@ -30,7 +34,7 @@ export const fetchDotbitProfile = async (path: string, payload: string) => {
 export const resolveDotbitResponse = async (handle: string) => {
   let domain;
   let address;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     const res = await fetchDotbitProfile(
       "v1/reverse/record",
       JSON.stringify({
@@ -79,12 +83,11 @@ export const resolveDotbitHandle = async (handle: string) => {
   let location;
   let header;
   const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
-
   const linksObj: Record<
     string,
     {
-      handle: string;
       link: string;
+      handle: string;
     }
   > = {};
   recordsMap.forEach((x) => {
@@ -96,22 +99,29 @@ export const resolveDotbitHandle = async (handle: string) => {
       if (!["description", "email", "avatar"].includes(platform) && x.value) {
         const _handle = resolveHandle(x.value, platform as PlatformType)!;
         linksObj[platform] = {
-          handle: _handle,
           link: getSocialMediaLink(x.value, platform as PlatformType)!,
+          handle: _handle,
         };
       }
     }
   });
+  const contenthashItem = Array.from(recordsMap).find((x) =>
+    x[0].startsWith("dweb")
+  )?.[1];
+
   return {
     address,
     identity: domain,
     platform: PlatformType.dotbit,
     displayName: domain || null,
     avatar: avatar || null,
-    email: recordsMap.get("profile.email")?.value || null,
     description: recordsMap.get("profile.description")?.value || null,
+    email: recordsMap.get("profile.email")?.value || null,
     location: location || null,
     header: header || null,
+    contenthash: contenthashItem
+      ? `${contenthashItem.key.replace("dweb.", "")}://${contenthashItem.value}`
+      : null,
     links: linksObj,
   };
 };

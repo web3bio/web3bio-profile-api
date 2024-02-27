@@ -1,31 +1,51 @@
 import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
-import { resolveIPFS_URL } from "./ipfs";
+import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
+import { chainIdToNetwork } from "./networks";
 import { PlatformType } from "./platform";
 import { SocialPlatformMapping } from "./utils";
+import * as contentHash from "@ensdomains/content-hash";
 
+const ArweaveAssetPrefix = "https://arweave.net/";
+const eipRegexp = /^eip155:(\d+)\/(erc1155|erc721):(.*)\/(.*)$/;
 const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
 
 export const resolveMediaURL = (url: string) => {
-  const ArweaveAssetPrefix = "https://arweave.net/";
   if (!url) return null;
-  return url.startsWith("data:") || url.startsWith("https:")
-    ? url
-    : url.startsWith("ar://")
-    ? url.replaceAll("ar://", ArweaveAssetPrefix)
-    : resolveIPFS_URL(url);
+  switch (!!url) {
+    case url.startsWith("data:") || url.startsWith("https:"):
+      return url;
+    case url.startsWith("ar://"):
+      return url.replaceAll("ar://", ArweaveAssetPrefix);
+    case url.startsWith("ipfs://") || isIPFS_Resource(url):
+      return resolveIPFS_URL(url);
+    default:
+      return url;
+  }
 };
 
 export const resolveHandle = (handle: string, platform?: PlatformType) => {
   if (!handle) return null;
-  if (platform && platform === PlatformType.website)
+  let handleToResolve = handle;
+  if (platform === PlatformType.website)
     return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
-  if (handle && domainRegexp.test(handle)) {
-    const arr = handle.split("/");
+  if (platform === PlatformType.youtube)
+    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
+  if (
+    platform &&
+    [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
+      platform
+    ) &&
+    handle.endsWith(".lens")
+  )
+    handleToResolve = handle.replace(".lens", "");
+  if (domainRegexp.test(handleToResolve)) {
+    const arr = handleToResolve.split("/");
     return (
-      handle.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
+      handleToResolve.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
     ).replaceAll("@", "");
   }
-  return handle.replaceAll("@", "");
+
+  return handleToResolve.replaceAll("@", "");
 };
 
 export const getSocialMediaLink = (
@@ -55,7 +75,7 @@ export function resolveSocialMediaLink(
     case PlatformType.website:
       return `https://${name}`;
     case PlatformType.discord:
-      if (!name.includes("#"))
+      if (name.includes("https://"))
         return SocialPlatformMapping(type).urlPrefix + name;
       return "";
     default:
@@ -68,19 +88,46 @@ export function resolveSocialMediaLink(
 export const resolveEipAssetURL = async (source: string) => {
   if (!source) return null;
   try {
-    const eipPrefix = "eip155:1";
-    if (source.startsWith(eipPrefix)) {
-      const arr = source.split(eipPrefix)[1].split(":")[1].split("/");
-      const fetchURL =
-        SIMPLE_HASH_URL + `/api/v0/nfts/ethereum/${arr[0]}/${arr[1]}`;
-      const res = await _fetcher(fetchURL);
+    if (eipRegexp.test(source)) {
+      const match = source.match(eipRegexp);
+      const chainId = match?.[1];
+      const contractAddress = match?.[3];
+      const tokenId = match?.[4];
+      const network = chainIdToNetwork(chainId);
 
-      if (res || res.nft_id) {
-        return resolveMediaURL(res.image_url || res.previews?.image_large_url);
+      if (contractAddress && tokenId && network) {
+        const fetchURL =
+          SIMPLE_HASH_URL +
+          `/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
+        const res = await _fetcher(fetchURL);
+
+        if (res || res.nft_id) {
+          return resolveMediaURL(
+            res.image_url || res.previews?.image_large_url
+          );
+        }
       }
     }
     return resolveMediaURL(source);
   } catch (e) {
     return null;
   }
+};
+
+export const decodeContenthash = (encoded: string) => {
+  let decoded;
+  if (
+    !encoded ||
+    ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
+  ) {
+    return null;
+  }
+  const codec = contentHash.getCodec(encoded);
+  const decodedId = contentHash.decode(encoded);
+  try {
+    decoded = `${codec}://${decodedId}`;
+  } catch (e) {
+    decoded = null;
+  }
+  return decoded;
 };

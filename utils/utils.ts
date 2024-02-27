@@ -8,6 +8,7 @@ import {
   regexUnstoppableDomains,
   regexSpaceid,
   regexFarcaster,
+  regexAvatar,
 } from "./regexp";
 
 export const handleSearchPlatform = (term: string) => {
@@ -28,8 +29,10 @@ export const handleSearchPlatform = (term: string) => {
       return PlatformType.twitter;
     case regexFarcaster.test(term):
       return PlatformType.farcaster;
-    default:
+    case regexAvatar.test(term):
       return PlatformType.nextid;
+    default:
+      return null;
   }
 };
 
@@ -39,6 +42,7 @@ export const isDomainSearch = (term: PlatformType) => {
     PlatformType.dotbit,
     PlatformType.unstoppableDomains,
     PlatformType.space_id,
+    PlatformType.lens,
   ].includes(term);
 };
 

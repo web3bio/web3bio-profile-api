@@ -1,15 +1,18 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
+import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import _ from "lodash";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
 };
 
 const UDSocialAccountsList = [
@@ -33,15 +36,18 @@ const fetchUDBase = async (path: string) => {
   }).then((res) => res.json());
 };
 const fetchUDProfile = async (domain: string) => {
-  return fetch(`${UDProfileEndpoint}/${domain}`, {
-    method: "GET",
-  }).then((res) => res.json());
+  return fetch(
+    `${UDProfileEndpoint}/${domain}?fields=profile,records,socialAccounts`,
+    {
+      method: "GET",
+    }
+  ).then((res) => res.json());
 };
 
 export const resolveUDResponse = async (handle: string) => {
   let address;
   let domain;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
     const res = await fetchUDBase(`resolve/reverse/${handle}`);
     if (!res?.meta) {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -78,15 +84,14 @@ export const resolveUDHandle = async (handle: string) => {
   if (metadata.records?.["ipfs.html.value"]) {
     LINKRES[PlatformType.url] = {
       handle: domain,
-      link:
-        resolveIPFS_URL(metadata.records?.["ipfs.html.value"], true) || null,
+      link: resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
   }
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
-      if (item) {
-        const resolvedHandle = resolveHandle(item?.location);
+      if (item && item.location && PlatformData[x]) {
+        const resolvedHandle = resolveHandle(item?.location, x);
         LINKRES[x] = {
           handle: resolvedHandle,
           link: getSocialMediaLink(resolvedHandle, x),
@@ -94,17 +99,22 @@ export const resolveUDHandle = async (handle: string) => {
       }
     });
   }
-
   return {
     address,
     identity: domain,
     platform: PlatformType.unstoppableDomains,
     displayName: metadata.profile.displayName || handle,
-    avatar: metadata.profile.imagePath || null,
-    email: null,
+    avatar:
+      metadata.profile.imageType === "default"
+        ? null
+        : metadata.profile.imagePath || null,
     description: metadata.profile.description || null,
+    email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
+    contenthash: LINKRES.url?.link
+      ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
+      : null,
     links: LINKRES || null,
   };
 };

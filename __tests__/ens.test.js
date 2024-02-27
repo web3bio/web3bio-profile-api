@@ -14,7 +14,14 @@ describe("Test For ENS Profile API", () => {
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/ens/mcdonalds.eth");
     expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Invalid Resolver Address");
+    expect((await res.json()).error).toBe("Invalid Resolved Address");
+  });
+  it("It should response 200 for dr3a.eth", async () => {
+    const res = await queryClient("/profile/ens/dr3a.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.links.hey).toBeTruthy();
+    expect(json.links.farcaster).toBeTruthy();
   });
   it("It should response 404 for xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.eth", async () => {
     const res = await queryClient(
@@ -23,7 +30,7 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.address).toBe(null);
-    expect(json.error).toBe("Does Not Exist");
+    expect(json.error).toBe("Invalid Resolved Address");
   });
   it("It should response 404 for solperdev.eth", async () => {
     const res = await queryClient("/profile/ens/solperdev.eth");
@@ -35,6 +42,7 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
+    expect(json.contenthash.startsWith('ipns')).toBeTruthy();
   });
   it("It should response 200 for vitalik.eth", async () => {
     const res = await queryClient("/profile/ens/vitalik.eth");
@@ -56,9 +64,9 @@ describe("Test For ENS Profile API", () => {
     const res = await queryClient(
       "/profile/ens/0xcee81f7dd39d817f699a5c9eb93e3e6520f5b996"
     );
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json.identity).toBe("0xcee81f7dd39d817f699a5c9eb93e3e6520f5b996");
   });
   it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(
@@ -74,7 +82,7 @@ describe("Test For ENS Profile API", () => {
     );
     expect(res.status).toBe(404);
     const json = await res.json();
-    expect(json.error).toBe("Invalid Address");
+    expect(json.error).toBe("Invalid Identity or Domain");
   });
   it("It should response 404 for sujiyan.lens", async () => {
     const res = await queryClient("/profile/ens/sujiyan.lens");
@@ -87,5 +95,12 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("linktr.ee/starcaster12");
+  });
+  it("It should response 200 for offchainexample.eth", async () => {
+    const res = await queryClient("/profile/ens/offchainexample.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBe("0xd8da6bf26964af9d7eed9e03e53415d37aa96045");
+    expect(json.email).toBeTruthy();
   });
 });

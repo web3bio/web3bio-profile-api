@@ -17,14 +17,49 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].identity).toBeTruthy();
   });
-  it("It should response 200 data for 0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6", async () => {
+  it("It should response 200 data for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     const res = await queryClient(
-      "/profile/0x0216e436525226b093ec753952deefd4bbc2ceb33f114b9021d1e92b12148575c6"
+      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
+    expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
   });
+  it("It should response 200 data for lilgho.lens", async () => {
+    const res = await queryClient("/profile/lilgho.lens");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("lilgho.lens");
+    // sort check
+    expect(json[1].identity).toBe("stani.lens");
+    expect(json.length).toBe(3);
+  });
+  it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
+    const res = await queryClient(
+      "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("stani.lens");
+    expect(json.length).toBe(3);
+  });
+  it("It should response 200 data for noun124.eth", async () => {
+    const res = await queryClient("/profile/noun124.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].identity).toBe("noun124.eth");
+    expect(json.find((x) => x.identity === "dwr.eth")).toBeTruthy();
+  });
+  it("It should response 200 data for 0x3ddfa8ec3052539b6c9549f12cea2c295cff5296", async () => {
+    const res = await queryClient(
+      "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].address).toBe("0x3ddfa8ec3052539b6c9549f12cea2c295cff5296");
+    expect(json.length).toBe(1);
+  });
+
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/sujiyan.eth");
     expect(res.status).toBe(200);
@@ -44,12 +79,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    const json2 = await (
-      await queryClient(
-        `/profile/${json?.find((x) => x.platform === "lens")?.address}`
-      )
-    ).json();
-    expect(json.length).toBe(json2.length);
+    expect(json[0].identity).toBe("stani.lens");
   });
   it("It should response 200 data for brantly.eth", async () => {
     const res = await queryClient("/profile/brantly.eth");
@@ -108,6 +138,25 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/livid.farcaster");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("livid");
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
+  });
+  it("It should response 200 data for аррӏе.eth", async () => {
+    const res = await queryClient("/profile/аррӏе.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
+    expect(json.length > 1).toBeTruthy()
+  });
+  it("It should response 404 data for sujiyan.bnb", async () => {
+    const res = await queryClient("/profile/sujiyan.bnb");
+    expect(res.status).toBe(404);
+    const json = await res.json();
+    expect(json.error).toBe("Invalid Identity or Domain");
+  });
+  it("It should response 200 data for shoni.eth", async () => {
+    const res = await queryClient("/profile/shoni.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.filter(x=>x.platform === 'farcaster').length).toBe(1);
   });
 });

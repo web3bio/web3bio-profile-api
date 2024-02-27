@@ -1,29 +1,25 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns } from "@/utils/regexp";
-import { handleSearchPlatform } from "@/utils/utils";
-import { getRelationQuery } from "@/utils/query";
-import { NeighborDetail, ProfileAPIResponse } from "@/utils/types";
+import { handleSearchPlatform, isDomainSearch } from "@/utils/utils";
+import {
+  getRelationQuery,
+  primaryDomainResolvedRequestArray,
+  primaryIdentityResolvedRequestArray,
+} from "@/utils/query";
+import { ProfileAPIResponse } from "@/utils/types";
+import { shouldPlatformFetch } from "../../../utils/base";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
     origin: string;
   };
 }
-
-const processArr = (arr: NeighborDetail[]) => {
-  const cache: NeighborDetail[] = [];
-  for (const t of arr) {
-    if (
-      cache.find((c) => c.platform === t.platform && c.identity === t.identity)
-    ) {
-      continue;
-    }
-    cache.push(t);
-  }
-
-  return cache;
-};
 
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
@@ -33,7 +29,7 @@ const nextidGraphQLEndpoint =
 
 const resolveHandleFromRelationService = (
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)
+  platform: PlatformType = handleSearchPlatform(handle)!
 ) => {
   const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
@@ -61,9 +57,10 @@ const sortByPlatform = (
 ) => {
   const defaultOrder = [
     PlatformType.ens,
-    PlatformType.lens,
     PlatformType.farcaster,
+    PlatformType.lens,
     PlatformType.dotbit,
+    PlatformType.unstoppableDomains,
   ];
 
   const order = defaultOrder.includes(platform)
@@ -74,12 +71,14 @@ const sortByPlatform = (
   const second: Array<ProfileAPIResponse> = [];
   const third: Array<ProfileAPIResponse> = [];
   const forth: Array<ProfileAPIResponse> = [];
+  const fifth: Array<ProfileAPIResponse> = [];
 
   arr.map((x) => {
     if (x.platform === order[0]) first.push(x);
     if (x.platform === order[1]) second.push(x);
     if (x.platform === order[2]) third.push(x);
     if (x.platform === order[3]) forth.push(x);
+    if (x.platform === order[4]) fifth.push(x);
   });
   return [
     first.find((x) => x.identity === handle),
@@ -88,6 +87,7 @@ const sortByPlatform = (
     .concat(second)
     .concat(third)
     .concat(forth)
+    .concat(fifth)
     .filter((x) => !!x);
 };
 const resolveUniversalRespondFromRelation = async ({
@@ -101,103 +101,121 @@ const resolveUniversalRespondFromRelation = async ({
   req: RequestInterface;
   ns?: boolean;
 }) => {
+  let notFound = false;
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
   );
-  if (!responseFromRelation || responseFromRelation?.error)
+  if (responseFromRelation?.errors)
     return errorHandle({
       identity: handle,
       platform,
-      message: responseFromRelation?.error,
+      message: responseFromRelation?.errors[0]?.message,
       code: 500,
     });
-  const resolved =
-    responseFromRelation?.data?.identity || responseFromRelation?.data?.domain;
-  const originneighbors =
-    resolved?.neighbor || resolved?.resolved?.neighbor || [];
-  const resolvedIdentity = resolved?.resolved ? resolved?.resolved : resolved;
 
-  const sourceNeighbor = resolvedIdentity
-    ? {
-        platform: resolvedIdentity.platform,
-        identity: resolvedIdentity.identity,
-        displayName: resolvedIdentity.displayName || resolved.name,
-        uuid: resolvedIdentity.uuid,
-      }
-    : {
-        platform,
-        identity: handle,
-      };
-
-  const neighbors = processArr([
-    ...originneighbors.map((x: { identity: NeighborDetail }) => {
-      return {
-        ...x.identity,
-      };
-    }),
-    sourceNeighbor,
-  ]);
-
-  if (
-    regexEns.test(handle) &&
-    neighbors.filter(
-      (x: { platform: PlatformType }) => x.platform === PlatformType.ethereum
-    ).length === 1
-  )
-    neighbors.forEach((x: { platform: PlatformType; displayName: string }) => {
-      if (
-        x.platform === PlatformType.ethereum &&
-        !!x.displayName &&
-        x.displayName !== handle
-      ) {
-        x.displayName = handle;
-      }
+  if (isDomainSearch(platform)) {
+    if (!responseFromRelation?.data?.domain) notFound = true;
+  } else {
+    if (!responseFromRelation?.data?.identity) notFound = true;
+  }
+  if (notFound) {
+    return errorHandle({
+      identity: handle,
+      platform,
+      message: ErrorMessages.notFound,
+      code: 404,
+    });
+  }
+  const resolvedRequestArray = (
+    isDomainSearch(platform)
+      ? primaryDomainResolvedRequestArray(
+          responseFromRelation,
+          handle,
+          platform
+        )
+      : primaryIdentityResolvedRequestArray(responseFromRelation)
+  ).sort((a, b) => {
+    if (a.reverse && b.reverse) return 0;
+    if (a.reverse && !b.reverse) return -1;
+    if (!a.reverse && b.reverse) return 1;
+    return 0;
+  });
+  if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      message: ErrorMessages.invalidResolved,
+      platform,
     });
   return await Promise.allSettled([
-    ...neighbors.map((x: NeighborDetail) => {
-      if (
-        [
-          PlatformType.ethereum,
-          PlatformType.farcaster,
-          PlatformType.lens,
-          PlatformType.dotbit,
-        ].includes(x.platform) &&
-        x.identity
-      ) {
-        const resolvedHandle =
-          x.platform === PlatformType.ethereum ? x.displayName : x.identity;
-        const resolvedPlatform =
-          x.platform === PlatformType.ethereum ? PlatformType.ens : x.platform;
+    ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
+      if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
         const fetchURL = `${req.nextUrl.origin}/${
           ns ? "ns" : "profile"
-        }/${resolvedPlatform.toLocaleLowerCase()}/${resolvedHandle}`;
-
-        if (resolvedHandle && resolvedPlatform)
-          return fetch(fetchURL).then((res) => res.json());
+        }/${x.platform.toLowerCase()}/${x.identity}`;
+        return fetch(fetchURL).then((res) => res.json());
       }
     }),
   ])
     .then((responses) => {
-      const returnRes = responses
+      const responsesToSort = responses
         .filter(
           (response) =>
             response.status === "fulfilled" &&
-            response.value?.address &&
-            response.value?.identity
+            response.value?.identity &&
+            !response.value?.error
         )
         .map(
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
-      return returnRes?.length
-        ? respondWithCache(
-            JSON.stringify(sortByPlatform(returnRes, platform, handle))
+      const returnRes = sortByPlatform(responsesToSort, platform, handle);
+
+      if (
+        platform === PlatformType.ethereum &&
+        !returnRes.some((x) => x?.address === handle)
+      ) {
+        returnRes.unshift(responsesToSort.find((x) => x?.address === handle));
+      }
+      if (!returnRes?.length && platform === PlatformType.ethereum) {
+        const nsObj = {
+          address: handle,
+          identity: handle,
+          platform: PlatformType.ethereum,
+          displayName: formatText(handle),
+          avatar: null,
+          description: null,
+        };
+        returnRes.push(
+          (ns
+            ? nsObj
+            : {
+                ...nsObj,
+                email: null,
+                location: null,
+                header: null,
+                links: null,
+              }) as ProfileAPIResponse
+        );
+      }
+      const uniqRes = returnRes.reduce((pre, cur) => {
+        if (
+          cur &&
+          !pre.find(
+            (x) => x.platform === cur.platform && x.identity === cur.identity
           )
+        ) {
+          pre.push(cur);
+        }
+        return pre;
+      }, [] as ProfileAPIResponse[]);
+      return uniqRes?.filter((x) => !x?.error)?.length
+        ? respondWithCache(JSON.stringify(uniqRes))
         : errorHandle({
             identity: handle,
             code: 404,
-            message: ErrorMessages.notFound,
+            message: uniqRes[0]?.error || ErrorMessages.notFound,
             platform,
           });
     })
@@ -213,21 +231,31 @@ const resolveUniversalRespondFromRelation = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   req: RequestInterface,
+  platform: PlatformType,
   ns?: boolean
 ) => {
-  const platformToQuery = handleSearchPlatform(handle);
   const handleToQuery = handle.endsWith(".farcaster")
-          ? handle.substring(0, handle.length - 10)
-          : handle;
-  if (!handleToQuery || !platformToQuery)
+    ? handle.substring(0, handle.length - 10)
+    : handle;
+  if (!handleToQuery || !platform)
     return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+  if (
+    platform === PlatformType.ethereum &&
+    !isValidEthereumAddress(handleToQuery)
+  )
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.ethereum,
+      code: 404,
+      message: ErrorMessages.invalidAddr,
+    });
   return await resolveUniversalRespondFromRelation({
-    platform: platformToQuery as PlatformType,
+    platform,
     handle: handleToQuery,
     req,
     ns,
@@ -237,16 +265,20 @@ export const resolveUniversalHandle = async (
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  return await resolveUniversalHandle(inputName, req);
+  const platform = handleSearchPlatform(inputName);
+  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
+    return errorHandle({
+      identity: inputName,
+      code: 404,
+      platform: null,
+      message: ErrorMessages.invalidIdentity,
+    });
+  }
+  return await resolveUniversalHandle(inputName, req, platform, false);
 }
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
+  regions: ["sfo1", "iad1", "pdx1"],
   maxDuration: 45,
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
 };

@@ -12,13 +12,14 @@ describe("Test For Unstoppable Domains Profile API", () => {
     const res = await queryClient("/profile/unstoppabledomains/sandy.x");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.links.lens.handle).toBe("sandracarter.lens");
+    expect(json.links.lens.handle).toBe("sandracarter");
   });
   it("It should response 200 for al.x", async () => {
     const res = await queryClient("/profile/unstoppabledomains/al.x");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0x2ccff304ef578b238ee82e1d1d53c34e80b48ad6");
+    expect(json.contenthash).toBeTruthy();
   });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/unstoppabledomains/sujiyan.eth");

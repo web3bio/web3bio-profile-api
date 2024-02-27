@@ -1,25 +1,26 @@
 import type { NextApiRequest } from "next";
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
-import { isAddress } from "ethers/lib/utils";
-import {
-  getResolverAddressFromName,
-  resolveENSCoinTypesValue,
-} from "../ens/[handle]";
-import { CoinType } from "@/utils/cointype";
+import { createPublicClient, http } from "viem";
+import { mainnet } from "viem/chains";
+import { normalize } from "viem/ens";
+
+const client = createPublicClient({
+  chain: mainnet,
+  transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
+}) as any;
 
 export const enum FarcasterQueryParamType {
   username = "username",
   connected_address = "connected_address",
 }
-
-const resolveENSHandleAddress = async (handle: string) => {
-  const resolver = await getResolverAddressFromName(handle);
-  if (!resolver) return null;
-  return await resolveENSCoinTypesValue(resolver, handle, CoinType.eth);
-};
 
 const originBase = "https://api.warpcast.com/v2/";
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
@@ -85,12 +86,15 @@ const resolveFarcasterLinks = (
   return LINKRES;
 };
 
-export const resolveFarcasterResponse = async(handle:string)=>{
+export const resolveFarcasterResponse = async (handle: string) => {
   let response;
-  if (isAddress(handle)) {
+  if (isValidEthereumAddress(handle)) {
+    const user = (await fetchWarpcastWithAddress(handle))?.result?.user;
+    const firstAddress = (await fetchAddressesFromWarpcastWithFid(user?.fid))
+      ?.result?.verifications?.[0]?.address;
     response = {
-      address: handle.toLowerCase(),
-      ...(await fetchWarpcastWithAddress(handle))?.result?.user,
+      address: firstAddress || handle.toLowerCase(),
+      ...user,
     };
     if (!response?.username)
       throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -101,19 +105,21 @@ export const resolveFarcasterResponse = async(handle:string)=>{
 
     const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
       ?.result?.verifications?.[0]?.address;
+    const ethAddress = regexEns.test(handle)
+      ? await client.getEnsAddress({
+          name: normalize(handle),
+        })
+      : null;
     response = {
-      address:
-        firstAddress?.toLowerCase() || (regexEns.test(handle)
-          ? await resolveENSHandleAddress(handle)
-          : null),
+      address: (firstAddress || ethAddress)?.toLowerCase(),
       ...rawUser,
     };
   }
-  return response
-}
+  return response;
+};
 
 export const resolveFarcasterHandle = async (handle: string) => {
-  const response = await resolveFarcasterResponse(handle)
+  const response = await resolveFarcasterResponse(handle);
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);
@@ -123,10 +129,11 @@ export const resolveFarcasterHandle = async (handle: string) => {
     platform: PlatformType.farcaster,
     displayName: response.displayName || response.username,
     avatar: response.pfp.url,
-    email: null,
     description: response.profile.bio.text || null,
+    email: null,
     location: response?.profile.location.description || null,
     header: null,
+    contenthash: null,
     links: links,
   };
   return resJSON;
@@ -151,22 +158,25 @@ export default async function handler(req: NextApiRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
-  if (!regexFarcaster.test(lowercaseName) && !regexEth.test(lowercaseName))
+  if (
+    !regexFarcaster.test(lowercaseName) &&
+    !regexEth.test(lowercaseName) &&
+    !lowercaseName.endsWith(".farcaster")
+  )
     return errorHandle({
       identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveFarcasterRespond(lowercaseName);
+  const queryInput = lowercaseName.endsWith(".farcaster")
+    ? lowercaseName.replace(".farcaster", "")
+    : lowercaseName;
+
+  return resolveFarcasterRespond(queryInput);
 }
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
+  regions: ["sfo1", "iad1", "pdx1"],
 };

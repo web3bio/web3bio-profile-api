@@ -1,41 +1,47 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { NextApiRequest } from "next";
 import {
-  isValidEthereumAddress,
   resolveENSResponse,
   resolveENSTextValue,
 } from "../../profile/ens/[handle]";
 
 export const resolveENSHandleNS = async (handle: string) => {
-  const { address, ensDomain, resolverAddress } = await resolveENSResponse(
+  const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
     handle
   );
+  if (earlyReturnJSON) {
+    return {
+      address: address,
+      identity: address,
+      platform: PlatformType.ethereum,
+      displayName: formatText(address),
+      avatar: null,
+      description: null,
+    };
+  }
 
-  if (!isValidEthereumAddress(resolverAddress))
-    throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
-
-  const avatarHandle =
-    (await resolveENSTextValue(resolverAddress, ensDomain, "avatar")) || null;
+  const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
   const resJSON = {
     address: address.toLowerCase(),
     identity: ensDomain,
     platform: PlatformType.ens,
-    displayName:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "name")) ||
-      ensDomain,
+    displayName: (await resolveENSTextValue(ensDomain, "name")) || ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
 
-    description:
-      (await resolveENSTextValue(resolverAddress, ensDomain, "description")) ||
-      null,
+    description: (await resolveENSTextValue(ensDomain, "description")) || null,
   };
   return resJSON;
 };
 
-const resolveENSRespondNS = async (handle: string) => {
+export const resolveENSRespondNS = async (handle: string) => {
   try {
     const json = await resolveENSHandleNS(handle);
     return respondWithCache(JSON.stringify(json));
@@ -64,10 +70,5 @@ export default async function handler(req: NextApiRequest) {
 
 export const config = {
   runtime: "edge",
-  regions: ["sfo1", "hnd1", "sin1"],
-  unstable_allowDynamic: [
-    "**/node_modules/lodash/**/*.js",
-    "**/node_modules/@ensdomain/address-encoder/**/*.js",
-    "**/node_modules/js-sha256/**/*.js",
-  ],
+  regions: ["sfo1", "iad1", "pdx1"],
 };
