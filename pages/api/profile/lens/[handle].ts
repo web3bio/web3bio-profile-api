@@ -5,6 +5,7 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { getLensProfileQuery } from "@/utils/lens";
+import { isAddress } from "viem";
 import {
   LinksItem,
   errorHandle,
@@ -77,7 +78,7 @@ export const resolveLensHandle = async (handle: string) => {
   if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
   let LINKRES = {};
-  if (response.metadata.attributes) {
+  if (response.metadata?.attributes) {
     const linksRecords = response.metadata.attributes;
     const linksToFetch = linksRecords.reduce(
       (pre: Array<any>, cur: { key: string }) => {
@@ -117,24 +118,24 @@ export const resolveLensHandle = async (handle: string) => {
   }
 
   const avatarUri =
-    response.metadata.picture.raw.uri ||
-    response.metadata.picture.optimized.uri ||
+    response.metadata?.picture?.raw.uri ||
+    response.metadata?.picture?.optimized.uri ||
     null;
   const coverPictureUri =
-    response.metadata.coverPicture?.optimized?.url ||
-    response.metadata.coverPicture?.raw.uri ||
+    response.metadata?.coverPicture?.optimized?.url ||
+    response.metadata?.coverPicture?.raw.uri ||
     null;
   const resJSON = {
     address: response.ownedBy?.address?.toLowerCase(),
     identity: response.handle.localName + ".lens",
     platform: PlatformType.lens,
     displayName:
-      response.metadata.displayName || response.handle.localName + ".lens",
+      response.metadata?.displayName || response.handle.localName + ".lens",
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
     email: null,
-    description: response.metadata.bio || null,
+    description: response.metadata?.bio || null,
     location:
-      response.metadata.attributes?.find(
+      response.metadata?.attributes?.find(
         (o: { key: string }) => o.key === "location"
       )?.value || null,
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
