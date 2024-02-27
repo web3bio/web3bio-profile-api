@@ -12,7 +12,7 @@ describe("Test For Lens Profile API", () => {
     const res = await queryClient("/profile/lens/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.links.website.handle).toBe("lens.xyz");
+    expect(json.links.website.handle).toBe("beta.family");
     expect(json.links.hey.handle).toBe("stani");
     expect(json.displayName).toBe('Stani')
     expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");

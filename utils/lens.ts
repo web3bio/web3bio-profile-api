@@ -3,60 +3,68 @@ import { LensParamType } from "@/pages/api/profile/lens/[handle]";
 export const getLensProfileQuery = (type: LensParamType) => {
   const queryNamespace =
     type === LensParamType.address ? "defaultProfile" : "profile";
-  const paramsNamespace =
-    type === LensParamType.address
-      ? "$handle: EthereumAddress!"
-      : "$handle: Handle";
   const requestNamespace =
-    type === LensParamType.address
-      ? "ethereumAddress: $handle"
-      : "handle: $handle ";
+    type === LensParamType.address ? "DefaultProfileRequest" : "ProfileRequest";
   return `
-  query Profile(${paramsNamespace}) {
-    ${queryNamespace}(request: { ${requestNamespace} }) {
+  query Profile($request: ${requestNamespace}!) {
+    ${queryNamespace}(request: $request) {
       id
-      name
-      bio
-      attributes {
-        displayType
-        traitType
-        key
-        value
+      ownedBy {
+        chainId
+        address
       }
-      picture {
-        ... on NftImage {
-          contractAddress
-          tokenId
-          uri
-          verified
-        }
-        ... on MediaSet {
-          original {
-            url
+      metadata {
+        displayName
+        bio
+        rawURI
+        appId
+        coverPicture {
+          optimized {
+            uri
             mimeType
           }
-        }
-        __typename
-      }
-      handle
-      coverPicture {
-        ... on NftImage {
-          contractAddress
-          tokenId
-          uri
-          verified
-        }
-        ... on MediaSet {
-          original {
-            url
+          raw {
             mimeType
+            uri
           }
         }
-        __typename
+        attributes {
+          value
+          key
+          type
+        }
+        picture {
+          ... on ImageSet {
+            raw {
+              uri
+              mimeType
+            }
+            optimized {
+              mimeType
+              uri
+            }
+          }
+        }
       }
-      ownedBy
+      handle {
+        id
+        fullHandle
+        namespace
+        localName
+        suggestedFormatted {
+          full
+          localName
+        }
+        linkedTo {
+          nftTokenId
+          contract {
+            address
+            chainId
+          }
+        }
+        ownedBy
+      }
     }
   }
 `;
 };
-
