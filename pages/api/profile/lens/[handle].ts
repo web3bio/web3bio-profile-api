@@ -120,12 +120,12 @@ export const resolveLensHandle = async (handle: string) => {
   }
 
   const avatarUri =
-    response.metadata?.picture?.raw.uri ||
-    response.metadata?.picture?.optimized.uri ||
+    response.metadata?.picture?.raw?.uri ||
+    response.metadata?.picture?.optimized?.uri ||
     null;
   const coverPictureUri =
     response.metadata?.coverPicture?.optimized?.url ||
-    response.metadata?.coverPicture?.raw.uri ||
+    response.metadata?.coverPicture?.raw?.uri ||
     null;
   const resJSON = {
     address: response.ownedBy?.address?.toLowerCase(),
