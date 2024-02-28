@@ -17,9 +17,9 @@ export const resolveLensHandleNS = async (handle: string) => {
     identity: response.handle.localName + ".lens",
     platform: PlatformType.lens,
     displayName:
-      response.metadata.displayName || response.handle.localName + ".lens",
+      response.metadata?.displayName || response.handle.localName + ".lens",
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
-    description: response.metadata.bio || null,
+    description: response.metadata?.bio || null,
   };
   return resJSON;
 };
