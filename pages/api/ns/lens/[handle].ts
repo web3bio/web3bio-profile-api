@@ -9,8 +9,8 @@ export const resolveLensHandleNS = async (handle: string) => {
   const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const avatarUri =
-    response.metadata.picture.raw.uri ||
-    response.metadata.picture.optimized.uri ||
+    response.metadata?.picture?.raw?.uri ||
+    response.metadata?.picture?.optimized?.uri ||
     null;
   const resJSON = {
     address: response.ownedBy?.address?.toLowerCase(),
