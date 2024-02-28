@@ -77,7 +77,12 @@ export const resolveLensHandle = async (handle: string) => {
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
   if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
-  let LINKRES = {};
+  let LINKRES = {
+    [PlatformType.hey]: {
+      link: getSocialMediaLink(pureHandle, PlatformType.hey),
+      handle: pureHandle,
+    },
+  };
   if (response.metadata?.attributes) {
     const linksRecords = response.metadata.attributes;
     const linksToFetch = linksRecords.reduce(
@@ -109,10 +114,7 @@ export const resolveLensHandle = async (handle: string) => {
       return _linkRes;
     };
     LINKRES = {
-      [PlatformType.hey]: {
-        link: getSocialMediaLink(pureHandle, PlatformType.hey),
-        handle: pureHandle,
-      },
+      ...LINKRES,
       ...(await getLink()),
     };
   }
