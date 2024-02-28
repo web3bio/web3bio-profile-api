@@ -144,7 +144,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/аррӏе.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("bdl.eth");
     expect(json.length > 1).toBeTruthy()
   });
   it("It should response 404 data for sujiyan.bnb", async () => {

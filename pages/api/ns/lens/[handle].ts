@@ -9,15 +9,17 @@ export const resolveLensHandleNS = async (handle: string) => {
   const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const avatarUri =
-    response.picture?.original?.url || response.picture?.uri || null;
-
+    response.metadata.picture.raw.uri ||
+    response.metadata.picture.optimized.uri ||
+    null;
   const resJSON = {
-    address: response.ownedBy?.toLowerCase(),
-    identity: response.handle,
+    address: response.ownedBy?.address?.toLowerCase(),
+    identity: response.handle.localName + ".lens",
     platform: PlatformType.lens,
-    displayName: response.name || response.handle,
+    displayName:
+      response.metadata.displayName || response.handle.localName + ".lens",
     avatar: (await resolveEipAssetURL(avatarUri)) || null,
-    description: response.bio || null,
+    description: response.metadata.bio || null,
   };
   return resJSON;
 };
