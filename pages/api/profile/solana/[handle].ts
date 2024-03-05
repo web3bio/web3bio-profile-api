@@ -2,6 +2,7 @@ import { ErrorMessages, errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { getSocialMediaLink } from "@/utils/resolver";
+import { SNSRecords } from "@/utils/types";
 import { NextApiRequest } from "next";
 
 const solanaEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
@@ -15,7 +16,13 @@ const getTwitterHandle = async (pubKey: string) => {
   return res?.result;
 };
 
-const getRecordContent = async (domain: string, record: string) => {};
+const getRecordContent = async (domain: string, record: string) => {
+  console.log(domain, record, 'records')
+  const res = await fetch(solanaEndpoint + `record-v2/${domain}/${record}`)
+    .then((res) => res.json())
+    .catch(() => null);
+  console.log(res, "result");
+};
 
 const lookup = async (handle: string) => {
   const res = await fetch(solanaEndpoint + "resolve/" + handle)
@@ -56,7 +63,12 @@ const resolveSolanaHandle = async (handle: string) => {
       link: string;
       handle: string;
     }
-  > = {};
+  > = {
+    [PlatformType.url]: {
+      handle: domain,
+      link: `https://${domain}-domain.org`,
+    },
+  };
   if (twitterHandle) {
     linksObj[PlatformType.twitter] = {
       handle: twitterHandle,
@@ -68,12 +80,12 @@ const resolveSolanaHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.solana,
     displayName: domain || null,
-    avatar: null,
+    avatar: await getRecordContent(domain, SNSRecords.Pic),
     description: null,
-    email: null,
+    email: await getRecordContent(domain, SNSRecords.Email),
     location: null,
     header: null,
-    contenthash: null,
+    contenthash: await getRecordContent(domain, SNSRecords.IPFS),
     links: linksObj,
   };
   return json;
