@@ -2,7 +2,6 @@ import { ErrorMessages, errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { getSocialMediaLink } from "@/utils/resolver";
-import { PublicKey } from "@solana/web3.js";
 import { NextApiRequest } from "next";
 
 const solanaEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
@@ -16,6 +15,8 @@ const getTwitterHandle = async (pubKey: string) => {
   return res?.result;
 };
 
+const getRecordContent = async (domain: string, record: string) => {};
+
 const lookup = async (handle: string) => {
   const res = await fetch(solanaEndpoint + "resolve/" + handle)
     .then((res) => res.json())
@@ -24,10 +25,14 @@ const lookup = async (handle: string) => {
 };
 
 const reverse = async (address: string) => {
-  console.log(new PublicKey(address).toBase58(), "address");
-  const res = await fetch(
-    solanaEndpoint + "reverse-lookup/" + new PublicKey(address).toBase58()
-  )
+  const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
+    .then((res) => res.json())
+    .catch(() => null);
+  return res?.result?.reverse + ".sol";
+};
+
+const getDomainPubkey = async (domain: string) => {
+  const res = await fetch(solanaEndpoint + "domain-key/" + domain)
     .then((res) => res.json())
     .catch(() => null);
   return res?.result;
@@ -43,7 +48,8 @@ const resolveSolanaHandle = async (handle: string) => {
     address = handle;
     domain = await reverse(handle);
   }
-  const twitterHandle = await getTwitterHandle(domain);
+  const pubkey = await getDomainPubkey(domain);
+  const twitterHandle = await getTwitterHandle(pubkey);
   const linksObj: Record<
     string,
     {
@@ -57,6 +63,20 @@ const resolveSolanaHandle = async (handle: string) => {
       link: getSocialMediaLink(twitterHandle, PlatformType.twitter) || "",
     };
   }
+  const json = {
+    address,
+    identity: domain,
+    platform: PlatformType.solana,
+    displayName: domain || null,
+    avatar: null,
+    description: null,
+    email: null,
+    location: null,
+    header: null,
+    contenthash: null,
+    links: linksObj,
+  };
+  return json;
 };
 
 export const resolveSolanaResopond = async (handle: string) => {
@@ -76,7 +96,6 @@ export const resolveSolanaResopond = async (handle: string) => {
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
-
   if (
     (!regexSns.test(inputName!) && !regexSolana.test(inputName!)) ||
     !inputName
