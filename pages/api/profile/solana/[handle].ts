@@ -1,35 +1,16 @@
 import { ErrorMessages, errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
-import { getSocialMediaLink } from "@/utils/resolver";
-import { SNSRecords } from "@/utils/types";
+
+import {
+  Record as SNSRecord,
+  getRecord,
+  resolve,
+} from "@bonfida/spl-name-service";
+import { Connection, clusterApiUrl } from "@solana/web3.js";
 import { NextApiRequest } from "next";
 
 const solanaEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
-
-const getTwitterHandle = async (pubKey: string) => {
-  const res = await fetch(
-    solanaEndpoint + "twitter/get-handle-by-key/" + pubKey
-  )
-    .then((res) => res.json())
-    .catch(() => null);
-  return res?.result;
-};
-
-const getRecordContent = async (domain: string, record: string) => {
-  console.log(domain, record, 'records')
-  const res = await fetch(solanaEndpoint + `record-v2/${domain}/${record}`)
-    .then((res) => res.json())
-    .catch(() => null);
-  console.log(res, "result");
-};
-
-const lookup = async (handle: string) => {
-  const res = await fetch(solanaEndpoint + "resolve/" + handle)
-    .then((res) => res.json())
-    .catch(() => null);
-  return res?.result;
-};
 
 const reverse = async (address: string) => {
   const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
@@ -38,54 +19,48 @@ const reverse = async (address: string) => {
   return res?.result?.reverse + ".sol";
 };
 
-const getDomainPubkey = async (domain: string) => {
-  const res = await fetch(solanaEndpoint + "domain-key/" + domain)
-    .then((res) => res.json())
-    .catch(() => null);
-  return res?.result;
+const getSNSRecord = async (
+  connection: Connection,
+  domain: string,
+  record: SNSRecord
+) => {
+  try {
+    return await getRecord(connection, domain.slice(0, -4), record, true);
+  } catch (e) {
+    return null;
+  }
 };
 
 const resolveSolanaHandle = async (handle: string) => {
   let domain,
     address = "";
+  const connection = new Connection(clusterApiUrl("mainnet-beta"));
   if (regexSns.test(handle)) {
     domain = handle;
-    address = await lookup(handle);
+    address = (await resolve(connection, handle))?.toBase58();
   } else {
     address = handle;
     domain = await reverse(handle);
   }
-  const pubkey = await getDomainPubkey(domain);
-  const twitterHandle = await getTwitterHandle(pubkey);
   const linksObj: Record<
     string,
     {
       link: string;
       handle: string;
     }
-  > = {
-    [PlatformType.url]: {
-      handle: domain,
-      link: `https://${domain}-domain.org`,
-    },
-  };
-  if (twitterHandle) {
-    linksObj[PlatformType.twitter] = {
-      handle: twitterHandle,
-      link: getSocialMediaLink(twitterHandle, PlatformType.twitter) || "",
-    };
-  }
+  > = {};
+
   const json = {
     address,
     identity: domain,
     platform: PlatformType.solana,
     displayName: domain || null,
-    avatar: await getRecordContent(domain, SNSRecords.Pic),
-    description: null,
-    email: await getRecordContent(domain, SNSRecords.Email),
+    avatar: await getSNSRecord(connection, domain, SNSRecord.Pic),
+    description: await getSNSRecord(connection, domain, SNSRecord.TXT),
+    email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
-    header: null,
-    contenthash: await getRecordContent(domain, SNSRecords.IPFS),
+    header: await getSNSRecord(connection, domain, SNSRecord.Background),
+    contenthash: await getSNSRecord(connection, domain, SNSRecord.IPFS),
     links: linksObj,
   };
   return json;
