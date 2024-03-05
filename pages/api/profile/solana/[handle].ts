@@ -125,4 +125,8 @@ export default async function handler(req: NextApiRequest) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "iad1", "pdx1"],
+  maxDuration: 45,
+  unstable_allowDynamic: [
+    "/node_modules/rpc-websockets/node_modules/@babel/runtime/regenerator/index.js",
+  ],
 };
