@@ -10,6 +10,7 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import {
   Record as SNSRecord,
   getRecord,
+  getRecordV2,
   resolve,
 } from "@bonfida/spl-name-service";
 import { Connection, clusterApiUrl } from "@solana/web3.js";
@@ -41,7 +42,13 @@ export const getSNSRecord = async (
   record: SNSRecord
 ) => {
   try {
+    // record v1
     return await getRecord(connection, domain.slice(0, -4), record, true);
+
+    // record v2
+    // return await getRecordV2(connection, domain.slice(0, -4), record, {
+    //   deserialize: true,
+    // }).then((res) => res?.deserializedContent);
   } catch (e) {
     return null;
   }
@@ -89,9 +96,9 @@ const resolveSolanaHandle = async (handle: string) => {
 
   for (let i = 0; i < recordsShouldFetch.length; i++) {
     const recordType = recordsShouldFetch[i];
-    const handle = await getSNSRecord(connection, domain, recordType);
-    if (handle) {
-      const resolved = resolveHandle(handle);
+    const linkHandle = await getSNSRecord(connection, domain, recordType);
+    if (linkHandle) {
+      const resolved = resolveHandle(linkHandle);
       const type = [SNSRecord.CNAME, SNSRecord.Url].includes(recordType)
         ? PlatformType.website
         : recordType;
