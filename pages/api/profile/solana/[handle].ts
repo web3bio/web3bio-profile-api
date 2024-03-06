@@ -1,4 +1,9 @@
-import { ErrorMessages, errorHandle, respondWithCache } from "@/utils/base";
+import {
+  ErrorMessages,
+  errorHandle,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
@@ -26,6 +31,7 @@ const reverse = async (address: string) => {
   const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
     .catch(() => null);
+  if (!res || res?.s === "error") return "";
   return res?.result?.reverse + ".sol";
 };
 
@@ -42,7 +48,7 @@ const getSNSRecord = async (
 };
 
 const resolveSolanaHandle = async (handle: string) => {
-  let domain,
+  let domain = "",
     address = "";
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
   if (regexSns.test(handle)) {
@@ -51,6 +57,30 @@ const resolveSolanaHandle = async (handle: string) => {
   } else {
     address = handle;
     domain = await reverse(handle);
+  }
+
+  if (!address) {
+    return errorHandle({
+      identity: domain,
+      platform: PlatformType.solana,
+      code: 404,
+      message: ErrorMessages.notFound,
+    });
+  }
+  if (address && !domain) {
+    return {
+      address,
+      identity: address,
+      platform: PlatformType.solana,
+      displayName: formatText(address),
+      avatar: null,
+      description: null,
+      email: null,
+      location: null,
+      header: null,
+      contenthash: null,
+      links: null,
+    };
   }
   const linksObj: Record<
     string,
@@ -65,8 +95,9 @@ const resolveSolanaHandle = async (handle: string) => {
     const handle = await getSNSRecord(connection, domain, recordType);
     if (handle) {
       const resolved = resolveHandle(handle);
-      const type =
-        recordType === SNSRecord.CNAME ? PlatformType.website : recordType;
+      const type = [SNSRecord.CNAME, SNSRecord.Url].includes(recordType)
+        ? PlatformType.website
+        : recordType;
       linksObj[type] = {
         handle: resolved!,
         link: getSocialMediaLink(resolved, type)!,
