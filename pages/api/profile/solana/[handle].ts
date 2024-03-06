@@ -43,12 +43,12 @@ export const getSNSRecord = async (
 ) => {
   try {
     // record v1
-    return await getRecord(connection, domain.slice(0, -4), record, true);
+    // return await getRecord(connection, domain.slice(0, -4), record, true);
 
     // record v2
-    // return await getRecordV2(connection, domain.slice(0, -4), record, {
-    //   deserialize: true,
-    // }).then((res) => res?.deserializedContent);
+    return await getRecordV2(connection, domain.slice(0, -4), record, {
+      deserialize: true,
+    }).then((res) => res?.deserializedContent);
   } catch (e) {
     return null;
   }
