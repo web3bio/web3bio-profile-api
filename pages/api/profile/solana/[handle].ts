@@ -27,7 +27,7 @@ const recordsShouldFetch = [
   SNSRecord.CNAME,
 ];
 
-const reverse = async (address: string) => {
+export const reverse = async (address: string) => {
   const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
     .catch(() => null);
@@ -35,7 +35,7 @@ const reverse = async (address: string) => {
   return res?.result?.reverse + ".sol";
 };
 
-const getSNSRecord = async (
+export const getSNSRecord = async (
   connection: Connection,
   domain: string,
   record: SNSRecord
@@ -48,24 +48,21 @@ const getSNSRecord = async (
 };
 
 const resolveSolanaHandle = async (handle: string) => {
-  let domain = "",
-    address = "";
+  let domain, address;
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
   if (regexSns.test(handle)) {
     domain = handle;
-    address = (await resolve(connection, handle))?.toBase58();
+    try {
+      address = (await resolve(connection, handle))?.toBase58();
+    } catch {
+      // do nothing
+    }
   } else {
     address = handle;
     domain = await reverse(handle);
   }
-
   if (!address) {
-    return errorHandle({
-      identity: domain,
-      platform: PlatformType.solana,
-      code: 404,
-      message: ErrorMessages.notFound,
-    });
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
   if (address && !domain) {
     return {
@@ -122,7 +119,7 @@ const resolveSolanaHandle = async (handle: string) => {
   return json;
 };
 
-export const resolveSolanaResopond = async (handle: string) => {
+export const resolveSolanaRespond = async (handle: string) => {
   try {
     const json = await resolveSolanaHandle(handle);
     return respondWithCache(JSON.stringify(json));
@@ -150,7 +147,7 @@ export default async function handler(req: NextApiRequest) {
       message: ErrorMessages.invalidIdentity,
     });
 
-  return resolveSolanaResopond(inputName);
+  return resolveSolanaRespond(inputName);
 }
 
 export const config = {
