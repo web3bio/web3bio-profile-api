@@ -1,4 +1,5 @@
 export const regexEns = /.*\.(eth|xyz|app|luxe|kred|art|ceo|club)$/i,
+  regexSns = /.*\.sol$/i,
   regexLens = /.*\.lens$/i,
   regexDotbit = /.*\.bit$/i,
   regexEth = /^0x[a-fA-F0-9]{40}$/i,
