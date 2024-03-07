@@ -9,7 +9,6 @@ import { regexSns, regexSolana } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import {
   Record as SNSRecord,
-  getRecord,
   getRecordV2,
   resolve,
 } from "@bonfida/spl-name-service";

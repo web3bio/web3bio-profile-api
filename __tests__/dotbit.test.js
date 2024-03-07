@@ -41,7 +41,7 @@ describe("Test For Dotbit Profile API", () => {
     const res = await queryClient("/profile/dotbit/phone.bit");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("tqqfpd5qzaeqjs74xbr3eiqfqpy6a2qdxj");
+    expect(json.address).toBe("tbrkixogyva7xmysduyis6asvapxkkk8ra");
   });
   it("It should response 200 for kingsgam.bit", async () => {
     const res = await queryClient("/profile/dotbit/kingsgam.bit");
