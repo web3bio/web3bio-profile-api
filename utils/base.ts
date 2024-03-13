@@ -22,6 +22,7 @@ export enum ErrorMessages {
   invalidIdentity = "Invalid Identity or Domain",
   invalidAddr = "Invalid Address",
   unknownError = "Unknown Error Occurs",
+  networkError = "Network Error"
 }
 
 export const errorHandle = (props: errorHandleProps) => {
