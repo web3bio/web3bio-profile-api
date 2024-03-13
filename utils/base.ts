@@ -1,5 +1,6 @@
 import { isAddress } from "viem";
 import { PlatformType } from "./platform";
+import { regexSolana } from "./regexp";
 
 export type LinksItem = {
   link: string | null;
@@ -22,7 +23,7 @@ export enum ErrorMessages {
   invalidIdentity = "Invalid Identity or Domain",
   invalidAddr = "Invalid Address",
   unknownError = "Unknown Error Occurs",
-  networkError = "Network Error"
+  networkError = "Network Error",
 }
 
 export const errorHandle = (props: errorHandleProps) => {
@@ -58,10 +59,13 @@ export const formatText = (string: string, length?: number) => {
   if (string.length <= len) {
     return string;
   }
-  if (string.startsWith("0x") && string.length >= 42) {
+  if (
+    string.startsWith("0x") ||
+    (regexSolana.test(string) && string.length >= 42)
+  ) {
     const oriAddr = string,
-      chars = length || 4;
-    return `${oriAddr.substring(0, chars + 2)}...${oriAddr.substring(
+      chars = length || 5;
+    return `${oriAddr.substring(0, chars)}...${oriAddr.substring(
       oriAddr.length - chars
     )}`;
   } else {
@@ -78,16 +82,19 @@ export const isValidEthereumAddress = (address: string) => {
   return true;
 };
 
-export const shouldPlatformFetch = (platform?: PlatformType | null)=>{
-  if(!platform) return false
-  if([
-    PlatformType.ens,
-    PlatformType.ethereum,
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.unstoppableDomains,
-    PlatformType.dotbit,
-    PlatformType.nextid
-  ].includes(platform)) return true
-  return false
-}
+export const shouldPlatformFetch = (platform?: PlatformType | null) => {
+  if (!platform) return false;
+  if (
+    [
+      PlatformType.ens,
+      PlatformType.ethereum,
+      PlatformType.farcaster,
+      PlatformType.lens,
+      PlatformType.unstoppableDomains,
+      PlatformType.dotbit,
+      PlatformType.nextid,
+    ].includes(platform)
+  )
+    return true;
+  return false;
+};
