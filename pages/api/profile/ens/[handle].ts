@@ -103,7 +103,7 @@ export const resolveENSResponse = async (handle: string) => {
           location: null,
           header: null,
           contenthash: null,
-          links: null,
+          links: {},
         },
       };
     }

@@ -19,4 +19,18 @@ describe("Test For Solana NS API", () => {
     const json = await res.json();
     expect(json.avatar).toBeTruthy()
   });
+  it("It should response 200 for _tesla.sol", async () => {
+    const res = await queryClient("/ns/solana/_tesla.sol");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.avatar).toBeTruthy()
+    expect(json.links.github.handle).toBe('test')
+  });
+  it("It should response 200 for wallet-guide-9.sol", async () => {
+    const res = await queryClient("/ns/solana/_tesla.sol");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.avatar).toBeTruthy()
+    expect(json.links.website.handle).toBe('google.com')
+  });
 });

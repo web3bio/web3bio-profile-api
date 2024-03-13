@@ -79,7 +79,7 @@ const resolveSolanaHandle = async (handle: string) => {
       location: null,
       header: null,
       contenthash: null,
-      links: null,
+      links: {},
     };
   }
   const linksObj: Record<
@@ -116,7 +116,9 @@ const resolveSolanaHandle = async (handle: string) => {
     email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
     header: await getSNSRecord(connection, domain, SNSRecord.Background),
-    contenthash: contentHash ? "ipfs://" + contentHash : null,
+    contenthash: contentHash
+      ? "ipfs://" + contentHash.replaceAll("ipfs://", "")
+      : null,
     links: linksObj,
   };
   return json;
