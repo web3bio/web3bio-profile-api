@@ -12,6 +12,7 @@ const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
   domain(domainSystem: $platform, name: $identity) {
     reverse
+    system
 		resolved {
 			identity
 			platform
