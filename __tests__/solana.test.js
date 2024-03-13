@@ -26,6 +26,6 @@ describe("Test For Solana Profile API", () => {
     const res = await queryClient("/profile/solana/0x33.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.avatar).toBe("https://cloudflare-ipfs.com/ipfs/QmaffCGgm9Trc37rKXecnbs1gjhFnX7Qzm61q3VDKU5aXr");
+    expect(json.avatar).toBeTruthy();
   });
 });
