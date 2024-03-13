@@ -8,6 +8,15 @@ import { isDomainSearch } from "./utils";
 export const getRelationQuery = (platform: PlatformType) => {
   return isDomainSearch(platform) ? GET_PROFILES_DOMAIN : GET_PROFILES_QUERY;
 };
+
+const directPass = (platform: PlatformType) => {
+  return [
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.solana,
+  ].includes(platform);
+};
+
 const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
   domain(domainSystem: $platform, name: $identity) {
@@ -65,13 +74,7 @@ export const primaryDomainResolvedRequestArray = (
     data.data.domain.resolved
   ) {
     const resolved = data?.data?.domain?.resolved?.neighbor
-      .filter(
-        (x) =>
-          x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          )
-      )
+      .filter((x) => x.reverse || directPass(x.identity.platform))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -99,13 +102,7 @@ export const primaryIdentityResolvedRequestArray = (
       reverse: null,
     };
     const reverseFromNeighbor = data.data.identity.neighbor
-      .filter(
-        (x) =>
-          x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          )
-      )
+      .filter((x) => x.reverse || directPass(x.identity.platform))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -122,9 +119,7 @@ export const primaryIdentityResolvedRequestArray = (
       .filter(
         (x) =>
           x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          ) ||
+          directPass(x.identity.platform) ||
           (x.identity.platform === PlatformType.ethereum &&
             x.identity.displayName)
       )
@@ -136,4 +131,3 @@ export const primaryIdentityResolvedRequestArray = (
     return [...reverseFromNeighbor, defaultReturn];
   }
 };
-
