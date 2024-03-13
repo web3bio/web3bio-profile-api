@@ -14,13 +14,14 @@ describe("Test For Solana Profile API", () => {
     expect(json.address).toBe("CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2");
     expect(json.displayName).toBeTruthy();
   });
-  it("It should response 200 for 抹茶.sol", async () => {
-    const res = await queryClient("/profile/solana/抹茶.sol");
+  it("It should response 200 for yoyodyne.sol", async () => {
+    const res = await queryClient("/profile/solana/yoyodyne.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBeTruthy();
+    expect(json.avatar).toBeTruthy();
+    expect(json.links.twitter.handle).toBe("blueoceanshark");
   });
-  it("It should response 200 for test.🇺🇸.sol", async () => {
+  it("It should response 404 for test.🇺🇸.sol", async () => {
     const res = await queryClient("/profile/solana/test.🇺🇸.sol");
     expect(res.status).toBe(404);
     const json = await res.json();

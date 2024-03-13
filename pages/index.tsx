@@ -23,12 +23,12 @@ export default function Home() {
         <title>Web3.bio Profile API - Web3 Universal Profiles</title>
         <meta
           name="description"
-          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
+          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, Unstoppable Domains, Solana Name Service, and Next.ID into their applications. "
         />
         <meta property="og:title" content="Web3.bio Profile API" />
         <meta
           property="og:description"
-          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, and Next.ID into their applications. "
+          content="The Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Lens Protocol, Farcaster, Unstoppable Domains, Solana Name Service, and Next.ID into their applications. "
         />
         <meta charSet="utf-8" />
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
@@ -58,17 +58,18 @@ export default function Home() {
             <p>
               The Web3.bio Profile API enables developers to easily and quickly
               integrate Web3 universal profiles from{" "}
-              <span className="text-underline">Ethereum (ENS)</span>,{" "}
+              <span className="text-underline" title="Ethereum and Ethereum Name Service (ENS)">Ethereum (ENS)</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Unstoppable Domains</span>,{" "}
+              <span className="text-underline" title="Solana and Solana Name Service (Bonfida)">Solana (SNS)</span>,{" "}
               <span className="text-underline">.bit</span> and{" "}
               <span className="text-underline">Next.ID</span> into their
               applications. These APIs are already integrated into{" "}
               <a
                 href="https://web3.bio"
                 target="_blank"
-                className="text-underline text-bold"
+                className="text-underline"
               >
                 Web3.bio
               </a>{" "}
@@ -569,6 +570,25 @@ export default function Home() {
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
                   Retrieve an Unstoppable Domains profile
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#solana-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /profile/solana/{"{"}identity{"}"}
+                </div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="label text-small">
+                  Retrieve an Solana Name Service profile
                 </div>
               </div>
             </a>
@@ -1250,7 +1270,7 @@ export default function Home() {
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
-                - An Ethereum address or an Unstoppable Domains username.
+                - An Ethereum address or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">Examples</h3>
@@ -1344,6 +1364,117 @@ export default function Home() {
     "displayName": "Pink Mamba",
     "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
     "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="solana-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
+              Solana (SNS) Profile API
+            </h2>
+            <p>Retrieve a Solana Name Service profile or name service resolution</p>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /profile/solana/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  /ns/solana/{"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6 mt-4">Parameter</h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                - A Solana address or a Solana Name Service domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">Examples</h3>
+            <ul>
+              <li>
+                <span className="label">Solana</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA"
+                  target="_blank"
+                >
+                  /profile/solana/HKKp49qGWXd6...
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA"
+                  target="_blank"
+                >
+                  /ns/solana/HKKp49qGWXd6...
+                </a>
+              </li>
+              <li>
+                <span className="label">Solana Name Service</span>{" "}
+                <a
+                  href="https://api.web3.bio/profile/solana/bonfida.sol"
+                  target="_blank"
+                >
+                  /profile/solana/bonfida.sol
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href="https://api.web3.bio/ns/solana/bonfida.sol"
+                  target="_blank"
+                >
+                  /ns/solana/bonfida.sol
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// https://api.web3.bio/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/profile/solana/bonfida.sol`}</span>
+                <br />
+{`{
+    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+    "identity": "bonfida.sol",
+    "platform": "solana",
+    "displayName": "bonfida.sol",
+    "avatar": null,
+    "description": null,
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {}
+}`}
+                <br /><br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <br />
+                <span className="text-gray">{`// https://api.web3.bio/ns/solana/bonfida.sol`}</span>
+                <br />
+{`{
+    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+    "identity": "bonfida.sol",
+    "platform": "solana",
+    "displayName": "bonfida.sol",
+    "avatar": null,
+    "description": null,
 }`}
               </code>
             </pre>
@@ -1543,6 +1674,16 @@ export default function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
+              March Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added Solana Name Service (Bonfida) query
+                support to the Profile API.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
               January Update
