@@ -1,5 +1,4 @@
 import { PlatformType } from "./platform";
-import { regexDomain, regexDotbit, regexEns } from "./regexp";
 import {
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
@@ -12,20 +11,14 @@ export const getRelationQuery = (platform: PlatformType) => {
 const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
   domain(domainSystem: $platform, name: $identity) {
-		source
-		system
-		name
     reverse
 		resolved {
 			identity
 			platform
 			displayName
-      uuid
       neighbor(depth:3) {
-        sources # Which upstreams provide these connection infos.
         reverse
         identity {
-          uuid
           platform
           identity
           displayName
@@ -42,12 +35,9 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     platform
     identity
     displayName
-    uuid
     neighbor(depth:3) {
-      sources # Which upstreams provide these connection infos.
       reverse
       identity {
-        uuid
         platform
         identity
         displayName

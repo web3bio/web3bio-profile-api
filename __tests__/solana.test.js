@@ -14,16 +14,18 @@ describe("Test For Solana Profile API", () => {
     expect(json.address).toBe("CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2");
     expect(json.displayName).toBeTruthy();
   });
-  it("It should response 200 for 抹茶.sol", async () => {
-    const res = await queryClient("/profile/solana/抹茶.sol");
+  it("It should response 200 for 7059.sol", async () => {
+    const res = await queryClient("/profile/solana/7059.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBeTruthy();
+    expect(json.email).toBe('test@gmail.com')
+    expect(json.links.twitter.handle).toBe('bonfida')
   });
-  it("It should response 200 for test.🇺🇸.sol", async () => {
-    const res = await queryClient("/profile/solana/test.🇺🇸.sol");
-    expect(res.status).toBe(404);
+  it("It should response 200 for 0x33.sol", async () => {
+    const res = await queryClient("/profile/solana/0x33.sol");
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json.avatar).toBe("https://cloudflare-ipfs.com/ipfs/QmaffCGgm9Trc37rKXecnbs1gjhFnX7Qzm61q3VDKU5aXr");
   });
 });
