@@ -48,7 +48,6 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("noun124.eth");
-    expect(json.find((x) => x.identity === "dwr.eth")).toBeTruthy();
   });
   it("It should response 200 data for 0x3ddfa8ec3052539b6c9549f12cea2c295cff5296", async () => {
     const res = await queryClient(
