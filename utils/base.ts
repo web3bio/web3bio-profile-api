@@ -1,6 +1,5 @@
 import { isAddress } from "viem";
 import { PlatformType } from "./platform";
-import { regexSolana } from "./regexp";
 
 export type LinksItem = {
   link: string | null;
@@ -56,23 +55,19 @@ export const respondWithCache = (json: string) => {
 export const formatText = (string: string, length?: number) => {
   if (!string) return "";
   const len = length ?? 12;
+  const chars = len / 2 - 2;
   if (string.length <= len) {
     return string;
   }
-  if (string.startsWith("0x") && string.length >= 42) {
-    const oriAddr = string,
-      chars = length || 4;
-    return `${oriAddr.substring(0, chars + 2)}...${oriAddr.substring(
-      oriAddr.length - chars
+  if (string.startsWith("0x"))  {
+    return `${string.substring(0, chars + 2)}...${string.substring(
+      string.length - chars
     )}`;
   } else {
-    if (regexSolana.test(string)) {
-      return `${string.substring(0, 5)}...${string.substring(
-        string.length - 5
-      )}`;
-    }
     if (string.length > len) {
-      return `${string.substr(0, len)}...`;
+      return `${string.substring(0, chars + 1)}...${string.substring(
+        string.length - (chars + 1)
+      )}`;
     }
   }
   return string;
