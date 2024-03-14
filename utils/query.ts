@@ -1,6 +1,6 @@
 import { PlatformType } from "./platform";
-import { regexDomain, regexDotbit, regexEns } from "./regexp";
 import {
+  Neighbor,
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
 } from "./types";
@@ -9,23 +9,26 @@ import { isDomainSearch } from "./utils";
 export const getRelationQuery = (platform: PlatformType) => {
   return isDomainSearch(platform) ? GET_PROFILES_DOMAIN : GET_PROFILES_QUERY;
 };
+
+const directPass = (data: Neighbor) => {
+  if (data.reverse) return true;
+  return [PlatformType.farcaster, PlatformType.lens].includes(
+    data.identity.platform
+  );
+};
+
 const GET_PROFILES_DOMAIN = `
 query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
   domain(domainSystem: $platform, name: $identity) {
-		source
-		system
-		name
     reverse
+    system
 		resolved {
 			identity
 			platform
 			displayName
-      uuid
       neighbor(depth:3) {
-        sources # Which upstreams provide these connection infos.
         reverse
         identity {
-          uuid
           platform
           identity
           displayName
@@ -42,12 +45,9 @@ query GET_PROFILES_QUERY($platform: String, $identity: String) {
     platform
     identity
     displayName
-    uuid
     neighbor(depth:3) {
-      sources # Which upstreams provide these connection infos.
       reverse
       identity {
-        uuid
         platform
         identity
         displayName
@@ -74,13 +74,7 @@ export const primaryDomainResolvedRequestArray = (
     data.data.domain.resolved
   ) {
     const resolved = data?.data?.domain?.resolved?.neighbor
-      .filter(
-        (x) =>
-          x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          )
-      )
+      .filter((x) => directPass(x))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -108,13 +102,7 @@ export const primaryIdentityResolvedRequestArray = (
       reverse: null,
     };
     const reverseFromNeighbor = data.data.identity.neighbor
-      .filter(
-        (x) =>
-          x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          )
-      )
+      .filter((x) => directPass(x))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -130,10 +118,7 @@ export const primaryIdentityResolvedRequestArray = (
     const reverseFromNeighbor = data?.data?.identity?.neighbor
       .filter(
         (x) =>
-          x.reverse ||
-          [PlatformType.farcaster, PlatformType.lens].includes(
-            x.identity.platform
-          ) ||
+          directPass(x) ||
           (x.identity.platform === PlatformType.ethereum &&
             x.identity.displayName)
       )
@@ -145,4 +130,3 @@ export const primaryIdentityResolvedRequestArray = (
     return [...reverseFromNeighbor, defaultReturn];
   }
 };
-
