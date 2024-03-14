@@ -115,7 +115,7 @@ export const resolveUDHandle = async (handle: string) => {
     contenthash: LINKRES.url?.link
       ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
       : null,
-    links: LINKRES || null,
+    links: LINKRES,
   };
 };
 

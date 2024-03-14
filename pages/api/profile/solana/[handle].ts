@@ -41,10 +41,6 @@ export const getSNSRecord = async (
   record: SNSRecord
 ) => {
   try {
-    // record v1
-    // return await getRecord(connection, domain.slice(0, -4), record, true);
-
-    // record v2
     return await getRecordV2(connection, domain.slice(0, -4), record, {
       deserialize: true,
     }).then((res) => res?.deserializedContent);
@@ -56,6 +52,7 @@ export const getSNSRecord = async (
 const resolveSolanaHandle = async (handle: string) => {
   let domain, address;
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
+  if (!connection) throw new Error(ErrorMessages.networkError, { cause: 500 });
   if (regexSns.test(handle)) {
     domain = handle;
     try {
@@ -82,7 +79,7 @@ const resolveSolanaHandle = async (handle: string) => {
       location: null,
       header: null,
       contenthash: null,
-      links: null,
+      links: {},
     };
   }
   const linksObj: Record<
@@ -108,7 +105,6 @@ const resolveSolanaHandle = async (handle: string) => {
     }
   }
 
-  const contentHash = await getSNSRecord(connection, domain, SNSRecord.IPFS);
   const json = {
     address,
     identity: domain,
@@ -119,7 +115,7 @@ const resolveSolanaHandle = async (handle: string) => {
     email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
     header: await getSNSRecord(connection, domain, SNSRecord.Background),
-    contenthash: contentHash ? "ipfs://" + contentHash : null,
+    contenthash: await getSNSRecord(connection, domain, SNSRecord.IPFS),
     links: linksObj,
   };
   return json;

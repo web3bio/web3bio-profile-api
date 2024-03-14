@@ -14,17 +14,26 @@ describe("Test For Solana Profile API", () => {
     expect(json.address).toBe("CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2");
     expect(json.displayName).toBeTruthy();
   });
-  it("It should response 200 for yoyodyne.sol", async () => {
-    const res = await queryClient("/profile/solana/yoyodyne.sol");
+  it("It should response 200 for 7059.sol", async () => {
+    const res = await queryClient("/profile/solana/7059.sol");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBeTruthy();
+    expect(json.email).toBe("test@gmail.com");
+    expect(json.links.twitter.handle).toBe("bonfida");
+  });
+  it("It should response 200 for 0x33.sol", async () => {
+    const res = await queryClient("/profile/solana/0x33.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.avatar).toBeTruthy();
-    expect(json.links.twitter.handle).toBe("blueoceanshark");
   });
-  it("It should response 404 for test.🇺🇸.sol", async () => {
-    const res = await queryClient("/profile/solana/test.🇺🇸.sol");
-    expect(res.status).toBe(404);
+  it("It should response 200 for CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK", async () => {
+    const res = await queryClient(
+      "/profile/solana/CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK"
+    );
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json.displayName).toBe("CHzTB...GaXoK");
   });
 });

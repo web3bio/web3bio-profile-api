@@ -195,7 +195,7 @@ const resolveUniversalRespondFromRelation = async ({
                 email: null,
                 location: null,
                 header: null,
-                links: null,
+                links: {},
               }) as ProfileAPIResponse
         );
       }
