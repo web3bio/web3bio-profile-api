@@ -569,7 +569,7 @@ export default function Home() {
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
-                  Retrieve an Unstoppable Domains profile
+                  Retrieve an Unstoppable Domains domain
                 </div>
               </div>
             </a>
@@ -588,7 +588,7 @@ export default function Home() {
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
-                  Retrieve an Solana Name Service profile
+                  Retrieve a Solana Name Service profile
                 </div>
               </div>
             </a>
