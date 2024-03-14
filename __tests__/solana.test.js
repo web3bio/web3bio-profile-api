@@ -19,13 +19,21 @@ describe("Test For Solana Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBeTruthy();
-    expect(json.email).toBe('test@gmail.com')
-    expect(json.links.twitter.handle).toBe('bonfida')
+    expect(json.email).toBe("test@gmail.com");
+    expect(json.links.twitter.handle).toBe("bonfida");
   });
   it("It should response 200 for 0x33.sol", async () => {
     const res = await queryClient("/profile/solana/0x33.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.avatar).toBeTruthy();
+  });
+  it("It should response 200 for CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK", async () => {
+    const res = await queryClient(
+      "/profile/solana/CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.displayName).toBe("CHzTB...GaXoK");
   });
 });
