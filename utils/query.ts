@@ -1,5 +1,6 @@
 import { PlatformType } from "./platform";
 import {
+  Neighbor,
   RelationServiceDomainQueryResponse,
   RelationServiceIdentityQueryResponse,
 } from "./types";
@@ -9,12 +10,11 @@ export const getRelationQuery = (platform: PlatformType) => {
   return isDomainSearch(platform) ? GET_PROFILES_DOMAIN : GET_PROFILES_QUERY;
 };
 
-const directPass = (platform: PlatformType) => {
-  return [
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.solana,
-  ].includes(platform);
+const directPass = (data: Neighbor) => {
+  if (data.reverse) return true;
+  return [PlatformType.farcaster, PlatformType.lens].includes(
+    data.identity.platform
+  );
 };
 
 const GET_PROFILES_DOMAIN = `
@@ -73,8 +73,9 @@ export const primaryDomainResolvedRequestArray = (
       data.data.domain.system === PlatformType.lens) &&
     data.data.domain.resolved
   ) {
+    console.log(data.data.domain.resolved.neighbor);
     const resolved = data?.data?.domain?.resolved?.neighbor
-      .filter((x) => x.reverse || directPass(x.identity.platform))
+      .filter((x) => directPass(x))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -102,7 +103,7 @@ export const primaryIdentityResolvedRequestArray = (
       reverse: null,
     };
     const reverseFromNeighbor = data.data.identity.neighbor
-      .filter((x) => x.reverse || directPass(x.identity.platform))
+      .filter((x) => directPass(x))
       .map((x) => ({
         identity: x.identity.identity,
         platform: x.identity.platform,
@@ -118,8 +119,7 @@ export const primaryIdentityResolvedRequestArray = (
     const reverseFromNeighbor = data?.data?.identity?.neighbor
       .filter(
         (x) =>
-          x.reverse ||
-          directPass(x.identity.platform) ||
+          directPass(x) ||
           (x.identity.platform === PlatformType.ethereum &&
             x.identity.displayName)
       )
