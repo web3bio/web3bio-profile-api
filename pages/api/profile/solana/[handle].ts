@@ -105,7 +105,7 @@ const resolveSolanaHandle = async (handle: string) => {
     }
   }
 
-  const contentHash = await getSNSRecord(connection, domain, SNSRecord.IPFS);
+  const contenthash = await getSNSRecord(connection, domain, SNSRecord.IPFS);
   const json = {
     address,
     identity: domain,
@@ -116,9 +116,7 @@ const resolveSolanaHandle = async (handle: string) => {
     email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
     header: await getSNSRecord(connection, domain, SNSRecord.Background),
-    contenthash: contentHash
-      ? "ipfs://" + contentHash.replaceAll("ipfs://", "")
-      : null,
+    contenthash,
     links: linksObj,
   };
   return json;

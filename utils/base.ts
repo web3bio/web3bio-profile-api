@@ -59,16 +59,18 @@ export const formatText = (string: string, length?: number) => {
   if (string.length <= len) {
     return string;
   }
-  if (
-    string.startsWith("0x") ||
-    (regexSolana.test(string) && string.length >= 42)
-  ) {
+  if (string.startsWith("0x") && string.length >= 42) {
     const oriAddr = string,
-      chars = length || 5;
-    return `${oriAddr.substring(0, chars)}...${oriAddr.substring(
+      chars = length || 4;
+    return `${oriAddr.substring(0, chars + 2)}...${oriAddr.substring(
       oriAddr.length - chars
     )}`;
   } else {
+    if (regexSolana.test(string)) {
+      return `${string.substring(0, 5)}...${string.substring(
+        string.length - 5
+      )}`;
+    }
     if (string.length > len) {
       return `${string.substr(0, len)}...`;
     }
