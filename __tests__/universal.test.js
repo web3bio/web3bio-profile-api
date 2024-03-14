@@ -108,8 +108,8 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
   });
-  it("It should response 200 data for svg.eth", async () => {
-    const res = await queryClient("/profile/svg.eth");
+  it("It should response 200 data for 0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c", async () => {
+    const res = await queryClient("/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.filter((x) => x.platform === "lens").length > 1);
