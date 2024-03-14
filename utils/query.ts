@@ -73,7 +73,6 @@ export const primaryDomainResolvedRequestArray = (
       data.data.domain.system === PlatformType.lens) &&
     data.data.domain.resolved
   ) {
-    console.log(data.data.domain.resolved.neighbor);
     const resolved = data?.data?.domain?.resolved?.neighbor
       .filter((x) => directPass(x))
       .map((x) => ({
