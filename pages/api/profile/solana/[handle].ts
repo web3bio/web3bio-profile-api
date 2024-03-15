@@ -18,8 +18,7 @@ import { NextApiRequest } from "next";
 const solanaSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
 const solanaRPCURL =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
-  "https://solana-mainnet.g.alchemy.com/v2/1SCfiES7TBt6VOsqTScgASygI4AI4nes";
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("mainnet-beta");
 
 const recordsShouldFetch = [
   SNSRecord.Twitter,
