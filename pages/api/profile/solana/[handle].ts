@@ -27,12 +27,20 @@ const recordsShouldFetch = [
   SNSRecord.CNAME,
 ];
 
-export const reverse = async (address: string) => {
+export const reverseWithProxy = async (address: string) => {
   const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
     .catch(() => null);
   if (!res || res?.s === "error") return "";
   return res?.result?.reverse + ".sol";
+};
+
+export const resolveWithProxy = async (handle: string) => {
+  const res = await fetch(solanaEndpoint + "resolve/" + handle)
+    .then((res) => res.json())
+    .catch(() => null);
+  if (!res || res?.s === "error") return "";
+  return res?.result;
 };
 
 export const getSNSRecord = async (
@@ -49,20 +57,27 @@ export const getSNSRecord = async (
   }
 };
 
+export const resolveSNSDomain = async (
+  connection: Connection,
+  handle: string
+) => {
+  try {
+    return (await resolve(connection, handle))?.toBase58();
+  } catch {
+    return await resolveWithProxy(handle);
+  }
+};
+
 const resolveSolanaHandle = async (handle: string) => {
   let domain, address;
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
   if (!connection) throw new Error(ErrorMessages.networkError, { cause: 500 });
   if (regexSns.test(handle)) {
     domain = handle;
-    try {
-      address = (await resolve(connection, handle))?.toBase58();
-    } catch {
-      // do nothing
-    }
+    address = await resolveSNSDomain(connection, handle);
   } else {
     address = handle;
-    domain = await reverse(handle);
+    domain = await reverseWithProxy(handle);
   }
   if (!address) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
