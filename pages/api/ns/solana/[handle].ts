@@ -7,7 +7,7 @@ import { Record as SNSRecord } from "@bonfida/spl-name-service";
 import {
   getSNSRecord,
   resolveSNSDomain,
-  reverseSolanaAddress,
+  reverseWithProxy,
 } from "../../profile/solana/[handle]";
 
 export const resolveSolanaHandleNS = async (handle: string) => {
@@ -19,7 +19,7 @@ export const resolveSolanaHandleNS = async (handle: string) => {
     address = await resolveSNSDomain(connection, handle);
   } else {
     address = handle;
-    domain = await reverseSolanaAddress(connection, handle);
+    domain = await reverseWithProxy(handle);
   }
 
   const resJSON = {
