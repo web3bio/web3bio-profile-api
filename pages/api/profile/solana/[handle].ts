@@ -15,7 +15,11 @@ import {
 import { Connection, clusterApiUrl } from "@solana/web3.js";
 import { NextApiRequest } from "next";
 
-const solanaEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
+const solanaSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
+
+const solanaRPCURL =
+  process.env.NEXT_PUBLIC_SOLANA_RPC_URL ||
+  "https://solana-mainnet.g.alchemy.com/v2/1SCfiES7TBt6VOsqTScgASygI4AI4nes";
 
 const recordsShouldFetch = [
   SNSRecord.Twitter,
@@ -35,7 +39,7 @@ export const reverseSolanaAddress = async (
 };
 
 export const reverseWithProxy = async (address: string) => {
-  const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
+  const res = await fetch(solanaSDKProxyEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
     .catch(() => null);
   if (!res || res?.s === "error") return "";
@@ -43,7 +47,7 @@ export const reverseWithProxy = async (address: string) => {
 };
 
 export const resolveWithProxy = async (handle: string) => {
-  const res = await fetch(solanaEndpoint + "resolve/" + handle)
+  const res = await fetch(solanaSDKProxyEndpoint + "resolve/" + handle)
     .then((res) => res.json())
     .catch(() => null);
   if (!res || res?.s === "error") return "";
@@ -70,14 +74,16 @@ export const resolveSNSDomain = async (
 ) => {
   try {
     return (await resolve(connection, handle))?.toBase58();
-  } catch {
+  } catch (e) {
+    console.log(e, "error");
     return await resolveWithProxy(handle);
   }
 };
 
 const resolveSolanaHandle = async (handle: string) => {
   let domain, address;
-  const connection = new Connection(clusterApiUrl("mainnet-beta"));
+  const connection = new Connection(solanaRPCURL);
+
   if (!connection) throw new Error(ErrorMessages.networkError, { cause: 500 });
   if (regexSns.test(handle)) {
     domain = handle;
