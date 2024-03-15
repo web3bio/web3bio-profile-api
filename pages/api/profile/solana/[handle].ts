@@ -27,6 +27,13 @@ const recordsShouldFetch = [
   SNSRecord.CNAME,
 ];
 
+export const reverseSolanaAddress = async (
+  connection: Connection,
+  address: string
+) => {
+  return await resolveWithProxy(address);
+};
+
 export const reverseWithProxy = async (address: string) => {
   const res = await fetch(solanaEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
