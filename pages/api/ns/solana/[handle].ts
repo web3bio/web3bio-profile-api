@@ -3,8 +3,12 @@ import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { NextApiRequest } from "next";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
-import { Record as SNSRecord, resolve } from "@bonfida/spl-name-service";
-import { getSNSRecord, reverse } from "../../profile/solana/[handle]";
+import { Record as SNSRecord } from "@bonfida/spl-name-service";
+import {
+  getSNSRecord,
+  resolveSNSDomain,
+  reverseWithProxy,
+} from "../../profile/solana/[handle]";
 
 export const resolveSolanaHandleNS = async (handle: string) => {
   let domain = "",
@@ -12,10 +16,10 @@ export const resolveSolanaHandleNS = async (handle: string) => {
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
   if (regexSns.test(handle)) {
     domain = handle;
-    address = (await resolve(connection, handle))?.toBase58();
+    address = await resolveSNSDomain(connection, handle);
   } else {
     address = handle;
-    domain = await reverse(handle);
+    domain = await reverseWithProxy(handle);
   }
 
   const resJSON = {
