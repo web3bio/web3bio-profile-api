@@ -49,7 +49,12 @@ const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
   const res = await fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
-  return res;
+  if (res?.result?.verifications?.length == 0) return null;
+  return (
+    res.result.verifications.find(
+      (x: { protocol: PlatformType }) => x.protocol === PlatformType.ethereum
+    )?.address || res.result.verifications[0].address
+  );
 };
 
 const resolveFarcasterLinks = (
@@ -90,10 +95,9 @@ export const resolveFarcasterResponse = async (handle: string) => {
   let response;
   if (isValidEthereumAddress(handle)) {
     const user = (await fetchWarpcastWithAddress(handle))?.result?.user;
-    const firstAddress = (await fetchAddressesFromWarpcastWithFid(user?.fid))
-      ?.result?.verifications?.[0]?.address;
+    const address = await fetchAddressesFromWarpcastWithFid(user?.fid);
     response = {
-      address: firstAddress || handle.toLowerCase(),
+      address,
       ...user,
     };
     if (!response?.username)
@@ -103,15 +107,16 @@ export const resolveFarcasterResponse = async (handle: string) => {
       ?.user;
     if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
-    const firstAddress = (await fetchAddressesFromWarpcastWithFid(rawUser?.fid))
-      ?.result?.verifications?.[0]?.address;
-    const ethAddress = regexEns.test(handle)
-      ? await client.getEnsAddress({
-          name: normalize(handle),
-        })
-      : null;
+    const address = await fetchAddressesFromWarpcastWithFid(rawUser?.fid);
+
+    const ethAddress =
+      !address && regexEns.test(handle)
+        ? await client.getEnsAddress({
+            name: normalize(handle),
+          })
+        : null || "";
     response = {
-      address: (firstAddress || ethAddress)?.toLowerCase(),
+      address: (address || ethAddress)?.toLowerCase(),
       ...rawUser,
     };
   }
