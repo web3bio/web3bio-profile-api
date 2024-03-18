@@ -7,12 +7,8 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { handleSearchPlatform, isDomainSearch } from "@/utils/utils";
-import {
-  getRelationQuery,
-  primaryDomainResolvedRequestArray,
-  primaryIdentityResolvedRequestArray,
-} from "@/utils/query";
+import { handleSearchPlatform } from "@/utils/utils";
+import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ProfileAPIResponse } from "@/utils/types";
 import { shouldPlatformFetch } from "../../../utils/base";
 export interface RequestInterface extends NextApiRequest {
@@ -31,14 +27,13 @@ const resolveHandleFromRelationService = (
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!
 ) => {
-  const query = getRelationQuery(platform);
   return fetch(nextidGraphQLEndpoint, {
     method: "POST",
     headers: {
       "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
     },
     body: JSON.stringify({
-      query,
+      query: GET_PROFILES,
       variables: {
         platform,
         identity: handle,
@@ -101,7 +96,6 @@ const resolveUniversalRespondFromRelation = async ({
   req: RequestInterface;
   ns?: boolean;
 }) => {
-  let notFound = false;
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
     platform
@@ -114,12 +108,7 @@ const resolveUniversalRespondFromRelation = async ({
       code: 500,
     });
 
-  if (isDomainSearch(platform)) {
-    if (!responseFromRelation?.data?.domain) notFound = true;
-  } else {
-    if (!responseFromRelation?.data?.identity) notFound = true;
-  }
-  if (notFound) {
+  if (!responseFromRelation?.data?.identity) {
     return errorHandle({
       identity: handle,
       platform,
@@ -127,20 +116,16 @@ const resolveUniversalRespondFromRelation = async ({
       code: 404,
     });
   }
-  const resolvedRequestArray = (
-    isDomainSearch(platform)
-      ? primaryDomainResolvedRequestArray(
-          responseFromRelation,
-          handle,
-          platform
-        )
-      : primaryIdentityResolvedRequestArray(responseFromRelation)
+  const resolvedRequestArray = primaryDomainResolvedRequestArray(
+    responseFromRelation
   ).sort((a, b) => {
     if (a.reverse && b.reverse) return 0;
     if (a.reverse && !b.reverse) return -1;
     if (!a.reverse && b.reverse) return 1;
     return 0;
   });
+
+
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,

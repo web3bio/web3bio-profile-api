@@ -1,132 +1,60 @@
 import { PlatformType } from "./platform";
-import {
-  Neighbor,
-  RelationServiceDomainQueryResponse,
-  RelationServiceIdentityQueryResponse,
-} from "./types";
-import { isDomainSearch } from "./utils";
+import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
-export const getRelationQuery = (platform: PlatformType) => {
-  return isDomainSearch(platform) ? GET_PROFILES_DOMAIN : GET_PROFILES_QUERY;
-};
-
-const directPass = (data: Neighbor) => {
-  if (data.reverse) return true;
+const directPass = (identity: IdentityRecord) => {
+  if (identity.reverse) return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
-    data.identity.platform
+    identity.platform
   );
 };
 
-const GET_PROFILES_DOMAIN = `
-query GET_PROFILES_DOMAIN($platform: String, $identity: String) {
-  domain(domainSystem: $platform, name: $identity) {
-    reverse
-    system
-		resolved {
-			identity
-			platform
-			displayName
-      neighbor(depth:3) {
-        reverse
-        identity {
-          platform
-          identity
-          displayName
-        }
-      }
-		}
-	}
-}
-`;
-
-export const GET_PROFILES_QUERY = `
-query GET_PROFILES_QUERY($platform: String, $identity: String) {
+export const GET_PROFILES = `
+query GET_PROFILES($platform: String, $identity: String) {
   identity(platform: $platform, identity: $identity) {
-    platform
     identity
+    platform
     displayName
-    neighbor(depth:3) {
-      reverse
-      identity {
-        platform
+    uid
+    reverse
+    expiredAt
+    identityGraph(reverse:true) {
+      vertices {
+        uuid
         identity
+        platform
         displayName
+        uid
+        reverse
+        expiredAt
       }
+  
     }
   }
 }
 `;
 
 export const primaryDomainResolvedRequestArray = (
-  data: RelationServiceDomainQueryResponse,
-  handle: string,
-  platform: PlatformType
+  data: RelationServiceQueryResponse,
 ) => {
+  const resolvedRecord = data?.data?.identity;
   const defaultReturn = {
-    identity: handle,
-    platform: platform,
-    reverse: data.data.domain.reverse,
+    identity: resolvedRecord.identity,
+    platform: resolvedRecord.platform,
+    reverse: false,
   };
 
   if (
-    (data.data.domain.reverse ||
-      data.data.domain.system === PlatformType.lens) &&
-    data.data.domain.resolved
+    directPass(resolvedRecord) &&
+    resolvedRecord.identityGraph.vertices?.length > 0
   ) {
-    const resolved = data?.data?.domain?.resolved?.neighbor
+    const resolved = resolvedRecord.identityGraph.vertices
       .filter((x) => directPass(x))
       .map((x) => ({
-        identity: x.identity.identity,
-        platform: x.identity.platform,
+        identity: x.identity,
+        platform: x.platform,
         reverse: x.reverse,
       }));
-    return [
-      ...(resolved || []),
-      {
-        identity: data.data.domain.resolved.identity,
-        platform: data.data.domain.resolved.platform,
-        reverse: data.data.domain.reverse,
-      },
-    ];
+    return [...resolved];
   }
   return [defaultReturn];
-};
-
-export const primaryIdentityResolvedRequestArray = (
-  data: RelationServiceIdentityQueryResponse
-) => {
-  if (data.data.identity.platform === PlatformType.ethereum) {
-    const defaultReturn = {
-      identity: data.data.identity.identity,
-      platform: PlatformType.ethereum,
-      reverse: null,
-    };
-    const reverseFromNeighbor = data.data.identity.neighbor
-      .filter((x) => directPass(x))
-      .map((x) => ({
-        identity: x.identity.identity,
-        platform: x.identity.platform,
-        reverse: x.reverse,
-      }));
-    return [defaultReturn, ...reverseFromNeighbor];
-  } else {
-    const defaultReturn = {
-      identity: data?.data?.identity?.identity,
-      platform: data?.data?.identity?.platform,
-      reverse: null,
-    };
-    const reverseFromNeighbor = data?.data?.identity?.neighbor
-      .filter(
-        (x) =>
-          directPass(x) ||
-          (x.identity.platform === PlatformType.ethereum &&
-            x.identity.displayName)
-      )
-      .map((x) => ({
-        identity: x.identity.identity,
-        platform: x.identity.platform,
-        reverse: x.reverse,
-      }));
-    return [...reverseFromNeighbor, defaultReturn];
-  }
 };
