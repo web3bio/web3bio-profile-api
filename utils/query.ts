@@ -3,7 +3,7 @@ import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.reverse) return true;
-  return [PlatformType.farcaster, PlatformType.lens].includes(
+  return [PlatformType.farcaster, PlatformType.lens, PlatformType.nextid].includes(
     identity.platform
   );
 };
