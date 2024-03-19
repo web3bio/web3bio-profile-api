@@ -108,16 +108,10 @@ const resolveUniversalRespondFromRelation = async ({
       code: 500,
     });
 
-  if (!responseFromRelation?.data?.identity) {
-    return errorHandle({
-      identity: handle,
-      platform,
-      message: ErrorMessages.notFound,
-      code: 404,
-    });
-  }
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
-    responseFromRelation
+    responseFromRelation,
+    handle,
+    platform
   ).sort((a, b) => {
     if (a.reverse && b.reverse) return 0;
     if (a.reverse && !b.reverse) return -1;
