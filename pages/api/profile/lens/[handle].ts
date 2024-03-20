@@ -119,10 +119,11 @@ export const resolveLensHandle = async (handle: string) => {
     };
   }
 
-  const avatarUri =
-    response.metadata?.picture?.raw?.uri ||
-    response.metadata?.picture?.optimized?.uri ||
-    null;
+  const avatarUri = response.metadata
+    ? response.metadata?.picture?.raw?.uri ||
+      response.metadata?.picture?.optimized?.uri
+    : // null profile pic use hey default fallback
+      `https://api.hey.xyz/avatar?id=${response.id}`;
   const coverPictureUri =
     response.metadata?.coverPicture?.optimized?.url ||
     response.metadata?.coverPicture?.raw?.uri ||

@@ -33,16 +33,26 @@ const fetcher = (url: string) => {
 };
 
 const fetchWarpcastWithAddress = async (address: string) => {
-  const res = await fetcher(
-    originBase + `user-by-verification?address=${address}`
-  ).then((res) => res.json());
-  return res;
+  try {
+    const res = await fetcher(
+      originBase + `user-by-verification?address=${address}`
+    ).then((res) => res.json());
+    return res;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 };
 const fetchFidFromWarpcastWithUsername = async (uname: string) => {
-  const res = await fetcher(
-    originBase + `user-by-username?username=${uname}`
-  ).then((res) => res.json());
-  return res;
+  try {
+    const res = await fetcher(
+      originBase + `user-by-username?username=${uname}`
+    ).then((res) => res.json());
+    return res;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 };
 
 const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
@@ -182,6 +192,7 @@ export default async function handler(req: NextApiRequest) {
 }
 
 export const config = {
+  maxDuration: 45,
   runtime: "edge",
   regions: ["sfo1", "iad1", "pdx1"],
 };
