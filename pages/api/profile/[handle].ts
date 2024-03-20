@@ -120,7 +120,6 @@ const resolveUniversalRespondFromRelation = async ({
   });
 
 
-
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({
       identity: handle,
