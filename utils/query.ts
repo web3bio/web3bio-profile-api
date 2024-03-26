@@ -49,9 +49,9 @@ export const primaryDomainResolvedRequestArray = (
     };
     if (
       directPass(resolvedRecord) &&
-      resolvedRecord.identityGraph.vertices?.length > 0
+      resolvedRecord.identityGraph?.vertices?.length > 0
     ) {
-      const resolved = resolvedRecord.identityGraph.vertices
+      const resolved = resolvedRecord.identityGraph?.vertices
         .filter((x) => directPass(x))
         .map((x) => ({
           identity: x.identity,

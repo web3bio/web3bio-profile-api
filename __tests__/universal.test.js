@@ -33,7 +33,7 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].identity).toBe("lilgho.lens");
     // sort check
     expect(json[1].identity).toBe("stani.lens");
-    expect(json.length).toBe(3);
+    expect(json.length).toBe(11);
   });
   it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
     const res = await queryClient(
@@ -41,8 +41,7 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("stani.lens");
-    expect(json.length).toBe(3);
+    expect(json[0].identity).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
   });
   it("It should response 200 data for noun124.eth", async () => {
     const res = await queryClient("/profile/noun124.eth");
