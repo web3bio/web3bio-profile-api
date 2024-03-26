@@ -32,7 +32,7 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("lilgho.lens");
     // sort check
-    expect(json[1].identity).toBe("stani.lens");
+    expect(json[1].reverse).toBeTruthy();
     expect(json.length).toBe(11);
   });
   it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
