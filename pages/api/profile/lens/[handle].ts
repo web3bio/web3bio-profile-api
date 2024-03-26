@@ -16,6 +16,9 @@ import {
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 
+const LensProtocolProfileCollectionAddress =
+  "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
+
 export const enum LensParamType {
   domain = "domain",
   address = "address",
@@ -74,7 +77,7 @@ export const resolveLensResponse = async (handle: string) => {
 };
 export const resolveLensHandle = async (handle: string) => {
   const response = await resolveLensResponse(handle);
-  if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
+  if (!response?.id) throw new Error(ErrorMessages.notFound, { cause: 404 });
   if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
   let LINKRES = {
@@ -118,11 +121,15 @@ export const resolveLensHandle = async (handle: string) => {
       ...(await getLink()),
     };
   }
-
   const avatarUri = response.metadata
     ? response.metadata?.picture?.raw?.uri ||
       response.metadata?.picture?.optimized?.uri
-    : null;
+    : await resolveEipAssetURL(
+        `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
+          response.id?.slice(2),
+          16
+        )}`
+      );
   const coverPictureUri =
     response.metadata?.coverPicture?.optimized?.url ||
     response.metadata?.coverPicture?.raw?.uri ||
