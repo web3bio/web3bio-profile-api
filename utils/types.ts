@@ -11,11 +11,6 @@ export interface NeighborDetail {
   uuid: string;
   displayName: string;
 }
-export interface Neighbor {
-  source: string[];
-  reverse: boolean | null;
-  identity: NeighborDetail;
-}
 
 export interface ProfileAPIResponse {
   address: string;
@@ -37,40 +32,28 @@ export interface ProfileAPIResponse {
   >;
 }
 
-export interface RelationServiceDomainQueryResponse {
+export interface RelationServiceQueryResponse {
   data: {
-    domain: {
-      name: string;
-      system: string;
-      source: string[];
+    identity: {
+      identity: string;
+      platform: PlatformType;
+      displayName: string;
       reverse: boolean;
-      resolved: {
-        identity: string;
-        displayName: string;
-        uuid: string;
-        platform: string;
-        neighbor: Neighbor[]
+      uid: string;
+      uuid: string;
+      expiredAt: string;
+      identityGraph: {
+        vertices: IdentityRecord[];
       };
     };
   };
 }
 
-export interface RelationServiceIdentityQueryResponse {
-  data: {
-    identity: {
-      platform: string;
-      identity: string;
-      displayName: string[];
-      uuid: string;
-      reverseRecords: ReverseRecordItem[];
-      neighbor: Neighbor[]
-    };
-  };
-}
-
-export interface ReverseRecordItem {
-  source: string;
-  system: string;
-  name: string;
+export interface IdentityRecord {
+  uuid: string;
+  identity: string;
+  platform: PlatformType;
+  displayName: string;
   reverse: boolean;
+  expiredAt: string;
 }
