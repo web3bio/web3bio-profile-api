@@ -32,7 +32,7 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
     return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
   if (
     platform &&
-    [PlatformType.lens, PlatformType.hey, PlatformType.lenster].includes(
+    [PlatformType.lens, PlatformType.hey].includes(
       platform
     ) &&
     handle.endsWith(".lens")
