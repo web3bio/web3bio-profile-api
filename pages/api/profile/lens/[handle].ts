@@ -81,8 +81,8 @@ export const resolveLensHandle = async (handle: string) => {
   if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
   let LINKRES = {
-    [PlatformType.hey]: {
-      link: getSocialMediaLink(pureHandle, PlatformType.hey),
+    [PlatformType.lens]: {
+      link: getSocialMediaLink(pureHandle, PlatformType.lens),
       handle: pureHandle,
     },
   };
