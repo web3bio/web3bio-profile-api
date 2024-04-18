@@ -41,6 +41,7 @@ export enum PlatformType {
   linkedin = "linkedin",
   dns = "dns",
   tron = "tron",
+  lenster = "lenster",
   hey = "hey",
   facebook = "facebook",
   threads = "threads",
@@ -132,7 +133,7 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-lens.svg",
     label: "Lens",
     urlPrefix: "https://www.lensfrens.xyz/",
-    system: PlatformSystem.web3,
+    system: PlatformSystem.web2,
   },
   [PlatformType.nextid]: {
     key: PlatformType.nextid,
@@ -305,6 +306,14 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
     icon: "icons/icon-tron.svg",
     label: "Tron",
     urlPrefix: "https://tronscan.org/#/address/",
+    system: PlatformSystem.web3,
+  },
+  [PlatformType.lenster]: {
+    key: PlatformType.lenster,
+    color: "#845EEE",
+    icon: "icons/icon-lenster.svg",
+    label: "Lenster",
+    urlPrefix: "https://lenster.xyz/u/",
     system: PlatformSystem.web3,
   },
   [PlatformType.hey]: {
@@ -531,10 +540,21 @@ export const PlatformData: { [key in PlatformType]: SocialPlatform } = {
   },
 };
 
-export const supportedPlatforms = [
-  PlatformType.ens,
-  PlatformType.lens,
-  PlatformType.farcaster,
-  PlatformType.dotbit,
-  PlatformType.unstoppableDomains,
-];
+export const shouldPlatformFetch = (platform?: PlatformType | null) => {
+  if (!platform) return false;
+  if (
+    [
+      PlatformType.ens,
+      PlatformType.ethereum,
+      PlatformType.farcaster,
+      PlatformType.lens,
+      PlatformType.unstoppableDomains,
+      PlatformType.dotbit,
+      PlatformType.nextid,
+      PlatformType.solana,
+      PlatformType.sns,
+    ].includes(platform)
+  )
+    return true;
+  return false;
+};

@@ -1,13 +1,18 @@
 import { NextResponse } from "next/server";
+import { regexSolana } from "./utils/regexp";
 
 export const config = {
-  matcher: "/profile/:path*",
+  matcher: ["/ns/:path*", "/profile/:path*"],
 };
 
 const Middleware = (req: {
   nextUrl: { pathname: string; clone: () => URL };
 }) => {
-  if (req.nextUrl.pathname !== req.nextUrl.pathname.toLowerCase() && !req.nextUrl.pathname.includes('/solana')) {
+  const identity = req.nextUrl.pathname.split("/").pop() || "";
+  if (
+    req.nextUrl.pathname !== req.nextUrl.pathname.toLowerCase() &&
+    !regexSolana.test(identity)
+  ) {
     const url = req.nextUrl.clone();
     url.pathname = url.pathname.toLowerCase();
     return NextResponse.redirect(url);
