@@ -15,7 +15,7 @@ import {
 import { Connection, clusterApiUrl } from "@solana/web3.js";
 import { NextApiRequest } from "next";
 
-const solanaSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
+const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
 const solanaRPCURL =
   process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("mainnet-beta");
@@ -31,7 +31,7 @@ const recordsShouldFetch = [
 ];
 
 export const reverseWithProxy = async (address: string) => {
-  const res = await fetch(solanaSDKProxyEndpoint + "favorite-domain/" + address)
+  const res = await fetch(SnsSDKProxyEndpoint + "favorite-domain/" + address)
     .then((res) => res.json())
     .catch(() => null);
   if (!res || res?.s === "error") return "";
@@ -39,7 +39,7 @@ export const reverseWithProxy = async (address: string) => {
 };
 
 export const resolveWithProxy = async (handle: string) => {
-  const res = await fetch(solanaSDKProxyEndpoint + "resolve/" + handle)
+  const res = await fetch(SnsSDKProxyEndpoint + "resolve/" + handle)
     .then((res) => res.json())
     .catch(() => null);
   if (!res || res?.s === "error") return "";
@@ -128,7 +128,7 @@ const resolveSNSHandle = async (handle: string) => {
   const json = {
     address,
     identity: domain,
-    platform: PlatformType.solana,
+    platform: PlatformType.sns,
     displayName: domain || null,
     avatar: await getSNSRecord(connection, domain, SNSRecord.Pic),
     description: await getSNSRecord(connection, domain, SNSRecord.TXT),
@@ -148,7 +148,7 @@ export const resolveSNSRespond = async (handle: string) => {
   } catch (e: any) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.solana,
+      platform: PlatformType.sns,
       code: e.cause || 500,
       message: e.message,
     });
@@ -164,7 +164,7 @@ export default async function handler(req: NextApiRequest) {
   )
     return errorHandle({
       identity: inputName,
-      platform: PlatformType.solana,
+      platform: PlatformType.sns,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });

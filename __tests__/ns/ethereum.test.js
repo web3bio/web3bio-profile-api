@@ -10,6 +10,7 @@ describe("Test For Ethereum Profile API", () => {
     const res = await queryClient("/ns/ethereum/planetable.eth");
     const json = await res.json();
     expect(json.address).toBe("0x18deee9699526f8c8a87004b2e4e55029fb26b9a");
+    expect(json.platform).toBe("ENS");
   });
   it("It should response 200 for 0x7241DDDec3A6aF367882eAF9651b87E1C7549Dff", async () => {
     const res = await queryClient(

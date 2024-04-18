@@ -1,4 +1,9 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  ErrorMessages,
+  formatText,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { NextApiRequest } from "next";
@@ -21,7 +26,16 @@ export const resolveSNSHandleNS = async (handle: string) => {
     address = handle;
     domain = await reverseWithProxy(handle);
   }
-
+  if (!domain) {
+    return {
+      address: address,
+      identity: address,
+      platform: PlatformType.solana,
+      displayName: formatText(address),
+      avatar: null,
+      description: null,
+    };
+  }
   const resJSON = {
     address: address,
     identity: domain,
@@ -40,7 +54,7 @@ export const resolveSNSRespondNS = async (handle: string) => {
   } catch (e: any) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.solana,
+      platform: PlatformType.sns,
       code: e.cause || 500,
       message: e.message,
     });
@@ -53,7 +67,7 @@ export default async function handler(req: NextApiRequest) {
   if (!regexSns.test(inputName) && !regexSolana.test(inputName))
     return errorHandle({
       identity: inputName,
-      platform: PlatformType.solana,
+      platform: PlatformType.sns,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });

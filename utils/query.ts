@@ -40,6 +40,7 @@ export const primaryDomainResolvedRequestArray = (
   handle: string,
   platform: PlatformType
 ) => {
+  console.log(data)
   if (data?.data?.identity) {
     const resolvedRecord = data?.data?.identity;
     const defaultReturn = {
