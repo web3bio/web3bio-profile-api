@@ -1453,7 +1453,7 @@ export default function Home() {
 {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
     "identity": "bonfida.sol",
-    "platform": "solana",
+    "platform": "sns",
     "displayName": "bonfida.sol",
     "avatar": null,
     "description": null,
@@ -1471,7 +1471,7 @@ export default function Home() {
 {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
     "identity": "bonfida.sol",
-    "platform": "solana",
+    "platform": "sns",
     "displayName": "bonfida.sol",
     "avatar": null,
     "description": null,
