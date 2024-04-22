@@ -41,7 +41,7 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
+    expect(json[0].identity).toBe("stani.lens");
   });
   it("It should response 200 data for noun124.eth", async () => {
     const res = await queryClient("/profile/noun124.eth");

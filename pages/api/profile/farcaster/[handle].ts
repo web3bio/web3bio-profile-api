@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
 import {
   errorHandle,
-  ErrorMessages,
   isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
@@ -11,6 +10,7 @@ import { regexEns, regexEth, regexFarcaster } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
+import { ErrorMessages } from "@/utils/types";
 
 const client = createPublicClient({
   chain: mainnet,

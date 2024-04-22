@@ -1,9 +1,10 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { NextApiRequest } from "next";
 import { resolveLensResponse } from "../../profile/lens/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export const resolveLensHandleNS = async (handle: string) => {
   const response = await resolveLensResponse(handle);

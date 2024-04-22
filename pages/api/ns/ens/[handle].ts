@@ -1,9 +1,4 @@
-import {
-  errorHandle,
-  ErrorMessages,
-  formatText,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
@@ -12,6 +7,7 @@ import {
   resolveENSResponse,
   resolveENSTextValue,
 } from "../../profile/ens/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export const resolveENSHandleNS = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
