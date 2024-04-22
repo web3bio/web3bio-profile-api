@@ -1,8 +1,9 @@
-import { errorHandle, ErrorMessages } from "@/utils/base";
+import { errorHandle } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { NextApiRequest } from "next";
 import { resolveSNSRespond } from "../sns/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export default async function handler(req: NextApiRequest) {
   const { searchParams } = new URL(req.url as string);

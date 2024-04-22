@@ -1,9 +1,4 @@
-import {
-  errorHandle,
-  ErrorMessages,
-  formatText,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { NextApiRequest } from "next";
@@ -14,6 +9,7 @@ import {
   resolveSNSDomain,
   reverseWithProxy,
 } from "../../profile/sns/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export const resolveSNSHandleNS = async (handle: string) => {
   let domain = "",

@@ -1,15 +1,14 @@
 import type { NextApiRequest } from "next";
 import {
   errorHandle,
-  ErrorMessages,
   formatText,
+  handleSearchPlatform,
   isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { handleSearchPlatform } from "@/utils/utils";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
-import { ProfileAPIResponse } from "@/utils/types";
+import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { shouldPlatformFetch } from "../../../utils/base";
 export interface RequestInterface extends NextApiRequest {
   nextUrl: {
@@ -118,7 +117,6 @@ const resolveUniversalRespondFromRelation = async ({
     if (!a.reverse && b.reverse) return 1;
     return 0;
   });
-
 
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return errorHandle({

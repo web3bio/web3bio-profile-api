@@ -7,14 +7,13 @@ import {
 import { getLensProfileQuery } from "@/utils/lens";
 import { isAddress } from "viem";
 import {
-  LinksItem,
   errorHandle,
-  ErrorMessages,
   respondWithCache,
   isValidEthereumAddress,
 } from "@/utils/base";
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
+import { ErrorMessages, LinksItem } from "@/utils/types";
 
 const LensProtocolProfileCollectionAddress =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";

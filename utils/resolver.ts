@@ -1,8 +1,7 @@
 import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
-import { PlatformType } from "./platform";
-import { SocialPlatformMapping } from "./utils";
+import { PlatformType, SocialPlatformMapping } from "./platform";
 import * as contentHash from "@ensdomains/content-hash";
 
 const ArweaveAssetPrefix = "https://arweave.net/";
@@ -32,9 +31,7 @@ export const resolveHandle = (handle: string, platform?: PlatformType) => {
     return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
   if (
     platform &&
-    [PlatformType.lens, PlatformType.hey].includes(
-      platform
-    ) &&
+    [PlatformType.lens, PlatformType.hey].includes(platform) &&
     handle.endsWith(".lens")
   )
     handleToResolve = handle.replace(".lens", "");

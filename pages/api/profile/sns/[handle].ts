@@ -1,12 +1,8 @@
-import {
-  ErrorMessages,
-  errorHandle,
-  formatText,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
+import { ErrorMessages } from "@/utils/types";
 import {
   Record as SNSRecord,
   getRecordV2,

@@ -1,5 +1,29 @@
 import { PlatformType } from "./platform";
 
+export type LinksItem = {
+  link: string | null;
+  handle: string | null;
+};
+
+export interface errorHandleProps {
+  identity: string | null;
+  code: number;
+  message: ErrorMessages | string;
+  platform: PlatformType | null;
+  headers?: HeadersInit;
+}
+
+export enum ErrorMessages {
+  notFound = "Not Found",
+  invalidResolver = "Invalid Resolver Address",
+  invalidResolved = "Invalid Resolved Address",
+  notExist = "Does Not Exist",
+  invalidIdentity = "Invalid Identity or Domain",
+  invalidAddr = "Invalid Address",
+  unknownError = "Unknown Error Occurs",
+  networkError = "Network Error",
+}
+
 export interface ProofRecord {
   platform: string;
   identity: string;

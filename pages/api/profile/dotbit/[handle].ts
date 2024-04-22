@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
 import {
   errorHandle,
-  ErrorMessages,
   isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
@@ -9,6 +8,7 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { CoinType } from "@/utils/cointype";
+import { ErrorMessages } from "@/utils/types";
 
 export const config = {
   runtime: "edge",
