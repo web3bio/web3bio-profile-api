@@ -16,11 +16,13 @@ describe("Test For ENS NS API", () => {
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/ns/ens/sujiyan.eth");
     expect(res.status).toBe(200);
+    const json = await res.json();
     expect(json.platform).toBe("ENS");
   });
   it("It should response 200 for vitalik.eth", async () => {
     const res = await queryClient("/ns/ens/vitalik.eth");
     expect(res.status).toBe(200);
+    const json = await res.json();
     expect(json.platform).toBe("ENS");
   });
 
