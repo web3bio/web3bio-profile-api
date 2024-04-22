@@ -1,7 +1,6 @@
 import type { NextApiRequest } from "next";
 import {
   errorHandle,
-  ErrorMessages,
   isValidEthereumAddress,
   respondWithCache,
 } from "@/utils/base";
@@ -9,6 +8,7 @@ import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { resolveIPFS_URL } from "@/utils/ipfs";
+import { ErrorMessages } from "@/utils/types";
 
 export const config = {
   runtime: "edge",

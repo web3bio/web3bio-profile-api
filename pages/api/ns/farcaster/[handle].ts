@@ -1,8 +1,9 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { NextApiRequest } from "next";
 import { resolveFarcasterResponse } from "../../profile/farcaster/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export const resolveFarcasterHandleNS = async (handle: string) => {
   const response = await resolveFarcasterResponse(handle);

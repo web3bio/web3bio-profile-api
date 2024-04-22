@@ -1,29 +1,17 @@
 import { isAddress } from "viem";
 import { PlatformType } from "./platform";
-
-export type LinksItem = {
-  link: string | null;
-  handle: string | null;
-};
-
-interface errorHandleProps {
-  identity: string | null;
-  code: number;
-  message: ErrorMessages | string;
-  platform: PlatformType | null;
-  headers?: HeadersInit;
-}
-
-export enum ErrorMessages {
-  notFound = "Not Found",
-  invalidResolver = "Invalid Resolver Address",
-  invalidResolved = "Invalid Resolved Address",
-  notExist = "Does Not Exist",
-  invalidIdentity = "Invalid Identity or Domain",
-  invalidAddr = "Invalid Address",
-  unknownError = "Unknown Error Occurs",
-  networkError = "Network Error",
-}
+import {
+  regexDotbit,
+  regexEns,
+  regexEth,
+  regexLens,
+  regexTwitter,
+  regexUnstoppableDomains,
+  regexSpaceid,
+  regexFarcaster,
+  regexAvatar,
+} from "./regexp";
+import { errorHandleProps } from "./types";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
@@ -59,7 +47,7 @@ export const formatText = (string: string, length?: number) => {
   if (string.length <= len) {
     return string;
   }
-  if (string.startsWith("0x"))  {
+  if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
       string.length - chars
     )}`;
@@ -94,4 +82,39 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   )
     return true;
   return false;
+};
+
+export const handleSearchPlatform = (term: string) => {
+  switch (true) {
+    case regexEns.test(term):
+      return PlatformType.ens;
+    case regexEth.test(term):
+      return PlatformType.ethereum;
+    case regexLens.test(term):
+      return PlatformType.lens;
+    case regexUnstoppableDomains.test(term):
+      return PlatformType.unstoppableDomains;
+    case regexSpaceid.test(term):
+      return PlatformType.space_id;
+    case regexDotbit.test(term):
+      return PlatformType.dotbit;
+    case regexTwitter.test(term):
+      return PlatformType.twitter;
+    case regexFarcaster.test(term):
+      return PlatformType.farcaster;
+    case regexAvatar.test(term):
+      return PlatformType.nextid;
+    default:
+      return null;
+  }
+};
+
+export const isDomainSearch = (term: PlatformType) => {
+  return [
+    PlatformType.ens,
+    PlatformType.dotbit,
+    PlatformType.unstoppableDomains,
+    PlatformType.space_id,
+    PlatformType.lens,
+  ].includes(term);
 };

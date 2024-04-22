@@ -1,10 +1,9 @@
-import { errorHandle, ErrorMessages, respondWithCache } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { NextApiRequest } from "next";
-import {
-  resolveDotbitResponse,
-} from "../../profile/dotbit/[handle]";
+import { resolveDotbitResponse } from "../../profile/dotbit/[handle]";
+import { ErrorMessages } from "@/utils/types";
 
 export const config = {
   runtime: "edge",
