@@ -22,24 +22,25 @@ export default async function handler(req: NextApiRequest) {
     const profile = await fetch(baseURL + `/profile/${platform}/${name}`)
       .then((res) => res.json())
       .catch((e) => null);
-    if (!profile?.avatar) {
+    if (profile?.avatar) {
+      avatarHTML = ReactDOMServer.renderToString(
+        <Image
+          style={{
+            borderRadius: 99,
+          }}
+          width={Number(size)}
+          height={Number(size)}
+          alt={profile.identity}
+          src={profile.avatar}
+        />
+      );
+    } else {
       shouldReturnBoring = true;
-      return;
     }
-    avatarHTML = ReactDOMServer.renderToString(
-      <Image
-        style={{
-          borderRadius: 99,
-        }}
-        width={Number(size)}
-        height={Number(size)}
-        alt={profile.identity}
-        src={profile.avatar}
-      />
-    );
   } else {
     shouldReturnBoring = true;
   }
+
   if (shouldReturnBoring) {
     const variant = searchParams.get("variant") || "bauhaus";
     const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
@@ -55,6 +56,7 @@ export default async function handler(req: NextApiRequest) {
       />
     );
   }
+
   return new Response(avatarHTML, {
     status: 200,
     headers: {
