@@ -9,7 +9,10 @@ import {
   regexUnstoppableDomains,
   regexSpaceid,
   regexFarcaster,
-  regexAvatar,
+  regexCrossbell,
+  regexSns,
+  regexBtc,
+  regexSolana,
 } from "./regexp";
 import { errorHandleProps } from "./types";
 
@@ -84,6 +87,8 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
       PlatformType.unstoppableDomains,
       PlatformType.dotbit,
       PlatformType.nextid,
+      PlatformType.solana,
+      PlatformType.sns,
     ].includes(platform)
   )
     return true;
@@ -91,7 +96,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
 };
 
 export const handleSearchPlatform = (term: string) => {
-  switch (true) {
+  switch (!!term) {
     case regexEns.test(term):
       return PlatformType.ens;
     case regexEth.test(term):
@@ -102,25 +107,21 @@ export const handleSearchPlatform = (term: string) => {
       return PlatformType.unstoppableDomains;
     case regexSpaceid.test(term):
       return PlatformType.space_id;
+    case regexCrossbell.test(term):
+      return PlatformType.crossbell;
     case regexDotbit.test(term):
       return PlatformType.dotbit;
+    case regexSns.test(term):
+      return PlatformType.sns;
+    case regexBtc.test(term):
+      return PlatformType.bitcoin;
+    case regexSolana.test(term):
+      return PlatformType.solana;
     case regexTwitter.test(term):
       return PlatformType.twitter;
     case regexFarcaster.test(term):
       return PlatformType.farcaster;
-    case regexAvatar.test(term):
-      return PlatformType.nextid;
     default:
-      return null;
+      return PlatformType.nextid;
   }
-};
-
-export const isDomainSearch = (term: PlatformType) => {
-  return [
-    PlatformType.ens,
-    PlatformType.dotbit,
-    PlatformType.unstoppableDomains,
-    PlatformType.space_id,
-    PlatformType.lens,
-  ].includes(term);
 };

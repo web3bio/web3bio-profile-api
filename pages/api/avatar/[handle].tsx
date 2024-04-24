@@ -14,18 +14,22 @@ import Image from "next/image";
 export default async function handler(req: NextApiRequest) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   let avatarHTML = "";
+  let shouldReturnBoring = false;
   const name = searchParams.get("handle") || "";
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profile = await fetch(baseURL + `/profile/${platform}/${name}`).then(
-      (res) => res.json()
-    );
-    if (!profile.avatar) return;
+    const profile = await fetch(baseURL + `/profile/${platform}/${name}`)
+      .then((res) => res.json())
+      .catch((e) => null);
+    if (!profile?.avatar) {
+      shouldReturnBoring = true;
+      return;
+    }
     avatarHTML = ReactDOMServer.renderToString(
       <Image
         style={{
-          borderRadius: 99
+          borderRadius: 99,
         }}
         width={Number(size)}
         height={Number(size)}
@@ -34,6 +38,9 @@ export default async function handler(req: NextApiRequest) {
       />
     );
   } else {
+    shouldReturnBoring = true;
+  }
+  if (shouldReturnBoring) {
     const variant = searchParams.get("variant") || "bauhaus";
     const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
 
@@ -48,7 +55,6 @@ export default async function handler(req: NextApiRequest) {
       />
     );
   }
-
   return new Response(avatarHTML, {
     status: 200,
     headers: {
