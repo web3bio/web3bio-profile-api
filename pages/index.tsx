@@ -58,12 +58,22 @@ export default function Home() {
             <p>
               The Web3.bio Profile API enables developers to easily and quickly
               integrate Web3 universal profiles from{" "}
-              <span className="text-underline" title="Ethereum and Ethereum Name Service (ENS)">Ethereum (ENS)</span>,{" "}
-              <span className="text-underline">Lens Protocol</span>,{" "}
+              <span
+                className="text-underline"
+                title="Ethereum and Ethereum Name Service (ENS)"
+              >
+                Ethereum (ENS)
+              </span>
+              , <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Unstoppable Domains</span>,{" "}
-              <span className="text-underline" title="Solana and Solana Name Service (Bonfida)">Solana (SNS)</span>,{" "}
-              <span className="text-underline">.bit</span> and{" "}
+              <span
+                className="text-underline"
+                title="Solana and Solana Name Service (Bonfida)"
+              >
+                Solana (SNS)
+              </span>
+              , <span className="text-underline">.bit</span> and{" "}
               <span className="text-underline">Next.ID</span> into their
               applications. These APIs are already integrated into{" "}
               <a
@@ -490,7 +500,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/{"{"}identity{"}"}
                 </div>
               </div>
@@ -508,14 +520,14 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/ens/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  Retrieve an ENS profile
-                </div>
+                <div className="label text-small">Retrieve an ENS profile</div>
               </div>
             </a>
             <a
@@ -526,14 +538,14 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/lens/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  Retrieve a Lens profile
-                </div>
+                <div className="label text-small">Retrieve a Lens profile</div>
               </div>
             </a>
             <a
@@ -544,7 +556,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
@@ -563,7 +577,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/unstoppabledomains/{"{"}identity{"}"}
                 </div>
               </div>
@@ -582,7 +598,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/solana/{"{"}identity{"}"}
                 </div>
               </div>
@@ -601,22 +619,23 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  Retrieve a .bit profile
-                </div>
+                <div className="label text-small">Retrieve a .bit profile</div>
               </div>
             </a>
 
             <p>
-              Web3.bio Profile API also provides basic profiles for name service resolution under {" "}
-              <span className="label">api.web3.bio/ns</span> (Replace <span className="label">profile</span> with <span className="label">ns</span>).
+              Web3.bio Profile API also provides basic profiles for name service
+              resolution under <span className="label">api.web3.bio/ns</span>{" "}
+              (Replace <span className="label">profile</span> with{" "}
+              <span className="label">ns</span>).
             </p>
-
           </section>
 
           <section
@@ -627,7 +646,10 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Universal Profile API
             </h2>
-            <p>Retrieve Universal profiles or name service resolution across platforms </p>
+            <p>
+              Retrieve Universal profiles or name service resolution across
+              platforms{" "}
+            </p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -635,7 +657,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/{"{"}identity{"}"}
                 </div>
               </div>
@@ -647,7 +671,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/{"{"}identity{"}"}
                 </div>
               </div>
@@ -657,7 +683,8 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 - An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), a .bit domain, a Next.ID address, or an Unstoppable Domains domain.
+                username (ends with .farcaster), a .bit domain, a Next.ID
+                address, or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">Examples</h3>
@@ -687,10 +714,7 @@ export default function Home() {
                   /profile/vitalik.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href="https://api.web3.bio/ns/vitalik.eth"
-                  target="_blank"
-                >
+                <a href="https://api.web3.bio/ns/vitalik.eth" target="_blank">
                   /ns/vitalik.eth
                 </a>
               </li>
@@ -703,10 +727,7 @@ export default function Home() {
                   /profile/stani.lens
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href="https://api.web3.bio/ns/stani.lens"
-                  target="_blank"
-                >
+                <a href="https://api.web3.bio/ns/stani.lens" target="_blank">
                   /ns/stani.lens
                 </a>
               </li>
@@ -735,10 +756,7 @@ export default function Home() {
                   /profile/sandy.nft
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href="https://api.web3.bio/ns/sandy.nft"
-                  target="_blank"
-                >
+                <a href="https://api.web3.bio/ns/sandy.nft" target="_blank">
                   /ns/sandy.nft
                 </a>
               </li>
@@ -767,10 +785,7 @@ export default function Home() {
                   /profile/jeffx.bit
                 </a>
                 <span className="text-gray ml-2 mr-2">or</span>
-                <a
-                  href="https://api.web3.bio/ns/jeffx.bit"
-                  target="_blank"
-                >
+                <a href="https://api.web3.bio/ns/jeffx.bit" target="_blank">
                   /ns/jeffx.bit
                 </a>
               </li>
@@ -782,11 +797,11 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/vitalik.eth`}</span>
                 <br />
-{`[
+                {`[
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
         "identity": "vitalik.eth",
-        "platform": "ENS",
+        "platform": "ens",
         "displayName": "vitalik.eth",
         "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
         "description": null,
@@ -837,16 +852,17 @@ export default function Home() {
         }
     }
 ]`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/vitalik.eth`}</span>
                 <br />
-{`[
+                {`[
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
         "identity": "vitalik.eth",
-        "platform": "ENS",
+        "platform": "ens",
         "displayName": "vitalik.eth",
         "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
         "description": null
@@ -888,7 +904,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/ens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -900,7 +918,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/ens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -958,10 +978,10 @@ export default function Home() {
                   {`// https://api.web3.bio/profile/ens/vitalik.eth`}{" "}
                 </span>
                 <br />
-{`{
+                {`{
     "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
     "identity": "vitalik.eth",
-    "platform": "ENS",
+    "platform": "ens",
     "displayName": "vitalik.eth",
     "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
     "description": null,
@@ -976,7 +996,8 @@ export default function Home() {
         }
     }
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">
                   {`// https://api.web3.bio/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
                 </span>
@@ -985,10 +1006,10 @@ export default function Home() {
                   {`// https://api.web3.bio/ns/ens/vitalik.eth`}{" "}
                 </span>
                 <br />
-{`{
+                {`{
     "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
     "identity": "vitalik.eth",
-    "platform": "ENS",
+    "platform": "ens",
     "displayName": "vitalik.eth",
     "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
     "description": null
@@ -1013,7 +1034,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/lens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1025,7 +1048,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/lens/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1078,7 +1103,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/lens/stani.lens`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
     "identity": "stani.lens",
     "platform": "lens",
@@ -1100,12 +1125,13 @@ export default function Home() {
         }
     }
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/lens/stani.lens`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
     "identity": "stani.lens",
     "platform": "lens",
@@ -1133,7 +1159,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1145,7 +1173,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/farcaster/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1198,7 +1228,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/farcaster/dwr.eth`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
     "identity": "dwr.eth",
     "platform": "farcaster",
@@ -1216,12 +1246,13 @@ export default function Home() {
       }
     }
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/farcaster/suji`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
     "identity": "dwr.eth",
     "platform": "farcaster",
@@ -1241,7 +1272,9 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Unstoppable Domains Profile API
             </h2>
-            <p>Retrieve an Unstoppable Domains profile or name service resolution</p>
+            <p>
+              Retrieve an Unstoppable Domains profile or name service resolution
+            </p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1249,7 +1282,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/unstoppabledomains/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1261,7 +1296,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/unstoppabledomains/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1314,7 +1351,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/unstoppabledomains/sandy.nft`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
     "identity": "sandy.nft",
     "platform": "unstoppabledomains",
@@ -1352,12 +1389,13 @@ export default function Home() {
         }
     }
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/unstoppabledomains/sandy.nft`}</span>
                 <br />
-{`{
+                {`{
     "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
     "identity": "sandy.nft",
     "platform": "unstoppabledomains",
@@ -1377,7 +1415,9 @@ export default function Home() {
             <h2 className="text-bold h4" style={{ marginBottom: "2rem" }}>
               Solana (SNS) Profile API
             </h2>
-            <p>Retrieve a Solana Name Service profile or name service resolution</p>
+            <p>
+              Retrieve a Solana Name Service profile or name service resolution
+            </p>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1385,7 +1425,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/solana/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1397,7 +1439,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/solana/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1450,7 +1494,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/solana/bonfida.sol`}</span>
                 <br />
-{`{
+                {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
     "identity": "bonfida.sol",
     "platform": "sns",
@@ -1463,12 +1507,13 @@ export default function Home() {
     "contenthash": null,
     "links": {}
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/solana/bonfida.sol`}</span>
                 <br />
-{`{
+                {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
     "identity": "bonfida.sol",
     "platform": "sns",
@@ -1496,7 +1541,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /profile/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1508,7 +1555,9 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">https://api.web3.bio</span>
+                  <span className="text-gray hide-sm">
+                    https://api.web3.bio
+                  </span>
                   /ns/dotbit/{"{"}identity{"}"}
                 </div>
               </div>
@@ -1561,7 +1610,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/profile/dotbit/bestcase.bit`}</span>
                 <br />
-{`{
+                {`{
     "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
     "identity": "bestcase.bit",
     "platform": "dotbit",
@@ -1595,12 +1644,13 @@ export default function Home() {
         }
     }
 }`}
-                <br /><br />
+                <br />
+                <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
                 <br />
                 <span className="text-gray">{`// https://api.web3.bio/ns/dotbit/bestcase.bit`}</span>
                 <br />
-{`{
+                {`{
     "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
     "identity": "bestcase.bit",
     "platform": "dotbit",
@@ -1611,7 +1661,7 @@ export default function Home() {
               </code>
             </pre>
           </section>
-          
+
           <section
             className="pt-4 pb-4"
             id="errors"
@@ -1634,10 +1684,10 @@ export default function Home() {
               <code>
                 <span className="text-gray">{`// https://api.web3.bio/profile/web3bio_example.eth`}</span>
                 <br />
-{`{
+                {`{
     "address": null,
     "identity": "web3bio_example.eth",
-    "platform": "ENS",
+    "platform": "ens",
     "error": "Not Found"
 }`}
               </code>
@@ -1680,8 +1730,8 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Solana Name Service (Bonfida) query
-                support to the Profile API.
+                <span className="label label-primary">Feature</span> Added
+                Solana Name Service (Bonfida) query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1690,10 +1740,13 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Update</span> Added <code>contenthash</code> field for more complete ENS, Unstoppable Domains and .bit Profile API queries.
+                <span className="label label-primary">Update</span> Added{" "}
+                <code>contenthash</code> field for more complete ENS,
+                Unstoppable Domains and .bit Profile API queries.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added offchain query support for ENS Profile API.
+                <span className="label label-primary">Update</span> Added
+                offchain query support for ENS Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1702,8 +1755,9 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added <code>ns</code> basic profile resolution query
-                support to the Profile APIs.
+                <span className="label label-primary">Feature</span> Added{" "}
+                <code>ns</code> basic profile resolution query support to the
+                Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1712,12 +1766,12 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Unstoppable Domains query
-                support to the Profile APIs.
+                <span className="label label-primary">Feature</span> Added
+                Unstoppable Domains query support to the Profile APIs.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added Ethereum address query
-                support to all Profile APIs.
+                <span className="label label-primary">Update</span> Added
+                Ethereum address query support to all Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1736,12 +1790,12 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added .bit query support
-                to the Profile APIs.
+                <span className="label label-primary">Feature</span> Added .bit
+                query support to the Profile APIs.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added ENS username support
-                in the Farcaster Profile API.
+                <span className="label label-primary">Update</span> Added ENS
+                username support in the Farcaster Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1750,8 +1804,8 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Next.ID query
-                support to the Profile APIs.
+                <span className="label label-primary">Feature</span> Added
+                Next.ID query support to the Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1760,9 +1814,9 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Universal Profile
-                API. Developers can retrieve universal profiles across supported
-                platforms with a single query.
+                <span className="label label-primary">Feature</span> Added
+                Universal Profile API. Developers can retrieve universal
+                profiles across supported platforms with a single query.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -1771,8 +1825,9 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Ethereum Name
-                Service (ENS), Lens, and Farcaster support to the Profile APIs.
+                <span className="label label-primary">Feature</span> Added
+                Ethereum Name Service (ENS), Lens, and Farcaster support to the
+                Profile APIs.
               </li>
             </ul>
           </section>
