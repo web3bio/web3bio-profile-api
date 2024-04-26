@@ -15,7 +15,7 @@ describe("Test For Ethereum Profile API", () => {
     const json = await res.json();
     const res2 = await queryClient("/profile/wijuwiju.eth");
     const json2 = await res2.json();
-    expect(json.address).toBe(json2.find((x) => x.platform === "ENS").address);
+    expect(json.address).toBe(json2.find((x) => x.platform === "ens").address);
   });
   it("It should response 200 for gamedb.eth", async () => {
     const res = await queryClient("/profile/ethereum/gamedb.eth");
@@ -32,7 +32,7 @@ describe("Test For Ethereum Profile API", () => {
   it("It should response 200 for yisiliu.eth", async () => {
     const res = await queryClient("/profile/ethereum/yisiliu.eth");
     const json = await res.json();
-    expect(json.platform).toBe("ENS");
+    expect(json.platform).toBe("ens");
   });
   it("It should response 404 for taoli.eth", async () => {
     const res = await queryClient("/profile/ethereum/taoli.eth");
