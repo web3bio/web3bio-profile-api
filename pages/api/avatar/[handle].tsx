@@ -8,8 +8,6 @@ import {
   shouldPlatformFetch,
 } from "@/utils/base";
 
-// Demo: http://localhost:3000/avatar/vitalik.eth
-
 export default async function handler(req: NextApiRequest) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
   let avatarHTML = "";
@@ -25,16 +23,11 @@ export default async function handler(req: NextApiRequest) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
         avatarHTML = avatarURL;
-      } else {
-        shouldReturnBoring = true;
       }
-    } else {
-      shouldReturnBoring = true;
     }
-  } else {
-    shouldReturnBoring = true;
   }
-  if (shouldReturnBoring) {
+  if (!avatarHTML) {
+    shouldReturnBoring = true;
     const variant = searchParams.get("variant") || "bauhaus";
     const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
 
