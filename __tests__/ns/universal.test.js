@@ -16,7 +16,7 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(
       json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ENS")?.address
+        json.find((x) => x.platform === "ens")?.address
     );
   });
 
@@ -38,7 +38,7 @@ describe("Test For Universal NS API", () => {
     const res = await queryClient("/profile/gamedb.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "ENS").identity).toBe("gamedb.eth");
+    expect(json.find((x) => x.platform === "ens").identity).toBe("gamedb.eth");
   });
   it("It should response 200 data for livid.farcaster", async () => {
     const res = await queryClient("/ns/livid.farcaster");
@@ -50,7 +50,7 @@ describe("Test For Universal NS API", () => {
     const res = await queryClient("/ns/freeguy.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "ENS").address).toBe(
+    expect(json.find((x) => x.platform === "ens").address).toBe(
       "0x18dbd0bfd810ac8cf6d1eee77fc3905db4c1bf48"
     );
   });
