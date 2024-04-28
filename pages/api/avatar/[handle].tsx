@@ -7,7 +7,6 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import Image from "next/image";
 
 // Demo: http://localhost:3000/avatar/vitalik.eth
 
@@ -19,28 +18,17 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profile = await fetch(baseURL + `/profile/${platform}/${name}`)
+    const profile = await fetch(baseURL + `/ns/${platform}/${name}`)
       .then((res) => res.json())
       .catch((e) => null);
     if (profile?.avatar) {
-      avatarHTML = ReactDOMServer.renderToString(
-        <Image
-          style={{
-            borderRadius: 99,
-          }}
-          width={Number(size)}
-          height={Number(size)}
-          alt={profile.identity}
-          src={profile.avatar}
-        />
-      );
+      avatarHTML = profile.avatar;
     } else {
       shouldReturnBoring = true;
     }
   } else {
     shouldReturnBoring = true;
   }
-
   if (shouldReturnBoring) {
     const variant = searchParams.get("variant") || "bauhaus";
     const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
@@ -61,7 +49,6 @@ export default async function handler(req: NextApiRequest) {
     status: 200,
     headers: {
       "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-      "Content-Type": "image/svg+xml, text/html",
     },
   });
 }
