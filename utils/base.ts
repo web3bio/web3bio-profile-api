@@ -20,7 +20,7 @@ const { NEXT_PUBLIC_VERCEL_URL } = process.env;
 
 export const baseURL = NEXT_PUBLIC_VERCEL_URL
   ? `https://${NEXT_PUBLIC_VERCEL_URL}`
-  : "https://api-staging.web3.bio";
+  : "https://api.web3.bio";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
