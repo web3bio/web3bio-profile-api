@@ -16,11 +16,7 @@ import {
 } from "./regexp";
 import { errorHandleProps } from "./types";
 
-const { NEXT_PUBLIC_VERCEL_URL } = process.env;
-
-export const baseURL = NEXT_PUBLIC_VERCEL_URL
-  ? `https://${NEXT_PUBLIC_VERCEL_URL}`
-  : "https://api.web3.bio";
+export const baseURL = process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
