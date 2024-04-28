@@ -16,7 +16,7 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profiles = await fetch(baseURL + `/ns/${name}`)
+    const profiles = await fetch(baseURL + `/profile/${name}`)
       .then((res) => res.json())
       .catch((e) => null);
     if (profiles?.length > 0) {
