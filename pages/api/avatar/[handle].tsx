@@ -16,14 +16,14 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profiles = await fetch(baseURL + `/profile/${name}`)
+    const profile = await fetch(baseURL + `/ns/${platform}/${name}`)
       .then((res) => res.json())
       .catch((e) => null);
-    if (profiles?.length > 0) {
-      const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      if (avatarURL) {
-        avatarHTML = avatarURL;
-      }
+    if (profile?.avatar) {
+      // const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
+      // if (avatarURL) {
+        avatarHTML = profile?.avatar;
+      // }
     }
   }
   if (!avatarHTML) {
