@@ -5,7 +5,7 @@ describe("Test For Avatar Service API", () => {
     const res = await queryClient("/avatar/sujiyan.eth");
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text.startsWith("<img"));
+    expect(text.startsWith("https"));
   });
   it("It should response 200 for bonfida.sol", async () => {
     const res = await queryClient("/avatar/bonfida.sol");
@@ -25,6 +25,6 @@ describe("Test For Avatar Service API", () => {
     );
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text.startsWith("<img"));
+    expect(text.startsWith("https"));
   });
 });
