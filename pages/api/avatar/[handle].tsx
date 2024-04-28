@@ -16,14 +16,16 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profile = await fetch(baseURL + `/ns/${platform}/${name}`)
+    const profiles = await fetch(baseURL + `/ns/${name}`)
       .then((res) => res.json())
       .catch((e) => null);
-    if (profile?.avatar) {
-      // const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      // if (avatarURL) {
-        avatarHTML = profile?.avatar;
-      // }
+    if (profiles?.length > 0) {
+      const avatarURL = profiles?.find(
+        (x: { avatar: string | null }) => x.avatar !== null
+      )?.avatar;
+      if (avatarURL) {
+        avatarHTML = avatarURL;
+      }
     }
   }
   if (!avatarHTML) {
@@ -54,5 +56,4 @@ export default async function handler(req: NextApiRequest) {
 export const config = {
   runtime: "edge",
   regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
 };
