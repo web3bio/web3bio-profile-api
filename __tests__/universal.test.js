@@ -65,7 +65,7 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(
       json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ENS")?.address
+        json.find((x) => x.platform === "ens")?.address
     );
   });
   it("It should response 404 for mcdonalds.eth", async () => {
@@ -84,7 +84,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/brantly.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    const linksOBJ = json.find((x) => x.platform === "ENS").links;
+    const linksOBJ = json.find((x) => x.platform === "ens").links;
     const links = Object.keys(linksOBJ);
     const isValidHandle = (() => {
       for (let i in linksOBJ) {
@@ -133,7 +133,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/gamedb.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "ENS").identity).toBe("gamedb.eth");
+    expect(json.find((x) => x.platform === "ens").identity).toBe("gamedb.eth");
   });
   it("It should response 200 data for livid.farcaster", async () => {
     const res = await queryClient("/profile/livid.farcaster");
