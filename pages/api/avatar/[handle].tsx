@@ -16,9 +16,9 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profiles = fetch(baseURL + `/ns/${name}`)
+    const profiles = (await fetch(baseURL + `/ns/${name}`)
       .then((res) => res.json())
-      .catch((e) => null) as any;
+      .catch((e) => null)) as any;
     avatarHTML = profiles[0]?.avatar;
     // if (profiles?.length > 0) {
     //   const avatarURL = profiles?.find(
