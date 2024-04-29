@@ -1,4 +1,7 @@
-import { LensParamType } from "@/pages/api/profile/lens/[handle]";
+export const enum LensParamType {
+  domain = "domain",
+  address = "address",
+}
 
 export const getLensProfileQuery = (type: LensParamType) => {
   const queryNamespace =

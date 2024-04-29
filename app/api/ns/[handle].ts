@@ -1,10 +1,10 @@
 import { ErrorMessages } from "@/utils/types";
-import { RequestInterface, resolveUniversalHandle } from "../../../pages/api/profile/[handle]";
 import {
   errorHandle,
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
+import { RequestInterface, resolveUniversalHandle } from "../profile/[handle]";
 
 export default async function handler(req: RequestInterface) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");

@@ -3,11 +3,12 @@ import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { NextApiRequest } from "next";
+
+import { ErrorMessages } from "@/utils/types";
 import {
   resolveENSResponse,
   resolveENSTextValue,
-} from "../../../../pages/api/profile/ens/[handle]";
-import { ErrorMessages } from "@/utils/types";
+} from "../../profile/ens/[handle]";
 
 export const resolveENSHandleNS = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(

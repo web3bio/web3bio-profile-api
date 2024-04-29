@@ -4,12 +4,13 @@ import { regexSns, regexSolana } from "@/utils/regexp";
 import { NextApiRequest } from "next";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
 import { Record as SNSRecord } from "@bonfida/spl-name-service";
+
+import { ErrorMessages } from "@/utils/types";
 import {
   getSNSRecord,
   resolveSNSDomain,
   reverseWithProxy,
-} from "../../../../pages/api/profile/sns/[handle]";
-import { ErrorMessages } from "@/utils/types";
+} from "../../profile/sns/[handle]";
 
 export const resolveSNSHandleNS = async (handle: string) => {
   let domain = "",

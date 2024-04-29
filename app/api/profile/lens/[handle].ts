@@ -4,7 +4,7 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import { getLensProfileQuery } from "@/utils/lens";
+import { LensParamType, getLensProfileQuery } from "@/utils/lens";
 import { isAddress } from "viem";
 import {
   errorHandle,
@@ -17,11 +17,6 @@ import { ErrorMessages, LinksItem } from "@/utils/types";
 
 const LensProtocolProfileCollectionAddress =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
-
-export const enum LensParamType {
-  domain = "domain",
-  address = "address",
-}
 
 export const config = {
   runtime: "edge",
