@@ -16,10 +16,10 @@ export default async function handler(req: NextApiRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profiles = await fetch(baseURL + `/ns/${name}`)
+    const profiles = fetch(baseURL + `/ns/${name}`)
       .then((res) => res.json())
-      .catch((e) => null);
-    avatarHTML = profiles;
+      .catch((e) => null) as any;
+    avatarHTML = profiles[0]?.avatar;
     // if (profiles?.length > 0) {
     //   const avatarURL = profiles?.find(
     //     (x: { avatar: string | null }) => x.avatar !== null
@@ -49,7 +49,7 @@ export default async function handler(req: NextApiRequest) {
     status: 200,
     headers: {
       "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-      "Content-Type": shouldReturnBoring ? "image/svg+xml" : "application/json",
+      "Content-Type": shouldReturnBoring ? "image/svg+xml" : "text/plain",
     },
   });
 }
