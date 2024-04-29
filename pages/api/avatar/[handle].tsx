@@ -20,17 +20,16 @@ export default async function handler(req: NextApiRequest) {
       const profiles = await fetch(baseURL + `/ns/${name}`).then((res) =>
         res.json()
       );
-
       if (profiles?.length > 0) {
         const avatarURL = profiles?.find(
           (x: { avatar: string | null }) => x.avatar !== null
         )?.avatar;
         if (avatarURL) {
+          return respondWithCache(JSON.stringify(avatarURL), {
+            "Content-Type": "application/json",
+          });
         }
       }
-      return respondWithCache(JSON.stringify(profiles), {
-        "Content-Type": "application/json",
-      });
     }
   } catch (e: any) {
     return errorHandle({
@@ -41,20 +40,20 @@ export default async function handler(req: NextApiRequest) {
     });
   }
 
-  // const variant = searchParams.get("variant") || "bauhaus";
-  // const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
+  const variant = searchParams.get("variant") || "bauhaus";
+  const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
 
-  // const avatarHTML = ReactDOMServer.renderToString(
-  //   <Avatar
-  //     {...{
-  //       name,
-  //       size,
-  //       variant: variant as AvatarProps["variant"],
-  //       colors,
-  //     }}
-  //   />
-  // );
-  // return respondWithCache(avatarHTML, { "Content-Type": "image/svg+xml" });
+  const avatarHTML = ReactDOMServer.renderToString(
+    <Avatar
+      {...{
+        name,
+        size,
+        variant: variant as AvatarProps["variant"],
+        colors,
+      }}
+    />
+  );
+  return respondWithCache(avatarHTML, { "Content-Type": "image/svg+xml" });
 }
 
 export const config = {
