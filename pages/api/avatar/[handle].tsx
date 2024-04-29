@@ -19,7 +19,7 @@ export default async function handler(req: NextApiRequest) {
     const profiles = (await fetch(baseURL + `/ns/${name}`)
       .then((res) => res.json())
       .catch((e) => null)) as any;
-    avatarHTML = profiles[0]?.avatar;
+    avatarHTML = JSON.parse(JSON.stringify(profiles))[0];
     // if (profiles?.length > 0) {
     //   const avatarURL = profiles?.find(
     //     (x: { avatar: string | null }) => x.avatar !== null
