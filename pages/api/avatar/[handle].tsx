@@ -7,11 +7,10 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
+import { respondWithCache } from "@/utils/base";
 
 export default async function handler(req: NextApiRequest) {
   const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
-  let avatarHTML = "";
-  let shouldReturnBoring = false;
   const name = searchParams.get("handle") || "";
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
@@ -19,39 +18,32 @@ export default async function handler(req: NextApiRequest) {
     const profiles = (await fetch(baseURL + `/ns/${name}`)
       .then((res) => res.json())
       .catch((e) => null)) as any;
-    avatarHTML = JSON.parse(JSON.stringify(profiles))[0];
-    // if (profiles?.length > 0) {
-    //   const avatarURL = profiles?.find(
-    //     (x: { avatar: string | null }) => x.avatar !== null
-    //   )?.avatar;
-    //   if (avatarURL) {
-    //     avatarHTML = avatarURL;
-    //   }
-    // }
+    if (profiles?.length > 0) {
+      const avatarURL = profiles?.find(
+        (x: { avatar: string | null }) => x.avatar !== null
+      )?.avatar;
+      if (avatarURL) {
+        return respondWithCache(avatarURL, {
+          "Content-Type": "application/json",
+        });
+      }
+    }
   }
-  if (!avatarHTML) {
-    shouldReturnBoring = true;
-    const variant = searchParams.get("variant") || "bauhaus";
-    const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
 
-    avatarHTML = ReactDOMServer.renderToString(
-      <Avatar
-        {...{
-          name,
-          size,
-          variant: variant as AvatarProps["variant"],
-          colors,
-        }}
-      />
-    );
-  }
-  return new Response(avatarHTML, {
-    status: 200,
-    headers: {
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-      "Content-Type": shouldReturnBoring ? "image/svg+xml" : "text/plain",
-    },
-  });
+  const variant = searchParams.get("variant") || "bauhaus";
+  const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
+
+  const avatarHTML = ReactDOMServer.renderToString(
+    <Avatar
+      {...{
+        name,
+        size,
+        variant: variant as AvatarProps["variant"],
+        colors,
+      }}
+    />
+  );
+  return respondWithCache(avatarHTML, { "Content-Type": "image/svg+xml" });
 }
 
 export const config = {

@@ -36,11 +36,15 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
-export const respondWithCache = (json: string) => {
+export const respondWithCache = (
+  json: string,
+  headers?: { [index: string]: string }
+) => {
   return new Response(json, {
     status: 200,
     headers: {
       "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      ...headers,
     },
   });
 };
