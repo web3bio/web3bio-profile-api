@@ -18,11 +18,11 @@ import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
 
 export const baseURL =
-  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
+  process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
-  return new Response(
+  return NextResponse.json(
     JSON.stringify({
       address: isValidAddress ? props.identity : null,
       identity: !isValidAddress ? props.identity : null,

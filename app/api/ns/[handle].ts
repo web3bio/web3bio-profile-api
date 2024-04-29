@@ -4,10 +4,11 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import { RequestInterface, resolveUniversalHandle } from "../profile/[handle]";
+import { resolveUniversalHandle } from "../profile/[handle]";
+import { NextRequest } from "next/server";
 
-export default async function handler(req: RequestInterface) {
-  const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const platform = handleSearchPlatform(inputName);
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {

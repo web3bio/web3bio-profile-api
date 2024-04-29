@@ -3,39 +3,45 @@ const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
   experimental: {
-    forceSwcTransforms: true,
+    serverComponentsExternalPackages: ["react-dom/server"],
   },
-  rewrites: async () => [
-    {
-      source: "/:path*",
-      destination: "/api/:path*",
-    },
-  ],
-  redirects: async () => [
-    {
-      source: "/api",
-      destination: "/",
-      permanent: true,
-    },
-    {
-      source: "/api/:path*",
-      destination: "/:path*",
-      permanent: true,
-    },
-  ],
-  headers: async () => [
-    {
-      source: "/:path*",
-      headers: [
-        { key: "Access-Control-Allow-Credentials", value: "true" },
-        { key: "Access-Control-Allow-Origin", value: "*" },
-        {
-          key: "Access-Control-Allow-Methods",
-          value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
-        },
-      ],
-    },
-  ],
+  async rewrites() {
+    return [
+      {
+        source: "/:path*",
+        destination: "/api/:path*",
+      },
+    ];
+  },
+  async redirects() {
+    return [
+      {
+        source: "/api",
+        destination: "/",
+        permanent: true,
+      },
+      {
+        source: "/api/:path*",
+        destination: "/:path*",
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "Access-Control-Allow-Credentials", value: "true" },
+          { key: "Access-Control-Allow-Origin", value: "*" },
+          {
+            key: "Access-Control-Allow-Methods",
+            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+          },
+        ],
+      },
+    ];
+  },
   images: {
     unoptimized: true,
   },

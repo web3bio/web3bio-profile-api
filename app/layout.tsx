@@ -8,9 +8,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <meta httpEquiv="x-ua-compatible" content="ie=edge" />
         <link rel="shortcut icon" href="/favicon.ico" />
       </head>
-      <body>
-        <main>{children}</main>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
+
+export const runtime = "edge";

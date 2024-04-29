@@ -10,11 +10,7 @@ import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { shouldPlatformFetch } from "../../../utils/base";
-export interface RequestInterface extends NextApiRequest {
-  nextUrl: {
-    origin: string;
-  };
-}
+import { NextRequest } from "next/server";
 
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
@@ -92,7 +88,7 @@ const resolveUniversalRespondFromRelation = async ({
 }: {
   platform: PlatformType;
   handle: string;
-  req: RequestInterface;
+  req: NextRequest;
   ns?: boolean;
 }) => {
   const responseFromRelation = await resolveHandleFromRelationService(
@@ -207,7 +203,7 @@ const resolveUniversalRespondFromRelation = async ({
 };
 export const resolveUniversalHandle = async (
   handle: string,
-  req: RequestInterface,
+  req: NextRequest,
   platform: PlatformType,
   ns?: boolean
 ) => {
@@ -239,8 +235,9 @@ export const resolveUniversalHandle = async (
   });
 };
 
-export default async function handler(req: RequestInterface) {
-  const searchParams = new URLSearchParams(req.url?.split("?")[1] || "");
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  console.log(searchParams,'params')
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const platform = handleSearchPlatform(inputName);
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {
