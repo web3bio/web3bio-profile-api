@@ -5,7 +5,7 @@ import {
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
 import { NextRequest, NextResponse } from "next/server";
-import satori from "satori";
+import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
   }
   const variant = searchParams.get("variant") || "bauhaus";
   const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
-  const avatarHTML = satori(
+  const avatarHTML = (
     <Avatar
       {...{
         name,
@@ -35,14 +35,12 @@ export async function GET(req: NextRequest) {
         variant: variant as AvatarProps["variant"],
         colors,
       }}
-    />,
-    {
-      width: Number(size) || 160,
-      height: Number(size) || 160,
-      fonts: [],
-    }
+    />
   );
-  return NextResponse.json(avatarHTML, {
+
+  return new ImageResponse(avatarHTML, {
+    width: 160,
+    height: 160,
     headers: {
       "Content-Type": "image/svg+xml",
     },
