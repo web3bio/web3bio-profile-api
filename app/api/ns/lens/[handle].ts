@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { NextApiRequest } from "next";
-import { resolveLensResponse } from "../../profile/lens/[handle]";
+import { resolveLensResponse } from "../../../../pages/api/profile/lens/[handle]";
 import { ErrorMessages } from "@/utils/types";
 
 export const resolveLensHandleNS = async (handle: string) => {

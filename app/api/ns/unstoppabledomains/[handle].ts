@@ -2,7 +2,7 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { NextApiRequest } from "next";
-import { resolveUDResponse } from "../../profile/unstoppabledomains/[handle]";
+import { resolveUDResponse } from "../../../../pages/api/profile/unstoppabledomains/[handle]";
 import { ErrorMessages } from "@/utils/types";
 
 export const resolveUDHandleNS = async (handle: string) => {

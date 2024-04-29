@@ -6,7 +6,7 @@ import { NextApiRequest } from "next";
 import {
   resolveENSResponse,
   resolveENSTextValue,
-} from "../../profile/ens/[handle]";
+} from "../../../../pages/api/profile/ens/[handle]";
 import { ErrorMessages } from "@/utils/types";
 
 export const resolveENSHandleNS = async (handle: string) => {

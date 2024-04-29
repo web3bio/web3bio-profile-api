@@ -8,7 +8,7 @@ import {
   getSNSRecord,
   resolveSNSDomain,
   reverseWithProxy,
-} from "../../profile/sns/[handle]";
+} from "../../../../pages/api/profile/sns/[handle]";
 import { ErrorMessages } from "@/utils/types";
 
 export const resolveSNSHandleNS = async (handle: string) => {
