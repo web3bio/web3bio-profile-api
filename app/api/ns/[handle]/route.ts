@@ -4,8 +4,8 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import { resolveUniversalHandle } from "../profile/[handle]";
 import { NextRequest } from "next/server";
+import { resolveUniversalHandle } from "../../profile/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;

@@ -1,15 +1,14 @@
-import type { NextApiRequest } from "next";
 import {
   errorHandle,
   formatText,
   handleSearchPlatform,
   isValidEthereumAddress,
   respondWithCache,
+  shouldPlatformFetch,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
-import { shouldPlatformFetch } from "../../../utils/base";
 import { NextRequest } from "next/server";
 
 const nextidGraphQLEndpoint =
@@ -201,6 +200,7 @@ const resolveUniversalRespondFromRelation = async ({
       });
     });
 };
+
 export const resolveUniversalHandle = async (
   handle: string,
   req: NextRequest,
@@ -234,21 +234,3 @@ export const resolveUniversalHandle = async (
     ns,
   });
 };
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  const platform = handleSearchPlatform(inputName);
-  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
-    return errorHandle({
-      identity: inputName,
-      code: 404,
-      platform: null,
-      message: ErrorMessages.invalidIdentity,
-    });
-  }
-  return await resolveUniversalHandle(inputName, req, platform, false);
-}
-
-export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
