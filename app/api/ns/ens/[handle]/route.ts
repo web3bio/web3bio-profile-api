@@ -9,7 +9,7 @@ import {
 } from "@/app/api/profile/ens/[handle]/route";
 import { NextRequest } from "next/server";
 
-export const resolveENSHandleNS = async (handle: string) => {
+const resolveENSHandleNS = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
     handle
   );

@@ -17,9 +17,6 @@ import { mainnet } from "viem/chains";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
-
 const client = createPublicClient({
   chain: mainnet,
   transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
@@ -251,8 +248,5 @@ export async function GET(req: NextRequest) {
   return resolveENSRespond(lowercaseName);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

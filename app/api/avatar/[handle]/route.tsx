@@ -1,12 +1,11 @@
 import {
   baseURL,
   handleSearchPlatform,
-  respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
-import { NextRequest } from "next/server";
-import { ImageResponse } from "next/og";
+import { NextRequest, NextResponse } from "next/server";
+import satori from "satori";
 
 export const runtime = "edge";
 
@@ -22,33 +21,30 @@ export async function GET(req: NextRequest) {
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
-        return respondWithCache(avatarURL, {
-          "Content-Type": "application/json",
-        });
+        return NextResponse.json(avatarURL);
       }
     }
   }
   const variant = searchParams.get("variant") || "bauhaus";
   const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
-  return (
-    new ImageResponse(
-      (
-        <Avatar
-          {...{
-            name,
-            size,
-            variant: variant as AvatarProps["variant"],
-            colors,
-          }}
-        />
-      )
-    ),
+  const avatarHTML = satori(
+    <Avatar
+      {...{
+        name,
+        size,
+        variant: variant as AvatarProps["variant"],
+        colors,
+      }}
+    />,
     {
-      width: size,
-      height: size,
-      headers: {
-        "Content-Type": "image/svg+xml",
-      },
+      width: Number(size) || 160,
+      height: Number(size) || 160,
+      fonts: [],
     }
   );
+  return NextResponse.json(avatarHTML, {
+    headers: {
+      "Content-Type": "image/svg+xml",
+    },
+  });
 }

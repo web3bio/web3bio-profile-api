@@ -1,18 +1,17 @@
 import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
-import { NextApiRequest } from "next";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
 import { Record as SNSRecord } from "@bonfida/spl-name-service";
-
 import { ErrorMessages } from "@/utils/types";
 import {
   getSNSRecord,
   resolveSNSDomain,
   reverseWithProxy,
 } from "@/app/api/profile/sns/[handle]/route";
+import { NextRequest } from "next/server";
 
-export const resolveSNSHandleNS = async (handle: string) => {
+const resolveSNSHandleNS = async (handle: string) => {
   let domain = "",
     address = "";
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
@@ -44,6 +43,20 @@ export const resolveSNSHandleNS = async (handle: string) => {
   return resJSON;
 };
 
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const inputName = searchParams.get("handle") || "";
+  if (!regexSns.test(inputName) && !regexSolana.test(inputName))
+    return errorHandle({
+      identity: inputName,
+      platform: PlatformType.sns,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+
+  return resolveSNSRespondNS(inputName);
+}
+
 export const resolveSNSRespondNS = async (handle: string) => {
   try {
     const json = await resolveSNSHandleNS(handle);
@@ -57,20 +70,6 @@ export const resolveSNSRespondNS = async (handle: string) => {
     });
   }
 };
-
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
-  const inputName = searchParams.get("handle") || "";
-  if (!regexSns.test(inputName) && !regexSolana.test(inputName))
-    return errorHandle({
-      identity: inputName,
-      platform: PlatformType.sns,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-
-  return resolveSNSRespondNS(inputName);
-}
 
 export const runtime = "edge";
 export const preferredRegion = ["sfo1", "iad1", "pdx1"];

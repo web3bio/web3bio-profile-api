@@ -6,7 +6,7 @@ import { resolveEipAssetURL } from "@/utils/resolver";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-export const resolveLensHandleNS = async (handle: string) => {
+const resolveLensHandleNS = async (handle: string) => {
   const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const avatarUri =

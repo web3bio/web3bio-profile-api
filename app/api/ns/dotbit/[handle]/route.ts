@@ -8,7 +8,22 @@ import { NextRequest } from "next/server";
 export const runtime = "edge";
 export const preferredRegion = ["sfo1", "iad1", "pdx1"];
 
-export const resolveDotbitHandleNS = async (handle: string) => {
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
+  const inputName = searchParams.get("handle");
+  const lowercaseName = inputName?.toLowerCase() || "";
+
+  if (!regexDotbit.test(lowercaseName) && !regexEth.test(lowercaseName))
+    return errorHandle({
+      identity: lowercaseName,
+      platform: PlatformType.dotbit,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  return resolveDotbitRespond(lowercaseName);
+}
+
+const resolveDotbitHandleNS = async (handle: string) => {
   const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
   return {
     address,
@@ -33,18 +48,3 @@ const resolveDotbitRespond = async (handle: string) => {
     });
   }
 };
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
-
-  if (!regexDotbit.test(lowercaseName) && !regexEth.test(lowercaseName))
-    return errorHandle({
-      identity: lowercaseName,
-      platform: PlatformType.dotbit,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-  return resolveDotbitRespond(lowercaseName);
-}

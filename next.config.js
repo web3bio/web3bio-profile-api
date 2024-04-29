@@ -2,9 +2,6 @@
 const nextConfig = {
   reactStrictMode: true,
   trailingSlash: false,
-  experimental: {
-    serverComponentsExternalPackages: ["react-dom/server"],
-  },
   async rewrites() {
     return [
       {

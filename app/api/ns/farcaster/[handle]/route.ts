@@ -5,7 +5,7 @@ import { ErrorMessages } from "@/utils/types";
 import { resolveFarcasterResponse } from "@/app/api/profile/farcaster/[handle]/route";
 import { NextRequest } from "next/server";
 
-export const resolveFarcasterHandleNS = async (handle: string) => {
+const resolveFarcasterHandleNS = async (handle: string) => {
   const response = await resolveFarcasterResponse(handle);
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const resJSON = {

@@ -1,12 +1,12 @@
 import { errorHandle } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
-import { NextApiRequest } from "next";
 import { ErrorMessages } from "@/utils/types";
+import { NextRequest } from "next/server";
 import { resolveSNSRespondNS } from "../sns/[handle]/route";
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
   if (!regexSns.test(inputName) && !regexSolana.test(inputName))
     return errorHandle({
