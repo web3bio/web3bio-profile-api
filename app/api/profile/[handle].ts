@@ -237,7 +237,6 @@ export const resolveUniversalHandle = async (
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  console.log(searchParams,'params')
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const platform = handleSearchPlatform(inputName);
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {
@@ -251,8 +250,5 @@ export async function GET(req: NextRequest) {
   return await resolveUniversalHandle(inputName, req, platform, false);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

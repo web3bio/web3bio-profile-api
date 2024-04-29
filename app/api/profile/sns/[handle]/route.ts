@@ -9,7 +9,7 @@ import {
   resolve,
 } from "@bonfida/spl-name-service";
 import { Connection, clusterApiUrl } from "@solana/web3.js";
-import { NextApiRequest } from "next";
+import { NextRequest } from "next/server";
 
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
@@ -151,7 +151,7 @@ export const resolveSNSRespond = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
+export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url as string);
   const inputName = searchParams.get("handle");
   if (
@@ -167,12 +167,5 @@ export default async function handler(req: NextApiRequest) {
 
   return resolveSNSRespond(inputName);
 }
-
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
-  unstable_allowDynamic: [
-    "/node_modules/rpc-websockets/node_modules/@babel/runtime/regenerator/index.js",
-  ],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

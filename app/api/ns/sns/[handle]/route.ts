@@ -10,7 +10,7 @@ import {
   getSNSRecord,
   resolveSNSDomain,
   reverseWithProxy,
-} from "../../profile/sns/[handle]";
+} from "@/app/api/profile/sns/[handle]/route";
 
 export const resolveSNSHandleNS = async (handle: string) => {
   let domain = "",
@@ -72,10 +72,5 @@ export default async function handler(req: NextApiRequest) {
   return resolveSNSRespondNS(inputName);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  unstable_allowDynamic: [
-    "/node_modules/rpc-websockets/node_modules/@babel/runtime/regenerator/index.js",
-  ],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

@@ -1,4 +1,3 @@
-import type { NextApiRequest } from "next";
 import {
   errorHandle,
   isValidEthereumAddress,
@@ -9,11 +8,10 @@ import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { ErrorMessages } from "@/utils/types";
+import { NextRequest } from "next/server";
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];
 
 const UDSocialAccountsList = [
   PlatformType.twitter,
@@ -133,8 +131,8 @@ const resolveUDRespond = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 

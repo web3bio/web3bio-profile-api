@@ -23,12 +23,12 @@ export const baseURL =
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
-    JSON.stringify({
+    {
       address: isValidAddress ? props.identity : null,
       identity: !isValidAddress ? props.identity : null,
       platform: props.platform,
       error: props.message,
-    }),
+    },
     {
       status: isNaN(props.code) ? 500 : props.code,
       headers: {
@@ -42,10 +42,11 @@ export const respondWithCache = (
   json: string,
   headers?: { [index: string]: string }
 ) => {
-  return NextResponse.json(json, {
+  return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
       "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      "Content-Type": "application/json",
       ...headers,
     },
   });

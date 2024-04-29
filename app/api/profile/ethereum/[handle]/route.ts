@@ -1,12 +1,12 @@
 import { errorHandle } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
-import { NextApiRequest } from "next";
-import { resolveENSRespond } from "../ens/[handle]";
 import { ErrorMessages } from "@/utils/types";
+import { resolveENSRespond } from "../../ens/[handle]/route";
+import { NextRequest } from "next/server";
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
   const lowercaseName = inputName?.toLowerCase();
   if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
@@ -19,8 +19,5 @@ export default async function handler(req: NextApiRequest) {
   return resolveENSRespond(lowercaseName);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

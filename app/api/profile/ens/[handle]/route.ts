@@ -1,4 +1,3 @@
-import type { NextApiRequest } from "next";
 import {
   errorHandle,
   formatText,
@@ -16,6 +15,10 @@ import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { ErrorMessages } from "@/utils/types";
+import { NextRequest } from "next/server";
+
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];
 
 const client = createPublicClient({
   chain: mainnet,
@@ -233,8 +236,8 @@ export const resolveENSRespond = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
   const lowercaseName = inputName?.toLowerCase();
 

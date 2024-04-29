@@ -2,13 +2,12 @@ import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
-import { NextApiRequest } from "next";
-
 import { ErrorMessages } from "@/utils/types";
 import {
   resolveENSResponse,
   resolveENSTextValue,
-} from "../../profile/ens/[handle]";
+} from "@/app/api/profile/ens/[handle]/route";
+import { NextRequest } from "next/server";
 
 export const resolveENSHandleNS = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
@@ -51,8 +50,8 @@ export const resolveENSRespondNS = async (handle: string) => {
     });
   }
 };
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
   const lowercaseName = inputName?.toLowerCase();
   if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
@@ -65,7 +64,5 @@ export default async function handler(req: NextApiRequest) {
   return resolveENSRespondNS(lowercaseName);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

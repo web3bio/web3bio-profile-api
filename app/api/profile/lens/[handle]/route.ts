@@ -14,15 +14,13 @@ import {
 import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { ErrorMessages, LinksItem } from "@/utils/types";
+import { NextRequest } from "next/server";
+
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];
 
 const LensProtocolProfileCollectionAddress =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
-
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-  maxDuration: 45,
-};
 const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
 
 export const getLensProfile = async (handle: string, type: LensParamType) => {
@@ -162,8 +160,8 @@ const resolveLensRespond = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 

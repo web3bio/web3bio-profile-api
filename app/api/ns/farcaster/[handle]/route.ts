@@ -1,9 +1,9 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
-import { NextApiRequest } from "next";
 import { ErrorMessages } from "@/utils/types";
-import { resolveFarcasterResponse } from "../../profile/farcaster/[handle]";
+import { resolveFarcasterResponse } from "@/app/api/profile/farcaster/[handle]/route";
+import { NextRequest } from "next/server";
 
 export const resolveFarcasterHandleNS = async (handle: string) => {
   const response = await resolveFarcasterResponse(handle);
@@ -33,8 +33,8 @@ const resolveFarcasterRespondNS = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
@@ -56,7 +56,5 @@ export default async function handler(req: NextApiRequest) {
   return resolveFarcasterRespondNS(queryInput);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];

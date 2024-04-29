@@ -1,9 +1,9 @@
+import { resolveUDResponse } from "@/app/api/profile/unstoppabledomains/[handle]/route";
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
-import { NextApiRequest } from "next";
 import { ErrorMessages } from "@/utils/types";
-import { resolveUDResponse } from "../../profile/unstoppabledomains/[handle]";
+import { NextRequest } from "next/server";
 
 export const resolveUDHandleNS = async (handle: string) => {
   const { address, domain, metadata } = await resolveUDResponse(handle);
@@ -31,8 +31,8 @@ const resolveUDRespond = async (handle: string) => {
   }
 };
 
-export default async function handler(req: NextApiRequest) {
-  const { searchParams } = new URL(req.url as string);
+export async function GET(req: NextRequest) {
+  const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
@@ -49,7 +49,5 @@ export default async function handler(req: NextApiRequest) {
   return resolveUDRespond(lowercaseName);
 }
 
-export const config = {
-  runtime: "edge",
-  regions: ["sfo1", "iad1", "pdx1"],
-};
+export const runtime = "edge";
+export const preferredRegion = ["sfo1", "iad1", "pdx1"];
