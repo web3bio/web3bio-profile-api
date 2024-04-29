@@ -15,8 +15,10 @@ import {
   regexSolana,
 } from "./regexp";
 import { errorHandleProps } from "./types";
+import { NextResponse } from "next/server";
 
-export const baseURL = process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
+export const baseURL =
+  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
@@ -36,11 +38,15 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
-export const respondWithCache = (json: string) => {
-  return new Response(json, {
+export const respondWithCache = (
+  json: string,
+  headers?: { [index: string]: string }
+) => {
+  return NextResponse.json(json, {
     status: 200,
     headers: {
       "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      ...headers,
     },
   });
 };
