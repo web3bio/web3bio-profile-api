@@ -17,15 +17,15 @@ export default async function handler(req: NextApiRequest) {
   const platform = handleSearchPlatform(name);
   try {
     if (shouldPlatformFetch(platform)) {
-      const profiles = (await fetch(baseURL + `/ns/${name}`)
-        .then((res) => res.json())
-        .catch((e) => null)) as any;
+      const profiles = await fetch(baseURL + `/ns/${name}`).then((res) =>
+        res.json()
+      );
+
       if (profiles?.length > 0) {
         const avatarURL = profiles?.find(
           (x: { avatar: string | null }) => x.avatar !== null
         )?.avatar;
         if (avatarURL) {
-         
         }
       }
       return respondWithCache(JSON.stringify(profiles), {
