@@ -48,8 +48,8 @@ export default async function handler(req: NextApiRequest) {
   return new Response(avatarHTML, {
     status: 200,
     headers: {
-      // "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-      "Content-Type": shouldReturnBoring ? "image/svg+xml" : "text/plain",
+      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      "Content-Type": shouldReturnBoring ? "image/svg+xml" : "application/json",
     },
   });
 }
