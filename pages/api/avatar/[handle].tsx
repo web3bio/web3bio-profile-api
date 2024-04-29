@@ -25,11 +25,12 @@ export default async function handler(req: NextApiRequest) {
           (x: { avatar: string | null }) => x.avatar !== null
         )?.avatar;
         if (avatarURL) {
-          return respondWithCache(avatarURL, {
-            "Content-Type": "application/json",
-          });
+         
         }
       }
+      return respondWithCache(JSON.stringify(profiles), {
+        "Content-Type": "application/json",
+      });
     }
   } catch (e: any) {
     return errorHandle({
