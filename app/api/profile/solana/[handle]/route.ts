@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveSNSRespond } from "../../sns/[handle]/route";
+import { resolveSNSRespond } from "../../sns/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;

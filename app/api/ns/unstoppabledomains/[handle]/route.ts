@@ -1,11 +1,11 @@
-import { resolveUDResponse } from "@/app/api/profile/unstoppabledomains/[handle]/route";
+import { resolveUDResponse } from "@/app/api/profile/unstoppabledomains/[handle]/utils";
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-export const resolveUDHandleNS = async (handle: string) => {
+const resolveUDHandleNS = async (handle: string) => {
   const { address, domain, metadata } = await resolveUDResponse(handle);
   return {
     address,

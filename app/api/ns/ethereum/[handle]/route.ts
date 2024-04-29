@@ -3,7 +3,8 @@ import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveENSRespondNS } from "../../ens/[handle]/route";
+import { resolveENSRespondNS } from "../../ens/[handle]/utils";
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";

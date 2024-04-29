@@ -1,14 +1,11 @@
-import {
-  errorHandle,
-  isValidEthereumAddress,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
+import { resolveUDResponse } from "./utils";
 
 export const runtime = "edge";
 export const preferredRegion = ["sfo1", "iad1", "pdx1"];
@@ -22,50 +19,7 @@ const UDSocialAccountsList = [
   PlatformType.youtube,
 ];
 
-const UDBaseEndpoint = "https://api.unstoppabledomains.com/";
-const UDProfileEndpoint = "https://profile.unstoppabledomains.com/api/public/";
-
-const fetchUDBase = async (path: string) => {
-  return fetch(UDBaseEndpoint + path, {
-    method: "GET",
-    headers: {
-      Authorization: process.env.NEXT_PUBLIC_UD_API_KEY || "",
-    },
-  }).then((res) => res.json());
-};
-const fetchUDProfile = async (domain: string) => {
-  return fetch(
-    `${UDProfileEndpoint}/${domain}?fields=profile,records,socialAccounts`,
-    {
-      method: "GET",
-    }
-  ).then((res) => res.json());
-};
-
-export const resolveUDResponse = async (handle: string) => {
-  let address;
-  let domain;
-  if (isValidEthereumAddress(handle)) {
-    const res = await fetchUDBase(`resolve/reverse/${handle}`);
-    if (!res?.meta) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
-    }
-    address = handle;
-    domain = res.meta.domain;
-  } else {
-    const res = await fetchUDBase(`resolve/domains/${handle}`);
-
-    if (!res?.meta) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
-    }
-    domain = res.meta.domain || handle;
-    address = res.meta.owner.toLowerCase();
-  }
-  const metadata = await fetchUDProfile(domain);
-
-  return { address, domain, metadata };
-};
-export const resolveUDHandle = async (handle: string) => {
+const resolveUDHandle = async (handle: string) => {
   const { address, domain, metadata } = await resolveUDResponse(handle);
   const LINKRES: {
     [key in PlatformType]?: {
