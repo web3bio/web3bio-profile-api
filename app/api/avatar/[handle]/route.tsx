@@ -25,7 +25,12 @@ export async function GET(req: NextRequest) {
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
-        return respondWithCache(JSON.stringify(avatarURL));
+        return new Response(avatarURL,{
+          headers: {
+            "Content-Type": "text/plain",
+            "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+          },
+        })
       }
     }
   }
