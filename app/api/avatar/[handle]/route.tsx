@@ -1,11 +1,9 @@
-import {
-  handleSearchPlatform,
-  respondWithCache,
-  shouldPlatformFetch,
-} from "@/utils/base";
-import Avatar, { AvatarProps } from "boring-avatars";
+import React from "react";
+import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
+import Avatar from "boring-avatars";
+const ReactDOMServer = (await import("react-dom/server")).default;
 
 export const runtime = "edge";
 
@@ -29,23 +27,18 @@ export async function GET(req: NextRequest) {
       }
     }
   }
+
   const variant = searchParams.get("variant") || "bauhaus";
   const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
-  const avatarHTML = (
-    <Avatar
-      {...{
-        name,
-        size,
-        variant: variant as AvatarProps["variant"],
-        colors,
-      }}
-    />
-  );
-
-  return new Response("test123", {
-    headers: {
-      "Content-Type": "image/svg+xml",
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-    },
-  });
+  // const avatarHTML = ReactDOMServer.renderToString(<div>222</div> );
+  const avatarHTML = `https://source.boringavatars.com/${variant}/${size}/${encodeURIComponent(
+    name
+  )}?colors=${colors.join(",")}`;
+  return NextResponse.redirect(avatarHTML);
+  // return new Response(avatarHTML, {
+  //   headers: {
+  //     "Content-Type": "image/svg+xml",
+  //     "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+  //   },
+  // });
 }

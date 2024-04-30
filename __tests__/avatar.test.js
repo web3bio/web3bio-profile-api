@@ -1,8 +1,8 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Avatar Service API", () => {
-  it("It should response 200 for sujiyan.eth", async () => {
-    const res = await queryClient("/avatar/sujiyan.eth");
+  it("It should response 200 for vitalik.eth", async () => {
+    const res = await queryClient("/avatar/vitalik.eth");
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text.startsWith("https"));
