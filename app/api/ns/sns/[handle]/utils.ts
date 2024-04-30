@@ -1,4 +1,4 @@
-import { errorHandle, formatText, respondWithCache } from "@/utils/base";
+import { formatText } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns } from "@/utils/regexp";
 import { clusterApiUrl, Connection } from "@solana/web3.js";
@@ -9,7 +9,7 @@ import {
   reverseWithProxy,
 } from "@/app/api/profile/sns/[handle]/utils";
 
-const resolveSNSHandleNS = async (handle: string) => {
+export const resolveSNSHandleNS = async (handle: string) => {
   let domain = "",
     address = "";
   const connection = new Connection(clusterApiUrl("mainnet-beta"));
@@ -39,18 +39,4 @@ const resolveSNSHandleNS = async (handle: string) => {
     description: await getSNSRecord(connection, domain, SNSRecord.TXT),
   };
   return resJSON;
-};
-
-export const resolveSNSRespondNS = async (handle: string) => {
-  try {
-    const json = await resolveSNSHandleNS(handle);
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.sns,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
 };

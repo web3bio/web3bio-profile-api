@@ -1,10 +1,10 @@
-import {
-  resolveENSResponse,
-  resolveENSTextValue,
-} from "@/app/api/profile/ens/[handle]/route";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { errorHandle, formatText, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
+import {
+  resolveENSResponse,
+  resolveENSTextValue,
+} from "@/app/api/profile/ens/[handle]/utils";
 export const resolveENSHandleNS = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
     handle

@@ -10,7 +10,6 @@ import { regexSns } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { ErrorMessages } from "@/utils/types";
 
-
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
 export const reverseWithProxy = async (address: string) => {
@@ -68,7 +67,7 @@ const recordsShouldFetch = [
   SNSRecord.CNAME,
 ];
 
-const resolveSNSHandle = async (handle: string) => {
+export const resolveSNSHandle = async (handle: string) => {
   let domain, address;
   const connection = new Connection(solanaRPCURL);
 
@@ -136,18 +135,3 @@ const resolveSNSHandle = async (handle: string) => {
   };
   return json;
 };
-
-
-export const resolveSNSRespond = async (handle: string) => {
-    try {
-      const json = await resolveSNSHandle(handle);
-      return respondWithCache(JSON.stringify(json));
-    } catch (e: any) {
-      return errorHandle({
-        identity: handle,
-        platform: PlatformType.sns,
-        code: e.cause || 500,
-        message: e.message,
-      });
-    }
-  };
