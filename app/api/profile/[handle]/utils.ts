@@ -79,7 +79,7 @@ const sortByPlatform = (
     .concat(fifth)
     .filter((x) => !!x);
 };
-const resolveUniversalRespondFromRelation = async ({
+export const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
   req,
@@ -95,12 +95,12 @@ const resolveUniversalRespondFromRelation = async ({
     platform
   );
   if (responseFromRelation?.errors)
-    return errorHandle({
+    return {
       identity: handle,
       platform,
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
-    });
+    };
 
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
@@ -114,12 +114,12 @@ const resolveUniversalRespondFromRelation = async ({
   });
 
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
-    return errorHandle({
+    return {
       identity: handle,
       code: 404,
       message: ErrorMessages.invalidResolved,
       platform,
-    });
+    };
   return await Promise.allSettled([
     ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
       if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
@@ -183,21 +183,21 @@ const resolveUniversalRespondFromRelation = async ({
         return pre;
       }, [] as ProfileAPIResponse[]);
       return uniqRes?.filter((x) => !x?.error)?.length
-        ? respondWithCache(JSON.stringify(uniqRes))
-        : errorHandle({
+        ? uniqRes
+        : {
             identity: handle,
             code: 404,
             message: uniqRes[0]?.error || ErrorMessages.notFound,
             platform,
-          });
+          };
     })
     .catch((error) => {
-      return errorHandle({
+      return {
         identity: handle,
         code: 500,
         message: error,
         platform,
-      });
+      };
     });
 };
 
@@ -211,26 +211,36 @@ export const resolveUniversalHandle = async (
     ? handle.substring(0, handle.length - 10)
     : handle;
   if (!handleToQuery || !platform)
-    return errorHandle({
+    return {
       identity: handle,
       platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
-    });
+    };
   if (
     platform === PlatformType.ethereum &&
     !isValidEthereumAddress(handleToQuery)
   )
-    return errorHandle({
+    return {
       identity: handle,
       platform: PlatformType.ethereum,
       code: 404,
       message: ErrorMessages.invalidAddr,
-    });
-  return await resolveUniversalRespondFromRelation({
+    };
+  const res = (await resolveUniversalRespondFromRelation({
     platform,
     handle: handleToQuery,
     req,
     ns,
-  });
+  })) as any;
+  if (res.message) {
+    return errorHandle({
+      identity: res.identity,
+      platform: res.platform,
+      code: res.code,
+      message: res.message,
+    });
+  } else {
+    return respondWithCache(JSON.stringify(res));
+  }
 };

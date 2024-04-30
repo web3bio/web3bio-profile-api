@@ -1,11 +1,11 @@
 import {
-  baseURL,
   handleSearchPlatform,
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
 import { NextRequest } from "next/server";
+import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 
 export const runtime = "edge";
 
@@ -15,9 +15,13 @@ export async function GET(req: NextRequest) {
   const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
-    const profiles = await fetch(baseURL + `/ns/${name}`)
-      .then((res) => res.json())
-      .catch((e) => null);
+    const profiles = (await resolveUniversalRespondFromRelation({
+      platform,
+      handle: name,
+      req,
+      ns: true,
+    })) as any;
+
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
