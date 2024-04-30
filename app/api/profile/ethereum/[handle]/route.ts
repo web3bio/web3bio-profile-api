@@ -5,7 +5,7 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveENSHandle } from "../../ens/[handle]/utils";
 
-export const resolveEtheruemRespond = async (handle: string) => {
+const resolveEtheruemRespond = async (handle: string) => {
   try {
     const json = await resolveENSHandle(handle);
     return respondWithCache(JSON.stringify(json));

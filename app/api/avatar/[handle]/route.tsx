@@ -1,6 +1,7 @@
 import {
   baseURL,
   handleSearchPlatform,
+  respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
-        return NextResponse.json(avatarURL);
+        return respondWithCache(JSON.stringify(avatarURL));
       }
     }
   }
