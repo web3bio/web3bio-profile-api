@@ -5,7 +5,7 @@ import {
   shouldPlatformFetch,
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 export const runtime = "edge";
 
@@ -38,5 +38,10 @@ export async function GET(req: NextRequest) {
     />
   );
 
-  return NextResponse.json(avatarHTML);
+  return new Response("test123", {
+    headers: {
+      "Content-Type": "image/svg+xml",
+      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+    },
+  });
 }
