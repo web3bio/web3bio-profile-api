@@ -30,6 +30,10 @@ export async function GET(req: NextRequest) {
 
   const variant = searchParams.get("variant") || "bauhaus";
   const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
+  const avatarHTML = `https://source.boringavatars.com/${variant}/${size}/${encodeURIComponent(
+    name
+  )}?colors=${colors.join(",")}`;
+  return NextResponse.redirect(avatarHTML);
   // const avatarHTML = ReactDOMServer.renderToString(
   //   <Avatar
   //     name={name}
@@ -38,10 +42,6 @@ export async function GET(req: NextRequest) {
   //     colors={colors}
   //   />
   // );
-  const avatarHTML = `https://source.boringavatars.com/${variant}/${size}/${encodeURIComponent(
-    name
-  )}?colors=${colors.join(",")}`;
-  return NextResponse.redirect(avatarHTML);
   // return new Response(avatarHTML, {
   //   headers: {
   //     "Content-Type": "image/svg+xml",
