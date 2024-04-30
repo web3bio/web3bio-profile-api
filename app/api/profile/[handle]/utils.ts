@@ -211,22 +211,22 @@ export const resolveUniversalHandle = async (
     ? handle.substring(0, handle.length - 10)
     : handle;
   if (!handleToQuery || !platform)
-    return {
+    return errorHandle({
       identity: handle,
       platform: PlatformType.nextid,
       code: 404,
       message: ErrorMessages.invalidIdentity,
-    };
+    });
   if (
     platform === PlatformType.ethereum &&
     !isValidEthereumAddress(handleToQuery)
   )
-    return {
+    return errorHandle({
       identity: handle,
       platform: PlatformType.ethereum,
       code: 404,
       message: ErrorMessages.invalidAddr,
-    };
+    });
   const res = (await resolveUniversalRespondFromRelation({
     platform,
     handle: handleToQuery,
