@@ -5,9 +5,9 @@ export const config = {
   matcher: ["/ns/:path*", "/profile/:path*"],
 };
 
-const Middleware = (req: {
+export function middleware(req: {
   nextUrl: { pathname: string; clone: () => URL };
-}) => {
+}) {
   const identity = req.nextUrl.pathname.split("/").pop() || "";
   if (
     req.nextUrl.pathname !== req.nextUrl.pathname.toLowerCase() &&
@@ -18,6 +18,4 @@ const Middleware = (req: {
     return NextResponse.redirect(url);
   }
   return NextResponse.next();
-};
-
-export default Middleware;
+}
