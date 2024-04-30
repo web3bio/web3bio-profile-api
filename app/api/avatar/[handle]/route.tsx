@@ -6,7 +6,6 @@ import {
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
 import { NextRequest, NextResponse } from "next/server";
-import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
@@ -39,11 +38,5 @@ export async function GET(req: NextRequest) {
     />
   );
 
-  return new ImageResponse(avatarHTML, {
-    width: 160,
-    height: 160,
-    headers: {
-      "Content-Type": "image/svg+xml",
-    },
-  });
+  return NextResponse.json(avatarHTML);
 }
