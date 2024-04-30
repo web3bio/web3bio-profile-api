@@ -3,11 +3,9 @@ import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.reverse) return true;
-  return [
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.nextid,
-  ].includes(identity.platform);
+  return [PlatformType.farcaster, PlatformType.lens].includes(
+    identity.platform
+  );
 };
 
 export const GET_PROFILES = `
@@ -48,11 +46,14 @@ export const primaryDomainResolvedRequestArray = (
       reverse: false,
     };
     if (
-      directPass(resolvedRecord) &&
+      (directPass(resolvedRecord) ||
+        resolvedRecord.platform === PlatformType.nextid) &&
       resolvedRecord.identityGraph?.vertices?.length > 0
     ) {
-      const resolved = resolvedRecord.identityGraph?.vertices
+      const vertices = resolvedRecord.identityGraph?.vertices;
+      const resolved = vertices
         .filter((x) => directPass(x))
+        .filter((x) => x.platform !== PlatformType.ethereum)
         .map((x) => ({
           identity: x.identity,
           platform: x.platform,
