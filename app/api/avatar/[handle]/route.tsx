@@ -4,7 +4,7 @@ import {
   shouldPlatformFetch,
 } from "@/utils/base";
 import Avatar, { AvatarProps } from "boring-avatars";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 
 export const runtime = "edge";
@@ -25,12 +25,7 @@ export async function GET(req: NextRequest) {
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL) {
-        return new Response(avatarURL,{
-          headers: {
-            "Content-Type": "text/plain",
-            "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-          },
-        })
+        return NextResponse.redirect(avatarURL);
       }
     }
   }
