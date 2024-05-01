@@ -2,7 +2,7 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveFarcasterResponse } from "@/app/api/profile/farcaster/[handle]/route";
+import { resolveFarcasterResponse } from "../../../profile/farcaster/[handle]/utils";
 import { NextRequest } from "next/server";
 
 const resolveFarcasterHandleNS = async (handle: string) => {
@@ -57,4 +57,3 @@ export async function GET(req: NextRequest) {
 }
 
 export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];

@@ -2,11 +2,8 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveDotbitResponse } from "@/app/api/profile/dotbit/[handle]/route";
+import { resolveDotbitResponse } from "@/app/api/profile/dotbit/[handle]/utils";
 import { NextRequest } from "next/server";
-
-export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -48,3 +45,5 @@ const resolveDotbitRespond = async (handle: string) => {
     });
   }
 };
+
+export const runtime = "edge";

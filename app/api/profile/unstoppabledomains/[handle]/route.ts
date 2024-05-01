@@ -7,9 +7,6 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveUDResponse } from "./utils";
 
-export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
-
 const UDSocialAccountsList = [
   PlatformType.twitter,
   PlatformType.discord,
@@ -102,3 +99,5 @@ export async function GET(req: NextRequest) {
     });
   return resolveUDRespond(lowercaseName);
 }
+
+export const runtime = "edge";

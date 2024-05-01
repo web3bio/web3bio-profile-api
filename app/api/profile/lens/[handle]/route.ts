@@ -16,9 +16,6 @@ import { regexEth, regexLens } from "@/utils/regexp";
 import { ErrorMessages, LinksItem } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
-
 const LensProtocolProfileCollectionAddress =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
 const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
@@ -174,3 +171,5 @@ export async function GET(req: NextRequest) {
     });
   return resolveLensRespond(lowercaseName);
 }
+
+export const runtime = "edge";

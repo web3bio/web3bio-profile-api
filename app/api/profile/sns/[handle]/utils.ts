@@ -4,7 +4,7 @@ import {
   getRecordV2,
   resolve,
 } from "@bonfida/spl-name-service";
-import { errorHandle, formatText, respondWithCache } from "@/utils/base";
+import { formatText } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";

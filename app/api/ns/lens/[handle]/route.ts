@@ -55,4 +55,3 @@ export async function GET(req: NextRequest) {
 }
 
 export const runtime = "edge";
-export const preferredRegion = ["sfo1", "iad1", "pdx1"];
