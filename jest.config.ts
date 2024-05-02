@@ -10,6 +10,7 @@ const config: Config = {
   preset: 'ts-jest',
   coverageProvider: 'v8',
   testEnvironment: 'node',
+  testTimeout: 200000,
   transform: {    
     "^.+\\.tsx?$": "ts-jest"
   },

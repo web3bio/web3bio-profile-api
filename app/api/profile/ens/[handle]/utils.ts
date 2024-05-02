@@ -85,6 +85,7 @@ const client = createPublicClient({
         })) || "";
   
       resolver = (await getENSProfile(ensDomain))?.[0];
+      
       if (!ensDomain) {
         return {
           address,
@@ -117,8 +118,9 @@ const client = createPublicClient({
         console.log("error", e);
       }
   
-      if (!isValidEthereumAddress(address) || !address)
+      if (!address || !isValidEthereumAddress(address)) {
         throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+      }
   
       resolver = (await getENSProfile(ensDomain))?.[0];
   
@@ -208,7 +210,6 @@ const client = createPublicClient({
         ...commonQueryOptions,
         body: JSON.stringify(payload),
       }).then((res) => res.json());
-  
       if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
     } catch (e) {
       return null;
