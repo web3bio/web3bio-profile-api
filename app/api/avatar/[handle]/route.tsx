@@ -1,16 +1,10 @@
-import React from "react";
 import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
-import Avatar, { AvatarProps } from "boring-avatars";
-const ReactDOMServer = (await import("react-dom/server")).default;
-
-export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const name = searchParams.get("handle") || "";
-  const size = searchParams.get("size") || 160;
   const platform = handleSearchPlatform(name);
   if (shouldPlatformFetch(platform)) {
     const profiles = (await resolveUniversalRespondFromRelation({
@@ -26,26 +20,9 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(avatarURL);
       }
     }
+  } else {
+    return NextResponse.redirect(`/avatar/svg?handle=${name}`);
   }
-
-  const variant = searchParams.get("variant") || "bauhaus";
-  const colors = ["#4b538b", "#15191d", "#f7a21b", "#e45635", "#d60257"];
-  const avatarHTML = `https://source.boringavatars.com/${variant}/${size}/${encodeURIComponent(
-    name
-  )}?colors=${colors.join(",")}`;
-  return NextResponse.redirect(avatarHTML);
-  // const avatarHTML = ReactDOMServer.renderToString(
-  //   <Avatar
-  //     name={name}
-  //     size={size}
-  //     variant={variant as AvatarProps["variant"]}
-  //     colors={colors}
-  //   />
-  // );
-  // return new Response(avatarHTML, {
-  //   headers: {
-  //     "Content-Type": "image/svg+xml",
-  //     "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
-  //   },
-  // });
 }
+
+export const runtime = "edge";
