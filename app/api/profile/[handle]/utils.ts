@@ -126,6 +126,7 @@ export const resolveUniversalRespondFromRelation = async ({
         const fetchURL = `${req.nextUrl.origin}/${
           ns ? "ns" : "profile"
         }/${x.platform.toLowerCase()}/${x.identity}`;
+        // console.log(x.platform, x.identity);
         return fetch(fetchURL).then((res) => res.json());
       }
     }),

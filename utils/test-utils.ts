@@ -1,4 +1,3 @@
-import fetch from "node-fetch";
 import { baseURL } from "./base";
 
 // const baseURL = 'https://api.web3.bio'

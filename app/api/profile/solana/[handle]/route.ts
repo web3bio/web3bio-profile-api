@@ -31,4 +31,5 @@ export async function GET(req: NextRequest) {
     });
   return resolveSolanaRespond(inputName);
 }
+
 export const runtime = "edge";
