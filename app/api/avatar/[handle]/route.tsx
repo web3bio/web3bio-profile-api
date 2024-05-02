@@ -20,9 +20,8 @@ export async function GET(req: NextRequest) {
         return NextResponse.redirect(avatarURL);
       }
     }
-  } else {
-    return NextResponse.redirect(`/avatar/svg?handle=${name}`);
   }
+  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_PROFILE_END_POINT}/avatar/svg?handle=${name}`);
 }
 
 export const runtime = "edge";

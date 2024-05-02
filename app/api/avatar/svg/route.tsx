@@ -15,9 +15,9 @@ export async function GET(req: NextRequest) {
   };
 
   const ReactDOMServer = (await import('react-dom/server')).default;
-  const svg = Buffer.from(ReactDOMServer.renderToString(
+  const svg = ReactDOMServer.renderToString(
     <AvatarMarble {...avatarProps} />
-  ))
+  )
 
   return new Response(svg, {
     headers: {
