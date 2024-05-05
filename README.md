@@ -17,7 +17,7 @@ The supported platforms are:
 - Unstoppable Domains
 - .bit
 
-Queries can be found in `pages/api/profile/` and `pages/api/ns/`.
+Queries can be found in `app/api/profile/` and `app/api/ns/`.
 
 ## Local Dev
 
