@@ -1,4 +1,5 @@
 // Code from Boring Avatars https://github.com/boringdesigners/boring-avatars
+// Demo: /avatar/svg?handle=vitalik.eth
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -6,6 +7,7 @@ export async function GET(req: NextRequest) {
   const name = searchParams.get("handle") || "";
   const size = searchParams.get("size") || 240;
   const colors = ["#84bfc3", "#fff5d6", "#ffb870", "#d96153", "#000511"];
+  
   const avatarProps = {
     colors, 
     name,
@@ -45,7 +47,7 @@ const AvatarMarble = (props: any) => {
     >
       {props.title && <title>{props.name}</title>}
       <mask id={maskID} maskUnits="userSpaceOnUse" x={0} y={0} width={SIZE} height={SIZE}>
-        <rect width={SIZE} height={SIZE} rx={props.square ? undefined : SIZE * 2} fill="#FFFFFF" />
+        <rect width={SIZE} height={SIZE} rx={props.square ? undefined : SIZE * 2} fill="#fff" />
       </mask>
       <g mask={`url(#${maskID})`}>
         <rect width={SIZE} height={SIZE} fill={properties[0].color} />
@@ -65,7 +67,7 @@ const AvatarMarble = (props: any) => {
             ' ' +
             SIZE / 2 +
             ') scale(' +
-            properties[2].scale +
+            properties[1].scale +
             ')'
           }
         />
@@ -92,6 +94,26 @@ const AvatarMarble = (props: any) => {
             ')'
           }
         />
+        <path
+          filter={`url(#filter_${maskID})`}
+          d="M22.216 24L0 46.75l14.108 38.129L78 86l-3.081-59.276-22.378 4.005 12.972 20.186-23.35 27.395L22.215 24z"
+          fill={"rgba(255, 255, 255, .25"}
+          transform={
+            'translate(' +
+            properties[3].translateX +
+            ' ' +
+            properties[3].translateY +
+            ') rotate(' +
+            properties[3].rotate +
+            ' ' +
+            SIZE / 2 +
+            ' ' +
+            SIZE / 2 +
+            ') scale(' +
+            properties[3].scale +
+            ')'
+          }
+        />
       </g>
       <defs>
         <filter
@@ -101,7 +123,7 @@ const AvatarMarble = (props: any) => {
         >
           <feFlood floodOpacity={0} result="BackgroundImageFix" />
           <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
-          <feGaussianBlur stdDeviation={7} result="effect1_foregroundBlur" />
+          <feGaussianBlur stdDeviation={8} result="effect1_foregroundBlur" />
         </filter>
       </defs>
     </svg>
@@ -143,10 +165,6 @@ const getUnit = (number: number, range: number, index?: number) => {
 
 const getDigit = (number: number, ntn: number) => {
   return Math.floor(( number/ Math.pow(10, ntn)) % 10);
-}
-
-const getBoolean = (number: number, ntn: number) => {
-  return (!((getDigit(number, ntn)) % 2))
 }
 
 const getRandomColor = (number: number, colors: string | any[], range: any) => {
