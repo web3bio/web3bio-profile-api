@@ -18,20 +18,20 @@ const UDSocialAccountsList = [
 
 const resolveUDHandle = async (handle: string) => {
   const { address, domain, metadata } = await resolveUDResponse(handle);
-  const LINKRES: {
+  const linksObj: {
     [key in PlatformType]?: {
       link: string | null;
       handle: string | null;
     };
   } = {};
   if (metadata.profile.web2Url) {
-    LINKRES[PlatformType.website] = {
+    linksObj[PlatformType.website] = {
       handle: resolveHandle(metadata.profile?.web2Url),
       link: getSocialMediaLink(metadata.profile?.web2Url, PlatformType.website),
     };
   }
   if (metadata.records?.["ipfs.html.value"]) {
-    LINKRES[PlatformType.url] = {
+    linksObj[PlatformType.url] = {
       handle: domain,
       link: resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
@@ -41,9 +41,9 @@ const resolveUDHandle = async (handle: string) => {
       const item = metadata.socialAccounts[x];
       if (item && item.location && PlatformData[x]) {
         const resolvedHandle = resolveHandle(item?.location, x);
-        LINKRES[x] = {
-          handle: resolvedHandle,
+        linksObj[x] = {
           link: getSocialMediaLink(resolvedHandle, x),
+          handle: resolvedHandle,
         };
       }
     });
@@ -61,10 +61,10 @@ const resolveUDHandle = async (handle: string) => {
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
-    contenthash: LINKRES.url?.link
+    contenthash: linksObj.url?.link
       ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
       : null,
-    links: LINKRES,
+    links: linksObj,
   };
 };
 

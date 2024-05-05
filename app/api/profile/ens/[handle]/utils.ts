@@ -144,7 +144,7 @@ const client = createPublicClient({
     if (earlyReturnJSON) {
       return earlyReturnJSON;
     }
-    let LINKRES = {};
+    let linksObj = {};
     if (textRecords?.length > 0) {
       const linksToFetch = textRecords.reduce(
         (pre: Array<string>, cur: string) => {
@@ -177,7 +177,7 @@ const client = createPublicClient({
         }
         return _linkRes;
       };
-      LINKRES = await getLink();
+      linksObj = await getLink();
     }
   
     const headerHandle = await getHeaderTextValue(textRecords, ensDomain);
@@ -193,7 +193,7 @@ const client = createPublicClient({
       location: (await resolveENSTextValue(ensDomain, "location")) || null,
       header: (await resolveEipAssetURL(headerHandle)) || null,
       contenthash: decodeContenthash(contentHash),
-      links: LINKRES,
+      links: linksObj,
     };
     return resJSON;
   };

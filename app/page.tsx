@@ -105,6 +105,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="stani.lens Lens"
                         href="https://web3.bio/stani.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -128,6 +129,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="stani.lens Lens"
                         href="https://web3.bio/lensofficial.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -153,6 +155,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="stani.lens Lens"
                         href="https://web3.bio/lilgho.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -193,9 +196,10 @@ export default function Home() {
                     <div className="card-identity">0xd702...8ff2</div>
                     <div className="card-badges">
                       <a
-                        className="platform-badge ENS"
+                        className="platform-badge ens"
                         title="dwr.eth ENS"
                         href="https://web3.bio/dwr.eth"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -212,28 +216,10 @@ export default function Home() {
                         <span className="platform-badge-name">dwr.eth</span>
                       </a>
                       <a
-                        className="platform-badge ENS"
-                        title="dwr.eth ENS"
-                        href="https://web3.bio/noun124.eth"
-                      >
-                        <div className="platform-badge-icon">
-                          <svg
-                            fill="#5298FF"
-                            height="32"
-                            viewBox="0 0 32 32"
-                            width="20"
-                            xmlns="http://www.w3.org/2000/svg"
-                            className="text-pride"
-                          >
-                            <path d="m5.7592 7.55037c.30026-.55738.73349-1.03257 1.26171-1.38361l8.86329-6.16676-9.08157 14.9623s-.79345-1.3361-1.10301-2.0121c-.38558-.85-.58007-1.7737-.5698-2.7065.01027-.93276.22512-1.85203.62938-2.69333zm-3.65802 10.32143c.10009 1.4308.50582 2.8238 1.19009 4.0857.68417 1.262 1.63113 2.3637 2.77739 3.2314l9.80364 6.8111s-6.13378-8.8074-11.30729-17.5713c-.52382-.9259-.87594-1.9383-1.03952-2.9885-.0724-.4756-.0724-.9594 0-1.435-.13492.2491-.39673.759-.39673.759-.5246 1.0659-.8819 2.2058-1.05938 3.3799-.10214 1.2409-.09148 2.4886.0318 3.7277zm24.99522 1.1858c-.3175-.6759-1.1031-2.0121-1.1031-2.0121l-9.0656 14.9545 8.8633-6.1628c.5281-.3511.9615-.8262 1.2617-1.3836.4043-.8414.619-1.7606.6294-2.6933.0103-.9328-.1842-1.8566-.5699-2.7066zm3.5984-4.9255c-.1001-1.4307-.5058-2.8238-1.19-4.0857-.6843-1.26192-1.6312-2.36366-2.7775-3.23128l-9.7878-6.81512s6.1298 8.80737 11.3074 17.5713c.5224.9262.8731 1.9385 1.0355 2.9885.0724.4756.0724.9594 0 1.435.1349-.2491.3967-.759.3967-.759.5246-1.0659.8819-2.2058 1.0593-3.3799.1035-1.2409.0942-2.4885-.0277-3.7277z"></path>
-                          </svg>
-                        </div>
-                        <span className="platform-badge-name">noun124.eth</span>
-                      </a>
-                      <a
                         className="platform-badge farcaster"
                         title="dwr.eth Farcaster"
                         href="https://web3.bio/dwr.eth.farcaster"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -257,6 +243,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="dwr.eth Lens"
                         href="https://web3.bio/danromero.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -299,9 +286,10 @@ export default function Home() {
                     <div className="card-identity">0xd8da...6045</div>
                     <div className="card-badges">
                       <a
-                        className="platform-badge ENS"
+                        className="platform-badge ens"
                         title="vitalik.eth ENS"
                         href="https://web3.bio/vitalik.eth"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -321,6 +309,7 @@ export default function Home() {
                         className="platform-badge farcaster"
                         title="vitalik.eth Farcaster"
                         href="https://web3.bio/vitalik.eth.farcaster"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -344,6 +333,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="vitalik.eth Lens"
                         href="https://web3.bio/vitalik.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -366,6 +356,8 @@ export default function Home() {
                         </span>
                       </a>
                     </div>
+                    <div className="card-description">
+                    </div>
                   </div>
                 </div>
                 <div className="profile-card">
@@ -383,9 +375,10 @@ export default function Home() {
                     <div className="card-identity">0xb8c2...67d5</div>
                     <div className="card-badges">
                       <a
-                        className="platform-badge ENS"
+                        className="platform-badge ens"
                         title="nick.eth ENS"
                         href="https://web3.bio/nick.eth"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -405,6 +398,7 @@ export default function Home() {
                         className="platform-badge farcaster"
                         title="nick.eth Farcaster"
                         href="https://web3.bio/nick.eth.farcaster"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -428,6 +422,7 @@ export default function Home() {
                         className="platform-badge lens"
                         title="nick.eth Lens"
                         href="https://web3.bio/arachnid.lens"
+                        target="_blank"
                       >
                         <div className="platform-badge-icon">
                           <svg
@@ -452,7 +447,6 @@ export default function Home() {
                     </div>
                     <div className="card-description">
                       Lead developer of ENS & Ethereum Foundation alum.
-                      Certified rat tickler. he/him.
                     </div>
                   </div>
                 </div>
@@ -842,11 +836,11 @@ export default function Home() {
         "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
         "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
         "email": null,
-        "header": "",
+        "header": null,
         "contenthash": null,
         "links": {
-            "hey": {
-                "link": "https://hey.xyz/u/vitalik",
+            "lens": {
+                "link": "https://www.lensfrens.xyz/vitalik",
                 "handle": "vitalik"
             }
         }
@@ -1115,8 +1109,8 @@ export default function Home() {
     "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
     "contenthash": null,
     "links": {
-        "hey": {
-            "link": "https://hey.xyz/u/stani",
+        "lens": {
+            "link": "https://www.lensfrens.xyz/stani",
             "handle": "stani"
         },
         "website": {
@@ -1240,10 +1234,10 @@ export default function Home() {
     "header": null,
     "contenthash": null,
     "links": {
-      "farcaster": {
-        "link": "https://warpcast.com/dwr.eth",
-        "handle": "dwr.eth"
-      }
+        "farcaster": {
+            "link": "https://warpcast.com/dwr.eth",
+            "handle": "dwr.eth"
+        }
     }
 }`}
                 <br />
@@ -1356,7 +1350,7 @@ export default function Home() {
     "identity": "sandy.nft",
     "platform": "unstoppabledomains",
     "displayName": "Pink Mamba",
-    "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
+    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
     "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
     "email": null,
     "location": "Metaverse",
@@ -1364,28 +1358,28 @@ export default function Home() {
     "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
     "links": {
         "url": {
-          "handle": "sandy.nft",
-          "link": "https://gateway.pinata.cloud/ipfs/Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7"
+            "link": "https://gateway.pinata.cloud/ipfs/Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
+            "handle": "sandy.nft"
         },
         "twitter": {
-          "handle": "Sandy_carter",
-          "link": "https://twitter.com/Sandy_carter"
+            "link": "https://twitter.com/Sandy_carter",
+            "handle": "Sandy_carter"
         },
         "discord": {
-          "handle": "SandyCarter#6286",
-          "link": ""
+            "link": "",
+            "handle": "SandyCarter#6286"
         },
         "lens": {
-          "handle": "sandracarter.lens",
-          "link": "https://hey.xyz/sandracarter.lens"
+            "link": "https://www.lensfrens.xyz/sandracarter",
+            "handle": "sandracarter.lens"
         },
         "telegram": {
-          "handle": "sandycarter",
-          "link": "https://t.me/sandycarter"
+            "link": "https://t.me/sandycarter",
+            "handle": "sandycarter"
         },
         "youtube": {
-          "handle": "@sandycarter3993",
-          "link": "https://www.youtube.com/@sandycarter3993"
+            "link": "https://www.youtube.com/@sandycarter3993",
+            "handle": "@sandycarter3993"
         }
     }
 }`}
@@ -1400,7 +1394,7 @@ export default function Home() {
     "identity": "sandy.nft",
     "platform": "unstoppabledomains",
     "displayName": "Pink Mamba",
-    "avatar": "https://api.readyplayer.me/v1/avatars/63c05bd15ed959b0ed9b8453.png",
+    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
     "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
 }`}
               </code>
@@ -1623,24 +1617,24 @@ export default function Home() {
     "contenthash": "ipns://libp2p.io",
     "links": {
         "twitter": {
-            "handle": "dotbitHQ",
-            "link": "https://twitter.com/dotbitHQ"
+            "link": "https://twitter.com/dotbitHQ",
+            "handle": "dotbitHQ"
         },
         "github": {
-            "handle": "dotbitHQ",
-            "link": "https://github.com/dotbitHQ"
+            "link": "https://github.com/dotbitHQ", 
+            "handle": "dotbitHQ"
         },
         "discord": {
-            "handle": "did",
-            "link": "https://discord.com/invite/did"
+            "link": "https://discord.com/invite/did",
+            "handle": "did"
         },
         "website": {
-            "handle": "www.did.id",
-            "link": "https://www.did.id/"
+            "link": "https://www.did.id/",  
+            "handle": "www.did.id"
         },
         "nostr": {
-            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
-            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
+            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",  
+            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
         }
     }
 }`}

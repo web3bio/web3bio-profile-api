@@ -114,8 +114,8 @@ export const resolveSNSHandle = async (handle: string) => {
         ? PlatformType.website
         : recordType;
       linksObj[type] = {
-        handle: resolved!,
         link: getSocialMediaLink(resolved, type)!,
+        handle: resolved!,
       };
     }
   }

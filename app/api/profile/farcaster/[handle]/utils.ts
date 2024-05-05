@@ -71,7 +71,7 @@ const resolveFarcasterLinks = (
   },
   resolvedHandle: string | null
 ) => {
-  const LINKRES: {
+  const linksObj: {
     [key in PlatformType.twitter | PlatformType.farcaster]?: {
       link: string | null;
       handle: string | null;
@@ -89,13 +89,13 @@ const resolveFarcasterLinks = (
   if (twitterMatch) {
     const matched = twitterMatch[1];
     const resolveMatch = resolveHandle(matched, PlatformType.farcaster);
-    LINKRES[PlatformType.twitter] = {
+    linksObj[PlatformType.twitter] = {
       link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
       handle: resolveMatch,
     };
   }
 
-  return LINKRES;
+  return linksObj;
 };
 
 export const resolveFarcasterResponse = async (handle: string) => {

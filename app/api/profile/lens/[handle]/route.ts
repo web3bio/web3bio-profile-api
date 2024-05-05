@@ -69,7 +69,7 @@ export const resolveLensHandle = async (handle: string) => {
   if (!response?.id) throw new Error(ErrorMessages.notFound, { cause: 404 });
   if (response.error) throw new Error(response.error, { cause: 500 });
   const pureHandle = response.handle.localName;
-  let LINKRES = {
+  let linksObj = {
     [PlatformType.lens]: {
       link: getSocialMediaLink(pureHandle, PlatformType.lens),
       handle: pureHandle,
@@ -105,8 +105,8 @@ export const resolveLensHandle = async (handle: string) => {
       }
       return _linkRes;
     };
-    LINKRES = {
-      ...LINKRES,
+    linksObj = {
+      ...linksObj,
       ...(await getLink()),
     };
   }
@@ -138,7 +138,7 @@ export const resolveLensHandle = async (handle: string) => {
       )?.value || null,
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
     contenthash: null,
-    links: LINKRES,
+    links: linksObj,
   };
   return resJSON;
 };
