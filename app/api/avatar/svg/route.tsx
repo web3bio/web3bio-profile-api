@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
   return new Response(svg, {
     headers: {
       "Content-Type": "image/svg+xml",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate, stale-if-error=86400",
+      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
     },
   });
 }
