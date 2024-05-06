@@ -1,4 +1,9 @@
-import { formatText, isValidEthereumAddress } from "@/utils/base";
+import {
+  errorHandle,
+  formatText,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import {
   decodeContenthash,
   getSocialMediaLink,
@@ -6,7 +11,7 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PlatformType, PlatformData } from "@/utils/platform";
-import { regexEns } from "@/utils/regexp";
+import { regexEns, regexEth } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { ErrorMessages } from "@/utils/types";
@@ -210,5 +215,28 @@ export const getENSProfile = async (name: string) => {
     if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
   } catch (e) {
     return null;
+  }
+};
+
+export const resolveENSRespond = async (handle: string) => {
+  if (!regexEns.test(handle) && !regexEth.test(handle))
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.ens,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  try {
+    const json = await resolveENSHandle(handle);
+    console.log(json,'kkk')
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    console.log(e,'error')
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.ens,
+      code: e.cause || 500,
+      message: e.message,
+    });
   }
 };

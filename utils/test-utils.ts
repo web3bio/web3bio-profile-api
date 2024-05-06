@@ -1,9 +1,7 @@
 import { NextRequest } from "next/server";
 
 export const generateRequestBody = (handle: string) => {
-  return {
-    nextUrl: {
-      searchParams: new URLSearchParams({ handle }),
-    },
-  } as NextRequest;
+  const req = new NextRequest("http://localhost:3000", {});
+  req.nextUrl.searchParams.set("handle", handle);
+  return req;
 };
