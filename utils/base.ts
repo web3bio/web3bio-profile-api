@@ -45,8 +45,8 @@ export const respondWithCache = (
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
       "Content-Type": "application/json",
+      "Cache-Control": "public, s-maxage=604800, max-age=604800, stale-while-revalidate, stale-if-error=86400",
       ...headers,
     },
   });
