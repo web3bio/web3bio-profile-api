@@ -1,15 +1,16 @@
-import { queryClient } from "../../utils/test-utils";
+import { GET } from "@/app/api/ns/farcaster/[handle]/route";
+import { generateRequestBody } from "@/utils/test-utils";
 
 describe("Test For Farcaster NS API", () => {
   it("It should response 200 for suji", async () => {
-    const res = await queryClient("/ns/farcaster/suji");
+    const res = await GET(generateRequestBody("suji"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
   });
   it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
-    const res = await queryClient(
-      "/ns/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649"
+    const res = await GET(
+      generateRequestBody("0x934b510d4c9103e6a87aef13b816fb080286d649")
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -18,16 +19,16 @@ describe("Test For Farcaster NS API", () => {
   });
 
   it("It should response 404 for dwr", async () => {
-    const res = await queryClient("/ns/farcaster/dwr");
+    const res = await GET(generateRequestBody("dwr"));
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.displayName).toBe("Dan Romero");
-    expect(json.address).toBeTruthy()
+    expect(json.address).toBeTruthy();
   });
   it("It should response 200 for dwr.eth", async () => {
-    const res = await queryClient("/ns/farcaster/dwr.eth");
+    const res = await GET(generateRequestBody("dwr.eth"));
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBeTruthy()
+    expect(json.address).toBeTruthy();
   });
 });

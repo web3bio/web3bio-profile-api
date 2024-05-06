@@ -1,6 +1,3 @@
-/**
-* @ jest-environment node
-*/
 import { GET } from "@/app/api/profile/solana/[handle]/route";
 import { NextRequest } from "next/server";
 

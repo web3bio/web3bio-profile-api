@@ -1,4 +1,3 @@
-import type { NextApiRequest } from "next";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
