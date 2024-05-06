@@ -84,7 +84,7 @@ export const resolveLensHandle = async (handle: string) => {
       []
     );
     const getLink = async () => {
-      const _linkRes: Partial<Record<string, LinksItem>> = {};
+      const linksObj: Partial<Record<string, LinksItem>> = {};
       for (let i = 0; i < linksToFetch.length; i++) {
         const recordText = linksToFetch[i];
         const handle = resolveHandle(
@@ -96,13 +96,13 @@ export const resolveLensHandle = async (handle: string) => {
             recordText === PlatformType.twitter
               ? handle.replaceAll("@", "")
               : handle;
-          _linkRes[recordText] = {
+          linksObj[recordText] = {
             link: getSocialMediaLink(resolvedHandle, recordText),
             handle: resolvedHandle,
           };
         }
       }
-      return _linkRes;
+      return linksObj;
     };
     linksObj = {
       ...linksObj,
