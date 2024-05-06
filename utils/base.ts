@@ -17,9 +17,6 @@ import {
 import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
 
-export const baseURL =
-  process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000";
-
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
