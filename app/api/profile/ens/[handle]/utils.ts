@@ -192,7 +192,7 @@ const client = createPublicClient({
       email: (await resolveENSTextValue(ensDomain, "email")) || null,
       location: (await resolveENSTextValue(ensDomain, "location")) || null,
       header: (await resolveEipAssetURL(headerHandle)) || null,
-      contenthash: decodeContenthash(contentHash),
+      contenthash: await decodeContenthash(contentHash),
       links: linksObj,
     };
     return resJSON;

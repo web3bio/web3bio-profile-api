@@ -20,7 +20,7 @@ const resolveSNSRespond = async (handle: string) => {
 };
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url as string);
+  const { searchParams } = req.nextUrl
   const inputName = searchParams.get("handle");
   if (
     (!regexSns.test(inputName!) && !regexSolana.test(inputName!)) ||
