@@ -17,6 +17,9 @@ import {
 import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
 
+export const baseURL =
+  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "http://localhost:3000";
+
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
@@ -43,7 +46,8 @@ export const respondWithCache = (
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate, stale-if-error=86400",
+      "Cache-Control":
+        "public, s-maxage=604800, stale-while-revalidate, stale-if-error=86400",
       ...headers,
     },
   });

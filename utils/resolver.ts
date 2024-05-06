@@ -2,7 +2,7 @@ import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
-import * as contentHash from "@ensdomains/content-hash";
+import { getCodec, decode } from "@ensdomains/content-hash";
 
 const ArweaveAssetPrefix = "https://arweave.net/";
 const eipRegexp = /^eip155:(\d+)\/(erc1155|erc721):(.*)\/(.*)$/;
@@ -119,8 +119,8 @@ export const decodeContenthash = (encoded: string) => {
   ) {
     return null;
   }
-  const codec = contentHash.getCodec(encoded);
-  const decodedId = contentHash.decode(encoded);
+  const codec = getCodec(encoded);
+  const decodedId = decode(encoded);
   try {
     decoded = `${codec}://${decodedId}`;
   } catch (e) {

@@ -1,4 +1,8 @@
-import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
+import {
+  baseURL,
+  handleSearchPlatform,
+  shouldPlatformFetch,
+} from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 
@@ -21,7 +25,7 @@ export async function GET(req: NextRequest) {
       }
     }
   }
-  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_PROFILE_END_POINT}/avatar/svg?handle=${name}`);
+  return NextResponse.redirect(`${baseURL}/avatar/svg?handle=${name}`);
 }
 
 export const runtime = "edge";
