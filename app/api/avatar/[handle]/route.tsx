@@ -1,6 +1,7 @@
 import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
+import { respondWithBoringSVG } from "../svg/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
       }
     }
   }
-  return NextResponse.redirect(`${process.env.NEXT_PUBLIC_PROFILE_END_POINT}/avatar/svg?handle=${name}`);
+  return respondWithBoringSVG(name, 240);
 }
 
 export const runtime = "edge";
