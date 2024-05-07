@@ -33,6 +33,7 @@ const fetchWarpcastWithAddress = async (address: string) => {
     const res = await fetcher(
       originBase + `user-by-verification?address=${address}`
     ).then((res) => res.json());
+    console.log(res,'res')
     return res;
   } catch (e) {
     console.log(e);

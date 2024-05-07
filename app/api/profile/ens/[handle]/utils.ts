@@ -228,7 +228,6 @@ export const resolveENSRespond = async (handle: string) => {
     });
   try {
     const json = await resolveENSHandle(handle);
-    console.log(json,'kkk')
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     console.log(e,'error')

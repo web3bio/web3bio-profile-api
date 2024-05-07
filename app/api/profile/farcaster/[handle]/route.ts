@@ -13,6 +13,7 @@ const resolveFarcasterRespond = async (handle: string) => {
     const json = await resolveFarcasterHandle(handle);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
+    console.log(e,'error')
     return errorHandle({
       identity: handle,
       platform: PlatformType.farcaster,

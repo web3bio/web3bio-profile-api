@@ -1,5 +1,11 @@
 import { PlatformType } from "./platform";
 
+export interface ParamsType {
+  params: {
+    handle: string;
+  };
+}
+
 export type LinksItem = {
   link: string | null;
   handle: string | null;

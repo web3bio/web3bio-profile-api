@@ -1,7 +1,7 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
+import { ErrorMessages, ParamsType } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveSNSHandle } from "./utils";
 
@@ -19,9 +19,8 @@ const resolveSNSRespond = async (handle: string) => {
   }
 };
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl
-  const inputName = searchParams.get("handle");
+export async function GET(req: NextRequest, { params }: ParamsType) {
+  const inputName = params.handle;
   if (
     (!regexSns.test(inputName!) && !regexSolana.test(inputName!)) ||
     !inputName
