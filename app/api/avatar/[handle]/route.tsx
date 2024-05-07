@@ -17,8 +17,15 @@ export async function GET(req: NextRequest) {
 
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      if (avatarURL) {
-        return NextResponse.redirect(avatarURL);
+      const arrayBuffer = await fetch(avatarURL)
+        .then((res) => res.arrayBuffer())
+        .catch(() => null);
+      if (arrayBuffer) {
+        return new Response(arrayBuffer,{
+          headers:{
+            "Content-Type": "image/png",
+          }
+        });
       }
     }
   }
