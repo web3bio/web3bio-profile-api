@@ -1,7 +1,10 @@
 import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 import { respondWithBoringSVG } from "../svg/utils";
+import type * as WasmModule from "@/constants/magick.wasm";
+// @ts-ignore
+import Wasm from "@/constants/magick.wasm?module";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -21,10 +24,18 @@ export async function GET(req: NextRequest) {
         .then((res) => res.arrayBuffer())
         .catch(() => null);
       if (arrayBuffer) {
-        return new Response(arrayBuffer,{
-          headers:{
+        const instance = (await WebAssembly.instantiate(Wasm)) as any;
+        const exports = instance.exports as typeof WasmModule;
+        exports.ImageMagick.read(avatarURL, (image) => {
+          image.resize(120, 120);
+          image.write(exports.MagickFormat.Png, (data) => {
+            console.log(data, "imageData");
+          });
+        });
+        return new Response(arrayBuffer, {
+          headers: {
             "Content-Type": "image/png",
-          }
+          },
         });
       }
     }
