@@ -21,8 +21,11 @@ export async function GET(req: NextRequest) {
 
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      if (/(?:\.webp)$/i.test(avatarURL))
-        NextResponse.redirect(baseURL + "/avatar/process?url=" + avatarURL);
+      if (avatarURL.includes(".webp")) {
+        return NextResponse.redirect(
+          baseURL + "/avatar/process?url=" + encodeURIComponent(avatarURL)
+        );
+      }
       const arrayBuffer = await fetch(avatarURL)
         .then((res) => res.arrayBuffer())
         .catch(() => null);
