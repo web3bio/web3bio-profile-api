@@ -1,10 +1,11 @@
-import { handleSearchPlatform, shouldPlatformFetch } from "@/utils/base";
-import { NextRequest } from "next/server";
+import {
+  baseURL,
+  handleSearchPlatform,
+  shouldPlatformFetch,
+} from "@/utils/base";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 import { respondWithBoringSVG } from "../svg/utils";
-import type * as WasmModule from "@/constants/magick.wasm";
-// @ts-ignore
-import Wasm from "@/constants/magick.wasm?module";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -20,21 +21,16 @@ export async function GET(req: NextRequest) {
 
     if (profiles?.length > 0) {
       const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
+      if (/(?:\.webp)$/i.test(avatarURL))
+        NextResponse.redirect(baseURL + "/avatar/process?url=" + avatarURL);
       const arrayBuffer = await fetch(avatarURL)
         .then((res) => res.arrayBuffer())
         .catch(() => null);
       if (arrayBuffer) {
-        const instance = (await WebAssembly.instantiate(Wasm)) as any;
-        const exports = instance.exports as typeof WasmModule;
-        exports.ImageMagick.read(avatarURL, (image) => {
-          image.resize(120, 120);
-          image.write(exports.MagickFormat.Png, (data) => {
-            console.log(data, "imageData");
-          });
-        });
         return new Response(arrayBuffer, {
           headers: {
-            "Content-Type": "image/png",
+            "Cache-Control":
+              "public, s-maxage=604800, stale-while-revalidate=86400",
           },
         });
       }
