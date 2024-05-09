@@ -3,14 +3,9 @@ import sharp from "sharp";
 export const runtime = "nodejs";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const url = searchParams.get("url");
   try {
-    new URL(url || "");
-  } catch (e) {
-    return NextResponse.json("Invalid Image URL");
-  }
-
-  try {
+    const url = searchParams.get("url");
+    new URL(url!);
     const imageBuffer = await fetch(url!).then((res) => res.arrayBuffer());
     const resultBuffer = await sharp(imageBuffer)
       .toFormat("png")
@@ -19,6 +14,7 @@ export async function GET(req: NextRequest) {
 
     return new Response(resultBuffer, {
       headers: {
+        "Content-Type": "image/png",
         "Cache-Control":
           "public, s-maxage=604800, stale-while-revalidate=86400",
       },
