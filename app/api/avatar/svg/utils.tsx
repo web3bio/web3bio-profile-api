@@ -1,5 +1,6 @@
 const ELEMENTS = 4;
 const SIZE = 80;
+
 const AvatarMarble = (props: any) => {
   const properties = generateColors(props.name, props.colors);
   const maskID = String(hashCode(props.name));
@@ -159,7 +160,7 @@ export const defaultColors = [
   "#000511",
 ];
 
-export const respondWithBoringSVG = async (name: string, size: number) => {
+export const respondWithSVG = async (name: string, size: number) => {
   const avatarProps = {
     colors: defaultColors,
     name,

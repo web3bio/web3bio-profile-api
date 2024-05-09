@@ -3,9 +3,9 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
-import { respondWithBoringSVG } from "../svg/utils";
+import { respondWithSVG } from "../svg/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -20,11 +20,9 @@ export async function GET(req: NextRequest) {
     })) as any;
 
     if (profiles?.length > 0) {
-      const avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
+      let avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
       if (avatarURL.includes(".webp")) {
-        return NextResponse.redirect(
-          baseURL + "/avatar/process?url=" + encodeURIComponent(avatarURL)
-        );
+        avatarURL = baseURL + "/avatar/process?url=" + encodeURIComponent(avatarURL);
       }
       const arrayBuffer = await fetch(avatarURL)
         .then((res) => res.arrayBuffer())
@@ -39,7 +37,7 @@ export async function GET(req: NextRequest) {
       }
     }
   }
-  return respondWithBoringSVG(name, 240);
+  return respondWithSVG(name, 240);
 }
 
 export const runtime = "edge";
