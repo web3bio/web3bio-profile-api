@@ -19,6 +19,7 @@ describe("Test For Unstoppable Domains Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0x2ccff304ef578b238ee82e1d1d53c34e80b48ad6");
+    expect(json.links.url.handle).toBe("al.x");
     expect(json.contenthash).toBeTruthy();
   });
   it("It should response 200 for sujiyan.eth", async () => {
