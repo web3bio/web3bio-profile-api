@@ -7,13 +7,9 @@ import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import { ErrorMessages } from "@/utils/types";
 
-export const enum FarcasterQueryParamType {
-  username = "username",
-  connected_address = "connected_address",
-}
-
 const originBase = "https://api.warpcast.com/v2/";
 const regexTwitterLink = /(\S*)(.|@)twitter/i;
+const regexFid = /fid:(\d*)/i;
 
 const fetcher = (url: string) => {
   return fetch(url, {
@@ -28,7 +24,7 @@ const client = createPublicClient({
   transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
 }) as any;
 
-const fetchWarpcastWithAddress = async (address: string) => {
+const fetchProfileWithAddress = async (address: string) => {
   try {
     const res = await fetcher(
       originBase + `user-by-verification?address=${address}`
@@ -40,7 +36,7 @@ const fetchWarpcastWithAddress = async (address: string) => {
   }
 };
 
-const fetchFidFromWarpcastWithUsername = async (uname: string) => {
+const fetchProfileWithUsername = async (uname: string) => {
   try {
     const res = await fetcher(
       originBase + `user-by-username?username=${uname}`
@@ -52,7 +48,19 @@ const fetchFidFromWarpcastWithUsername = async (uname: string) => {
   }
 };
 
-const fetchAddressesFromWarpcastWithFid = async (fid: string) => {
+const fetchProfileWithFid = async (fid: string) => {
+  try {
+    const res = await fetcher(
+      originBase + `user-by-fid?fid=${fid}`
+    ).then((res) => res.json());
+    return res;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+};
+
+const fetchAddressesWithFid = async (fid: string) => {
   const res = await fetcher(originBase + `verifications?fid=${fid}`).then(
     (res) => res.json()
   );
@@ -101,27 +109,40 @@ const resolveFarcasterLinks = (
 export const resolveFarcasterResponse = async (handle: string) => {
   let response;
   if (isValidEthereumAddress(handle)) {
-    const user = (await fetchWarpcastWithAddress(handle))?.result?.user;
-    const address = await fetchAddressesFromWarpcastWithFid(user?.fid);
+    const user = (await fetchProfileWithAddress(handle))?.result?.user;
+    const address = await fetchAddressesWithFid(user?.fid);
     response = {
       address,
       ...user,
     };
-    if (!response?.username)
+    if (!response?.fid)
       throw new Error(ErrorMessages.notFound, { cause: 404 });
+  } else if (regexFid.test(handle)) {
+    const userFid = handle.match(regexFid)?.[1] || "";
+    console.log(userFid)
+    const rawUser = (await fetchProfileWithFid(userFid))?.result
+    ?.user;
+    const address = await fetchAddressesWithFid(userFid);
+    if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
+    response = {
+      address,
+      ...rawUser,
+    };
+
   } else {
-    const rawUser = (await fetchFidFromWarpcastWithUsername(handle))?.result
+    console.log(regexFid.test(handle))
+    const rawUser = (await fetchProfileWithUsername(handle))?.result
       ?.user;
     if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
-    const address = await fetchAddressesFromWarpcastWithFid(rawUser?.fid);
+    const address = await fetchAddressesWithFid(rawUser?.fid);
 
     const ethAddress =
       !address && regexEns.test(handle)
         ? await client.getEnsAddress({
             name: normalize(handle),
           })
-        : null || "";
+        : null;
     response = {
       address: (address || ethAddress)?.toLowerCase(),
       ...rawUser,
