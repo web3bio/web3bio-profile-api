@@ -23,7 +23,7 @@ describe("Test For SNS NS API", () => {
     const res = await queryClient("/ns/sns/_tesla.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.avatar).toBeTruthy();
+    expect(json.address).toBeTruthy();
   });
   it("It should response 200 for wallet-guide-9.sol", async () => {
     const res = await queryClient("/ns/sns/wallet-guide-9.sol");

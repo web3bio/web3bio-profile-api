@@ -9,19 +9,26 @@ import {
   regexUnstoppableDomains,
   regexSpaceid,
   regexFarcaster,
-  regexAvatar,
+  regexCrossbell,
+  regexSns,
+  regexBtc,
+  regexSolana,
 } from "./regexp";
 import { errorHandleProps } from "./types";
+import { NextResponse } from "next/server";
+
+export const baseURL =
+  process.env.NEXT_PUBLIC_VERCEL_URL || "http://localhost:3000";
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
-  return new Response(
-    JSON.stringify({
+  return NextResponse.json(
+    {
       address: isValidAddress ? props.identity : null,
       identity: !isValidAddress ? props.identity : null,
       platform: props.platform,
       error: props.message,
-    }),
+    },
     {
       status: isNaN(props.code) ? 500 : props.code,
       headers: {
@@ -31,11 +38,16 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
-export const respondWithCache = (json: string) => {
-  return new Response(json, {
+export const respondWithCache = (
+  json: string,
+  headers?: { [index: string]: string }
+) => {
+  return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
-      "Cache-Control": "public, s-maxage=86400, stale-while-revalidate=3600",
+      "Content-Type": "application/json",
+      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      ...headers,
     },
   });
 };
@@ -78,6 +90,8 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
       PlatformType.unstoppableDomains,
       PlatformType.dotbit,
       PlatformType.nextid,
+      PlatformType.solana,
+      PlatformType.sns,
     ].includes(platform)
   )
     return true;
@@ -85,7 +99,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
 };
 
 export const handleSearchPlatform = (term: string) => {
-  switch (true) {
+  switch (!!term) {
     case regexEns.test(term):
       return PlatformType.ens;
     case regexEth.test(term):
@@ -96,25 +110,21 @@ export const handleSearchPlatform = (term: string) => {
       return PlatformType.unstoppableDomains;
     case regexSpaceid.test(term):
       return PlatformType.space_id;
+    case regexCrossbell.test(term):
+      return PlatformType.crossbell;
     case regexDotbit.test(term):
       return PlatformType.dotbit;
+    case regexSns.test(term):
+      return PlatformType.sns;
+    case regexBtc.test(term):
+      return PlatformType.bitcoin;
+    case regexSolana.test(term):
+      return PlatformType.solana;
     case regexTwitter.test(term):
       return PlatformType.twitter;
     case regexFarcaster.test(term):
       return PlatformType.farcaster;
-    case regexAvatar.test(term):
-      return PlatformType.nextid;
     default:
-      return null;
+      return PlatformType.nextid;
   }
-};
-
-export const isDomainSearch = (term: PlatformType) => {
-  return [
-    PlatformType.ens,
-    PlatformType.dotbit,
-    PlatformType.unstoppableDomains,
-    PlatformType.space_id,
-    PlatformType.lens,
-  ].includes(term);
 };
