@@ -23,7 +23,9 @@ export async function GET(req: NextRequest) {
       const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
       let avatarURL = rawAvatarUrl;
       if (avatarURL?.includes(".webp")) {
-        avatarURL = `https://${baseURL}` + "/avatar/process?url=" + encodeURIComponent(rawAvatarUrl);
+        avatarURL = `${baseURL}/avatar/process?url=${encodeURIComponent(
+          rawAvatarUrl
+        )}`;
       }
       const arrayBuffer = await fetch(avatarURL)
         .then((res) => res.arrayBuffer())
