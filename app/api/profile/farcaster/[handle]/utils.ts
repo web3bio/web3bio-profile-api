@@ -119,7 +119,6 @@ export const resolveFarcasterResponse = async (handle: string) => {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
   } else if (regexFid.test(handle)) {
     const userFid = handle.match(regexFid)?.[1] || "";
-    console.log(userFid)
     const rawUser = (await fetchProfileWithFid(userFid))?.result
     ?.user;
     const address = await fetchAddressesWithFid(userFid);
@@ -130,7 +129,6 @@ export const resolveFarcasterResponse = async (handle: string) => {
     };
 
   } else {
-    console.log(regexFid.test(handle))
     const rawUser = (await fetchProfileWithUsername(handle))?.result
       ?.user;
     if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });

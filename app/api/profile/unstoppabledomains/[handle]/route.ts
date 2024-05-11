@@ -7,6 +7,13 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveUDResponse } from "./utils";
 
+const formatContenthash = (string: string) => {
+  if (string.includes("ipns")) {
+    return `ipns://${string.replace("/ipns/", "")}`;
+  }
+  return `ipfs://${string}`;
+};
+
 const UDSocialAccountsList = [
   PlatformType.twitter,
   PlatformType.discord,
@@ -48,6 +55,7 @@ const resolveUDHandle = async (handle: string) => {
       }
     });
   }
+
   return {
     address,
     identity: domain,
@@ -62,7 +70,7 @@ const resolveUDHandle = async (handle: string) => {
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
     contenthash: linksObj.url?.link
-      ? `ipfs://${metadata.records?.["ipfs.html.value"]}`
+      ? formatContenthash(`${metadata.records?.["ipfs.html.value"]}`)
       : null,
     links: linksObj,
   };
