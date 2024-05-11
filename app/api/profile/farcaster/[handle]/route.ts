@@ -3,7 +3,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexFarcaster } from "@/utils/regexp";
+import { regexFarcaster } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveFarcasterHandle } from "./utils";
@@ -27,10 +27,11 @@ export async function GET(req: NextRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
+  const regexFid = /fid:(\d*)/i;
+
   if (
     !regexFarcaster.test(lowercaseName) &&
-    !regexEth.test(lowercaseName) &&
-    !lowercaseName.endsWith(".farcaster")
+    !regexFid.test(lowercaseName)
   )
     return errorHandle({
       identity: lowercaseName,
