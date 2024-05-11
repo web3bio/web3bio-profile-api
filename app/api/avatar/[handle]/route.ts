@@ -20,9 +20,10 @@ export async function GET(req: NextRequest) {
     })) as any;
 
     if (profiles?.length > 0) {
-      let avatarURL = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      if (avatarURL.includes(".webp")) {
-        avatarURL = baseURL + "/avatar/process?url=" + encodeURIComponent(avatarURL);
+      const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
+      let avatarURL = rawAvatarUrl;
+      if (avatarURL?.includes(".webp")) {
+        avatarURL = baseURL + "/avatar/process?url=" + encodeURIComponent(rawAvatarUrl);
       }
       const arrayBuffer = await fetch(avatarURL)
         .then((res) => res.arrayBuffer())
