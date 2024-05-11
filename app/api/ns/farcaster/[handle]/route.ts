@@ -38,10 +38,11 @@ export async function GET(req: NextRequest) {
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
 
+  const regexFid = /fid:(\d*)/i;
+
   if (
     !regexFarcaster.test(lowercaseName) &&
-    !regexEth.test(lowercaseName) &&
-    !lowercaseName.endsWith(".farcaster")
+    !regexFid.test(lowercaseName)
   )
     return errorHandle({
       identity: lowercaseName,

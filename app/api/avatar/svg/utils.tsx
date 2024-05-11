@@ -166,7 +166,7 @@ export const respondWithSVG = async (name: string, size: number) => {
     name,
     title: name,
     size,
-    square: false,
+    square: true,
   };
   const ReactDOMServer = (await import("react-dom/server")).default;
   const svg = ReactDOMServer.renderToString(<AvatarMarble {...avatarProps} />);
