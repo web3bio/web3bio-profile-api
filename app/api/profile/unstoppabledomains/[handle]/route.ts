@@ -2,16 +2,19 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { resolveIPFS_URL } from "@/utils/ipfs";
+import { IPFS_GATEWAY_HOST, resolveIPFS_URL } from "@/utils/ipfs";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveUDResponse } from "./utils";
 
 const formatContenthash = (string: string) => {
-  if (string.includes("ipns")) {
-    return `ipns://${string.replace("/ipns/", "")}`;
+  if (string) {
+    if (string.startsWith("/ipns")) {
+      return `${IPFS_GATEWAY_HOST}${string}`;
+    }
+    return resolveIPFS_URL(string);
   }
-  return `ipfs://${string}`;
+  return string;
 };
 
 const UDSocialAccountsList = [
@@ -35,12 +38,6 @@ const resolveUDHandle = async (handle: string) => {
     linksObj[PlatformType.website] = {
       handle: resolveHandle(metadata.profile?.web2Url),
       link: getSocialMediaLink(metadata.profile?.web2Url, PlatformType.website),
-    };
-  }
-  if (metadata.records?.["ipfs.html.value"]) {
-    linksObj[PlatformType.url] = {
-      handle: domain,
-      link: resolveIPFS_URL(metadata.records?.["ipfs.html.value"]) || null,
     };
   }
   if (metadata.socialAccounts) {
@@ -69,9 +66,7 @@ const resolveUDHandle = async (handle: string) => {
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
-    contenthash: linksObj.url?.link
-      ? formatContenthash(`${metadata.records?.["ipfs.html.value"]}`)
-      : null,
+    contenthash: formatContenthash(metadata.records?.["ipfs.html.value"]) || null,
     links: linksObj,
   };
 };
