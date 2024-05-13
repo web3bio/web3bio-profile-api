@@ -28,7 +28,9 @@ export async function GET(req: NextRequest) {
             rawAvatarUrl
           )}`;
         }
-        const response = await fetch(avatarURL);
+        const response = await fetch(avatarURL, {
+          redirect: "manual",
+        });
         if (response) {
           return new Response(response.body, {
             headers: {
