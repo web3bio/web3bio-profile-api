@@ -71,3 +71,8 @@ export const getLensProfileQuery = (type: LensParamType) => {
   }
 `;
 };
+
+
+export const LensProtocolProfileCollectionAddress =
+  "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
+export const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
