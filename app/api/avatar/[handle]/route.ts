@@ -11,6 +11,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const name = searchParams.get("handle") || "";
   const platform = handleSearchPlatform(name);
+  let avatarURL = "";
   try {
     if (shouldPlatformFetch(platform)) {
       const profiles = (await resolveUniversalRespondFromRelation({
@@ -22,22 +23,18 @@ export async function GET(req: NextRequest) {
 
       if (profiles?.length > 0) {
         const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
-        let avatarURL = rawAvatarUrl;
-        if (avatarURL?.includes(".webp")) {
+        avatarURL = rawAvatarUrl;
+        if (rawAvatarUrl?.includes(".webp")) {
           avatarURL = `${baseURL}/avatar/process?url=${encodeURIComponent(
             rawAvatarUrl
           )}`;
         }
         const response = await fetch(avatarURL, {
           redirect: "error",
-        })
-          .then((res) => res)
-          .catch((e) => NextResponse.redirect(avatarURL));
+        }).then((res) => res.arrayBuffer());
         if (response) {
-          return new Response(response.body, {
+          return new Response(response, {
             headers: {
-              "Content-Type":
-                response.headers.get("content-type") || "image/png",
               "Cache-Control":
                 "public, s-maxage=604800, stale-while-revalidate=86400",
             },
@@ -46,7 +43,7 @@ export async function GET(req: NextRequest) {
       }
     }
   } catch (e) {
-    return respondWithSVG(name, 240);
+    return NextResponse.redirect(avatarURL);
   }
   return respondWithSVG(name, 240);
 }
