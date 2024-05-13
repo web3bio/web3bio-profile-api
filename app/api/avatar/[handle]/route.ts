@@ -3,7 +3,7 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/utils";
 
@@ -26,17 +26,19 @@ export async function GET(req: NextRequest) {
         avatarURL = `${baseURL}/avatar/process?url=${encodeURIComponent(
           rawAvatarUrl
         )}`;
-      }
-      const arrayBuffer = await fetch(avatarURL)
-        .then((res) => res.arrayBuffer())
-        .catch(() => null);
-      if (arrayBuffer) {
-        return new Response(arrayBuffer, {
-          headers: {
-            "Cache-Control":
-              "public, s-maxage=604800, stale-while-revalidate=86400",
-          },
-        });
+        const arrayBuffer = await fetch(avatarURL)
+          .then((res) => res.arrayBuffer())
+          .catch(() => null);
+        if (arrayBuffer) {
+          return new Response(arrayBuffer, {
+            headers: {
+              "Cache-Control":
+                "public, s-maxage=604800, stale-while-revalidate=86400",
+            },
+          });
+        }
+      } else {
+        return NextResponse.redirect(avatarURL);
       }
     }
   }
