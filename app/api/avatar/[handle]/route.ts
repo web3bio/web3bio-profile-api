@@ -3,7 +3,7 @@ import {
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/utils";
 
@@ -29,8 +29,10 @@ export async function GET(req: NextRequest) {
           )}`;
         }
         const response = await fetch(avatarURL, {
-          redirect: "manual",
-        });
+          redirect: "error",
+        })
+          .then((res) => res)
+          .catch((e) => NextResponse.redirect(avatarURL));
         if (response) {
           return new Response(response.body, {
             headers: {
