@@ -33,4 +33,9 @@ describe("Test For Lens NS API", () => {
     expect(res.status).toBe(404);
     expect((await res.json()).error).toBe("Invalid Identity or Domain");
   });
+  it("It should response 200 for sujidaily.lens", async () => {
+    const res = await queryClient("/ns/lens/sujidaily.lens");
+    expect(res.status).toBe(200);
+    expect((await res.json()).avatar).toBeTruthy()
+  });
 });

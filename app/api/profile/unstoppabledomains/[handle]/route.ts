@@ -2,7 +2,6 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformData, PlatformType } from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { IPFS_GATEWAY_HOST, resolveIPFS_URL } from "@/utils/ipfs";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveUDResponse } from "./utils";
@@ -10,11 +9,11 @@ import { resolveUDResponse } from "./utils";
 const formatContenthash = (string: string) => {
   if (string) {
     if (string.startsWith("/ipns")) {
-      return `${IPFS_GATEWAY_HOST}${string}`;
+      return `ipns://${string.replace("/ipns/", "")}`;
     }
-    return resolveIPFS_URL(string);
+    return `ipfs://${string}`;
   }
-  return string;
+  return null;
 };
 
 const UDSocialAccountsList = [
@@ -66,7 +65,8 @@ const resolveUDHandle = async (handle: string) => {
     email: metadata.profile.publicDomainSellerEmail || null,
     location: metadata.profile.location || null,
     header: metadata.profile.coverPath || null,
-    contenthash: formatContenthash(metadata.records?.["ipfs.html.value"]) || null,
+    contenthash:
+      formatContenthash(metadata.records?.["ipfs.html.value"]) || null,
     links: linksObj,
   };
 };
