@@ -1,10 +1,14 @@
-import type { NextApiRequest } from "next";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import { LensParamType, getLensProfileQuery } from "@/utils/lens";
+import {
+  LensGraphQLEndpoint,
+  LensParamType,
+  LensProtocolProfileCollectionAddress,
+  getLensProfileQuery,
+} from "@/utils/lens";
 import { isAddress } from "viem";
 import {
   errorHandle,
@@ -15,10 +19,6 @@ import { PlatformType, PlatformData } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { ErrorMessages, LinksItem } from "@/utils/types";
 import { NextRequest } from "next/server";
-
-const LensProtocolProfileCollectionAddress =
-  "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
-const LensGraphQLEndpoint = "https://api-v2.lens.dev/";
 
 export const getLensProfile = async (handle: string, type: LensParamType) => {
   const query = getLensProfileQuery(type);
