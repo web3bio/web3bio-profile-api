@@ -27,4 +27,12 @@ describe("Test For Avatar Service API", () => {
     const text = await res.text();
     expect(text.startsWith("https"));
   });
+  it("It should response 200 for suji.eth", async () => {
+    const res = await queryClient(
+      "/avatar/suji.eth"
+    );
+    expect(res.status).toBe(200);
+    const text = await res.text();
+    expect(text.startsWith("<svg"));
+  });
 });

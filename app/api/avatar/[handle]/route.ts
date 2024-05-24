@@ -22,7 +22,12 @@ export async function GET(req: NextRequest) {
 
     if (profiles?.length > 0) {
       const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
-      avatarURL = rawAvatarUrl;
+      try {
+        new URL(rawAvatarUrl);
+        avatarURL = rawAvatarUrl;
+      } catch (e) {
+        return respondWithSVG(name, 240);
+      }
       if (rawAvatarUrl?.includes(".webp")) {
         avatarURL = `${baseURL}/avatar/process?url=${encodeURIComponent(
           rawAvatarUrl
