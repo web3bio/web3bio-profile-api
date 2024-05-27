@@ -50,9 +50,9 @@ const fetchProfileWithUsername = async (uname: string) => {
 
 const fetchProfileWithFid = async (fid: string) => {
   try {
-    const res = await fetcher(
-      originBase + `user-by-fid?fid=${fid}`
-    ).then((res) => res.json());
+    const res = await fetcher(originBase + `user-by-fid?fid=${fid}`).then(
+      (res) => res.json()
+    );
     return res;
   } catch (e) {
     console.log(e);
@@ -110,27 +110,23 @@ export const resolveFarcasterResponse = async (handle: string) => {
   let response;
   if (isValidEthereumAddress(handle)) {
     const user = (await fetchProfileWithAddress(handle))?.result?.user;
+    if (!user?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
     const address = await fetchAddressesWithFid(user?.fid);
     response = {
       address,
       ...user,
     };
-    if (!response?.fid)
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
   } else if (regexFid.test(handle)) {
     const userFid = handle.match(regexFid)?.[1] || "";
-    const rawUser = (await fetchProfileWithFid(userFid))?.result
-    ?.user;
+    const rawUser = (await fetchProfileWithFid(userFid))?.result?.user;
     const address = await fetchAddressesWithFid(userFid);
     if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
     response = {
       address,
       ...rawUser,
     };
-
   } else {
-    const rawUser = (await fetchProfileWithUsername(handle))?.result
-      ?.user;
+    const rawUser = (await fetchProfileWithUsername(handle))?.result?.user;
     if (!rawUser?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
     const address = await fetchAddressesWithFid(rawUser?.fid);
