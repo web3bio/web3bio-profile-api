@@ -19,7 +19,6 @@ export async function GET(req: NextRequest) {
       req,
       ns: true,
     })) as any;
-
     if (profiles?.length > 0) {
       const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
       try {
@@ -37,7 +36,7 @@ export async function GET(req: NextRequest) {
         const response = await fetch(avatarURL, {
           redirect: "manual",
         });
-        if (response) {
+        if (response.ok) {
           return new Response(response.body, {
             headers: {
               "Content-Type":
@@ -46,6 +45,8 @@ export async function GET(req: NextRequest) {
                 "public, s-maxage=604800, stale-while-revalidate=86400",
             },
           });
+        }else{
+          return respondWithSVG(name, 240);
         }
       } catch (e) {
         return NextResponse.redirect(avatarURL);
