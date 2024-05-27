@@ -27,7 +27,6 @@ query GET_PROFILES($platform: String, $identity: String) {
         reverse
         expiredAt
       }
-  
     }
   }
 }
@@ -60,6 +59,22 @@ export const primaryDomainResolvedRequestArray = (
           reverse: x.reverse,
         }));
       return [...resolved];
+    }
+    if (
+      [PlatformType.ethereum, PlatformType.ens].includes(
+        resolvedRecord.platform
+      )
+    ) {
+      const vertices = resolvedRecord.identityGraph?.vertices
+        .filter((x) =>
+          [PlatformType.lens, PlatformType.farcaster].includes(x.platform)
+        )
+        .map((x) => ({
+          identity: x.identity,
+          platform: x.platform,
+          reverse: null,
+        })) || [];
+      return [...vertices, defaultReturn];
     }
     return [defaultReturn];
   }
