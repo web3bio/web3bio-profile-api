@@ -89,7 +89,6 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
       PlatformType.farcaster,
       PlatformType.lens,
       PlatformType.unstoppableDomains,
-      PlatformType.dotbit,
       PlatformType.nextid,
       PlatformType.solana,
       PlatformType.sns,
