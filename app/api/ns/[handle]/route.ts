@@ -6,12 +6,18 @@ import {
 } from "@/utils/base";
 import { NextRequest } from "next/server";
 import { resolveUniversalHandle } from "../../profile/[handle]/utils";
+import { PlatformType } from "@/utils/platform";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const platform = handleSearchPlatform(inputName);
-  if (!inputName || !platform || !shouldPlatformFetch(platform)) {
+  if (
+    !inputName ||
+    !platform ||
+    !shouldPlatformFetch(platform) ||
+    platform === PlatformType.dotbit
+  ) {
     return errorHandle({
       identity: inputName,
       code: 404,
