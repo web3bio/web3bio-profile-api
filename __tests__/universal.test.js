@@ -125,7 +125,7 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "dotbit")).toBeTruthy();
+    expect(json.find((x) => x.platform === "ens")).toBeTruthy();
   });
   it("It should response 200 data for gamedb.eth", async () => {
     const res = await queryClient("/profile/gamedb.eth");
