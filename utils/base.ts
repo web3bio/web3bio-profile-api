@@ -89,8 +89,8 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
       PlatformType.farcaster,
       PlatformType.lens,
       PlatformType.unstoppableDomains,
-      PlatformType.dotbit,
       PlatformType.nextid,
+      PlatformType.dotbit,
       PlatformType.solana,
       PlatformType.sns,
     ].includes(platform)

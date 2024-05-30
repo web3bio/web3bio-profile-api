@@ -1,11 +1,11 @@
 import Image from "next/image";
 import Script from "next/script";
 
-const baseURL = process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
+const baseURL =
+  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
 export async function generateMetadata() {
-  const title =
-    "Web3.bio Profile API - Web3 Identity Resolver";
+  const title = "Web3.bio Profile API - Web3 Identity Resolver";
   const description =
     "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Farcaster, Lens Protocol, Unstoppable Domains, Solana Name Service, and Next.ID into their applications.";
 
@@ -75,7 +75,10 @@ export default function Home() {
           <h1 className="h2 mt-4 pt-4">
             <strong className="text-bold">Web3.bio Profile API</strong>
           </h1>
-          <h2 className="h6 text-gray mb-4 pb-4">Web3 Identity Resolver · Web3 DID Resolver · Web3 Domain Name Service Resolver</h2>
+          <h2 className="h6 text-gray mb-4 pb-4">
+            Web3 Identity Resolver · Web3 DID Resolver · Web3 Domain Name
+            Service Resolver
+          </h2>
           <section className="mt-4 pt-4 pb-4">
             <p>
               Web3.bio Profile API enables developers to easily and quickly
@@ -85,8 +88,8 @@ export default function Home() {
                 title="Ethereum and Ethereum Name Service (ENS)"
               >
                 Ethereum (ENS)
-              </span>,{" "}
-              <span className="text-underline">Farcaster</span>,{" "}
+              </span>
+              , <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Unstoppable Domains</span>,{" "}
               <span
@@ -94,8 +97,8 @@ export default function Home() {
                 title="Solana and Solana Name Service (Bonfida)"
               >
                 Solana (SNS)
-              </span>,{" "}
-              <span className="text-underline">.bit</span> and{" "}
+              </span>
+              , <span className="text-underline">.bit</span> and{" "}
               <span className="text-underline">Next.ID</span> into their
               applications. These APIs are already integrated into{" "}
               <a
@@ -378,8 +381,7 @@ export default function Home() {
                         </span>
                       </a>
                     </div>
-                    <div className="card-description">
-                    </div>
+                    <div className="card-description"></div>
                   </div>
                 </div>
                 <div className="profile-card">
@@ -515,9 +517,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  Universal Profile API
-                </div>
+                <div className="mr-2">Universal Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -532,9 +532,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  ENS Profile API
-                </div>
+                <div className="mr-2">ENS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -550,9 +548,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  Farcaster Profile API
-                </div>
+                <div className="mr-2">Farcaster Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -560,7 +556,7 @@ export default function Home() {
                 </div>
               </div>
             </a>
-            
+
             <a
               href="#lens-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
@@ -568,9 +564,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  Lens Profile API
-                </div>
+                <div className="mr-2">Lens Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -586,9 +580,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  Unstoppable Domains Profile API
-                </div>
+                <div className="mr-2">Unstoppable Domains Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -604,9 +596,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  Solana Profile API
-                </div>
+                <div className="mr-2">Solana Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -622,9 +612,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  .bit Profile API
-                </div>
+                <div className="mr-2">.bit Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -646,14 +634,14 @@ export default function Home() {
             id="universal-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Universal Profile API
-            </h2>
+            <h2 className="text-bold h4">Universal Profile API</h2>
             <p>
               Retrieve Universal profiles or name service resolution across
               platforms{" "}
             </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -661,9 +649,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -678,9 +664,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -688,17 +672,21 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
                 An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), a .bit domain, a Next.ID
-                address, or an Unstoppable Domains domain.
+                username (ends with .farcaster), a Next.ID address, or an
+                Unstoppable Domains domain.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum</span>{" "}
@@ -718,17 +706,11 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
-                <a
-                  href={`${baseURL}/profile/vitalik.eth`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/vitalik.eth`} target="_blank">
                   /profile/vitalik.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a 
-                  href={`${baseURL}/ns/vitalik.eth`} 
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/vitalik.eth`} target="_blank">
                   /ns/vitalik.eth
                 </a>
               </li>
@@ -741,19 +723,13 @@ export default function Home() {
                   /profile/dwr.eth.farcaster
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/dwr.eth.farcaster`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/dwr.eth.farcaster`} target="_blank">
                   /ns/dwr.eth.farcaster
                 </a>
               </li>
               <li>
                 <span className="label">Lens</span>{" "}
-                <a
-                  href={`${baseURL}/profile/stani.lens`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/stani.lens`} target="_blank">
                   /profile/stani.lens
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
@@ -763,10 +739,7 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Unstoppable Domains</span>{" "}
-                <a
-                  href={`${baseURL}/profile/sandy.nft`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/sandy.nft`} target="_blank">
                   /profile/sandy.nft
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
@@ -790,21 +763,10 @@ export default function Home() {
                   /ns/0x028f......3e50
                 </a>
               </li>
-              <li>
-                <span className="label">.bit</span>{" "}
-                <a
-                  href={`${baseURL}/profile/jeffx.bit`}
-                  target="_blank"
-                >
-                  /profile/jeffx.bit
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/jeffx.bit`} target="_blank">
-                  /ns/jeffx.bit
-                </a>
-              </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Responses</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">{`// ${baseURL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
@@ -907,11 +869,11 @@ export default function Home() {
             id="ens-profile-api"
             style={{ paddingTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              ENS Profile API
-            </h2>
+            <h2 className="text-bold h4">ENS Profile API</h2>
             <p>Retrieve an ENS profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -919,9 +881,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -938,9 +898,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -950,7 +908,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
@@ -958,7 +918,9 @@ export default function Home() {
                 An Ethereum address or an ENS domain.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum</span>{" "}
@@ -978,22 +940,18 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
-                <a
-                  href={`${baseURL}/profile/ens/vitalik.eth`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/ens/vitalik.eth`} target="_blank">
                   /profile/ens/vitalik.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/ens/vitalik.eth`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/ens/vitalik.eth`} target="_blank">
                   /ns/ens/vitalik.eth
                 </a>
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Responses</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">
@@ -1049,11 +1007,11 @@ export default function Home() {
             id="farcaster-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Farcaster Profile API
-            </h2>
+            <h2 className="text-bold h4">Farcaster Profile API</h2>
             <p>Retrieve a Farcaster profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1061,9 +1019,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1080,9 +1036,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1092,15 +1046,20 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a Farcaster username/fname or a Farcaster FID (with fid:).
+                An Ethereum address or a Farcaster username/fname or a Farcaster
+                FID (with fid:).
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum</span>{" "}
@@ -1127,26 +1086,17 @@ export default function Home() {
                   /profile/farcaster/dwr.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/farcaster/dwr.eth`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/farcaster/dwr.eth`} target="_blank">
                   /ns/farcaster/dwr.eth
                 </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${baseURL}/profile/farcaster/fid:3`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/farcaster/fid:3`} target="_blank">
                   /profile/farcaster/fid:3
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/farcaster/fid:3`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/farcaster/fid:3`} target="_blank">
                   /ns/farcaster/fid:3
                 </a>
               </li>
@@ -1202,11 +1152,11 @@ export default function Home() {
             id="lens-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Lens Profile API
-            </h2>
+            <h2 className="text-bold h4">Lens Profile API</h2>
             <p>Retrieve a Lens profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1214,9 +1164,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1233,9 +1181,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1245,7 +1191,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
@@ -1253,7 +1201,9 @@ export default function Home() {
                 An Ethereum/Polygon address or a Lens handle.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum / Polygon</span>{" "}
@@ -1273,17 +1223,11 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Lens</span>{" "}
-                <a
-                  href={`${baseURL}/profile/lens/stani.lens`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/profile/lens/stani.lens`} target="_blank">
                   /profile/lens/stani.lens
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/lens/stani.lens`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/lens/stani.lens`} target="_blank">
                   /ns/lens/stani.lens
                 </a>
               </li>
@@ -1339,13 +1283,13 @@ export default function Home() {
             id="unstoppabledomains-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Unstoppable Domains Profile API
-            </h2>
+            <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
             <p>
               Retrieve an Unstoppable Domains profile or name service resolution
             </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1353,9 +1297,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1372,9 +1314,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1384,7 +1324,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
@@ -1392,7 +1334,9 @@ export default function Home() {
                 An Ethereum address or an Unstoppable Domains domain.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum</span>{" "}
@@ -1494,13 +1438,13 @@ export default function Home() {
             id="solana-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Solana (SNS) Profile API
-            </h2>
+            <h2 className="text-bold h4">Solana (SNS) Profile API</h2>
             <p>
               Retrieve a Solana Name Service profile or name service resolution
             </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1508,9 +1452,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1527,9 +1469,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1539,15 +1479,18 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                A Solana address or a Solana Name Service domain.
+                <br />A Solana address or a Solana Name Service domain.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Solana</span>{" "}
@@ -1574,10 +1517,7 @@ export default function Home() {
                   /profile/solana/bonfida.sol
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/solana/bonfida.sol`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/solana/bonfida.sol`} target="_blank">
                   /ns/solana/bonfida.sol
                 </a>
               </li>
@@ -1624,11 +1564,11 @@ export default function Home() {
             id="dotbit-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              .bit Profile API
-            </h2>
+            <h2 className="text-bold h4">.bit Profile API</h2>
             <p>Retrieve a .bit profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Endpoints</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
             <div
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1636,9 +1576,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1655,9 +1593,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">
-                    {baseURL}
-                  </span>
+                  <span className="text-gray hide-sm">{baseURL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1667,7 +1603,9 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Parameters</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
@@ -1675,7 +1613,9 @@ export default function Home() {
                 An Ethereum address or a .bit username.
               </li>
             </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>Examples</h3>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
             <ul>
               <li>
                 <span className="label">Ethereum</span>{" "}
@@ -1702,10 +1642,7 @@ export default function Home() {
                   /profile/dotbit/bestcase.bit
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${baseURL}/ns/dotbit/bestcase.bit`}
-                  target="_blank"
-                >
+                <a href={`${baseURL}/ns/dotbit/bestcase.bit`} target="_blank">
                   /ns/dotbit/bestcase.bit
                 </a>
               </li>
@@ -1773,9 +1710,7 @@ export default function Home() {
             id="errors"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Status and Errors
-            </h2>
+            <h2 className="text-bold h4">Status and Errors</h2>
             <p>
               Successful responses are indicated with a <code>200</code> HTTP
               status code.{" "}
@@ -1805,9 +1740,7 @@ export default function Home() {
             id="release-notes"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">
-              Release Notes
-            </h2>
+            <h2 className="text-bold h4">Release Notes</h2>
             <p>
               We are gradually making updates to Web3.bio Profile API. You may
               expect new features, improvements and bug fixes. If you have any

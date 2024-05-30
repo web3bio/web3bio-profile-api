@@ -11,6 +11,12 @@ import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
 
+export const platformsToExclude = [
+  PlatformType.dotbit,
+  PlatformType.sns,
+  PlatformType.solana,
+];
+
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
@@ -48,9 +54,8 @@ const sortByPlatform = (
     PlatformType.ens,
     PlatformType.farcaster,
     PlatformType.lens,
-    PlatformType.dotbit,
     PlatformType.unstoppableDomains,
-    PlatformType.ethereum
+    PlatformType.ethereum,
   ];
 
   const order = defaultOrder.includes(platform)
@@ -62,7 +67,6 @@ const sortByPlatform = (
   const third: Array<ProfileAPIResponse> = [];
   const forth: Array<ProfileAPIResponse> = [];
   const fifth: Array<ProfileAPIResponse> = [];
-  const sixth: Array<ProfileAPIResponse> = [];
 
   arr.map((x) => {
     if (x.platform === order[0]) first.push(x);
@@ -70,7 +74,6 @@ const sortByPlatform = (
     if (x.platform === order[2]) third.push(x);
     if (x.platform === order[3]) forth.push(x);
     if (x.platform === order[4]) fifth.push(x);
-    sixth.push(x);
   });
   return [
     first.find((x) => x.identity === handle),
@@ -80,7 +83,6 @@ const sortByPlatform = (
     .concat(third)
     .concat(forth)
     .concat(fifth)
-    .concat(sixth)
     .filter((x) => !!x);
 };
 export const resolveUniversalRespondFromRelation = async ({
@@ -105,7 +107,6 @@ export const resolveUniversalRespondFromRelation = async ({
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
     };
-
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
     handle,
@@ -146,7 +147,9 @@ export const resolveUniversalRespondFromRelation = async ({
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
-      const returnRes = sortByPlatform(responsesToSort, platform, handle);
+      const returnRes = platformsToExclude.includes(platform)
+        ? responsesToSort
+        : sortByPlatform(responsesToSort, platform, handle);
 
       if (
         platform === PlatformType.ethereum &&

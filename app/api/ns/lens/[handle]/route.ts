@@ -10,15 +10,15 @@ import { NextRequest } from "next/server";
 const resolveLensHandleNS = async (handle: string) => {
   const response = await resolveLensResponse(handle);
   if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
-  const avatarUri = response.metadata
-    ? response.metadata?.picture?.raw?.uri ||
-      response.metadata?.picture?.optimized?.uri
-    : await resolveEipAssetURL(
-        `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
-          response.id?.slice(2),
-          16
-        )}`
-      );
+  const avatarUri =
+    response.metadata?.picture?.raw?.uri ||
+    response.metadata?.picture?.optimized?.uri ||
+    (await resolveEipAssetURL(
+      `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
+        response.id?.slice(2),
+        16
+      )}`
+    ));
   const resJSON = {
     address: response.ownedBy?.address?.toLowerCase(),
     identity: response.handle.localName + ".lens",
