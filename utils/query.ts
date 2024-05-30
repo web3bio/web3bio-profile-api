@@ -1,3 +1,4 @@
+import { platformsToExclude } from "@/app/api/profile/[handle]/utils";
 import { PlatformType } from "./platform";
 import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
@@ -44,6 +45,9 @@ export const primaryDomainResolvedRequestArray = (
       platform: resolvedRecord.platform,
       reverse: false,
     };
+    if (platformsToExclude.includes(platform)) {
+      return [defaultReturn];
+    }
     if (
       (directPass(resolvedRecord) ||
         resolvedRecord.platform === PlatformType.nextid) &&
@@ -65,15 +69,16 @@ export const primaryDomainResolvedRequestArray = (
         resolvedRecord.platform
       )
     ) {
-      const vertices = resolvedRecord.identityGraph?.vertices
-        .filter((x) =>
-          [PlatformType.lens, PlatformType.farcaster].includes(x.platform)
-        )
-        .map((x) => ({
-          identity: x.identity,
-          platform: x.platform,
-          reverse: null,
-        })) || [];
+      const vertices =
+        resolvedRecord.identityGraph?.vertices
+          .filter((x) =>
+            [PlatformType.lens, PlatformType.farcaster].includes(x.platform)
+          )
+          .map((x) => ({
+            identity: x.identity,
+            platform: x.platform,
+            reverse: null,
+          })) || [];
       return [...vertices, defaultReturn];
     }
     return [defaultReturn];

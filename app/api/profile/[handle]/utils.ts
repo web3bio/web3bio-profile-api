@@ -11,6 +11,12 @@ import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
 
+export const platformsToExclude = [
+  PlatformType.dotbit,
+  PlatformType.sns,
+  PlatformType.solana,
+];
+
 const nextidGraphQLEndpoint =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
@@ -67,7 +73,7 @@ const sortByPlatform = (
     if (x.platform === order[1]) second.push(x);
     if (x.platform === order[2]) third.push(x);
     if (x.platform === order[3]) forth.push(x);
-    fifth.push(x);
+    if (x.platform === order[4]) fifth.push(x);
   });
   return [
     first.find((x) => x.identity === handle),
@@ -101,7 +107,6 @@ export const resolveUniversalRespondFromRelation = async ({
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
     };
-
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
     handle,
@@ -142,7 +147,9 @@ export const resolveUniversalRespondFromRelation = async ({
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
-      const returnRes = sortByPlatform(responsesToSort, platform, handle);
+      const returnRes = platformsToExclude.includes(platform)
+        ? responsesToSort
+        : sortByPlatform(responsesToSort, platform, handle);
 
       if (
         platform === PlatformType.ethereum &&
