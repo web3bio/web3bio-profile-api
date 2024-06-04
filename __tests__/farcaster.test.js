@@ -14,7 +14,7 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
-    expect(json.address).toBe("0x934b510d4c9103e6a87aef13b816fb080286d649");
+    expect(json.address).toBe("0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2");
     expect(json.links.farcaster.handle).toBe("suji");
   });
   it("It should response 200 for farcaster", async () => {

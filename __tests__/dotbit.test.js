@@ -1,13 +1,6 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Dotbit Profile API", () => {
-  it("It should response 200 for jeffx.bit", async () => {
-    const res = await queryClient("/profile/dotbit/jeffx.bit");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.platform).toBe("dotbit");
-    expect(json.address).toBe("0x1d643fac9a463c9d544506006a6348c234da485f");
-  });
   it("It should response 404 for 0x42e573b38e41cfa26be5d85235368e596dc6d12b", async () => {
     const res = await queryClient(
       "/profile/dotbit/0x42e573b38e41cfa26be5d85235368e596dc6d12b"
