@@ -47,3 +47,4 @@ const resolveDotbitRespond = async (handle: string) => {
 };
 
 export const runtime = "edge";
+export const preferredRegion = ["hnd1", "sfo1"];

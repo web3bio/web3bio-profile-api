@@ -48,6 +48,7 @@ export const respondWithCache = (
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      "CDN-Cache-Control": "max-age=604800",
       ...headers,
     },
   });
