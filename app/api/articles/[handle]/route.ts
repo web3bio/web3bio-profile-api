@@ -77,7 +77,9 @@ export async function GET(req: NextRequest) {
       items: [
         ...rssArticles.items?.map((x: any) => ({
           ...x,
-          type: ArticlePlatform.contenthash,
+          platform: ArticlePlatform.contenthash,
+          body: x.description,
+          published: new Date(x.published).getTime(),
         })),
       ],
     };
@@ -100,7 +102,7 @@ export async function GET(req: NextRequest) {
         description: subStr(content.content.body),
         published: x.content_timestamp * 1000,
         body: content.content.body,
-        type: ArticlePlatform.mirror,
+        platform: ArticlePlatform.mirror,
       });
     } else {
       // paragraph
@@ -114,14 +116,14 @@ export async function GET(req: NextRequest) {
         description: subStr(content.markdown),
         published: x.content_timestamp * 1000,
         body: content.markdown,
-        type: ArticlePlatform.paragraph,
+        platform: ArticlePlatform.paragraph,
       });
     }
   });
   result.items = [
     ...result.items
       .sort((a: any, b: any) => {
-        return a.published - b.published;
+        return b.published - a.published;
       })
       .slice(0, limit),
   ];
