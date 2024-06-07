@@ -1,5 +1,6 @@
 import { baseURL, handleSearchPlatform, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
+import { ArticleItem, ArticleResponse } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -52,12 +53,12 @@ export async function GET(req: NextRequest) {
     link: "",
     description: "",
     image: "",
-    items: [] as any,
+    items: new Array<ArticleItem>(),
   };
   const emptyReturn = () =>
     NextResponse.json(JSON.stringify(emptyResultStruct));
   let result = { ...emptyResultStruct };
-  let rssArticles = {} as any;
+  let rssArticles = {} as ArticleResponse;
 
   const profile = await fetch(
     baseURL + `/api/profile/${system}/${handle}`
@@ -79,10 +80,12 @@ export async function GET(req: NextRequest) {
         title: rssArticles.title,
         link: rssArticles.link,
         description: rssArticles.description,
-        image: rssArticles.image || null,
+        image: rssArticles.image || "",
         items: [
-          ...rssArticles.items?.map((x: any) => ({
-            ...x,
+          ...rssArticles.items?.map((x: ArticleItem) => ({
+            title: x.title,
+            link: x.link,
+            description: x.description,
             published: new Date(x.published).getTime(),
             body: x.description,
             platform: ArticlePlatform.contenthash,
@@ -125,7 +128,7 @@ export async function GET(req: NextRequest) {
     });
     result.items = [
       ...result.items
-        .sort((a: any, b: any) => {
+        .sort((a: ArticleItem, b: ArticleItem) => {
           return b.published - a.published;
         })
         .slice(0, limit),
