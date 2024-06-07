@@ -55,15 +55,12 @@ export async function GET(req: NextRequest) {
     image: "",
     items: new Array<ArticleItem>(),
   };
-  const emptyReturn = () =>
-    NextResponse.json(JSON.stringify(emptyResultStruct));
+  const emptyReturn = () => NextResponse.json(emptyResultStruct);
   let result = { ...emptyResultStruct };
   let rssArticles = {} as ArticleResponse;
-
-  const profile = await fetch(
-    baseURL + `/api/profile/${system}/${handle}`
-  ).then((res) => res.json());
-
+  const profile = await fetch(baseURL + `/api/profile/${system}/${handle}`)
+    .then((res) => res.json())
+    .catch((e) => null);
   if (!profile) return emptyReturn();
 
   if (
