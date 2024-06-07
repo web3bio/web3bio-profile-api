@@ -89,10 +89,7 @@ export interface IdentityRecord {
 }
 
 export interface ArticleResponse {
-  title: string;
-  link: string;
-  description: string;
-  image: string;
+  sites: ArticleSite[]
   items: ArticleItem[];
 }
 export interface ArticleItem {
@@ -102,4 +99,12 @@ export interface ArticleItem {
   published: number;
   platform: string;
   body: string;
+}
+
+export interface ArticleSite{
+  platform:string,
+  name:string,
+  description: string,
+  image:string,
+  link:string,
 }

@@ -1,6 +1,6 @@
 import { baseURL, handleSearchPlatform, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { ArticleItem, ArticleResponse } from "@/utils/types";
+import { ArticleItem, ArticleSite } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "edge";
@@ -49,15 +49,12 @@ export async function GET(req: NextRequest) {
   const platform = searchParams.get("platform") || "";
   const system = handleSearchPlatform(handle);
   const emptyResultStruct = {
-    title: "",
-    link: "",
-    description: "",
-    image: "",
+    sites: new Array<ArticleSite>(),
     items: new Array<ArticleItem>(),
   };
   const emptyReturn = () => NextResponse.json(emptyResultStruct);
   let result = { ...emptyResultStruct };
-  let rssArticles = {} as ArticleResponse;
+  let rssArticles = {} as any;
   const profile = await fetch(baseURL + `/api/profile/${system}/${handle}`)
     .then((res) => res.json())
     .catch((e) => null);
@@ -72,23 +69,18 @@ export async function GET(req: NextRequest) {
     )
   ) {
     rssArticles = await fetchRss(profile.identity, limit);
-    if (rssArticles?.items)
-      result = {
-        title: rssArticles.title,
-        link: rssArticles.link,
-        description: rssArticles.description,
-        image: rssArticles.image || "",
-        items: [
-          ...rssArticles.items?.map((x: ArticleItem) => ({
-            title: x.title,
-            link: x.link,
-            description: x.description,
-            published: new Date(x.published).getTime(),
-            body: x.description,
-            platform: ArticlePlatform.contenthash,
-          })),
-        ],
-      };
+    if (rssArticles?.items) {
+      result.items = [
+        ...rssArticles.items?.map((x: ArticleItem) => ({
+          title: x.title,
+          link: x.link,
+          description: x.description,
+          published: new Date(x.published).getTime(),
+          body: x.description,
+          platform: ArticlePlatform.contenthash,
+        })),
+      ];
+    }
   }
 
   if (platform !== ArticlePlatform.contenthash) {
