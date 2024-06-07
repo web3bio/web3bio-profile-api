@@ -83,9 +83,9 @@ export async function GET(req: NextRequest) {
         items: [
           ...rssArticles.items?.map((x: any) => ({
             ...x,
-            platform: ArticlePlatform.contenthash,
-            body: x.description,
             published: new Date(x.published).getTime(),
+            body: x.description,
+            platform: ArticlePlatform.contenthash,
           })),
         ],
       };
@@ -104,8 +104,6 @@ export async function GET(req: NextRequest) {
         result.items.push({
           title: content.content.title,
           link: `${MirrorBaseURL}/${profile.identity}/${x.original_id}`,
-          author: "",
-          thumbnail: "",
           description: subStr(content.content.body),
           published: x.content_timestamp * 1000,
           body: content.content.body,
@@ -118,8 +116,6 @@ export async function GET(req: NextRequest) {
           link: content.url
             ? `https://${content.url}`
             : `${ParagraphBaseURL}/@${profile.identity}/${content.slug}`,
-          author: "",
-          thumbnail: "",
           description: subStr(content.markdown),
           published: x.content_timestamp * 1000,
           body: content.markdown,
