@@ -122,6 +122,41 @@ export async function GET(req: NextRequest) {
         })
         .slice(0, limit),
     ];
+    [
+      ArticlePlatform.contenthash,
+      ArticlePlatform.mirror,
+      ArticlePlatform.paragraph,
+    ].forEach((x) => {
+      if (result.items.some((i) => i.platform === x)) {
+        if (x === ArticlePlatform.contenthash) {
+          result.sites.push({
+            platform: ArticlePlatform.contenthash,
+            name: rssArticles.title,
+            description: rssArticles.description,
+            image: rssArticles.image,
+            link: rssArticles.link,
+          });
+        }
+        if (x === ArticlePlatform.mirror) {
+          result.sites.push({
+            platform: ArticlePlatform.mirror,
+            name: `${profile.identity}'s Mirror`,
+            description: "",
+            image: "",
+            link: `${MirrorBaseURL}/${profile.identity}`,
+          });
+        }
+        if (x === ArticlePlatform.paragraph) {
+          result.sites.push({
+            platform: ArticlePlatform.paragraph,
+            name: `${profile.identity}'s Paragraph`,
+            description: "",
+            image: "",
+            link: `${ParagraphBaseURL}/@${profile.identity}`,
+          });
+        }
+      }
+    });
   }
   return respondWithCache(JSON.stringify(result));
 }
