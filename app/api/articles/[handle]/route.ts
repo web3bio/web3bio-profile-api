@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
   const profile = await fetch(baseURL + `/api/profile/${system}/${handle}`)
     .then((res) => res.json())
     .catch((e) => null);
-  if (!profile) return emptyReturn();
+  if (!profile || !profile?.address) return emptyReturn();
 
   if (
     [PlatformType.ethereum, PlatformType.ens, PlatformType.dotbit].includes(
