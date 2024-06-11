@@ -33,23 +33,13 @@ export async function GET(req: NextRequest) {
         )}`;
       }
       try {
-        const response = await fetch(avatarURL, {
-          redirect: "manual",
-        });
-        if (response.ok) {
-          return new Response(response.body, {
-            headers: {
-              "Content-Type":
-                response.headers.get("content-type") || "image/png",
-              "Cache-Control":
-                "public, s-maxage=604800, stale-while-revalidate=86400",
-            },
-          });
-        }else{
+        if (avatarURL) {
+          return NextResponse.redirect(avatarURL);
+        } else {
           return respondWithSVG(name, 240);
         }
       } catch (e) {
-        return NextResponse.redirect(avatarURL);
+        return respondWithSVG(name, 240);
       }
     }
   }
