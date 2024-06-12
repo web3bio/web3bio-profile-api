@@ -2,13 +2,14 @@ import { NextResponse } from "next/server";
 import { regexSolana } from "./utils/regexp";
 
 export const config = {
-  matcher: ["/ns/:path*", "/profile/:path*"],
+  matcher: ["/(.*(?:[A-Z]+).*)"],
 };
 
 export function middleware(req: {
   nextUrl: { pathname: string; clone: () => URL };
 }) {
   const identity = req.nextUrl.pathname.split("/").pop() || "";
+  console.log("Middleware: ", identity)
   if (
     req.nextUrl.pathname !== req.nextUrl.pathname.toLowerCase() &&
     !regexSolana.test(identity)
