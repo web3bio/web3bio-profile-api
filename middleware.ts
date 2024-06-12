@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { regexSolana } from "./utils/regexp";
 
 export const config = {
-  matcher: ["/(.*(?:[A-Z]+).*)"],
+  matcher: ["/((profile|ns|avatar).*(?:[A-Z]+).*)"],
 };
 
 export function middleware(req: {
