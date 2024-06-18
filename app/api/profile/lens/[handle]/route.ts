@@ -140,7 +140,7 @@ export const resolveLensHandle = async (handle: string) => {
     contenthash: null,
     links: linksObj,
     social: {
-      uid: response.id,
+      uid: parseInt(response.id, 16),
       follower: response.stats.followers,
       following: response.stats.following,
     },
