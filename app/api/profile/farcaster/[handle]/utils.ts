@@ -162,6 +162,11 @@ export const resolveFarcasterHandle = async (handle: string) => {
     header: null,
     contenthash: null,
     links: links,
+    social: {
+      uid: response.fid,
+      follower: response.followerCount,
+      following: response.followingCount,
+    },
   };
   return resJSON;
 };

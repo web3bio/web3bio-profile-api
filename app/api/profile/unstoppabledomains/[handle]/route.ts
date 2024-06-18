@@ -51,7 +51,6 @@ const resolveUDHandle = async (handle: string) => {
       }
     });
   }
-
   return {
     address,
     identity: domain,
@@ -68,6 +67,11 @@ const resolveUDHandle = async (handle: string) => {
     contenthash:
       formatContenthash(metadata.records?.["ipfs.html.value"]) || null,
     links: linksObj,
+    social: {
+      uid: address,
+      follower: metadata.social.followerCount,
+      following: metadata.social.followingCount,
+    },
   };
 };
 

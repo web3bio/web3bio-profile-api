@@ -95,6 +95,7 @@ export const resolveSNSHandle = async (handle: string) => {
       header: null,
       contenthash: null,
       links: {},
+      social:{}
     };
   }
   const linksObj: Record<
