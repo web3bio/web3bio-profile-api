@@ -68,7 +68,7 @@ const resolveUDHandle = async (handle: string) => {
       formatContenthash(metadata.records?.["ipfs.html.value"]) || null,
     links: linksObj,
     social: {
-      uid: address,
+      uid: domain,
       follower: metadata.social.followerCount,
       following: metadata.social.followingCount,
     },
