@@ -31,7 +31,7 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("lilgho.lens");
-    expect(json[0].avatar).toBeTruthy()
+    expect(json[0].avatar).toBeTruthy();
     expect(json[1].avatar).toBeTruthy();
     expect(json.length).toBe(11);
   });
@@ -67,6 +67,9 @@ describe("Test For Universal Profile API", () => {
       json.find((x) => x.platform === "lens")?.address ===
         json.find((x) => x.platform === "ens")?.address
     );
+    expect(
+      json.find((x) => x.platform === "farcaster").social.follower
+    ).toBeTruthy();
   });
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/mcdonalds.eth");
@@ -79,6 +82,9 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("stani.lens");
+    expect(
+      json.find((x) => x.platform === "lens").social.following
+    ).toBeTruthy();
   });
   it("It should response 200 data for brantly.eth", async () => {
     const res = await queryClient("/profile/brantly.eth");
@@ -164,6 +170,8 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/ggomagang.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find(x=>x.platform === 'farcaster').identity).toBe("undefined");
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe(
+      "undefined"
+    );
   });
 });

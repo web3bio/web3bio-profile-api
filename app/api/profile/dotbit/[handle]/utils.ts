@@ -1,6 +1,4 @@
-import {
-  isValidEthereumAddress,
-} from "@/utils/base";
+import { isValidEthereumAddress } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { CoinType } from "@/utils/cointype";
@@ -115,5 +113,6 @@ export const resolveDotbitHandle = async (handle: string) => {
       ? `${contenthashItem.key.replace("dweb.", "")}://${contenthashItem.value}`
       : null,
     links: linksObj,
+    social: {},
   };
 };

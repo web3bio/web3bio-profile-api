@@ -139,6 +139,11 @@ export const resolveLensHandle = async (handle: string) => {
     header: (await resolveEipAssetURL(coverPictureUri)) || null,
     contenthash: null,
     links: linksObj,
+    social: {
+      uid: parseInt(response.id, 16),
+      follower: response.stats.followers,
+      following: response.stats.following,
+    },
   };
   return resJSON;
 };
