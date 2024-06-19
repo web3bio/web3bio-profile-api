@@ -194,6 +194,7 @@ const client = createPublicClient({
       header: (await resolveEipAssetURL(headerHandle)) || null,
       contenthash: decodeContenthash(contentHash),
       links: linksObj,
+      social:{}
     };
     return resJSON;
   };
