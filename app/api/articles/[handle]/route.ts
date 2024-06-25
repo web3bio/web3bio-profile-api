@@ -1,5 +1,4 @@
 import { baseURL, handleSearchPlatform, respondWithCache } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
 import { ArticleItem, ArticleSite } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -59,14 +58,10 @@ export async function GET(req: NextRequest) {
     .then((res) => res.json())
     .catch((e) => null);
   if (!profile || !profile?.address) return emptyReturn();
-
+  const platforms = platform.split(",");
   if (
-    [PlatformType.ethereum, PlatformType.ens, PlatformType.dotbit].includes(
-      system
-    ) &&
-    ![ArticlePlatform.mirror, ArticlePlatform.paragraph].includes(
-      platform as ArticlePlatform
-    )
+    profile?.contenthash &&
+    (platforms.some((x) => x === ArticlePlatform.contenthash) || !platform)
   ) {
     rssArticles = await fetchRss(profile.identity, limit);
     if (rssArticles?.items) {
@@ -83,7 +78,14 @@ export async function GET(req: NextRequest) {
     }
   }
 
-  if (platform !== ArticlePlatform.contenthash) {
+  if (
+    platforms.some((x) =>
+      [ArticlePlatform.mirror, ArticlePlatform.paragraph].includes(
+        x as ArticlePlatform
+      )
+    ) ||
+    !platform
+  ) {
     const fireflyArticles = await fetchArticle(
       profile.address,
       limit,
@@ -122,41 +124,41 @@ export async function GET(req: NextRequest) {
         })
         .slice(0, limit),
     ];
-    [
-      ArticlePlatform.contenthash,
-      ArticlePlatform.mirror,
-      ArticlePlatform.paragraph,
-    ].forEach((x) => {
-      if (result.items.some((i) => i.platform === x)) {
-        if (x === ArticlePlatform.contenthash) {
-          result.sites.push({
-            platform: ArticlePlatform.contenthash,
-            name: rssArticles.title,
-            description: rssArticles.description,
-            image: rssArticles.image,
-            link: rssArticles.link,
-          });
-        }
-        if (x === ArticlePlatform.mirror) {
-          result.sites.push({
-            platform: ArticlePlatform.mirror,
-            name: `${profile.identity}'s Mirror`,
-            description: "",
-            image: "",
-            link: `${MirrorBaseURL}/${profile.identity}`,
-          });
-        }
-        if (x === ArticlePlatform.paragraph) {
-          result.sites.push({
-            platform: ArticlePlatform.paragraph,
-            name: `${profile.identity}'s Paragraph`,
-            description: "",
-            image: "",
-            link: `${ParagraphBaseURL}/@${profile.identity}`,
-          });
-        }
-      }
-    });
   }
+  [
+    ArticlePlatform.contenthash,
+    ArticlePlatform.mirror,
+    ArticlePlatform.paragraph,
+  ].forEach((x) => {
+    if (result.items.some((i) => i.platform === x)) {
+      if (x === ArticlePlatform.contenthash) {
+        result.sites.push({
+          platform: ArticlePlatform.contenthash,
+          name: rssArticles.title,
+          description: rssArticles.description,
+          image: rssArticles.image,
+          link: rssArticles.link,
+        });
+      }
+      if (x === ArticlePlatform.mirror) {
+        result.sites.push({
+          platform: ArticlePlatform.mirror,
+          name: `${profile.identity}'s Mirror`,
+          description: "",
+          image: "",
+          link: `${MirrorBaseURL}/${profile.identity}`,
+        });
+      }
+      if (x === ArticlePlatform.paragraph) {
+        result.sites.push({
+          platform: ArticlePlatform.paragraph,
+          name: `${profile.identity}'s Paragraph`,
+          description: "",
+          image: "",
+          link: `${ParagraphBaseURL}/@${profile.identity}`,
+        });
+      }
+    }
+  });
   return respondWithCache(JSON.stringify(result));
 }
