@@ -44,28 +44,32 @@ const fetchArticle = async (address: string, limit: number) => {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const address = searchParams.get("address") || "";
-  const domain = searchParams.get("domain") || "";
+  let address = searchParams.get("address") || "";
+  let domain = searchParams.get("domain") || "";
+  const contenthash = searchParams.get("contenthash") || false;
   const limit = parseInt(searchParams.get("limit") || "") || 10;
   const emptyResultStruct = {
     sites: new Array<ArticleSite>(),
     items: new Array<ArticleItem>(),
   };
-  let profileIdentity = domain;
-
   const emptyReturn = () => NextResponse.json(emptyResultStruct);
   let result = { ...emptyResultStruct };
   let rssArticles = {} as any;
 
-  if (!isValidEthereumAddress(address)) return emptyReturn();
-  if (
-    domain &&
-    [
-      PlatformType.ens,
-      PlatformType.dotbit,
-      PlatformType.unstoppableDomains,
-    ].includes(handleSearchPlatform(domain))
-  ) {
+  if (!isValidEthereumAddress(address) && !domain) return emptyReturn();
+
+  if (!address || !domain) {
+    const searchPlatform = domain
+      ? handleSearchPlatform(domain)
+      : PlatformType.ens;
+    const profile = await fetch(
+      `${baseURL}/ns/${searchPlatform}/${domain || address}`
+    ).then((res) => res.json());
+    address = profile.address;
+    domain = profile.identity;
+  }
+
+  if (contenthash) {
     rssArticles = await fetchRss(domain, limit);
     if (rssArticles?.items) {
       result.items = [
@@ -90,19 +94,13 @@ export async function GET(req: NextRequest) {
 
   const fireflyArticles = await fetchArticle(address, limit);
 
-  if (!profileIdentity) {
-    profileIdentity = (await fetch(baseURL + "/ns/ens/" + address).then((res) =>
-      res.json()
-    )).identity;
-  }
-
   fireflyArticles?.data?.map((x: any) => {
     const content = JSON.parse(x.content_body);
     if (x.platform === 1) {
       // mirror
       result.items.push({
         title: content.content.title,
-        link: `${MirrorBaseURL}/${profileIdentity}/${x.original_id}`,
+        link: `${MirrorBaseURL}/${domain}/${x.original_id}`,
         description: subStr(content.content.body),
         published: x.content_timestamp * 1000,
         body: content.content.body,
@@ -111,10 +109,10 @@ export async function GET(req: NextRequest) {
       if (!result.sites.some((x) => x.platform === ArticlePlatform.mirror)) {
         result.sites.push({
           platform: ArticlePlatform.mirror,
-          name: `${profileIdentity}'s Mirror`,
+          name: `${domain}'s Mirror`,
           description: "",
           image: "",
-          link: `${MirrorBaseURL}/${profileIdentity}`,
+          link: `${MirrorBaseURL}/${domain}`,
         });
       }
     } else {
@@ -123,7 +121,7 @@ export async function GET(req: NextRequest) {
         title: content.title,
         link: content.url
           ? `https://${content.url}`
-          : `${ParagraphBaseURL}/@${profileIdentity}/${content.slug}`,
+          : `${ParagraphBaseURL}/@${domain}/${content.slug}`,
         description: subStr(content.markdown),
         published: x.content_timestamp * 1000,
         body: content.markdown,
@@ -132,10 +130,10 @@ export async function GET(req: NextRequest) {
       if (!result.sites.some((x) => x.platform === ArticlePlatform.paragraph)) {
         result.sites.push({
           platform: ArticlePlatform.paragraph,
-          name: `${profileIdentity}'s Paragraph`,
+          name: `${domain}'s Paragraph`,
           description: "",
           image: "",
-          link: `${ParagraphBaseURL}/@${profileIdentity}`,
+          link: `${ParagraphBaseURL}/@${domain}`,
         });
       }
     }
