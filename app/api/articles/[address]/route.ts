@@ -51,6 +51,8 @@ export async function GET(req: NextRequest) {
     sites: new Array<ArticleSite>(),
     items: new Array<ArticleItem>(),
   };
+  let profileIdentity = domain;
+
   const emptyReturn = () => NextResponse.json(emptyResultStruct);
   let result = { ...emptyResultStruct };
   let rssArticles = {} as any;
@@ -87,10 +89,12 @@ export async function GET(req: NextRequest) {
   }
 
   const fireflyArticles = await fetchArticle(address, limit);
-  console.log(fireflyArticles,'kk')
-  const profile = await fetch(baseURL + "/ns/ens/" + address).then((res) =>
-    res.json()
-  );
+
+  if (!profileIdentity) {
+    profileIdentity = (await fetch(baseURL + "/ns/ens/" + address).then((res) =>
+      res.json()
+    )).identity;
+  }
 
   fireflyArticles?.data?.map((x: any) => {
     const content = JSON.parse(x.content_body);
@@ -98,7 +102,7 @@ export async function GET(req: NextRequest) {
       // mirror
       result.items.push({
         title: content.content.title,
-        link: `${MirrorBaseURL}/${profile.identity}/${x.original_id}`,
+        link: `${MirrorBaseURL}/${profileIdentity}/${x.original_id}`,
         description: subStr(content.content.body),
         published: x.content_timestamp * 1000,
         body: content.content.body,
@@ -107,10 +111,10 @@ export async function GET(req: NextRequest) {
       if (!result.sites.some((x) => x.platform === ArticlePlatform.mirror)) {
         result.sites.push({
           platform: ArticlePlatform.mirror,
-          name: `${profile.identity}'s Mirror`,
+          name: `${profileIdentity}'s Mirror`,
           description: "",
           image: "",
-          link: `${MirrorBaseURL}/${profile.identity}`,
+          link: `${MirrorBaseURL}/${profileIdentity}`,
         });
       }
     } else {
@@ -119,7 +123,7 @@ export async function GET(req: NextRequest) {
         title: content.title,
         link: content.url
           ? `https://${content.url}`
-          : `${ParagraphBaseURL}/@${profile.identity}/${content.slug}`,
+          : `${ParagraphBaseURL}/@${profileIdentity}/${content.slug}`,
         description: subStr(content.markdown),
         published: x.content_timestamp * 1000,
         body: content.markdown,
@@ -128,10 +132,10 @@ export async function GET(req: NextRequest) {
       if (!result.sites.some((x) => x.platform === ArticlePlatform.paragraph)) {
         result.sites.push({
           platform: ArticlePlatform.paragraph,
-          name: `${profile.identity}'s Paragraph`,
+          name: `${profileIdentity}'s Paragraph`,
           description: "",
           image: "",
-          link: `${ParagraphBaseURL}/@${profile.identity}`,
+          link: `${ParagraphBaseURL}/@${profileIdentity}`,
         });
       }
     }
