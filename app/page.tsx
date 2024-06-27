@@ -791,6 +791,7 @@ export default function Home() {
                 "handle": "vitalik.ca"
             }
         }
+        "social": {}
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -808,6 +809,11 @@ export default function Home() {
                 "link": "https://warpcast.com/vbuterin",
                 "handle": "vbuterin"
             }
+        },
+        "social": {
+             "uid": 5650,
+             "follower": 312547,
+             "following": 72
         }
     },
     {
@@ -825,6 +831,11 @@ export default function Home() {
                 "link": "https://www.lensfrens.xyz/vitalik",
                 "handle": "vitalik"
             }
+        },
+        "social": {
+            "uid": 100275,
+            "follower": 33500,
+            "following": 7
         }
     }
 ]`}
@@ -978,7 +989,8 @@ export default function Home() {
             "link": "https://vitalik.ca",
             "handle": "vitalik.ca"
         }
-    }
+    },
+    "social": {}
 }`}
                 <br />
                 <br />
@@ -1125,6 +1137,11 @@ export default function Home() {
             "link": "https://warpcast.com/dwr.eth",
             "handle": "dwr.eth"
         }
+    },
+    "social": {
+        "uid": 3,
+        "follower": 385189,
+        "following": 3111
     }
 }`}
                 <br />
@@ -1258,6 +1275,11 @@ export default function Home() {
             "link": "https://lens.xyz",
             "handle": "lens.xyz"
         }
+    },
+    "social": {
+        "uid": "5",
+        "follower": 92157,
+        "following": 1139
     }
 }`}
                 <br />
@@ -1413,6 +1435,11 @@ export default function Home() {
             "link": "https://www.youtube.com/@sandycarter3993",
             "handle": "@sandycarter3993"
         }
+    },
+    "social": {
+        "uid": "sandy.nft",
+        "follower": 137,
+        "following": 0
     }
 }`}
                 <br />
@@ -1539,7 +1566,8 @@ export default function Home() {
     "location": null,
     "header": null,
     "contenthash": null,
-    "links": {}
+    "links": {},
+    "social": {}
 }`}
                 <br />
                 <br />
@@ -1685,7 +1713,8 @@ export default function Home() {
             "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",  
             "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
         }
-    }
+    },
+    "social": {}
 }`}
                 <br />
                 <br />
