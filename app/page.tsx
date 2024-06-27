@@ -1277,7 +1277,7 @@ export default function Home() {
         }
     },
     "social": {
-        "uid": "5",
+        "uid": 5,
         "follower": 92157,
         "following": 1139
     }
