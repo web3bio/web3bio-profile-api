@@ -27,7 +27,6 @@ export const resolveENSHandleNS = async (handle: string) => {
     platform: PlatformType.ens,
     displayName: (await resolveENSTextValue(ensDomain, "name")) || ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
-
     description: (await resolveENSTextValue(ensDomain, "description")) || null,
   };
   return resJSON;
