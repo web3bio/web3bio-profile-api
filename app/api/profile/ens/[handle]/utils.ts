@@ -17,8 +17,9 @@ const client = createPublicClient({
     chain: mainnet,
     transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
   }) as any;
+  const theGraphKey = process.env.NEXT_PUBLIC_THEGRAPH_API_KEY;
   const ensSubGraphBaseURL =
-    "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
+    theGraphKey ? `https://gateway-arbitrum.network.thegraph.com/api/${theGraphKey}/subgraphs/id/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH` : "https://api.thegraph.com/subgraphs/name/ensdomains/ens";
   
   const commonQueryOptions = {
     method: "POST",

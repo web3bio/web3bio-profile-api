@@ -1416,7 +1416,7 @@ export default function Home() {
             "handle": "sandy.nft"
         },
         "twitter": {
-            "link": "https://twitter.com/Sandy_carter",
+            "link": "https://x.com/Sandy_carter",
             "handle": "Sandy_carter"
         },
         "discord": {
@@ -1694,7 +1694,7 @@ export default function Home() {
     "contenthash": "ipns://libp2p.io",
     "links": {
         "twitter": {
-            "link": "https://twitter.com/dotbitHQ",
+            "link": "https://x.com/dotbitHQ",
             "handle": "dotbitHQ"
         },
         "github": {
@@ -1776,7 +1776,7 @@ export default function Home() {
               feedback on the features or want to report a bug, please reach out
               to us on{" "}
               <a
-                href="https://twitter.com/web3bio"
+                href="https://x.com/web3bio"
                 target="_blank"
                 className="text-underline"
               >

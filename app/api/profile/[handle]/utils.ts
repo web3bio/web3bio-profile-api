@@ -100,6 +100,7 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+
   if (responseFromRelation?.errors)
     return {
       identity: handle,
@@ -125,6 +126,7 @@ export const resolveUniversalRespondFromRelation = async ({
       message: ErrorMessages.invalidResolved,
       platform,
     };
+
   return await Promise.allSettled([
     ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
       if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
