@@ -6,7 +6,7 @@ describe("Test For ENS Profile API", () => {
     const json = await res.json();
     expect(json.address).toBeTruthy();
     expect(json.links.twitter.handle).toBe("brantlymillegan");
-    expect(json.links.twitter.link).toBe("https://twitter.com/brantlymillegan");
+    expect(json.links.twitter.link).toBe("https://x.com/brantlymillegan");
     expect(json.links.discord.link).toBe("");
     expect(json.links.discord.handle).toBeTruthy()
     expect(res.status).toBe(200);

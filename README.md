@@ -29,4 +29,4 @@ yarn && yarn dev
 
 ## Contributing
 
-Feel free to submit a pull request to propose bug fixes and improvements. Your help is always appreciated. You may also give feature feedback or report bugs to [Web3.bio Twitter](https://twitter.com/web3bio) and [Telegram group](https://t.me/web3dotbio).
+Feel free to submit a pull request to propose bug fixes and improvements. Your help is always appreciated. You may also give feature feedback or report bugs to [Web3.bio Twitter](https://x.com/web3bio) and [Telegram group](https://t.me/web3dotbio).
