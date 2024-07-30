@@ -12,6 +12,7 @@ export const runtime = "edge";
 
 const MirrorBaseURL = "https://mirror.xyz";
 const ParagraphBaseURL = "https://paragraph.xyz";
+const { parse } = require("rss-to-json");
 
 const subStr = (str: string) => {
   return str.length > 100 ? str.substring(0, 80) + "..." : str;
@@ -93,7 +94,7 @@ export async function GET(req: NextRequest) {
   }
 
   const fireflyArticles = await fetchArticle(address, limit);
-
+  let paragraphUser = "";
   fireflyArticles?.data?.map((x: any) => {
     const content = JSON.parse(x.content_body);
     if (x.platform === 1) {
@@ -106,17 +107,17 @@ export async function GET(req: NextRequest) {
         body: content.content.body,
         platform: ArticlePlatform.mirror,
       });
-      if (!result.sites.some((x) => x.platform === ArticlePlatform.mirror)) {
-        result.sites.push({
-          platform: ArticlePlatform.mirror,
-          name: `${domain}'s Mirror`,
-          description: "",
-          image: "",
-          link: `${MirrorBaseURL}/${domain}`,
-        });
-      }
-    } else {
+    } else if (x.platform === 2) {
       // paragraph
+      if (content.url && !paragraphUser) {
+        if (content.url.includes("@")) {
+          paragraphUser = content.url.match(
+            /paragraph\.xyz\/@([a-zA-Z0-9_-]+)/
+          )[1];
+        } else {
+          paragraphUser = content.url.split("/")[0].split(".")[0];
+        }
+      }
       result.items.push({
         title: content.title,
         link: content.url
@@ -127,17 +128,33 @@ export async function GET(req: NextRequest) {
         body: content.markdown,
         platform: ArticlePlatform.paragraph,
       });
-      if (!result.sites.some((x) => x.platform === ArticlePlatform.paragraph)) {
-        result.sites.push({
-          platform: ArticlePlatform.paragraph,
-          name: `${domain}'s Paragraph`,
-          description: "",
-          image: "",
-          link: `${ParagraphBaseURL}/@${domain}`,
-        });
-      }
     }
   });
+
+  if (result.items.some((x) => x.platform === ArticlePlatform.mirror)) {
+    const siteJSON = await parse(`https://mirror.xyz/${domain}/feed/atom`);
+    if (siteJSON?.title) {
+      result.sites.push({
+        platform: ArticlePlatform.mirror,
+        name: siteJSON.title,
+        description: siteJSON.description,
+        image: siteJSON.image,
+        link: siteJSON.link,
+      });
+    }
+  }
+  if (result.items.some((x) => x.platform === ArticlePlatform.paragraph)) {
+    const siteJSON = await parse(
+      `https://paragraph.xyz/api/blogs/rss/@${paragraphUser || domain}`
+    );
+    result.sites.push({
+      platform: ArticlePlatform.paragraph,
+      name: siteJSON.title || `${domain}'s Mirror`,
+      description: siteJSON.description || "",
+      image: siteJSON.image || "",
+      link: siteJSON.link || `${ParagraphBaseURL}/@${paragraphUser}`,
+    });
+  }
   result.items = [
     ...result.items
       .sort((a: ArticleItem, b: ArticleItem) => {
