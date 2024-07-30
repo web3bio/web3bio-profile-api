@@ -148,7 +148,10 @@ export async function GET(req: NextRequest) {
     result.sites.push({
       platform: ArticlePlatform.paragraph,
       name: siteJSON.title || `${domain}'s Mirror`,
-      description: siteJSON.description || "",
+      description:
+        !siteJSON.description || siteJSON.description === "undefined"
+          ? ""
+          : siteJSON.description,
       image: siteJSON.image || "",
       link: siteJSON.link || `${ParagraphBaseURL}/@${paragraphUser}`,
     });
