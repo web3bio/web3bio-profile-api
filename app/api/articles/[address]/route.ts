@@ -133,15 +133,13 @@ export async function GET(req: NextRequest) {
 
   if (result.items.some((x) => x.platform === ArticlePlatform.mirror)) {
     const siteJSON = await parse(`https://mirror.xyz/${domain}/feed/atom`);
-    if (siteJSON?.title) {
-      result.sites.push({
-        platform: ArticlePlatform.mirror,
-        name: siteJSON.title,
-        description: siteJSON.description,
-        image: siteJSON.image,
-        link: siteJSON.link,
-      });
-    }
+    result.sites.push({
+      platform: ArticlePlatform.mirror,
+      name: siteJSON.title || `${domain}'s Mirror`,
+      description: siteJSON.description || "",
+      image: siteJSON.image || "",
+      link: siteJSON.link || `${MirrorBaseURL}/${domain}`,
+    });
   }
   if (result.items.some((x) => x.platform === ArticlePlatform.paragraph)) {
     const siteJSON = await parse(
