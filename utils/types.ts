@@ -88,8 +88,7 @@ export interface IdentityRecord {
   expiredAt: string;
 }
 
-export interface ArticleResponse {
-  sites: ArticleSite[]
+export interface ContenthashResponse extends ArticleSite {
   items: ArticleItem[];
 }
 export interface ArticleItem {
@@ -107,4 +106,5 @@ export interface ArticleSite{
   description: string,
   image:string,
   link:string,
+  title: string
 }
