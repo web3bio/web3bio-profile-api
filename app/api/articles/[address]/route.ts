@@ -43,8 +43,8 @@ const fetchArticle = async (address: string, limit: number) => {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ addresses: [address], limit }),
-  });
-  return response.json();
+  }).catch((e) => null);
+  return response ? response?.json() : [];
 };
 
 export async function GET(req: NextRequest) {
