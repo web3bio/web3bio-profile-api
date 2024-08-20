@@ -87,24 +87,3 @@ export interface IdentityRecord {
   reverse: boolean;
   expiredAt: string;
 }
-
-export interface ArticleResponse {
-  sites: ArticleSite[]
-  items: ArticleItem[];
-}
-export interface ArticleItem {
-  title: string;
-  description: string;
-  link: string;
-  published: number;
-  platform: string;
-  body: string;
-}
-
-export interface ArticleSite{
-  platform:string,
-  name:string,
-  description: string,
-  image:string,
-  link:string,
-}
