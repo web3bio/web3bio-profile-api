@@ -1,5 +1,9 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
-import { PlatformData, PlatformType } from "@/utils/platform";
+import {
+  PLATFORM_DATA,
+  PlatformType,
+  SocialPlatformMapping,
+} from "@/utils/platform";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { ErrorMessages } from "@/utils/types";
@@ -42,7 +46,7 @@ const resolveUDHandle = async (handle: string) => {
   if (metadata.socialAccounts) {
     UDSocialAccountsList.forEach((x) => {
       const item = metadata.socialAccounts[x];
-      if (item && item.location && PlatformData[x]) {
+      if (item && item.location && PLATFORM_DATA.get(x)) {
         const resolvedHandle = resolveHandle(item?.location, x);
         linksObj[x] = {
           link: getSocialMediaLink(resolvedHandle, x),

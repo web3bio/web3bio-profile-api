@@ -15,7 +15,7 @@ import {
   respondWithCache,
   isValidEthereumAddress,
 } from "@/utils/base";
-import { PlatformType, PlatformData } from "@/utils/platform";
+import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { ErrorMessages, LinksItem } from "@/utils/types";
 import { NextRequest } from "next/server";
@@ -79,7 +79,8 @@ export const resolveLensHandle = async (handle: string) => {
     const linksRecords = response.metadata.attributes;
     const linksToFetch = linksRecords.reduce(
       (pre: Array<any>, cur: { key: string }) => {
-        if (Object.keys(PlatformData).includes(cur.key)) pre.push(cur.key);
+        if (Array.from(PLATFORM_DATA.keys()).includes(cur.key as PlatformType))
+          pre.push(cur.key);
         return pre;
       },
       []
