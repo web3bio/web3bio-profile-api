@@ -122,7 +122,6 @@ export const resolveENSResponse = async (handle: string) => {
     }
 
     resolver = (await getENSProfile(ensDomain))?.[0];
-
     if (!resolver?.resolver && !address)
       throw new Error(ErrorMessages.invalidResolver, { cause: 404 });
     if (resolver?.message) throw new Error(resolver.message);
@@ -144,6 +143,7 @@ export const resolveENSHandle = async (handle: string) => {
     return earlyReturnJSON;
   }
   let linksObj = {};
+
   if (textRecords?.length > 0) {
     const linksToFetch = textRecords.reduce(
       (pre: Array<string>, cur: string) => {
