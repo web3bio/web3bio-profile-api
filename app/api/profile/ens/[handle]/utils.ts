@@ -10,10 +10,12 @@ import { regexEns } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { ErrorMessages } from "@/utils/types";
+
 const client = createPublicClient({
   chain: mainnet,
   transport: http(process.env.NEXT_PUBLIC_ETHEREUM_RPC_URL),
-}) as any;
+});
+
 const theGraphKey = process.env.NEXT_PUBLIC_THEGRAPH_API_KEY;
 const ensSubGraphBaseURL = theGraphKey
   ? `https://gateway-arbitrum.network.thegraph.com/api/${theGraphKey}/subgraphs/id/5XqPmWe6gjyrJtFn9cLy237i4cWw2j9HcUJEXsP5qGtH`
@@ -21,12 +23,10 @@ const ensSubGraphBaseURL = theGraphKey
 
 const commonQueryOptions = {
   method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
+  headers: { "Content-Type": "application/json" },
 };
 
-const ensRecordsDefaultOrShouldSkipText = [
+const ensRecordsDefaultOrShouldSkipText = new Set([
   "name",
   "email",
   "snapshot",
@@ -38,58 +38,50 @@ const ensRecordsDefaultOrShouldSkipText = [
   "keywords",
   "location",
   "banner",
-];
+]);
 
 const getENSRecordsQuery = `
-    query Profile($name: String) {
-      domains(where: { name: $name }) {
-        resolver {
-          texts
-          coinTypes
-          contentHash
-        }
+  query Profile($name: String) {
+    domains(where: { name: $name }) {
+      resolver {
+        texts
+        coinTypes
+        contentHash
       }
     }
-  `;
+  }
+`;
 
 export const resolveENSTextValue = async (name: string, text: string) => {
-  return await client.getEnsText({
-    name: name,
-    key: text,
-  });
+  return await client.getEnsText({ name, key: text });
 };
 
-const getHeaderTextValue = async (texts: string[], domain: string) => {
+const getHeaderTextValue = async (texts: string, domain: string) => {
   if (!texts?.length) return null;
-  if (texts.includes("header")) {
-    return resolveENSTextValue(domain, "header");
-  }
-  if (texts.includes("banner")) {
-    return resolveENSTextValue(domain, "banner");
-  }
-  return null;
+  const headerKey = texts.includes("header")
+    ? "header"
+    : texts.includes("banner")
+    ? "banner"
+    : null;
+  return headerKey ? resolveENSTextValue(domain, headerKey) : null;
 };
 
 export const resolveENSResponse = async (handle: string) => {
   let address = "";
   let ensDomain = "";
   let resolver = null;
+
   if (isValidEthereumAddress(handle)) {
-    if (!isValidEthereumAddress(handle))
-      throw new Error(ErrorMessages.invalidAddr, { cause: 404 });
     address = handle.toLowerCase();
     ensDomain =
-      (await client.getEnsName({
-        address,
-      })) || "";
-
-    resolver = (await getENSProfile(ensDomain))?.[0];
+      (await client.getEnsName({ address: address as `0x${string}` })) || "";
+    resolver = ensDomain ? (await getENSProfile(ensDomain))?.[0] : null;
 
     if (!ensDomain) {
       return {
         address,
         earlyReturnJSON: {
-          address: address,
+          address,
           identity: address,
           platform: PlatformType.ethereum,
           displayName: formatText(address),
@@ -105,16 +97,12 @@ export const resolveENSResponse = async (handle: string) => {
     }
   } else {
     if (!regexEns.test(handle))
-      throw Error(ErrorMessages.invalidIdentity, { cause: 404 });
+      throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
     ensDomain = handle;
     try {
-      address = await client
-        .getEnsAddress({
-          name: ensDomain,
-        })
-        .then((res: string) => res);
+      address = (await client.getEnsAddress({ name: ensDomain })) || "";
     } catch (e) {
-      console.log("error", e);
+      console.error("Error resolving ENS address:", e);
     }
 
     if (!address || !isValidEthereumAddress(address)) {
@@ -139,49 +127,13 @@ export const resolveENSResponse = async (handle: string) => {
 export const resolveENSHandle = async (handle: string) => {
   const { address, ensDomain, earlyReturnJSON, textRecords, contentHash } =
     await resolveENSResponse(handle);
-  if (earlyReturnJSON) {
-    return earlyReturnJSON;
-  }
-  let linksObj = {};
+  if (earlyReturnJSON) return earlyReturnJSON;
 
-  if (textRecords?.length > 0) {
-    const linksToFetch = textRecords.reduce(
-      (pre: Array<string>, cur: string) => {
-        if (!ensRecordsDefaultOrShouldSkipText.includes(cur)) pre.push(cur);
-        return pre;
-      },
-      []
-    );
+  const linksObj = await getLinks(textRecords, ensDomain);
+  const headerHandle = (await getHeaderTextValue(textRecords, ensDomain)) || "";
+  const avatarHandle = await resolveENSTextValue(ensDomain, "avatar");
 
-    const getLink = async () => {
-      const _linkRes: { [index: string]: any } = {};
-      for (let i = 0; i < linksToFetch.length; i++) {
-        const recordText = linksToFetch[i];
-        const key = Array.from(PLATFORM_DATA.keys()).find((o) => {
-          const item = PLATFORM_DATA.get(o);
-          return item?.ensText?.includes(recordText.toLowerCase());
-        });
-        if (key) {
-          const textValue = await resolveENSTextValue(ensDomain, recordText);
-          const handle = resolveHandle(textValue, key as PlatformType);
-          if (textValue && handle) {
-            const resolvedKey =
-              key === PlatformType.url ? PlatformType.website : key;
-            _linkRes[resolvedKey] = {
-              link: getSocialMediaLink(handle, resolvedKey),
-              handle: handle,
-            };
-          }
-        }
-      }
-      return _linkRes;
-    };
-    linksObj = await getLink();
-  }
-
-  const headerHandle = await getHeaderTextValue(textRecords, ensDomain);
-  const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
-  const resJSON = {
+  return {
     address: address.toLowerCase(),
     identity: ensDomain,
     platform: PlatformType.ens,
@@ -195,23 +147,49 @@ export const resolveENSHandle = async (handle: string) => {
     links: linksObj,
     social: {},
   };
-  return resJSON;
+};
+
+const getLinks = async (textRecords: string[], ensDomain: string) => {
+  if (!textRecords?.length) return {};
+
+  const linksToFetch = textRecords.filter(
+    (text) => !ensRecordsDefaultOrShouldSkipText.has(text)
+  );
+  const linkPromises = linksToFetch.map(async (recordText) => {
+    const key = Array.from(PLATFORM_DATA.keys()).find((k) =>
+      PLATFORM_DATA.get(k)?.ensText?.includes(recordText.toLowerCase())
+    );
+    if (!key) return null;
+
+    const textValue = (await resolveENSTextValue(ensDomain, recordText)) || "";
+    const handle = resolveHandle(textValue, key);
+    if (!textValue || !handle) return null;
+
+    const resolvedKey = key === PlatformType.url ? PlatformType.website : key;
+    return [
+      resolvedKey,
+      {
+        link: getSocialMediaLink(handle, resolvedKey),
+        handle,
+      },
+    ];
+  });
+
+  const resolvedLinks = await Promise.all(linkPromises);
+  return Object.fromEntries(resolvedLinks.filter(Boolean) as any);
 };
 
 export const getENSProfile = async (name: string) => {
   try {
-    const payload = {
-      query: getENSRecordsQuery,
-      variables: {
-        name,
-      },
-    };
-    const fetchRes = await fetch(ensSubGraphBaseURL, {
+    const payload = { query: getENSRecordsQuery, variables: { name } };
+    const response = await fetch(ensSubGraphBaseURL, {
       ...commonQueryOptions,
       body: JSON.stringify(payload),
-    }).then((res) => res.json());
-    if (fetchRes) return fetchRes.data?.domains || fetchRes.errors;
+    });
+    const fetchRes = await response.json();
+    return fetchRes.data?.domains || fetchRes.errors;
   } catch (e) {
+    console.error("Error fetching ENS profile:", e);
     return null;
   }
 };
