@@ -1,6 +1,6 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexFarcaster } from "@/utils/regexp";
+import { regexFarcaster } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveFarcasterResponse } from "../../../profile/farcaster/[handle]/utils";
 import { NextRequest } from "next/server";
@@ -40,10 +40,7 @@ export async function GET(req: NextRequest) {
 
   const regexFid = /fid:(\d*)/i;
 
-  if (
-    !regexFarcaster.test(lowercaseName) &&
-    !regexFid.test(lowercaseName)
-  )
+  if (!regexFarcaster.test(lowercaseName) && !regexFid.test(lowercaseName))
     return errorHandle({
       identity: lowercaseName,
       platform: PlatformType.farcaster,

@@ -95,7 +95,7 @@ export const resolveSNSHandle = async (handle: string) => {
       header: null,
       contenthash: null,
       links: {},
-      social:{}
+      social: {},
     };
   }
   const linksObj: Record<
@@ -121,7 +121,7 @@ export const resolveSNSHandle = async (handle: string) => {
     }
   }
 
-  const json = {
+  return {
     address,
     identity: domain,
     platform: PlatformType.sns,
@@ -134,5 +134,4 @@ export const resolveSNSHandle = async (handle: string) => {
     contenthash: await getSNSRecord(connection, domain, SNSRecord.IPFS),
     links: linksObj,
   };
-  return json;
 };
