@@ -5,13 +5,26 @@ import {
   resolveENSResponse,
   resolveENSTextValue,
 } from "@/app/api/profile/ens/[handle]/utils";
-export const resolveENSHandleNS = async (handle: string) => {
+
+interface ENSProfileData {
+  address: string;
+  identity: string;
+  platform: PlatformType;
+  displayName: string;
+  avatar: string | null;
+  description: string | null;
+}
+
+export const resolveENSHandleNS = async (
+  handle: string
+): Promise<ENSProfileData> => {
   const { address, ensDomain, earlyReturnJSON } = await resolveENSResponse(
     handle
   );
+
   if (earlyReturnJSON) {
     return {
-      address: address,
+      address,
       identity: address,
       platform: PlatformType.ethereum,
       displayName: formatText(address),
@@ -20,28 +33,33 @@ export const resolveENSHandleNS = async (handle: string) => {
     };
   }
 
-  const avatarHandle = (await resolveENSTextValue(ensDomain, "avatar")) || null;
-  const resJSON = {
+  const [avatarHandle, name, description] = await Promise.all([
+    resolveENSTextValue(ensDomain, "avatar"),
+    resolveENSTextValue(ensDomain, "name"),
+    resolveENSTextValue(ensDomain, "description"),
+  ]);
+
+  return {
     address: address.toLowerCase(),
     identity: ensDomain,
     platform: PlatformType.ens,
-    displayName: (await resolveENSTextValue(ensDomain, "name")) || ensDomain,
+    displayName: name || ensDomain,
     avatar: avatarHandle ? await resolveEipAssetURL(avatarHandle) : null,
-    description: (await resolveENSTextValue(ensDomain, "description")) || null,
+    description: description || null,
   };
-  return resJSON;
 };
 
 export const resolveENSRespondNS = async (handle: string) => {
   try {
     const json = await resolveENSHandleNS(handle);
     return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
+  } catch (e: unknown) {
+    const error = e as Error;
     return errorHandle({
       identity: handle,
       platform: PlatformType.ens,
-      code: e.cause || 500,
-      message: e.message,
+      code: (error as any).cause || 500,
+      message: error.message,
     });
   }
 };

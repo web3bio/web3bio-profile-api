@@ -82,7 +82,9 @@ export function resolveSocialMediaLink(
   }
 }
 
-export const resolveEipAssetURL = async (source: string) => {
+export const resolveEipAssetURL = async (
+  source: string
+): Promise<string | null> => {
   if (!source) return null;
   try {
     if (eipRegexp.test(source)) {
