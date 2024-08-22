@@ -22,7 +22,7 @@ const fetchDotbitProfile = async (path: string, payload: object) => {
   return data?.data;
 };
 
-const resolveDotbitResponse = async (handle: string) => {
+export const resolveDotbitResponse = async (handle: string) => {
   let domain, address;
   const isAddress = isValidEthereumAddress(handle);
 
