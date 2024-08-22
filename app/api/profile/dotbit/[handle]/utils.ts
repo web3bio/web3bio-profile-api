@@ -36,7 +36,11 @@ export const resolveDotbitResponse = async (handle: string) => {
   const path = isAddress ? "v1/reverse/record" : "v1/account/info";
   const res = await fetchDotbitProfile(path, payload);
 
-  if (!res || (!isAddress && !res.account_info)) {
+  if (
+    !res ||
+    (!isAddress && !res.account_info) ||
+    (isAddress && !res.account)
+  ) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 

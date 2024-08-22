@@ -72,6 +72,21 @@ const fetchAddressesWithFid = async (fid: string) => {
   );
 };
 
+const createLinksObj = (resolvedHandle: string | null) => {
+  return Object.fromEntries(
+    resolvedHandle
+      ? [
+          [
+            PlatformType.farcaster,
+            {
+              link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
+              handle: resolvedHandle,
+            },
+          ],
+        ]
+      : []
+  );
+};
 const resolveFarcasterLinks = (
   response: {
     username: string;
@@ -79,30 +94,17 @@ const resolveFarcasterLinks = (
   },
   resolvedHandle: string | null
 ) => {
-  const linksObj: {
-    [key in PlatformType.twitter | PlatformType.farcaster]?: {
-      link: string | null;
-      handle: string | null;
-    };
-  } = resolvedHandle
-    ? {
-        farcaster: {
-          link: getSocialMediaLink(resolvedHandle, PlatformType.farcaster),
-          handle: resolvedHandle,
-        },
-      }
-    : {};
+  const linksObj = createLinksObj(resolvedHandle);
   const bioText = response.profile.bio.text || "";
   const twitterMatch = bioText.match(regexTwitterLink);
   if (twitterMatch) {
     const matched = twitterMatch[1];
-    const resolveMatch = resolveHandle(matched, PlatformType.farcaster);
+    const resolveMatch = resolveHandle(matched, PlatformType.farcaster) || "";
     linksObj[PlatformType.twitter] = {
       link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
       handle: resolveMatch,
     };
   }
-
   return linksObj;
 };
 
@@ -150,7 +152,7 @@ export const resolveFarcasterHandle = async (handle: string) => {
   if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const resolvedHandle = resolveHandle(response.username);
   const links = resolveFarcasterLinks(response, resolvedHandle);
-  const resJSON = {
+  return {
     address: response.address || null,
     identity: response.username,
     platform: PlatformType.farcaster,
@@ -168,5 +170,4 @@ export const resolveFarcasterHandle = async (handle: string) => {
       following: response.followingCount,
     },
   };
-  return resJSON;
 };

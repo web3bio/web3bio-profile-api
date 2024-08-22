@@ -31,12 +31,6 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
 ];
 
-/**
- * Resolves the handle from the relation service.
- * @param {string} handle - The handle to resolve.
- * @param {PlatformType} [platform] - The platform type.
- * @returns {Promise<any>} - The resolved handle response or an error object.
- */
 async function resolveHandleFromRelationService(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!
@@ -60,13 +54,7 @@ async function resolveHandleFromRelationService(
     return { errors: e };
   }
 }
-/**
- * Sorts the profile responses by platform, putting the target platform first.
- * @param {ProfileAPIResponse[]} responses - The profile responses to sort.
- * @param {PlatformType} targetPlatform - The platform to prioritize.
- * @param {string} handle - The target handle.
- * @returns {ProfileAPIResponse[]} - The sorted profile responses.
- */
+
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[],
   targetPlatform: PlatformType,

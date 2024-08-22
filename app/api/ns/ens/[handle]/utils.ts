@@ -53,13 +53,12 @@ export const resolveENSRespondNS = async (handle: string) => {
   try {
     const json = await resolveENSHandleNS(handle);
     return respondWithCache(JSON.stringify(json));
-  } catch (e: unknown) {
-    const error = e as Error;
+  } catch (e: any) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.ens,
-      code: (error as any).cause || 500,
-      message: error.message,
+      code: e.cause || 500,
+      message: e.message,
     });
   }
 };
