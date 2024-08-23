@@ -5,8 +5,6 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveSNSHandleNS } from "./utils";
 
-const resolveSNSRespondNS = async (handle: string) => {};
-
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
