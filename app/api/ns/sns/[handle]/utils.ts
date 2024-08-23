@@ -30,7 +30,7 @@ export const resolveSNSHandleNS = async (handle: string) => {
       description: null,
     };
   }
-  const resJSON = {
+  return {
     address: address,
     identity: domain,
     platform: PlatformType.sns,
@@ -38,5 +38,4 @@ export const resolveSNSHandleNS = async (handle: string) => {
     avatar: await getSNSRecord(connection, domain, SNSRecord.Pic),
     description: await getSNSRecord(connection, domain, SNSRecord.TXT),
   };
-  return resJSON;
 };

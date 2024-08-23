@@ -5,53 +5,47 @@ import { ErrorMessages } from "@/utils/types";
 import { resolveFarcasterResponse } from "../../../profile/farcaster/[handle]/utils";
 import { NextRequest } from "next/server";
 
-const resolveFarcasterHandleNS = async (handle: string) => {
-  const response = await resolveFarcasterResponse(handle);
-  if (!response?.fid) throw new Error(ErrorMessages.notFound, { cause: 404 });
-  const resJSON = {
-    address: response.address || null,
-    identity: response.username,
-    platform: PlatformType.farcaster,
-    displayName: response.displayName || response.username,
-    avatar: response.pfp.url,
-    description: response.profile.bio.text || null,
-  };
-  return resJSON;
-};
+export const runtime = "edge";
+const regexFid = /fid:(\d*)/i;
+export async function GET(req: NextRequest) {
+  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
 
-const resolveFarcasterRespondNS = async (handle: string) => {
-  try {
-    const json = await resolveFarcasterHandleNS(handle);
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
+  if (!regexFarcaster.test(handle) && !regexFid.test(handle)) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.farcaster,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
-};
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
-
-  const regexFid = /fid:(\d*)/i;
-
-  if (!regexFarcaster.test(lowercaseName) && !regexFid.test(lowercaseName))
-    return errorHandle({
-      identity: lowercaseName,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+  }
 
-  const queryInput = lowercaseName.endsWith(".farcaster")
-    ? lowercaseName.replace(".farcaster", "")
-    : lowercaseName;
-  return resolveFarcasterRespondNS(queryInput);
+  const queryInput = handle.endsWith(".farcaster")
+    ? handle.replace(".farcaster", "")
+    : handle;
+
+  try {
+    const response = await resolveFarcasterResponse(queryInput);
+
+    if (!response?.fid) {
+      throw new Error(ErrorMessages.notFound, { cause: 404 });
+    }
+
+    const json = {
+      address: response.address || null,
+      identity: response.username,
+      platform: PlatformType.farcaster,
+      displayName: response.displayName || response.username,
+      avatar: response.pfp.url,
+      description: response.profile.bio.text || null,
+    };
+
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: queryInput,
+      platform: PlatformType.farcaster,
+      code: e.cause || 404,
+      message: e.message || ErrorMessages.notFound,
+    });
+  }
 }
-
-export const runtime = "edge";

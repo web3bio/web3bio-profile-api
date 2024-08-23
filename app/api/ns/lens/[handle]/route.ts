@@ -7,33 +7,44 @@ import { resolveEipAssetURL } from "@/utils/resolver";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-const resolveLensHandleNS = async (handle: string) => {
-  const response = await resolveLensResponse(handle);
-  if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
-  const avatarUri =
-    response.metadata?.picture?.raw?.uri ||
-    response.metadata?.picture?.optimized?.uri ||
-    (await resolveEipAssetURL(
-      `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
-        response.id?.slice(2),
-        16
-      )}`
-    ));
-  const resJSON = {
-    address: response.ownedBy?.address?.toLowerCase(),
-    identity: response.handle.localName + ".lens",
-    platform: PlatformType.lens,
-    displayName:
-      response.metadata?.displayName || response.handle.localName + ".lens",
-    avatar: (await resolveEipAssetURL(avatarUri)) || null,
-    description: response.metadata?.bio || null,
-  };
-  return resJSON;
-};
+export const runtime = "edge";
 
-const resolveLensRespond = async (handle: string) => {
+export async function GET(req: NextRequest) {
+  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
+
+  if (!regexLens.test(handle) && !regexEth.test(handle)) {
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.lens,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  }
+
   try {
-    const json = await resolveLensHandleNS(handle);
+    const response = await resolveLensResponse(handle);
+    if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
+
+    const avatarUri =
+      response.metadata?.picture?.raw?.uri ||
+      response.metadata?.picture?.optimized?.uri ||
+      (await resolveEipAssetURL(
+        `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
+          response.id?.slice(2),
+          16
+        )}`
+      ));
+
+    const json = {
+      address: response.ownedBy?.address?.toLowerCase(),
+      identity: response.handle.localName + ".lens",
+      platform: PlatformType.lens,
+      displayName:
+        response.metadata?.displayName || response.handle.localName + ".lens",
+      avatar: (await resolveEipAssetURL(avatarUri)) || null,
+      description: response.metadata?.bio || null,
+    };
+
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
@@ -43,21 +54,4 @@ const resolveLensRespond = async (handle: string) => {
       message: e.message,
     });
   }
-};
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
-
-  if (!regexLens.test(lowercaseName) && !regexEth.test(lowercaseName))
-    return errorHandle({
-      identity: lowercaseName,
-      platform: PlatformType.lens,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-  return resolveLensRespond(lowercaseName);
 }
-
-export const runtime = "edge";
