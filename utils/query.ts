@@ -1,4 +1,4 @@
-import { PLATFORMS_TO_EXCLUDE } from "@/app/api/profile/[handle]/utils";
+import { PLATFORMS_TO_EXCLUDE } from "./base";
 import { PlatformType } from "./platform";
 import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 

@@ -5,7 +5,17 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveSNSHandle } from "./utils";
 
-const resolveSNSRespond = async (handle: string) => {
+export async function GET(req: NextRequest) {
+  const { searchParams } = new URL(req.url as string);
+  const handle = searchParams.get("handle");
+  if ((!regexSns.test(handle!) && !regexSolana.test(handle!)) || !handle)
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.sns,
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+
   try {
     const json = await resolveSNSHandle(handle);
     return respondWithCache(JSON.stringify(json));
@@ -17,22 +27,5 @@ const resolveSNSRespond = async (handle: string) => {
       message: e.message,
     });
   }
-};
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url as string);
-  const inputName = searchParams.get("handle");
-  if (
-    (!regexSns.test(inputName!) && !regexSolana.test(inputName!)) ||
-    !inputName
-  )
-    return errorHandle({
-      identity: inputName,
-      platform: PlatformType.sns,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-
-  return resolveSNSRespond(inputName);
 }
 export const runtime = "edge";

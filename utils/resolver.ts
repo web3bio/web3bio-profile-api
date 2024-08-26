@@ -1,12 +1,11 @@
-import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
+import { ArweaveAssetPrefix, SIMPLE_HASH_URL } from "./base";
+import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 import * as contentHash from "@ensdomains/content-hash";
+import { regexDomain, regexEIP } from "./regexp";
 
-const ArweaveAssetPrefix = "https://arweave.net/";
-const eipRegexp = /^eip155:(\d+)\/(erc1155|erc721):(.*)\/(.*)$/;
-const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
 export const resolveMediaURL = (url: string): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https:")) return url;
@@ -39,7 +38,7 @@ export const resolveHandle = (
     handle = handle.slice(0, -5);
   }
 
-  if (domainRegexp.test(handle)) {
+  if (regexDomain.test(handle)) {
     const parts = handle.split("/");
     return (
       handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
@@ -85,7 +84,7 @@ export const resolveEipAssetURL = async (
 ): Promise<string | null> => {
   if (!source) return null;
 
-  const match = source.match(eipRegexp);
+  const match = source.match(regexEIP);
   if (match) {
     const [full, chainId, protocol, contractAddress, tokenId] = match;
     const network = chainIdToNetwork(chainId);

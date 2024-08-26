@@ -1,4 +1,5 @@
 import {
+  PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
   handleSearchPlatform,
@@ -10,12 +11,6 @@ import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
-
-export const PLATFORMS_TO_EXCLUDE = [
-  PlatformType.dotbit,
-  PlatformType.sns,
-  PlatformType.solana,
-];
 
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id/

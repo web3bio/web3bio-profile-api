@@ -87,3 +87,8 @@ export interface IdentityRecord {
   reverse: boolean;
   expiredAt: string;
 }
+
+export const enum LensParamType {
+  domain = "domain",
+  address = "address",
+}

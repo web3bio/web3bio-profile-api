@@ -1,6 +1,9 @@
 import { resolveLensResponse } from "@/app/api/profile/lens/[handle]/route";
-import { errorHandle, respondWithCache } from "@/utils/base";
-import { LensProtocolProfileCollectionAddress } from "@/utils/lens";
+import {
+  LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS,
+  errorHandle,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { resolveEipAssetURL } from "@/utils/resolver";
@@ -29,7 +32,7 @@ export async function GET(req: NextRequest) {
       response.metadata?.picture?.raw?.uri ||
       response.metadata?.picture?.optimized?.uri ||
       (await resolveEipAssetURL(
-        `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
+        `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${parseInt(
           response.id?.slice(2),
           16
         )}`
