@@ -1,4 +1,4 @@
-import { platformsToExclude } from "@/app/api/profile/[handle]/utils";
+import { PLATFORMS_TO_EXCLUDE } from "./base";
 import { PlatformType } from "./platform";
 import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
@@ -45,7 +45,7 @@ export const primaryDomainResolvedRequestArray = (
       platform: resolvedRecord.platform,
       reverse: false,
     };
-    if (platformsToExclude.includes(platform)) {
+    if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
       return [defaultReturn];
     }
     if (

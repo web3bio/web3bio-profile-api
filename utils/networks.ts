@@ -1,4 +1,4 @@
-export enum Network {
+enum Network {
   ethereum = "ethereum",
   binance_smart_chain = "binance_smart_chain",
   base = "base",
@@ -21,11 +21,13 @@ export enum Network {
   zora = "zora",
   mastodon = "mastodon",
   lens = "lens",
+  linea = "linea",
   snapshot = "snapshot",
   erc1577 = "erc1577",
+  solana = "solana",
 }
 
-export interface NetworkMetaData {
+interface NetworkMetaData {
   key: string;
   chainId?: number;
   icon: string;
@@ -33,9 +35,11 @@ export interface NetworkMetaData {
   primaryColor: string;
   bgColor: string;
   scanPrefix: string;
+  scanLabel?: string;
+  short?: string;
 }
 
-export const NetworkData: { [key in Network]: NetworkMetaData } = {
+const NETWORK_DATA: { [key in Network]: NetworkMetaData } = {
   [Network.ethereum]: {
     key: Network.ethereum,
     chainId: 1,
@@ -43,7 +47,9 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     label: "Ethereum",
     primaryColor: "#3741ba",
     bgColor: "#ebecf8",
-    scanPrefix: "https://etherscan.io/",
+    scanPrefix: "https://etherscan.io/address/",
+    scanLabel: "Etherscan.io",
+    short: "eth",
   },
   [Network.polygon]: {
     key: Network.polygon,
@@ -53,6 +59,7 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     primaryColor: "#7a4add",
     bgColor: "#ece5fa",
     scanPrefix: "https://polygonscan.com/",
+    short: "matic",
   },
   [Network.avalanche]: {
     key: Network.avalanche,
@@ -79,6 +86,7 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     primaryColor: "#2949d4",
     bgColor: "#eaedfb",
     scanPrefix: "https://arbiscan.io/",
+    short: "arb",
   },
   [Network.arbitrum_one]: {
     key: Network.arbitrum_one,
@@ -88,6 +96,7 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     primaryColor: "#2949d4",
     bgColor: "#eaedfb",
     scanPrefix: "https://arbiscan.io/",
+    short: "arb",
   },
   [Network.arbitrum_nova]: {
     key: Network.arbitrum_nova,
@@ -97,6 +106,7 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     primaryColor: "#ee7c31",
     bgColor: "#fdf2ea",
     scanPrefix: "https://nova.arbiscan.io/",
+    short: "arb",
   },
   [Network.arweave]: {
     key: Network.arweave,
@@ -114,12 +124,14 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     primaryColor: "#f0b90b",
     bgColor: "#fdf3d4",
     scanPrefix: "https://bscscan.com/",
+    short: "bsc",
   },
   [Network.base]: {
     key: Network.base,
     chainId: 8453,
     icon: "icons/icon-base.svg",
     label: "Base",
+    short: "base",
     primaryColor: "#2151f5",
     bgColor: "#e9eefe",
     scanPrefix: "https://basescan.org/",
@@ -169,6 +181,7 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
   },
   [Network.optimism]: {
     key: Network.optimism,
+    short: "op",
     chainId: 10,
     icon: "icons/icon-optimism.svg",
     label: "Optimism",
@@ -203,11 +216,22 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     bgColor: "#f1e7db",
     scanPrefix: "https://scrollscan.com/",
   },
+  [Network.solana]: {
+    key: Network.solana,
+    chainId: 534352,
+    primaryColor: "#9945FF",
+    icon: "icons/icon-solana.svg",
+    label: "Solana",
+    bgColor: "#ffffff",
+    scanPrefix: "https://solscan.io/account/",
+    scanLabel: "Solscan.io",
+  },
   [Network.zora]: {
     key: Network.zora,
     chainId: 7777777,
     icon: "icons/icon-zora.svg",
     label: "Zora",
+    short: "zora",
     primaryColor: "#141414",
     bgColor: "#efefef",
     scanPrefix: "https://explorer.zora.energy/",
@@ -229,6 +253,14 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
     bgColor: "#d9f1dc",
     scanPrefix: "https://momoka.lens.xyz/",
   },
+  [Network.linea]: {
+    key: Network.linea,
+    icon: "icons/icon-linea.svg",
+    label: "Linea",
+    primaryColor: "#000000",
+    bgColor: "#efefef",
+    scanPrefix: "https://lineascan.build/",
+  },
   [Network.snapshot]: {
     key: Network.snapshot,
     icon: "icons/icon-snapshot.svg",
@@ -247,11 +279,23 @@ export const NetworkData: { [key in Network]: NetworkMetaData } = {
   },
 };
 
-export const chainIdToNetwork = (chainId?: number | string) => {
+const NetworksMap = new Map(Object.values(NETWORK_DATA).map((x) => [x.key, x]));
+
+const networkByIdOrName = (id: number, name?: string) => {
+  for (const [key, value] of NetworksMap) {
+    if (value.chainId === id || [key, value.short].includes(name)) {
+      return value;
+    }
+  }
+  return null;
+};
+
+export const chainIdToNetwork = (
+  chainId?: number | string,
+  useShort?: boolean
+) => {
   if (!chainId) return null;
   return (
-    Object.values(NetworkData).find(
-      (x) => x.chainId && x.chainId === Number(chainId)
-    )?.key || null
+    networkByIdOrName(Number(chainId))?.[useShort ? "short" : "key"] || null
   );
 };

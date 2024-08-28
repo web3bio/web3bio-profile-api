@@ -3,21 +3,18 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import {
-  LensGraphQLEndpoint,
-  LensParamType,
-  LensProtocolProfileCollectionAddress,
-  getLensProfileQuery,
-} from "@/utils/lens";
+import { getLensProfileQuery } from "@/utils/lens";
 import { isAddress } from "viem";
 import {
   errorHandle,
   respondWithCache,
   isValidEthereumAddress,
+  LENS_GRAPHQL_ENDPOINT,
+  LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS,
 } from "@/utils/base";
-import { PlatformType, PlatformData } from "@/utils/platform";
+import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
-import { ErrorMessages, LinksItem } from "@/utils/types";
+import { ErrorMessages, LensParamType, LinksItem } from "@/utils/types";
 import { NextRequest } from "next/server";
 
 export const getLensProfile = async (handle: string, type: LensParamType) => {
@@ -30,7 +27,7 @@ export const getLensProfile = async (handle: string, type: LensParamType) => {
       query,
       variables,
     };
-    const fetchRes = await fetch(LensGraphQLEndpoint, {
+    const fetchRes = await fetch(LENS_GRAPHQL_ENDPOINT, {
       method: "POST",
       body: JSON.stringify(payload),
       headers: {
@@ -79,7 +76,8 @@ export const resolveLensHandle = async (handle: string) => {
     const linksRecords = response.metadata.attributes;
     const linksToFetch = linksRecords.reduce(
       (pre: Array<any>, cur: { key: string }) => {
-        if (Object.keys(PlatformData).includes(cur.key)) pre.push(cur.key);
+        if (Array.from(PLATFORM_DATA.keys()).includes(cur.key as PlatformType))
+          pre.push(cur.key);
         return pre;
       },
       []
@@ -114,7 +112,7 @@ export const resolveLensHandle = async (handle: string) => {
     response.metadata?.picture?.raw?.uri ||
     response.metadata?.picture?.optimized?.uri ||
     (await resolveEipAssetURL(
-      `eip155:137/erc721:${LensProtocolProfileCollectionAddress}/${parseInt(
+      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${parseInt(
         response.id?.slice(2),
         16
       )}`

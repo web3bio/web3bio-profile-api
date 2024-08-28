@@ -1,4 +1,5 @@
 import {
+  PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
   handleSearchPlatform,
@@ -11,80 +12,90 @@ import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-export const platformsToExclude = [
-  PlatformType.dotbit,
-  PlatformType.sns,
-  PlatformType.solana,
-];
-
-const nextidGraphQLEndpoint =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
-  "https://relation-service-tiger.next.id";
 // staging
 // const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
+const NEXTID_GRAPHQL_ENDPOINT =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
+  "https://relation-service-tiger.next.id";
 
-const resolveHandleFromRelationService = (
+const DEFAULT_PLATFORM_ORDER = [
+  PlatformType.ens,
+  PlatformType.farcaster,
+  PlatformType.lens,
+  PlatformType.unstoppableDomains,
+  PlatformType.ethereum,
+];
+
+async function resolveHandleFromRelationService(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!
-) => {
-  return fetch(nextidGraphQLEndpoint, {
-    method: "POST",
-    headers: {
-      "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
-    },
-    body: JSON.stringify({
-      query: GET_PROFILES,
-      variables: {
-        platform,
-        identity: handle,
+): Promise<any> {
+  try {
+    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
       },
-    }),
-  })
-    .then((res) => res.json())
-    .catch((e) => ({
-      error: e,
-    }));
-};
-const sortByPlatform = (
-  arr: Array<ProfileAPIResponse>,
-  platform: PlatformType,
+      body: JSON.stringify({
+        query: GET_PROFILES,
+        variables: {
+          platform,
+          identity: handle,
+        },
+      }),
+    });
+    return await response.json();
+  } catch (e) {
+    return { errors: e };
+  }
+}
+
+function sortProfilesByPlatform(
+  responses: ProfileAPIResponse[],
+  targetPlatform: PlatformType,
   handle: string
-) => {
-  const defaultOrder = [
-    PlatformType.ens,
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.unstoppableDomains,
-    PlatformType.ethereum,
-  ];
+): ProfileAPIResponse[] {
+  const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
+    ? [
+        targetPlatform,
+        ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
+      ]
+    : DEFAULT_PLATFORM_ORDER;
 
-  const order = defaultOrder.includes(platform)
-    ? [platform, ...defaultOrder.filter((x) => x !== platform)]
-    : defaultOrder;
+  const sortedResponses = responses.reduce(
+    (acc, response) => {
+      const { platform, identity } = response;
+      const index = order.indexOf(platform as PlatformType);
+      if (index === 0) {
+        acc.first.push(response);
+      } else if (index === 1) {
+        acc.second.push(response);
+      } else if (index === 2) {
+        acc.third.push(response);
+      } else if (index === 3) {
+        acc.fourth.push(response);
+      } else if (index === 4) {
+        acc.fifth.push(response);
+      }
+      return acc;
+    },
+    {
+      first: new Array(responses.find((x) => x.identity === handle)),
+      second: new Array(),
+      third: new Array(),
+      fourth: new Array(),
+      fifth: new Array(),
+    }
+  );
 
-  const first: Array<ProfileAPIResponse> = [];
-  const second: Array<ProfileAPIResponse> = [];
-  const third: Array<ProfileAPIResponse> = [];
-  const forth: Array<ProfileAPIResponse> = [];
-  const fifth: Array<ProfileAPIResponse> = [];
-
-  arr.map((x) => {
-    if (x.platform === order[0]) first.push(x);
-    if (x.platform === order[1]) second.push(x);
-    if (x.platform === order[2]) third.push(x);
-    if (x.platform === order[3]) forth.push(x);
-    if (x.platform === order[4]) fifth.push(x);
-  });
   return [
-    first.find((x) => x.identity === handle),
-    ...first?.filter((x) => x.identity !== handle),
-  ]
-    .concat(second)
-    .concat(third)
-    .concat(forth)
-    .concat(fifth)
-    .filter((x) => !!x);
-};
+    ...sortedResponses.first,
+    ...sortedResponses.second,
+    ...sortedResponses.third,
+    ...sortedResponses.fourth,
+    ...sortedResponses.fifth,
+  ].filter(Boolean);
+}
 export const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
@@ -149,15 +160,15 @@ export const resolveUniversalRespondFromRelation = async ({
           (response) =>
             (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
         );
-      const returnRes = platformsToExclude.includes(platform)
+      const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
         ? responsesToSort
-        : sortByPlatform(responsesToSort, platform, handle);
+        : sortProfilesByPlatform(responsesToSort, platform, handle);
 
       if (
         platform === PlatformType.ethereum &&
         !returnRes.some((x) => x?.address === handle)
       ) {
-        returnRes.unshift(responsesToSort.find((x) => x?.address === handle));
+        returnRes.unshift(responsesToSort.find((x) => x?.address === handle)!);
       }
       if (!returnRes?.length && platform === PlatformType.ethereum) {
         const nsObj = {

@@ -17,9 +17,20 @@ import {
 import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
 
+export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
+  "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
+export const LENS_GRAPHQL_ENDPOINT = "https://api-v2.lens.dev/";
+export const ArweaveAssetPrefix = "https://arweave.net/";
+export const SIMPLE_HASH_URL = "https://simplehash-proxy.r2d2.to";
 export const baseURL = process.env.NEXT_PUBLIC_VERCEL_URL
   ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
   : "http://localhost:3000";
+
+export const PLATFORMS_TO_EXCLUDE = [
+  PlatformType.dotbit,
+  PlatformType.sns,
+  PlatformType.solana,
+];
 
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
