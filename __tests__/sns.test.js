@@ -1,7 +1,7 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Solana Profile API", () => {
-  it("It should response 200 for bonfida.bit", async () => {
+  it("It should response 200 for bonfida.sol", async () => {
     const res = await queryClient("/profile/sns/bonfida.sol");
     expect(res.status).toBe(200);
     const json = await res.json();

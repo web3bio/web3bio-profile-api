@@ -37,6 +37,7 @@ export enum PlatformType {
   reddit = "reddit",
   github = "github",
   unstoppableDomains = "unstoppabledomains",
+  basenames = "basenames",
   ckb = "ckb",
   farcaster = "farcaster",
   space_id = "space_id",
@@ -240,6 +241,16 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-unstoppabledomains.svg",
       label: "Unstoppable Domains",
       registerlink: "https://unstoppabledomains.com/search?searchTerm=",
+      system: PlatformSystem.web3,
+    },
+  ],
+  [
+    PlatformType.basenames,
+    {
+      color: "#0052ff",
+      icon: "icons/icon-base.svg",
+      label: "Basenames",
+      registerlink: "https://www.base.org/name/",
       system: PlatformSystem.web3,
     },
   ],
@@ -952,7 +963,7 @@ export const PLATFORM_DATA: ReadonlyMap<
 ]);
 
 export const SocialPlatformMapping = (
-  platform: PlatformType
+  platform: PlatformType,
 ): Readonly<SocialPlatform> => {
   return (
     PLATFORM_DATA.get(platform) || { ...DEFAULT_PLATFORM, label: platform }
