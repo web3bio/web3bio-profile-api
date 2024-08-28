@@ -5,36 +5,32 @@ import { ErrorMessages } from "@/utils/types";
 import { resolveDotbitResponse } from "@/app/api/profile/dotbit/[handle]/utils";
 import { NextRequest } from "next/server";
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
+export const runtime = "edge";
 
-  if (!regexDotbit.test(lowercaseName) && !regexEth.test(lowercaseName))
+export async function GET(req: NextRequest) {
+  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
+
+  if (!regexDotbit.test(handle) && !regexEth.test(handle)) {
     return errorHandle({
-      identity: lowercaseName,
+      identity: handle,
       platform: PlatformType.dotbit,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveDotbitRespond(lowercaseName);
-}
+  }
 
-const resolveDotbitHandleNS = async (handle: string) => {
-  const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
-  return {
-    address,
-    identity: domain,
-    platform: PlatformType.dotbit,
-    displayName: domain || null,
-    avatar: recordsMap.get("profile.avatar")?.value || null,
-    description: recordsMap.get("profile.description")?.value || null,
-  };
-};
-
-const resolveDotbitRespond = async (handle: string) => {
   try {
-    const json = await resolveDotbitHandleNS(handle);
+    const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
+
+    const json = {
+      address,
+      identity: domain,
+      platform: PlatformType.dotbit,
+      displayName: domain || null,
+      avatar: recordsMap.get("profile.avatar")?.value || null,
+      description: recordsMap.get("profile.description")?.value || null,
+    };
+
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
@@ -44,6 +40,4 @@ const resolveDotbitRespond = async (handle: string) => {
       message: e.message,
     });
   }
-};
-
-export const runtime = "edge";
+}

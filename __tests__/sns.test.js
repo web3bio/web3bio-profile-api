@@ -1,7 +1,7 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Solana Profile API", () => {
-  it("It should response 200 for bonfida.bit", async () => {
+  it("It should response 200 for bonfida.sol", async () => {
     const res = await queryClient("/profile/sns/bonfida.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -20,7 +20,7 @@ describe("Test For Solana Profile API", () => {
     const json = await res.json();
     expect(json.address).toBeTruthy();
     expect(json.email).toBe("test@gmail.com");
-    expect(json.links.twitter.handle).toBe("bonfida1");
+    expect(json.links.website.handle).toBe("www.sns.id");
   });
   it("It should response 200 for 0x33.sol", async () => {
     const res = await queryClient("/profile/sns/0x33.sol");

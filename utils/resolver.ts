@@ -1,130 +1,125 @@
-import { SIMPLE_HASH_URL, _fetcher } from "./fetcher";
+import { ArweaveAssetPrefix, SIMPLE_HASH_URL } from "./base";
+import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 import * as contentHash from "@ensdomains/content-hash";
+import { regexDomain, regexEIP } from "./regexp";
 
-const ArweaveAssetPrefix = "https://arweave.net/";
-const eipRegexp = /^eip155:(\d+)\/(erc1155|erc721):(.*)\/(.*)$/;
-const domainRegexp = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/;
-
-export const resolveMediaURL = (url: string) => {
+export const resolveMediaURL = (url: string): string | null => {
   if (!url) return null;
-  switch (!!url) {
-    case url.startsWith("data:") || url.startsWith("https:"):
-      return url;
-    case url.startsWith("ar://"):
-      return url.replaceAll("ar://", ArweaveAssetPrefix);
-    case url.startsWith("ipfs://") || isIPFS_Resource(url):
-      return resolveIPFS_URL(url);
-    default:
-      return url;
-  }
+  if (url.startsWith("data:") || url.startsWith("https:")) return url;
+  if (url.startsWith("ar://")) return url.replace("ar://", ArweaveAssetPrefix);
+  if (url.startsWith("ipfs://") || isIPFS_Resource(url))
+    return resolveIPFS_URL(url);
+  return url;
 };
 
-export const resolveHandle = (handle: string, platform?: PlatformType) => {
+export const resolveHandle = (
+  handle: string,
+  platform?: PlatformType
+): string | null => {
   if (!handle) return null;
-  let handleToResolve = handle;
-  if (platform === PlatformType.website)
-    return handle.replace(/http(s?):\/\//g, "").replace(/\/$/g, "");
-  if (platform === PlatformType.youtube)
-    return handle.match(/@(.*?)(?=[\/]|$)/)?.[0] || "";
+
+  if (platform === PlatformType.website) {
+    return handle.replace(/^https?:\/\//i, "").replace(/\/$/g, "");
+  }
+
+  if (platform === PlatformType.youtube) {
+    const match = handle.match(/@(.*?)(?=[\/]|$)/);
+    return match ? match[0] : "";
+  }
+
   if (
     platform &&
     [PlatformType.lens, PlatformType.hey].includes(platform) &&
     handle.endsWith(".lens")
-  )
-    handleToResolve = handle.replace(".lens", "");
-  if (domainRegexp.test(handleToResolve)) {
-    const arr = handleToResolve.split("/");
-    return (
-      handleToResolve.endsWith("/") ? arr[arr.length - 2] : arr[arr.length - 1]
-    ).replaceAll("@", "");
+  ) {
+    handle = handle.slice(0, -5);
   }
 
-  return handleToResolve.replaceAll("@", "");
+  if (regexDomain.test(handle)) {
+    const parts = handle.split("/");
+    return (
+      handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
+    ).replace(/@/g, "");
+  }
+
+  return handle.replace(/@/g, "");
 };
 
 export const getSocialMediaLink = (
   url: string | null,
   type: PlatformType | string
-) => {
-  let resolvedURL = "";
+): string | null => {
   if (!url) return null;
-  if (url.startsWith("https")) {
-    resolvedURL = url;
-  } else {
-    resolvedURL = resolveSocialMediaLink(url, type);
-  }
-
-  return resolvedURL;
+  return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
 };
 
 export function resolveSocialMediaLink(
   name: string,
   type: PlatformType | string
-) {
-  if (!Object.keys(PlatformType).includes(type))
+): string {
+  if (!Object.prototype.hasOwnProperty.call(PlatformType, type)) {
     return `https://web3.bio/?s=${name}`;
+  }
+
   switch (type) {
     case PlatformType.url:
-      return `${name}`;
+      return name;
     case PlatformType.website:
       return `https://${name}`;
     case PlatformType.discord:
-      if (name.includes("https://"))
-        return SocialPlatformMapping(type).urlPrefix + name;
-      return "";
-    default:
-      return SocialPlatformMapping(type as PlatformType).urlPrefix
-        ? SocialPlatformMapping(type as PlatformType).urlPrefix + name
+      return name.includes("https://")
+        ? SocialPlatformMapping(type).urlPrefix + name
         : "";
+    default:
+      const prefix = SocialPlatformMapping(type as PlatformType).urlPrefix;
+      return prefix ? prefix + name : "";
   }
 }
 
-export const resolveEipAssetURL = async (source: string) => {
+export const resolveEipAssetURL = async (
+  source: string
+): Promise<string | null> => {
   if (!source) return null;
-  try {
-    if (eipRegexp.test(source)) {
-      const match = source.match(eipRegexp);
-      const chainId = match?.[1];
-      const contractAddress = match?.[3];
-      const tokenId = match?.[4];
-      const network = chainIdToNetwork(chainId);
 
-      if (contractAddress && tokenId && network) {
-        const fetchURL =
-          SIMPLE_HASH_URL +
-          `/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
+  const match = source.match(regexEIP);
+  if (match) {
+    const [full, chainId, protocol, contractAddress, tokenId] = match;
+    const network = chainIdToNetwork(chainId);
+
+    if (contractAddress && tokenId && network) {
+      try {
+        const fetchURL = `${SIMPLE_HASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
         const res = await _fetcher(fetchURL);
-
-        if (res || res.nft_id) {
+        if (res?.nft_id) {
           return resolveMediaURL(
             res.image_url || res.previews?.image_large_url
           );
         }
+      } catch (e) {
+        console.error("Error fetching NFT data:", e);
       }
     }
-    return resolveMediaURL(source);
-  } catch (e) {
-    return null;
   }
+
+  return resolveMediaURL(source);
 };
 
 export const decodeContenthash = (encoded: string) => {
-  let decoded;
   if (
     !encoded ||
     ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
   ) {
     return null;
   }
-  const codec = contentHash.getCodec(encoded);
-  const decodedId = contentHash.decode(encoded);
+
   try {
-    decoded = `${codec}://${decodedId}`;
+    const codec = contentHash.getCodec(encoded);
+    const decodedId = contentHash.decode(encoded);
+    return `${codec}://${decodedId}`;
   } catch (e) {
-    decoded = null;
+    return null;
   }
-  return decoded;
 };
