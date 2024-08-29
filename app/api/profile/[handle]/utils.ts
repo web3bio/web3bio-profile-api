@@ -12,8 +12,6 @@ import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-// staging
-// const nextidGraphQLEndpoint='https://relation-service.nextnext.id/
 const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
@@ -64,38 +62,21 @@ function sortProfilesByPlatform(
 
   const sortedResponses = responses.reduce(
     (acc, response) => {
-      const { platform, identity } = response;
+      const { platform } = response;
       const index = order.indexOf(platform as PlatformType);
-      if (index === 0) {
-        acc.first.push(response);
-      } else if (index === 1) {
-        acc.second.push(response);
-      } else if (index === 2) {
-        acc.third.push(response);
-      } else if (index === 3) {
-        acc.fourth.push(response);
-      } else if (index === 4) {
-        acc.fifth.push(response);
+      if (index >= 0 && index < 5) {
+        acc[index].push(response);
       }
       return acc;
     },
-    {
-      first: new Array(responses.find((x) => x.identity === handle)),
-      second: new Array(),
-      third: new Array(),
-      fourth: new Array(),
-      fifth: new Array(),
-    }
+    Array.from({ length: 5 }, (_, i) =>
+      i === 0 ? [responses.find((x) => x.identity === handle)] : []
+    )
   );
 
-  return [
-    ...sortedResponses.first,
-    ...sortedResponses.second,
-    ...sortedResponses.third,
-    ...sortedResponses.fourth,
-    ...sortedResponses.fifth,
-  ].filter(Boolean);
+  return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
 }
+
 export const resolveUniversalRespondFromRelation = async ({
   platform,
   handle,
@@ -119,16 +100,12 @@ export const resolveUniversalRespondFromRelation = async ({
       message: responseFromRelation?.errors[0]?.message,
       code: 500,
     };
+
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
     handle,
     platform
-  ).sort((a, b) => {
-    if (a.reverse && b.reverse) return 0;
-    if (a.reverse && !b.reverse) return -1;
-    if (!a.reverse && b.reverse) return 1;
-    return 0;
-  });
+  ).sort((a, b) => (a.reverse === b.reverse ? 0 : a.reverse ? -1 : 1));
 
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return {
@@ -138,16 +115,16 @@ export const resolveUniversalRespondFromRelation = async ({
       platform,
     };
 
-  return await Promise.allSettled([
-    ...resolvedRequestArray.map((x: { platform: string; identity: string }) => {
+  return await Promise.allSettled(
+    resolvedRequestArray.map((x) => {
       if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
         const fetchURL = `${req.nextUrl.origin}/${
           ns ? "ns" : "profile"
         }/${x.platform.toLowerCase()}/${x.identity}`;
         return fetch(fetchURL).then((res) => res.json());
       }
-    }),
-  ])
+    })
+  )
     .then((responses) => {
       const responsesToSort = responses
         .filter(
@@ -156,10 +133,8 @@ export const resolveUniversalRespondFromRelation = async ({
             response.value?.identity &&
             !response.value?.error
         )
-        .map(
-          (response) =>
-            (response as PromiseFulfilledResult<ProfileAPIResponse>)?.value
-        );
+        .map((response) => (response as PromiseFulfilledResult<any>).value);
+
       const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
         ? responsesToSort
         : sortProfilesByPlatform(responsesToSort, platform, handle);
@@ -170,7 +145,8 @@ export const resolveUniversalRespondFromRelation = async ({
       ) {
         returnRes.unshift(responsesToSort.find((x) => x?.address === handle)!);
       }
-      if (!returnRes?.length && platform === PlatformType.ethereum) {
+
+      if (!returnRes.length && platform === PlatformType.ethereum) {
         const nsObj = {
           address: handle,
           identity: handle,
@@ -191,18 +167,21 @@ export const resolveUniversalRespondFromRelation = async ({
               }) as ProfileAPIResponse
         );
       }
+
       const uniqRes = returnRes.reduce((pre, cur) => {
         if (
           cur &&
           !pre.find(
-            (x) => x.platform === cur.platform && x.identity === cur.identity
+            (x: ProfileAPIResponse) =>
+              x.platform === cur.platform && x.identity === cur.identity
           )
         ) {
           pre.push(cur);
         }
         return pre;
       }, [] as ProfileAPIResponse[]);
-      return uniqRes?.filter((x) => !x?.error)?.length
+
+      return uniqRes.filter((x: ProfileAPIResponse) => !x?.error).length
         ? uniqRes
         : {
             identity: handle,
@@ -211,14 +190,12 @@ export const resolveUniversalRespondFromRelation = async ({
             platform,
           };
     })
-    .catch((error) => {
-      return {
-        identity: handle,
-        code: 500,
-        message: error,
-        platform,
-      };
-    });
+    .catch((error) => ({
+      identity: handle,
+      code: 500,
+      message: error,
+      platform,
+    }));
 };
 
 export const resolveUniversalHandle = async (
@@ -230,6 +207,7 @@ export const resolveUniversalHandle = async (
   const handleToQuery = handle.endsWith(".farcaster")
     ? handle.substring(0, handle.length - 10)
     : handle;
+
   if (!handleToQuery || !platform)
     return errorHandle({
       identity: handle,
@@ -237,6 +215,7 @@ export const resolveUniversalHandle = async (
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+
   if (
     platform === PlatformType.ethereum &&
     !isValidEthereumAddress(handleToQuery)
@@ -247,12 +226,14 @@ export const resolveUniversalHandle = async (
       code: 404,
       message: ErrorMessages.invalidAddr,
     });
+
   const res = (await resolveUniversalRespondFromRelation({
     platform,
     handle: handleToQuery,
     req,
     ns,
   })) as any;
+
   if (res.message) {
     return errorHandle({
       identity: res.identity,
