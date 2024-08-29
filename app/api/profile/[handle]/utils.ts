@@ -26,7 +26,7 @@ const DEFAULT_PLATFORM_ORDER = [
 
 async function resolveHandleFromRelationService(
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)!,
+  platform: PlatformType = handleSearchPlatform(handle)!
 ): Promise<any> {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
@@ -51,7 +51,7 @@ async function resolveHandleFromRelationService(
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[],
   targetPlatform: PlatformType,
-  handle: string,
+  handle: string
 ): ProfileAPIResponse[] {
   const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
     ? [
@@ -70,11 +70,11 @@ function sortProfilesByPlatform(
       return acc;
     },
     Array.from({ length: 5 }, (_, i) =>
-      i === 0 ? [responses.find((x) => x.identity === handle)] : [],
-    ),
+      i === 0 ? [responses.find((x) => x.identity === handle)] : []
+    )
   );
 
-  return sortedResponses.flat().filter(Boolean);
+  return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
 }
 
 export const resolveUniversalRespondFromRelation = async ({
@@ -90,7 +90,7 @@ export const resolveUniversalRespondFromRelation = async ({
 }) => {
   const responseFromRelation = await resolveHandleFromRelationService(
     handle,
-    platform,
+    platform
   );
 
   if (responseFromRelation?.errors)
@@ -104,7 +104,7 @@ export const resolveUniversalRespondFromRelation = async ({
   const resolvedRequestArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
     handle,
-    platform,
+    platform
   ).sort((a, b) => (a.reverse === b.reverse ? 0 : a.reverse ? -1 : 1));
 
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
@@ -123,7 +123,7 @@ export const resolveUniversalRespondFromRelation = async ({
         }/${x.platform.toLowerCase()}/${x.identity}`;
         return fetch(fetchURL).then((res) => res.json());
       }
-    }),
+    })
   )
     .then((responses) => {
       const responsesToSort = responses
@@ -131,9 +131,9 @@ export const resolveUniversalRespondFromRelation = async ({
           (response) =>
             response.status === "fulfilled" &&
             response.value?.identity &&
-            !response.value?.error,
+            !response.value?.error
         )
-        .map((response) => response.value);
+        .map((response) => (response as PromiseFulfilledResult<any>).value);
 
       const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
         ? responsesToSort
@@ -164,7 +164,7 @@ export const resolveUniversalRespondFromRelation = async ({
                 location: null,
                 header: null,
                 links: {},
-              }) as ProfileAPIResponse,
+              }) as ProfileAPIResponse
         );
       }
 
@@ -172,7 +172,8 @@ export const resolveUniversalRespondFromRelation = async ({
         if (
           cur &&
           !pre.find(
-            (x) => x.platform === cur.platform && x.identity === cur.identity,
+            (x: ProfileAPIResponse) =>
+              x.platform === cur.platform && x.identity === cur.identity
           )
         ) {
           pre.push(cur);
@@ -180,7 +181,7 @@ export const resolveUniversalRespondFromRelation = async ({
         return pre;
       }, [] as ProfileAPIResponse[]);
 
-      return uniqRes.filter((x) => !x?.error).length
+      return uniqRes.filter((x: ProfileAPIResponse) => !x?.error).length
         ? uniqRes
         : {
             identity: handle,
@@ -201,7 +202,7 @@ export const resolveUniversalHandle = async (
   handle: string,
   req: NextRequest,
   platform: PlatformType,
-  ns?: boolean,
+  ns?: boolean
 ) => {
   const handleToQuery = handle.endsWith(".farcaster")
     ? handle.substring(0, handle.length - 10)
