@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
-
-const baseURL =
-  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
+import { BASE_URL } from "../utils/base";
 
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity Resolver";
@@ -10,7 +8,7 @@ export async function generateMetadata() {
     "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Farcaster, Lens Protocol, Unstoppable Domains, Solana Name Service, and Next.ID into their applications.";
 
   return {
-    metadataBase: new URL(baseURL),
+    metadataBase: new URL(BASE_URL),
     robots: "index, follow",
     title,
     description,
@@ -649,7 +647,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -664,7 +662,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -691,14 +689,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${baseURL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  href={`${BASE_URL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
                   target="_blank"
                 >
                   /profile/0xd8da...6045
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  href={`${BASE_URL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
                   target="_blank"
                 >
                   /ns/0xd8da...6045
@@ -706,58 +704,58 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
-                <a href={`${baseURL}/profile/vitalik.eth`} target="_blank">
+                <a href={`${BASE_URL}/profile/vitalik.eth`} target="_blank">
                   /profile/vitalik.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/vitalik.eth`} target="_blank">
+                <a href={`${BASE_URL}/ns/vitalik.eth`} target="_blank">
                   /ns/vitalik.eth
                 </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
                 <a
-                  href={`${baseURL}/profile/dwr.eth.farcaster`}
+                  href={`${BASE_URL}/profile/dwr.eth.farcaster`}
                   target="_blank"
                 >
                   /profile/dwr.eth.farcaster
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/dwr.eth.farcaster`} target="_blank">
+                <a href={`${BASE_URL}/ns/dwr.eth.farcaster`} target="_blank">
                   /ns/dwr.eth.farcaster
                 </a>
               </li>
               <li>
                 <span className="label">Lens</span>{" "}
-                <a href={`${baseURL}/profile/stani.lens`} target="_blank">
+                <a href={`${BASE_URL}/profile/stani.lens`} target="_blank">
                   /profile/stani.lens
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/stani.lens`} target="_blank">
+                <a href={`${BASE_URL}/ns/stani.lens`} target="_blank">
                   /ns/stani.lens
                 </a>
               </li>
               <li>
                 <span className="label">Unstoppable Domains</span>{" "}
-                <a href={`${baseURL}/profile/sandy.nft`} target="_blank">
+                <a href={`${BASE_URL}/profile/sandy.nft`} target="_blank">
                   /profile/sandy.nft
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/sandy.nft`} target="_blank">
+                <a href={`${BASE_URL}/ns/sandy.nft`} target="_blank">
                   /ns/sandy.nft
                 </a>
               </li>
               <li>
                 <span className="label">Next.ID</span>{" "}
                 <a
-                  href={`${baseURL}/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
+                  href={`${BASE_URL}/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
                   target="_blank"
                 >
                   /profile/0x028f......3e50
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
+                  href={`${BASE_URL}/ns/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
                   target="_blank"
                 >
                   /ns/0x028f......3e50
@@ -769,9 +767,9 @@ export default function Home() {
             </h3>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/vitalik.eth`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/vitalik.eth`}</span>
                 <br />
                 {`[
     {
@@ -841,9 +839,9 @@ export default function Home() {
 ]`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/vitalik.eth`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/vitalik.eth`}</span>
                 <br />
                 {`[
     {
@@ -892,7 +890,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -909,7 +907,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -936,14 +934,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${baseURL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  href={`${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
                   target="_blank"
                 >
                   profile/ens/0xd8da...6045
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  href={`${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
                   target="_blank"
                 >
                   /ns/ens/0xd8da...6045
@@ -951,11 +949,11 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
-                <a href={`${baseURL}/profile/ens/vitalik.eth`} target="_blank">
+                <a href={`${BASE_URL}/profile/ens/vitalik.eth`} target="_blank">
                   /profile/ens/vitalik.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/ens/vitalik.eth`} target="_blank">
+                <a href={`${BASE_URL}/ns/ens/vitalik.eth`} target="_blank">
                   /ns/ens/vitalik.eth
                 </a>
               </li>
@@ -966,11 +964,11 @@ export default function Home() {
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">
-                  {`// ${baseURL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
+                  {`// ${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
                 </span>
                 <br />
                 <span className="text-gray">
-                  {`// ${baseURL}/profile/ens/vitalik.eth`}{" "}
+                  {`// ${BASE_URL}/profile/ens/vitalik.eth`}{" "}
                 </span>
                 <br />
                 {`{
@@ -995,11 +993,11 @@ export default function Home() {
                 <br />
                 <br />
                 <span className="text-gray">
-                  {`// ${baseURL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
+                  {`// ${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
                 </span>
                 <br />
                 <span className="text-gray">
-                  {`// ${baseURL}/ns/ens/vitalik.eth`}{" "}
+                  {`// ${BASE_URL}/ns/ens/vitalik.eth`}{" "}
                 </span>
                 <br />
                 {`{
@@ -1031,7 +1029,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1048,7 +1046,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1076,14 +1074,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${baseURL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  href={`${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
                   target="_blank"
                 >
                   /profile/farcaster/0x8fc5...a2ea
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  href={`${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
                   target="_blank"
                 >
                   /ns/farcaster/0x8fc5...a2ea
@@ -1092,34 +1090,34 @@ export default function Home() {
               <li>
                 <span className="label">Farcaster</span>{" "}
                 <a
-                  href={`${baseURL}/profile/farcaster/dwr.eth`}
+                  href={`${BASE_URL}/profile/farcaster/dwr.eth`}
                   target="_blank"
                 >
                   /profile/farcaster/dwr.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/farcaster/dwr.eth`} target="_blank">
+                <a href={`${BASE_URL}/ns/farcaster/dwr.eth`} target="_blank">
                   /ns/farcaster/dwr.eth
                 </a>
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
-                <a href={`${baseURL}/profile/farcaster/fid:3`} target="_blank">
+                <a href={`${BASE_URL}/profile/farcaster/fid:3`} target="_blank">
                   /profile/farcaster/fid:3
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/farcaster/fid:3`} target="_blank">
+                <a href={`${BASE_URL}/ns/farcaster/fid:3`} target="_blank">
                   /ns/farcaster/fid:3
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/farcaster/dwr.eth`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/farcaster/fid:3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid:3`}</span>
                 <br />
                 {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
@@ -1146,11 +1144,11 @@ export default function Home() {
 }`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/farcaster/dwr.eth`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/farcaster/fid:3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid:3`}</span>
                 <br />
                 {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
@@ -1181,7 +1179,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1198,7 +1196,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1225,14 +1223,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum / Polygon</span>{" "}
                 <a
-                  href={`${baseURL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  href={`${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
                   target="_blank"
                 >
                   /profile/lens/0x7241...9dff
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  href={`${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
                   target="_blank"
                 >
                   /ns/lens/0x7241...9dff
@@ -1240,20 +1238,20 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Lens</span>{" "}
-                <a href={`${baseURL}/profile/lens/stani.lens`} target="_blank">
+                <a href={`${BASE_URL}/profile/lens/stani.lens`} target="_blank">
                   /profile/lens/stani.lens
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/lens/stani.lens`} target="_blank">
+                <a href={`${BASE_URL}/ns/lens/stani.lens`} target="_blank">
                   /ns/lens/stani.lens
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/lens/stani.lens`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
@@ -1284,9 +1282,9 @@ export default function Home() {
 }`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/lens/stani.lens`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
@@ -1319,7 +1317,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1336,7 +1334,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1363,14 +1361,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${baseURL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
+                  href={`${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
                   target="_blank"
                 >
                   /profile/unstoppabledomains/0x94ef...ab23
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
+                  href={`${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
                   target="_blank"
                 >
                   /ns/unstoppabledomains/0x94ef...ab23
@@ -1379,14 +1377,14 @@ export default function Home() {
               <li>
                 <span className="label">Unstoppable Domains</span>{" "}
                 <a
-                  href={`${baseURL}/profile/unstoppabledomains/sandy.nft`}
+                  href={`${BASE_URL}/profile/unstoppabledomains/sandy.nft`}
                   target="_blank"
                 >
                   /profile/unstoppabledomains/sandy.nft
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/unstoppabledomains/sandy.nft`}
+                  href={`${BASE_URL}/ns/unstoppabledomains/sandy.nft`}
                   target="_blank"
                 >
                   /ns/unstoppabledomains/sandy.nft
@@ -1395,9 +1393,9 @@ export default function Home() {
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/unstoppabledomains/sandy.nft`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/sandy.nft`}</span>
                 <br />
                 {`{
     "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
@@ -1444,9 +1442,9 @@ export default function Home() {
 }`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/unstoppabledomains/sandy.nft`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/sandy.nft`}</span>
                 <br />
                 {`{
     "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
@@ -1479,7 +1477,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1496,7 +1494,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1522,14 +1520,14 @@ export default function Home() {
               <li>
                 <span className="label">Solana</span>{" "}
                 <a
-                  href={`${baseURL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
+                  href={`${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
                   target="_blank"
                 >
                   /profile/solana/HKKp49qGWXd6...
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
+                  href={`${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
                   target="_blank"
                 >
                   /ns/solana/HKKp49qGWXd6...
@@ -1538,22 +1536,22 @@ export default function Home() {
               <li>
                 <span className="label">Solana Name Service</span>{" "}
                 <a
-                  href={`${baseURL}/profile/solana/bonfida.sol`}
+                  href={`${BASE_URL}/profile/solana/bonfida.sol`}
                   target="_blank"
                 >
                   /profile/solana/bonfida.sol
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/solana/bonfida.sol`} target="_blank">
+                <a href={`${BASE_URL}/ns/solana/bonfida.sol`} target="_blank">
                   /ns/solana/bonfida.sol
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/solana/bonfida.sol`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/solana/bonfida.sol`}</span>
                 <br />
                 {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
@@ -1571,9 +1569,9 @@ export default function Home() {
 }`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/solana/bonfida.sol`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/solana/bonfida.sol`}</span>
                 <br />
                 {`{
     "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
@@ -1604,7 +1602,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1621,7 +1619,7 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">
-                  <span className="text-gray hide-sm">{baseURL}</span>
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
@@ -1648,14 +1646,14 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${baseURL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
+                  href={`${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
                   target="_blank"
                 >
                   /profile/dotbit/0xfa8f...7f1d
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${baseURL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
+                  href={`${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
                   target="_blank"
                 >
                   /ns/dotbit/0xfa8f...7f1d
@@ -1664,22 +1662,22 @@ export default function Home() {
               <li>
                 <span className="label">.bit</span>{" "}
                 <a
-                  href={`${baseURL}/profile/dotbit/bestcase.bit`}
+                  href={`${BASE_URL}/profile/dotbit/bestcase.bit`}
                   target="_blank"
                 >
                   /profile/dotbit/bestcase.bit
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${baseURL}/ns/dotbit/bestcase.bit`} target="_blank">
+                <a href={`${BASE_URL}/ns/dotbit/bestcase.bit`} target="_blank">
                   /ns/dotbit/bestcase.bit
                 </a>
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/profile/dotbit/bestcase.bit`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/bestcase.bit`}</span>
                 <br />
                 {`{
     "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
@@ -1698,7 +1696,7 @@ export default function Home() {
             "handle": "dotbitHQ"
         },
         "github": {
-            "link": "https://github.com/dotbitHQ", 
+            "link": "https://github.com/dotbitHQ",
             "handle": "dotbitHQ"
         },
         "discord": {
@@ -1706,11 +1704,11 @@ export default function Home() {
             "handle": "did"
         },
         "website": {
-            "link": "https://www.did.id/",  
+            "link": "https://www.did.id/",
             "handle": "www.did.id"
         },
         "nostr": {
-            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",  
+            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
             "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
         }
     },
@@ -1718,9 +1716,9 @@ export default function Home() {
 }`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
                 <br />
-                <span className="text-gray">{`// ${baseURL}/ns/dotbit/bestcase.bit`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/bestcase.bit`}</span>
                 <br />
                 {`{
     "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
@@ -1752,7 +1750,7 @@ export default function Home() {
             </p>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${baseURL}/profile/web3bio_example.eth`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/web3bio_example.eth`}</span>
                 <br />
                 {`{
     "address": null,
@@ -1907,7 +1905,7 @@ export default function Home() {
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
- 
+
           gtag('config', 'G-DNMXB1P85W');
         `}
       </Script>

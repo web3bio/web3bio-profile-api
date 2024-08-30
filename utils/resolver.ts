@@ -1,4 +1,4 @@
-import { ArweaveAssetPrefix, SIMPLE_HASH_URL } from "./base";
+import { ARWEAVE_ASSET_PREFIX, SIMPLEHASH_URL } from "./base";
 import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
@@ -9,15 +9,16 @@ import { regexDomain, regexEIP } from "./regexp";
 export const resolveMediaURL = (url: string): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https:")) return url;
-  if (url.startsWith("ar://")) return url.replace("ar://", ArweaveAssetPrefix);
+  if (url.startsWith("ar://"))
+    return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
-    return resolveIPFS_URL(url);
+    return resolveIPFS_URL(url) || url;
   return url;
 };
 
 export const resolveHandle = (
   handle: string,
-  platform?: PlatformType
+  platform?: PlatformType,
 ): string | null => {
   if (!handle) return null;
 
@@ -50,7 +51,7 @@ export const resolveHandle = (
 
 export const getSocialMediaLink = (
   url: string | null,
-  type: PlatformType | string
+  type: PlatformType | string,
 ): string | null => {
   if (!url) return null;
   return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
@@ -58,7 +59,7 @@ export const getSocialMediaLink = (
 
 export function resolveSocialMediaLink(
   name: string,
-  type: PlatformType | string
+  type: PlatformType | string,
 ): string {
   if (!Object.prototype.hasOwnProperty.call(PlatformType, type)) {
     return `https://web3.bio/?s=${name}`;
@@ -80,7 +81,7 @@ export function resolveSocialMediaLink(
 }
 
 export const resolveEipAssetURL = async (
-  source: string
+  source: string,
 ): Promise<string | null> => {
   if (!source) return null;
 
@@ -91,11 +92,11 @@ export const resolveEipAssetURL = async (
 
     if (contractAddress && tokenId && network) {
       try {
-        const fetchURL = `${SIMPLE_HASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
+        const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
         const res = await _fetcher(fetchURL);
         if (res?.nft_id) {
           return resolveMediaURL(
-            res.image_url || res.previews?.image_large_url
+            res.image_url || res.previews?.image_large_url,
           );
         }
       } catch (e) {
