@@ -12,7 +12,7 @@ export const resolveMediaURL = (url: string): string | null => {
   if (url.startsWith("ar://"))
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
-    return resolveIPFS_URL(url);
+    return resolveIPFS_URL(url) || url;
   return url;
 };
 
