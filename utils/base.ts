@@ -20,11 +20,10 @@ import { NextResponse } from "next/server";
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
 export const LENS_GRAPHQL_ENDPOINT = "https://api-v2.lens.dev/";
-export const ArweaveAssetPrefix = "https://arweave.net/";
-export const SIMPLE_HASH_URL = "https://simplehash-proxy.r2d2.to";
-export const baseURL = process.env.NEXT_PUBLIC_VERCEL_URL
-  ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
-  : "http://localhost:3000";
+export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
+export const SIMPLEHASH_URL = "https://simplehash-proxy.r2d2.to";
+export const BASE_URL =
+  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
 export const PLATFORMS_TO_EXCLUDE = [
   PlatformType.dotbit,
@@ -47,12 +46,12 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    }
+    },
   );
 };
 export const respondWithCache = (
   json: string,
-  headers?: { [index: string]: string }
+  headers?: { [index: string]: string },
 ) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
@@ -73,12 +72,12 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars
+      string.length - chars,
     )}`;
   } else {
     if (string.length > len) {
       return `${string.substring(0, chars + 1)}...${string.substring(
-        string.length - (chars + 1)
+        string.length - (chars + 1),
       )}`;
     }
   }

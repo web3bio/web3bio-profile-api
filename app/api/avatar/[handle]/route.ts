@@ -1,5 +1,5 @@
 import {
-  baseURL,
+  BASE_URL,
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
@@ -28,8 +28,8 @@ export async function GET(req: NextRequest) {
         return respondWithSVG(name, 240);
       }
       if (rawAvatarUrl?.includes(".webp")) {
-        avatarURL = `${baseURL}/avatar/process?url=${encodeURIComponent(
-          rawAvatarUrl
+        avatarURL = `${BASE_URL}/avatar/process?url=${encodeURIComponent(
+          rawAvatarUrl,
         )}`;
       }
       try {
