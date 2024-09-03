@@ -46,12 +46,12 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    },
+    }
   );
 };
 export const respondWithCache = (
   json: string,
-  headers?: { [index: string]: string },
+  headers?: { [index: string]: string }
 ) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
@@ -72,12 +72,12 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars,
+      string.length - chars
     )}`;
   } else {
     if (string.length > len) {
       return `${string.substring(0, chars + 1)}...${string.substring(
-        string.length - (chars + 1),
+        string.length - (chars + 1)
       )}`;
     }
   }
@@ -137,5 +137,28 @@ export const handleSearchPlatform = (term: string) => {
       return PlatformType.farcaster;
     default:
       return PlatformType.nextid;
+  }
+};
+
+export const prettify = (input: string) => {
+  switch (!!input) {
+    case input.endsWith(".farcaster") || input.endsWith(".fcast.id"):
+      return input.replace(".farcaster", "").replace(".fcast.id", "");
+    case input.endsWith(".base.eth"):
+      return input.replace(".eth", "");
+    default:
+      return input;
+  }
+};
+
+export const uglify = (input: string, platform: PlatformType) => {
+  // checkout fcast.id
+  switch (platform) {
+    case PlatformType.basenames:
+      return input.endsWith(".base") ? `${input}.eth` : `${input}.base.eth`;
+    case PlatformType.farcaster:
+      return `${input}.farcaster`;
+    default:
+      return input;
   }
 };

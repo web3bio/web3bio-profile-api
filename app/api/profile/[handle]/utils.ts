@@ -4,6 +4,7 @@ import {
   formatText,
   handleSearchPlatform,
   isValidEthereumAddress,
+  prettify,
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/base";
@@ -204,9 +205,7 @@ export const resolveUniversalHandle = async (
   platform: PlatformType,
   ns?: boolean
 ) => {
-  const handleToQuery = handle.endsWith(".farcaster")
-    ? handle.substring(0, handle.length - 10)
-    : handle;
+  const handleToQuery = prettify(handle);
 
   if (!handleToQuery || !platform)
     return errorHandle({
