@@ -71,7 +71,13 @@ function sortProfilesByPlatform(
       return acc;
     },
     Array.from({ length: 5 }, (_, i) =>
-      i === 0 ? [responses.find((x) => x.identity === handle)] : []
+      i === 0
+        ? [
+            responses.find(
+              (x) => x.identity === handle && x.platform === targetPlatform
+            ),
+          ]
+        : []
     )
   );
 
