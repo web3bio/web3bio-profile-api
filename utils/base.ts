@@ -141,23 +141,24 @@ export const handleSearchPlatform = (term: string) => {
 };
 
 export const prettify = (input: string) => {
+  if (!input) return "";
   switch (!!input) {
     case input.endsWith(".farcaster") || input.endsWith(".fcast.id"):
       return input.replace(".farcaster", "").replace(".fcast.id", "");
-    case input.endsWith(".base.eth"):
-      return input.replace(".eth", "");
+    case input.endsWith(".base.eth") || input.endsWith(".base"):
+      return input.split(".")[0] + ".base.eth";
     default:
       return input;
   }
 };
 
 export const uglify = (input: string, platform: PlatformType) => {
-  // checkout fcast.id
+  if (!input) return "";
   switch (platform) {
     case PlatformType.basenames:
       return input.endsWith(".base") ? `${input}.eth` : `${input}.base.eth`;
     case PlatformType.farcaster:
-      return `${input}.farcaster`;
+      return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:
       return input;
   }
