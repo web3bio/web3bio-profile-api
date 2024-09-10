@@ -4,6 +4,7 @@ import {
   formatText,
   handleSearchPlatform,
   isValidEthereumAddress,
+  prettify,
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/base";
@@ -70,7 +71,13 @@ function sortProfilesByPlatform(
       return acc;
     },
     Array.from({ length: 5 }, (_, i) =>
-      i === 0 ? [responses.find((x) => x.identity === handle)] : []
+      i === 0
+        ? [
+            responses.find(
+              (x) => x.identity === handle && x.platform === targetPlatform
+            ),
+          ]
+        : []
     )
   );
 
@@ -204,9 +211,7 @@ export const resolveUniversalHandle = async (
   platform: PlatformType,
   ns?: boolean
 ) => {
-  const handleToQuery = handle.endsWith(".farcaster")
-    ? handle.substring(0, handle.length - 10)
-    : handle;
+  const handleToQuery = prettify(handle);
 
   if (!handleToQuery || !platform)
     return errorHandle({

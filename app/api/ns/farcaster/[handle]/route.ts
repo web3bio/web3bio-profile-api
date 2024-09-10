@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, prettify, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexFarcaster } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -19,9 +19,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const queryInput = handle.endsWith(".farcaster")
-    ? handle.replace(".farcaster", "")
-    : handle;
+  const queryInput = prettify(handle);
 
   try {
     const response = await resolveFarcasterResponse(queryInput);
