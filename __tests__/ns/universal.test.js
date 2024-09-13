@@ -56,7 +56,6 @@ describe("Test For Universal NS API", () => {
     const res = await queryClient("/ns/luc.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    console.log(json,'kkk')
     expect(
       json.filter(
         (x) =>
