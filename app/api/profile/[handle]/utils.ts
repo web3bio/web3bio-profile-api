@@ -112,7 +112,13 @@ export const resolveUniversalRespondFromRelation = async ({
     responseFromRelation,
     handle,
     platform
-  ).sort((a, b) => (a.reverse === b.reverse ? 0 : a.reverse ? -1 : 1));
+  )
+    .filter(
+      (x) =>
+        x.platform !== PlatformType.unstoppableDomains ||
+        !x.identity.endsWith(".eth")
+    )
+    .sort((a, b) => (a.reverse === b.reverse ? 0 : a.reverse ? -1 : 1));
 
   if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
     return {

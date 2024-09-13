@@ -57,11 +57,6 @@ export const primaryDomainResolvedRequestArray = (
       const resolved = vertices
         .filter((x) => directPass(x))
         .filter((x) => x.platform !== PlatformType.ethereum)
-        .filter((x) => {
-          if (platform === PlatformType.unstoppableDomains)
-            return !x.identity.endsWith(".eth");
-          return x;
-        })
         .map((x) => ({
           identity: x.identity,
           platform: x.platform,
