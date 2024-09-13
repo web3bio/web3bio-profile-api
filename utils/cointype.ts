@@ -1,3 +1,4 @@
+// referer SLIP-0044: https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 export const CoinType = {
   btc: 0,
   ltc: 2,
