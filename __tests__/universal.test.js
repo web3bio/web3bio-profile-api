@@ -98,7 +98,7 @@ describe("Test For Universal Profile API", () => {
         return true;
       }
     })();
-    expect(links.length).toBe(6);
+    expect(links.length).toBe(7);
     expect(isValidHandle).toBe(true);
   });
   it("It should response 200 data for 0xd8da6bf26964af9d7eed9e03e53415d37aa96045", async () => {
