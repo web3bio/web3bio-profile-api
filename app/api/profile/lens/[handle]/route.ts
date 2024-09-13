@@ -109,14 +109,15 @@ export const resolveLensHandle = async (handle: string) => {
     };
   }
   const avatarUri =
-    response.metadata?.picture?.raw?.uri ||
     response.metadata?.picture?.optimized?.uri ||
+    response.metadata?.picture?.raw?.uri ||
     (await resolveEipAssetURL(
       `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${parseInt(
         response.id?.slice(2),
         16
       )}`
     ));
+
   const coverPictureUri =
     response.metadata?.coverPicture?.optimized?.url ||
     response.metadata?.coverPicture?.raw?.uri ||

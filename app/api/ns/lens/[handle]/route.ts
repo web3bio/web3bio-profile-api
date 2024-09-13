@@ -29,8 +29,8 @@ export async function GET(req: NextRequest) {
     if (!response) throw new Error(ErrorMessages.notFound, { cause: 404 });
 
     const avatarUri =
-      response.metadata?.picture?.raw?.uri ||
       response.metadata?.picture?.optimized?.uri ||
+      response.metadata?.picture?.raw?.uri ||
       (await resolveEipAssetURL(
         `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${parseInt(
           response.id?.slice(2),
