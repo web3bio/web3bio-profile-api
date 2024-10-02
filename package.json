@@ -10,7 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@bonfida/spl-name-service": "^2.3.8",
+    "@bonfida/spl-name-service": "^3.0.3",
     "@ensdomains/content-hash": "^3.0.0",
     "@solana/web3.js": "^1.91.1",
     "dotenv": "^16.1.4",

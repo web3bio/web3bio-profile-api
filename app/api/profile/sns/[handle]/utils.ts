@@ -7,6 +7,7 @@ import {
 import { formatText } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns } from "@/utils/regexp";
+import { resolveIPFS_URL } from "@/utils/ipfs";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { ErrorMessages } from "@/utils/types";
 
@@ -31,7 +32,7 @@ export const resolveWithProxy = async (handle: string) => {
 export const getSNSRecord = async (
   connection: Connection,
   domain: string,
-  record: SNSRecord
+  record: SNSRecord,
 ) => {
   try {
     return await getRecordV2(connection, domain.slice(0, -4), record, {
@@ -44,7 +45,7 @@ export const getSNSRecord = async (
 
 export const resolveSNSDomain = async (
   connection: Connection,
-  handle: string
+  handle: string,
 ) => {
   try {
     return (await resolve(connection, handle))?.toBase58();
@@ -126,12 +127,16 @@ export const resolveSNSHandle = async (handle: string) => {
     identity: domain,
     platform: PlatformType.sns,
     displayName: domain || null,
-    avatar: await getSNSRecord(connection, domain, SNSRecord.Pic),
+    avatar: resolveIPFS_URL(
+      await getSNSRecord(connection, domain, SNSRecord.Pic) || "",
+    ),
     description: await getSNSRecord(connection, domain, SNSRecord.TXT),
     email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
     header: await getSNSRecord(connection, domain, SNSRecord.Background),
-    contenthash: await getSNSRecord(connection, domain, SNSRecord.IPFS),
+    contenthash:
+      (await getSNSRecord(connection, domain, SNSRecord.IPFS)) ||
+      (await getSNSRecord(connection, domain, SNSRecord.IPNS)),
     links: linksObj,
   };
 };
