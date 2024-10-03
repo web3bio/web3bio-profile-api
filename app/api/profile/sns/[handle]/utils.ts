@@ -21,6 +21,17 @@ export const reverseWithProxy = async (address: string) => {
   return res?.result?.reverse + ".sol";
 };
 
+export const resolveContentIPNS = async (handle: string) => {
+  const res = await fetch(SnsSDKProxyEndpoint + "domain-data/" + handle)
+    .then((res) => res.json())
+    .catch(() => null);
+  if (!res || res?.s === "error") return "";
+  const ipnsMatch = Buffer.from(res?.result, "base64")
+    .toString("utf-8")
+    .match(/ipns=(k51[a-zA-Z0-9]{59})/);
+  return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
+};
+
 export const resolveWithProxy = async (handle: string) => {
   const res = await fetch(SnsSDKProxyEndpoint + "resolve/" + handle)
     .then((res) => res.json())
@@ -128,15 +139,16 @@ export const resolveSNSHandle = async (handle: string) => {
     platform: PlatformType.sns,
     displayName: domain || null,
     avatar: resolveIPFS_URL(
-      await getSNSRecord(connection, domain, SNSRecord.Pic) || "",
+      (await getSNSRecord(connection, domain, SNSRecord.Pic)) || null,
     ),
     description: await getSNSRecord(connection, domain, SNSRecord.TXT),
     email: await getSNSRecord(connection, domain, SNSRecord.Email),
     location: null,
     header: await getSNSRecord(connection, domain, SNSRecord.Background),
     contenthash:
+      (await getSNSRecord(connection, domain, SNSRecord.IPNS)) ||
       (await getSNSRecord(connection, domain, SNSRecord.IPFS)) ||
-      (await getSNSRecord(connection, domain, SNSRecord.IPNS)),
+      (await resolveContentIPNS(domain)),
     links: linksObj,
   };
 };

@@ -24,8 +24,8 @@ export const isIPFS_Resource = (str: string) => {
 };
 
 export function resolveIPFS_URL(
-  cidOrURL: string | undefined,
-): string | undefined {
+  cidOrURL: string | undefined | null,
+): string | undefined | null {
   if (!cidOrURL) return cidOrURL;
 
   // eliminate cors proxy
