@@ -1,6 +1,9 @@
 const ELEMENTS = 4;
 const SIZE = 80;
 
+// The Avatar Marble component is a React component that creates a unique SVG image based on a provided name and color palette.
+// For the original source code, visit: https://github.com/boringdesigners/boring-avatars
+// Due to Edge Runtime limitations, the original source code has been modified to work with Edge Workers.
 const AvatarMarble = (props: any) => {
   const properties = generateColors(props.name, props.colors);
   const maskID = String(hashCode(props.name));
