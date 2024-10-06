@@ -6,10 +6,14 @@ import {
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveUniversalHandle } from "./utils";
+import { regexSolana, regexBtc } from "@/utils/regexp";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle")?.toLowerCase() || "";
+  const handle = searchParams.get("handle") || "";
+  const inputName = [regexSolana, regexBtc].some((x) => x.test(handle))
+    ? handle
+    : handle.toLowerCase();
   const platform = handleSearchPlatform(inputName);
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {
     return errorHandle({
