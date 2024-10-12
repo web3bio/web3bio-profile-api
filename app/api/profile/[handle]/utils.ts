@@ -13,7 +13,7 @@ import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
 import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
 import { NextRequest } from "next/server";
 
-const NEXTID_GRAPHQL_ENDPOINT =
+export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
 

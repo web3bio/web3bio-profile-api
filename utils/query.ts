@@ -91,3 +91,47 @@ export const primaryDomainResolvedRequestArray = (
     },
   ];
 };
+
+export const BATCH_GET_PROFILES = `
+  query BATCH_GET_PROFILES(ids: String) {
+  identities(ids: $ids) {
+    id
+    identity
+    platform
+    network
+    primaryName
+    isPrimary
+    resolvedAddress {
+      network
+      address
+    }
+    ownerAddress {
+      network
+      address
+    }
+    expiredAt
+    profile {
+      uid
+      identity
+      platform
+      network
+      address
+      displayName
+      avatar
+      description
+      contenthash
+      texts
+      addresses {
+        network
+        address
+      }
+      social {
+        uid
+        following
+        follower
+        updatedAt
+      }
+    }
+  }
+}
+`;
