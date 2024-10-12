@@ -9,14 +9,16 @@ async function fetchIdentityGraphBatch(ids: string[]) {
       method: "POST",
       body: JSON.stringify({
         query: BATCH_GET_PROFILES,
-        variables: {
-          ids,
-        },
+        // variables: {
+        //   ids,
+        // },
       }),
     });
-    return await response.json();
-  } catch (e) {
-    return { errors: e };
+    console.log(response,'kkk')
+    const result = await response.json();
+    return result
+  } catch (e: any) {
+    return { error: e.message };
   }
 }
 
@@ -25,10 +27,16 @@ export async function POST(req: NextRequest) {
   if (!ids.length) return NextResponse.json([]);
   try {
     const json = await fetchIdentityGraphBatch(ids);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json?.identities));
   } catch (e: any) {
-    return NextResponse.error();
+    return NextResponse.json({
+      error: e.message,
+    });
   }
+}
+
+export async function GET() {
+  return NextResponse.json("batch profile api");
 }
 
 export const runtime = "edge";
