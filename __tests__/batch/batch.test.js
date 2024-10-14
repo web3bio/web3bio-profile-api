@@ -15,8 +15,9 @@ describe("Test For Batch Profile API", () => {
   };
   it("It should response 200 for batch profile api", async () => {
     const res = await queryClient("/profile/batch", options,'http://localhost:3000');
-    const json = await res.json()
-    console.log(json,'json')
     expect(res.status).toBe(200);
+    const json = await res.json()
+    console.log(json)
+    expect(json.length > 0)
   });
 });

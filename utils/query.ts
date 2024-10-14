@@ -92,13 +92,9 @@ export const primaryDomainResolvedRequestArray = (
   ];
 };
 
-// todo: checkout this field
 export const BATCH_GET_PROFILES = `
-  query {
-  identities(ids: [
-    "ens,sujiyan.eth",
-    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-  ]) {
+  query BATCH_GET_PROFILES($ids: [String!]!) {
+  identities(ids: $ids) {
     id
     identity
     platform

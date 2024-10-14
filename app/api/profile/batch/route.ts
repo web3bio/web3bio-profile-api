@@ -7,16 +7,19 @@ async function fetchIdentityGraphBatch(ids: string[]) {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
       body: JSON.stringify({
         query: BATCH_GET_PROFILES,
-        // variables: {
-        //   ids,
-        // },
+        variables: {
+          ids: ids,
+        },
       }),
     });
-    console.log(response,'kkk')
+
     const result = await response.json();
-    return result
+    return result?.data?.identities;
   } catch (e: any) {
     return { error: e.message };
   }
@@ -27,7 +30,7 @@ export async function POST(req: NextRequest) {
   if (!ids.length) return NextResponse.json([]);
   try {
     const json = await fetchIdentityGraphBatch(ids);
-    return respondWithCache(JSON.stringify(json?.identities));
+    return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return NextResponse.json({
       error: e.message,
