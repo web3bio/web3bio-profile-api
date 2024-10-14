@@ -16,8 +16,7 @@ async function fetchIdentityGraphBatch(ids: string[]) {
           ids: ids,
         },
       }),
-    });
-
+    })
     const result = await response.json();
     return result?.data?.identities;
   } catch (e: any) {
