@@ -32,9 +32,9 @@ async function resolveHandleFromRelationService(
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
-      headers: {
-        "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
-      },
+      // headers: {
+      //   "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
+      // },
       body: JSON.stringify({
         query: GET_PROFILES,
         variables: {
@@ -43,6 +43,7 @@ async function resolveHandleFromRelationService(
         },
       }),
     });
+    console.log(response.status)
     return await response.json();
   } catch (e) {
     return { errors: e };
@@ -99,6 +100,8 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+
+  console.log(responseFromRelation,'kkk')
 
   if (responseFromRelation?.errors)
     return {

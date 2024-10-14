@@ -10,27 +10,93 @@ const directPass = (identity: IdentityRecord) => {
 };
 
 export const GET_PROFILES = `
-query GET_PROFILES($platform: String, $identity: String) {
-  identity(platform: $platform, identity: $identity) {
-    identity
-    platform
-    displayName
-    uid
-    reverse
-    expiredAt
-    identityGraph{
-      vertices {
-        uuid
+ query GET_PROFILES($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      id
+      identity
+      platform
+      network
+      primaryName
+      isPrimary
+      resolvedAddress {
+        network
+        address
+      }
+      ownerAddress {
+        network
+        address
+      }
+      expiredAt
+      profile {
+        uid
         identity
         platform
+        network
+        address
         displayName
-        uid
-        reverse
-        expiredAt
+        avatar
+        description
+        contenthash
+        texts
+        addresses {
+          network
+          address
+        }
+        social {
+          uid
+          following
+          follower
+          updateAt
+        }
       }
+        identityGraph {
+          graphId
+          vertices {
+            id
+            identity
+            platform
+            network
+            primaryName
+            isPrimary
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
+            expiredAt
+            profile {
+              identity
+              platform
+              address
+              displayName
+              avatar
+              description
+              contenthash
+              texts
+              addresses {
+                network
+                address
+              }
+              social {
+                uid
+                following
+                follower
+                updateAt
+              }
+            }
+          }
+          edges {
+            edgeType
+            dataSource
+            source
+            target
+          }
+        }
     }
   }
-}
 `;
 
 export const primaryDomainResolvedRequestArray = (
