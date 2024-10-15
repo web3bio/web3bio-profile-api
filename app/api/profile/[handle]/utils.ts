@@ -10,12 +10,33 @@ import {
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
-import { ErrorMessages, ProfileAPIResponse } from "@/utils/types";
+import {
+  ErrorMessages,
+  ProfileAPIResponse,
+  ProfileRecord,
+} from "@/utils/types";
 import { NextRequest } from "next/server";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
   "https://relation-service-tiger.next.id";
+
+function generateProfileStruct(data: ProfileRecord): ProfileAPIResponse {
+  return {
+    address: data.address,
+    identity: data.identity,
+    platform: data.platform,
+    displayName: data.displayName,
+    avatar: data.avatar,
+    description: data.description,
+    email: data.texts?.email || null,
+    location: data.texts?.location || null,
+    header: data.texts?.header || null,
+    contenthash: data.contenthash || null,
+    links: data.texts || {},
+    social: data.social || {},
+  };
+}
 
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
@@ -32,18 +53,18 @@ async function resolveHandleFromRelationService(
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
-      // headers: {
-      //   "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
-      // },
+      headers: {
+        "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
+        "content-type": "application/json",
+      },
       body: JSON.stringify({
         query: GET_PROFILES,
         variables: {
-          platform,
           identity: handle,
+          platform,
         },
       }),
     });
-    console.log(response.status)
     return await response.json();
   } catch (e) {
     return { errors: e };
@@ -100,9 +121,6 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-
-  console.log(responseFromRelation,'kkk')
-
   if (responseFromRelation?.errors)
     return {
       identity: handle,
@@ -111,7 +129,7 @@ export const resolveUniversalRespondFromRelation = async ({
       code: 500,
     };
 
-  const resolvedRequestArray = primaryDomainResolvedRequestArray(
+  const profilesArray = primaryDomainResolvedRequestArray(
     responseFromRelation,
     handle,
     platform
@@ -121,97 +139,72 @@ export const resolveUniversalRespondFromRelation = async ({
         x.platform !== PlatformType.unstoppableDomains ||
         !x.identity.endsWith(".eth")
     )
-    .sort((a, b) => (a.reverse === b.reverse ? 0 : a.reverse ? -1 : 1));
+    .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
 
-  if (!resolvedRequestArray.some((x) => x.platform !== PlatformType.nextid))
+  if (!profilesArray.some((x) => x.platform !== PlatformType.nextid))
     return {
       identity: handle,
       code: 404,
       message: ErrorMessages.invalidResolved,
       platform,
     };
+  const responsesToSort = profilesArray.map((x) =>
+    generateProfileStruct(x as ProfileRecord)
+  );
+  const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
+    ? responsesToSort
+    : sortProfilesByPlatform(responsesToSort, platform, handle);
 
-  return await Promise.allSettled(
-    resolvedRequestArray.map((x) => {
-      if (x.identity && shouldPlatformFetch(x.platform as PlatformType)) {
-        const fetchURL = `${req.nextUrl.origin}/${
-          ns ? "ns" : "profile"
-        }/${x.platform.toLowerCase()}/${x.identity}`;
-        return fetch(fetchURL).then((res) => res.json());
-      }
-    })
-  )
-    .then((responses) => {
-      const responsesToSort = responses
-        .filter(
-          (response) =>
-            response.status === "fulfilled" &&
-            response.value?.identity &&
-            !response.value?.error
-        )
-        .map((response) => (response as PromiseFulfilledResult<any>).value);
+  if (
+    platform === PlatformType.ethereum &&
+    !returnRes.some((x) => x?.address === handle)
+  ) {
+    returnRes.unshift(responsesToSort.find((x) => x?.address === handle)!);
+  }
 
-      const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
-        ? responsesToSort
-        : sortProfilesByPlatform(responsesToSort, platform, handle);
-
-      if (
-        platform === PlatformType.ethereum &&
-        !returnRes.some((x) => x?.address === handle)
-      ) {
-        returnRes.unshift(responsesToSort.find((x) => x?.address === handle)!);
-      }
-
-      if (!returnRes.length && platform === PlatformType.ethereum) {
-        const nsObj = {
-          address: handle,
-          identity: handle,
-          platform: PlatformType.ethereum,
-          displayName: formatText(handle),
-          avatar: null,
-          description: null,
-        };
-        returnRes.push(
-          (ns
-            ? nsObj
-            : {
-                ...nsObj,
-                email: null,
-                location: null,
-                header: null,
-                links: {},
-              }) as ProfileAPIResponse
-        );
-      }
-
-      const uniqRes = returnRes.reduce((pre, cur) => {
-        if (
-          cur &&
-          !pre.find(
-            (x: ProfileAPIResponse) =>
-              x.platform === cur.platform && x.identity === cur.identity
-          )
-        ) {
-          pre.push(cur);
-        }
-        return pre;
-      }, [] as ProfileAPIResponse[]);
-
-      return uniqRes.filter((x: ProfileAPIResponse) => !x?.error).length
-        ? uniqRes
-        : {
-            identity: handle,
-            code: 404,
-            message: uniqRes[0]?.error || ErrorMessages.notFound,
-            platform,
-          };
-    })
-    .catch((error) => ({
+  if (!returnRes.length && platform === PlatformType.ethereum) {
+    const nsObj = {
+      address: handle,
       identity: handle,
-      code: 500,
-      message: error,
-      platform,
-    }));
+      platform: PlatformType.ethereum,
+      displayName: formatText(handle),
+      avatar: null,
+      description: null,
+    };
+    returnRes.push(
+      (ns
+        ? nsObj
+        : {
+            ...nsObj,
+            email: null,
+            location: null,
+            header: null,
+            links: {},
+          }) as ProfileAPIResponse
+    );
+  }
+
+  const uniqRes = returnRes.reduce((pre, cur) => {
+    if (
+      cur &&
+      !pre.find(
+        (x: ProfileAPIResponse) =>
+          x.platform === cur.platform && x.identity === cur.identity
+      )
+    ) {
+      pre.push(cur);
+    }
+    return pre;
+  }, [] as ProfileAPIResponse[]);
+
+  return uniqRes.filter((x: ProfileAPIResponse) => !x?.error).length
+    ? uniqRes
+    : {
+        identity: handle,
+        code: 404,
+        message: uniqRes[0]?.error || ErrorMessages.notFound,
+        platform,
+      };
 };
 
 export const resolveUniversalHandle = async (

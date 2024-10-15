@@ -30,18 +30,6 @@ export enum ErrorMessages {
   networkError = "Network Error",
 }
 
-export interface ProofRecord {
-  platform: string;
-  identity: string;
-  displayName: string;
-}
-export interface NeighborDetail {
-  platform: PlatformType;
-  identity: string;
-  uuid: string;
-  displayName: string;
-}
-
 export interface ProfileAPIResponse {
   address: string;
   avatar: string | null;
@@ -49,43 +37,61 @@ export interface ProfileAPIResponse {
   platform: string;
   displayName: string | null;
   email: string | null;
+  contenthash: string | null;
   header: string | null;
   identity: string;
   location: string | null;
   error?: string;
-  links: Record<
-    PlatformType,
-    {
-      link: string;
-      handle: string;
-    }
-  >;
+  links: Record<PlatformType, LinksItem> | {};
+  social: SocialRecord;
 }
 
+interface SocialRecord {
+  uid: string;
+  follower: number;
+  following: number;
+}
+interface AddressRecord {
+  address: string;
+  network: string;
+  __typename: "Address";
+}
 export interface RelationServiceQueryResponse {
   data: {
-    identity: {
-      identity: string;
-      platform: PlatformType;
-      displayName: string;
-      reverse: boolean;
-      uid: string;
-      uuid: string;
-      expiredAt: string;
-      identityGraph: {
-        vertices: IdentityRecord[];
-      };
-    };
+    identity: IdentityRecord;
   };
 }
 
 export interface IdentityRecord {
-  uuid: string;
+  id: string;
+  expiredAt: number;
   identity: string;
+  isPrimary: boolean;
+  network: string;
+  ownerAddress: AddressRecord[];
+  resolvedAddress: AddressRecord[];
   platform: PlatformType;
+  primaryName: string | null;
+  profile: ProfileRecord;
+  identityGraph: {
+    vertices: IdentityRecord[];
+  };
+}
+
+export interface ProfileRecord {
+  // from web3bio IdentityGraph Service
+  uid: string;
+  address: string;
+  avatar: string;
+  contenthash: string;
+  description: string;
   displayName: string;
-  reverse: boolean;
-  expiredAt: string;
+  identity: string;
+  network: string;
+  platform: PlatformType;
+  social: SocialRecord;
+  texts: { [index: string]: string };
+  addresses: AddressRecord[];
 }
 
 export const enum LensParamType {
