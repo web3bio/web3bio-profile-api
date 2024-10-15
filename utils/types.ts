@@ -30,16 +30,18 @@ export enum ErrorMessages {
   networkError = "Network Error",
 }
 
-export interface ProfileAPIResponse {
+export interface ProfileNSResponse {
+  identity: string;
   address: string;
   avatar: string | null;
   description: string | null;
   platform: string;
   displayName: string | null;
+}
+export interface ProfileAPIResponse extends ProfileNSResponse {
   email: string | null;
   contenthash: string | null;
   header: string | null;
-  identity: string;
   location: string | null;
   error?: string;
   links: Record<PlatformType, LinksItem> | {};

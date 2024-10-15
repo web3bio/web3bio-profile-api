@@ -12,17 +12,12 @@ const directPass = (identity: IdentityRecord) => {
 export const GET_PROFILES = `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
-        id
         identity
         platform
-        primaryName
         isPrimary
-        expiredAt
         profile {
-          uid
           identity
           platform
-          network
           address
           displayName
           avatar
@@ -37,10 +32,10 @@ export const GET_PROFILES = `
             uid
             following
             follower
+            updateAt
           }
         }
         identityGraph {
-          graphId
           vertices {
             identity
             platform

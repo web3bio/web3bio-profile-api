@@ -13,6 +13,7 @@ import { resolveHandle, resolveSocialMediaLink } from "@/utils/resolver";
 import {
   ErrorMessages,
   ProfileAPIResponse,
+  ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
 import { NextRequest } from "next/server";
@@ -23,34 +24,47 @@ export const NEXTID_GRAPHQL_ENDPOINT =
 function generateSocialLinks(texts: { [index: string]: string } | null) {
   if (!texts) return {};
   const keys = Object.keys(texts);
-  const res = {};
+  const res = {} as any;
   keys.forEach((i) => {
-    if (PLATFORM_DATA.has(i as PlatformType)) {
-      Object.assign(res, i, {
-        handle: resolveHandle(i),
+    const key = PLATFORM_DATA.has(i as PlatformType)
+      ? i
+      : Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+        ) || null;
+    if (key) {
+      res[key] = {
+        handle: resolveHandle(texts[i]),
         link: resolveSocialMediaLink(texts[i], i),
-      });
+      };
     }
   });
 
   return res;
 }
 
-function generateProfileStruct(data: ProfileRecord): ProfileAPIResponse {
-  return {
+function generateProfileStruct(
+  data: ProfileRecord,
+  ns?: boolean
+): ProfileAPIResponse | ProfileNSResponse {
+  const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName,
     avatar: data.avatar,
     description: data.description,
-    email: data.texts?.email || null,
-    location: data.texts?.location || null,
-    header: data.texts?.header || null,
-    contenthash: data.contenthash || null,
-    links: generateSocialLinks(data.texts) || {},
-    social: data.social || {},
   };
+  return ns
+    ? nsObj
+    : {
+        ...nsObj,
+        email: data.texts?.email || null,
+        location: data.texts?.location || null,
+        header: data.texts?.header || null,
+        contenthash: data.contenthash || null,
+        links: generateSocialLinks(data.texts) || {},
+        social: data.social || {},
+      };
 }
 
 const DEFAULT_PLATFORM_ORDER = [
@@ -66,11 +80,10 @@ async function resolveHandleFromRelationService(
   platform: PlatformType = handleSearchPlatform(handle)!
 ): Promise<any> {
   try {
-    console.log(NEXTID_GRAPHQL_ENDPOINT, handle, platform);
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        // Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -88,7 +101,7 @@ async function resolveHandleFromRelationService(
 }
 
 function sortProfilesByPlatform(
-  responses: ProfileAPIResponse[],
+  responses: ProfileAPIResponse[] | ProfileNSResponse[],
   targetPlatform: PlatformType,
   handle: string
 ): ProfileAPIResponse[] {
@@ -137,7 +150,6 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  console.log(responseFromRelation);
   if (responseFromRelation?.errors)
     return {
       identity: handle,
@@ -166,7 +178,7 @@ export const resolveUniversalRespondFromRelation = async ({
       platform,
     };
   const responsesToSort = profilesArray.map((x) =>
-    generateProfileStruct(x as ProfileRecord)
+    generateProfileStruct(x as ProfileRecord, ns)
   );
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
@@ -209,7 +221,7 @@ export const resolveUniversalRespondFromRelation = async ({
           x.platform === cur.platform && x.identity === cur.identity
       )
     ) {
-      pre.push(cur);
+      pre.push(cur as ProfileAPIResponse);
     }
     return pre;
   }, [] as ProfileAPIResponse[]);
