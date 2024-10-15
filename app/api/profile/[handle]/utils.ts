@@ -6,10 +6,10 @@ import {
   isValidEthereumAddress,
   prettify,
   respondWithCache,
-  shouldPlatformFetch,
 } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
+import { resolveHandle, resolveSocialMediaLink } from "@/utils/resolver";
 import {
   ErrorMessages,
   ProfileAPIResponse,
@@ -18,8 +18,23 @@ import {
 import { NextRequest } from "next/server";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER ||
-  "https://relation-service-tiger.next.id";
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
+
+function generateSocialLinks(texts: { [index: string]: string } | null) {
+  if (!texts) return {};
+  const keys = Object.keys(texts);
+  const res = {};
+  keys.forEach((i) => {
+    if (PLATFORM_DATA.has(i as PlatformType)) {
+      Object.assign(res, i, {
+        handle: resolveHandle(i),
+        link: resolveSocialMediaLink(texts[i], i),
+      });
+    }
+  });
+
+  return res;
+}
 
 function generateProfileStruct(data: ProfileRecord): ProfileAPIResponse {
   return {
@@ -33,7 +48,7 @@ function generateProfileStruct(data: ProfileRecord): ProfileAPIResponse {
     location: data.texts?.location || null,
     header: data.texts?.header || null,
     contenthash: data.contenthash || null,
-    links: data.texts || {},
+    links: generateSocialLinks(data.texts) || {},
     social: data.social || {},
   };
 }
@@ -51,11 +66,12 @@ async function resolveHandleFromRelationService(
   platform: PlatformType = handleSearchPlatform(handle)!
 ): Promise<any> {
   try {
+    console.log(NEXTID_GRAPHQL_ENDPOINT, handle, platform);
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
-        "x-api-key": process.env.NEXT_PUBLIC_RELATION_API_KEY || "",
-        "content-type": "application/json",
+        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         query: GET_PROFILES,
@@ -121,6 +137,7 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+  console.log(responseFromRelation);
   if (responseFromRelation?.errors)
     return {
       identity: handle,
@@ -233,7 +250,6 @@ export const resolveUniversalHandle = async (
       code: 404,
       message: ErrorMessages.invalidAddr,
     });
-
   const res = (await resolveUniversalRespondFromRelation({
     platform,
     handle: handleToQuery,

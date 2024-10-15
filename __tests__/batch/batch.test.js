@@ -20,7 +20,6 @@ describe("Test For Batch Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    console.log(json);
     expect(json.length > 0);
   });
 });
