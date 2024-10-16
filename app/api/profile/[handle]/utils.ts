@@ -30,6 +30,7 @@ function generateSocialLinks(data: ProfileRecord) {
   const identity = data.identity;
   const res = {} as any;
   switch (platform) {
+    case PlatformType.ethereum:
     case PlatformType.ens:
       if (!texts) return {};
       let key = null;
@@ -84,6 +85,17 @@ function generateSocialLinks(data: ProfileRecord) {
           }
         }
       });
+      break;
+
+    // todo: remain to do
+    case PlatformType.dotbit:
+      break;
+    case PlatformType.sns:
+    case PlatformType.solana:
+      break;
+    case PlatformType.unstoppableDomains:
+      break;
+    default:
       break;
   }
 
@@ -198,6 +210,7 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
+  console.log(responseFromRelation, "relation");
   if (responseFromRelation?.errors)
     return {
       identity: handle,
