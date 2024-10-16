@@ -9,7 +9,7 @@ import {
 } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
-import { resolveHandle, resolveSocialMediaLink } from "@/utils/resolver";
+import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import {
   ErrorMessages,
   ProfileAPIResponse,
@@ -17,27 +17,75 @@ import {
   ProfileRecord,
 } from "@/utils/types";
 import { NextRequest } from "next/server";
+import { ensRecordsDefaultOrShouldSkipText } from "../ens/[handle]/utils";
+import { regexTwitterLink } from "@/utils/regexp";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
 
-function generateSocialLinks(texts: { [index: string]: string } | null) {
-  if (!texts) return {};
-  const keys = Object.keys(texts);
+function generateSocialLinks(data: ProfileRecord) {
+  const platform = data.platform;
+  const texts = data.texts;
+  const keys = texts ? Object.keys(texts) : [];
+  const identity = data.identity;
   const res = {} as any;
-  keys.forEach((i) => {
-    const key = PLATFORM_DATA.has(i as PlatformType)
-      ? i
-      : Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
-        ) || null;
-    if (key) {
-      res[key] = {
-        handle: resolveHandle(texts[i]),
-        link: resolveSocialMediaLink(texts[i], i),
+  switch (platform) {
+    case PlatformType.ens:
+      if (!texts) return {};
+      let key = null;
+      keys.forEach((i) => {
+        if (!ensRecordsDefaultOrShouldSkipText.has(i)) {
+          key = Array.from(PLATFORM_DATA.keys()).find((k) =>
+            PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+          );
+          if (key) {
+            res[key] = {
+              link: getSocialMediaLink(texts[i], key),
+              handle: resolveHandle(texts[i]),
+            };
+          }
+        }
+      });
+      break;
+    case PlatformType.farcaster:
+      const resolvedHandle = resolveHandle(identity);
+      res[PlatformType.farcaster] = {
+        links: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
+        handle: resolvedHandle,
       };
-    }
-  });
+      const twitterMatch = data.description.match(regexTwitterLink);
+      if (twitterMatch) {
+        const matched = twitterMatch[1];
+        const resolveMatch =
+          resolveHandle(matched, PlatformType.farcaster) || "";
+        res[PlatformType.twitter] = {
+          link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
+          handle: resolveMatch,
+        };
+      }
+      break;
+    case PlatformType.lens:
+      const pureHandle = identity.replace(".lens", "");
+      res[PlatformType.lens] = {
+        links: getSocialMediaLink(pureHandle!, PlatformType.lens),
+        handle: pureHandle,
+      };
+      keys.forEach((i) => {
+        if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
+          let key = null;
+          key = Array.from(PLATFORM_DATA.keys()).find(
+            (k) => k === i.toLowerCase()
+          );
+          if (key) {
+            res[key] = {
+              link: getSocialMediaLink(texts[i], i),
+              handle: resolveHandle(texts[i]),
+            };
+          }
+        }
+      });
+      break;
+  }
 
   return res;
 }
@@ -62,7 +110,7 @@ function generateProfileStruct(
         location: data.texts?.location || null,
         header: data.texts?.header || null,
         contenthash: data.contenthash || null,
-        links: generateSocialLinks(data.texts) || {},
+        links: generateSocialLinks(data) || {},
         social: data.social || {},
       };
 }
