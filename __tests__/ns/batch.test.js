@@ -14,7 +14,7 @@ describe("Test For Batch Profile API", () => {
   };
   it("It should response 200 for batch profile api", async () => {
     const res = await queryClient(
-      "/profile/batch",
+      "/ns/batch",
       options,
       "http://localhost:3000"
     );

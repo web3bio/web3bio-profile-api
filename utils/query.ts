@@ -96,6 +96,17 @@ export const primaryDomainResolvedRequestArray = (
       const resolved = vertices
         .filter((x) => directPass(x))
         .filter((x) => x.platform !== PlatformType.ethereum)
+        .filter((x) => {
+          if (x.platform === PlatformType.ens) {
+            const ownerAddress = x.ownerAddress[0].address;
+            const resolvedAddress = x.resolvedAddress.find(
+              (i) => i.network === x.ownerAddress[0].network
+            )?.address;
+            return ownerAddress === resolvedAddress;
+          } else {
+            return true;
+          }
+        })
         .map((x) => ({
           ...x.profile,
           isPrimary: x.isPrimary,

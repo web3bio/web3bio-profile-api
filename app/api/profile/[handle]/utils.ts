@@ -106,7 +106,7 @@ function generateSocialLinks(data: ProfileRecord) {
   return res;
 }
 
-async function generateProfileStruct(
+export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {

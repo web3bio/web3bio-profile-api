@@ -1,13 +1,22 @@
 import { respondWithCache } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
-import { NEXTID_GRAPHQL_ENDPOINT } from "../[handle]/utils";
+import {
+  NEXTID_GRAPHQL_ENDPOINT,
+  generateProfileStruct,
+} from "../[handle]/utils";
 import { BATCH_GET_PROFILES } from "@/utils/query";
-import { ProfileRecord } from "@/utils/types";
-import { resolveEipAssetURL } from "@/utils/resolver";
+import {
+  ProfileAPIResponse,
+  ProfileNSResponse,
+  ProfileRecord,
+} from "@/utils/types";
 
-async function fetchIdentityGraphBatch(
-  ids: string[]
-): Promise<ProfileRecord[] | { error: { message: string } }> {
+export async function fetchIdentityGraphBatch(
+  ids: string[],
+  ns: boolean
+): Promise<
+  ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
+> {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
@@ -26,10 +35,8 @@ async function fetchIdentityGraphBatch(
     if (json?.data?.identities?.length > 0) {
       for (let i = 0; i < json.data.identities.length; i++) {
         const item = json.data.identities[i].profile;
-        res.push({
-          ...item,
-          avatar: await resolveEipAssetURL(item.avatar),
-        });
+
+        res.push(await generateProfileStruct(item, ns));
       }
     }
     return res;
@@ -42,7 +49,7 @@ export async function POST(req: NextRequest) {
   const { ids } = await req.json();
   if (!ids.length) return NextResponse.json([]);
   try {
-    const json = await fetchIdentityGraphBatch(ids);
+    const json = await fetchIdentityGraphBatch(ids, false);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return NextResponse.json({
