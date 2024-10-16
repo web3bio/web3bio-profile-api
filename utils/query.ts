@@ -124,17 +124,6 @@ export const primaryDomainResolvedRequestArray = (
 export const BATCH_GET_PROFILES = `
   query BATCH_GET_PROFILES($ids: [String!]!) {
   identities(ids: $ids) {
-    id
-    identity
-    platform
-    network
-    primaryName
-    isPrimary
-    resolvedAddress {
-      network
-      address
-    }
-    expiredAt
     profile {
       uid
       identity

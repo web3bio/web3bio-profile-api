@@ -2,8 +2,11 @@ import { respondWithCache } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { NEXTID_GRAPHQL_ENDPOINT } from "../[handle]/utils";
 import { BATCH_GET_PROFILES } from "@/utils/query";
+import { ProfileRecord } from "@/utils/types";
 
-async function fetchIdentityGraphBatch(ids: string[]) {
+async function fetchIdentityGraphBatch(
+  ids: string[]
+): Promise<ProfileRecord[] | { error: { message: string } }> {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
@@ -16,9 +19,11 @@ async function fetchIdentityGraphBatch(ids: string[]) {
           ids: ids,
         },
       }),
-    })
+    });
     const result = await response.json();
-    return result?.data?.identities;
+    return result?.data?.identities?.map(
+      (x: { profile: ProfileRecord }) => x.profile
+    );
   } catch (e: any) {
     return { error: e.message };
   }
