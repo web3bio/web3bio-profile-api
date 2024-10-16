@@ -58,8 +58,4 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
-  return NextResponse.json("batch profile api");
-}
-
 export const runtime = "edge";
