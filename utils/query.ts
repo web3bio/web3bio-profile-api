@@ -40,6 +40,14 @@ export const GET_PROFILES = `
             identity
             platform
             isPrimary
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
             profile {
               identity
               platform

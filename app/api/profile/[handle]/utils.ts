@@ -9,7 +9,11 @@ import {
 } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
-import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
+import {
+  getSocialMediaLink,
+  resolveEipAssetURL,
+  resolveHandle,
+} from "@/utils/resolver";
 import {
   ErrorMessages,
   ProfileAPIResponse,
@@ -102,16 +106,16 @@ function generateSocialLinks(data: ProfileRecord) {
   return res;
 }
 
-function generateProfileStruct(
+async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean
-): ProfileAPIResponse | ProfileNSResponse {
+): Promise<ProfileAPIResponse | ProfileNSResponse> {
   const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName,
-    avatar: data.avatar,
+    avatar: await resolveEipAssetURL(data.avatar),
     description: data.description,
   };
   return ns
@@ -237,9 +241,15 @@ export const resolveUniversalRespondFromRelation = async ({
       message: ErrorMessages.invalidResolved,
       platform,
     };
-  const responsesToSort = profilesArray.map((x) =>
-    generateProfileStruct(x as ProfileRecord, ns)
-  );
+  
+  let responsesToSort = [];
+  for (let i = 0; i < profilesArray.length; i++) {
+    const obj = await generateProfileStruct(
+      profilesArray[i] as ProfileRecord,
+      ns
+    );
+    responsesToSort.push(obj);
+  }
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
     : sortProfilesByPlatform(responsesToSort, platform, handle);

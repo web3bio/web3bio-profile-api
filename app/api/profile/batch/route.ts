@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { NEXTID_GRAPHQL_ENDPOINT } from "../[handle]/utils";
 import { BATCH_GET_PROFILES } from "@/utils/query";
 import { ProfileRecord } from "@/utils/types";
+import { resolveEipAssetURL } from "@/utils/resolver";
 
 async function fetchIdentityGraphBatch(
   ids: string[]
@@ -20,10 +21,18 @@ async function fetchIdentityGraphBatch(
         },
       }),
     });
-    const result = await response.json();
-    return result?.data?.identities?.map(
-      (x: { profile: ProfileRecord }) => x.profile
-    );
+    const json = await response.json();
+    let res = [];
+    if (json?.data?.identities?.length > 0) {
+      for (let i = 0; i < json.data.identities.length; i++) {
+        const item = json.data.identities[i].profile;
+        res.push({
+          ...item,
+          avatar: await resolveEipAssetURL(item.avatar),
+        });
+      }
+    }
+    return res;
   } catch (e: any) {
     return { error: e.message };
   }
