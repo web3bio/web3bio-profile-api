@@ -210,7 +210,6 @@ export const resolveUniversalRespondFromRelation = async ({
     handle,
     platform
   );
-  console.log(responseFromRelation, "relation");
   if (responseFromRelation?.errors)
     return {
       identity: handle,
