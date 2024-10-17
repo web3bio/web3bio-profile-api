@@ -57,7 +57,7 @@ export const getSocialMediaLink = (
   return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
 };
 
-export function resolveSocialMediaLink(
+function resolveSocialMediaLink(
   name: string,
   type: PlatformType | string,
 ): string {

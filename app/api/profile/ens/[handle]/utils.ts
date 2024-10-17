@@ -26,7 +26,7 @@ const commonQueryOptions = {
   headers: { "Content-Type": "application/json" },
 };
 
-const ensRecordsDefaultOrShouldSkipText = new Set([
+export const ensRecordsDefaultOrShouldSkipText = new Set([
   "name",
   "email",
   "snapshot",
