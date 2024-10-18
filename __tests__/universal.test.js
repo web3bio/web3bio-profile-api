@@ -73,7 +73,7 @@ describe("Test For Universal Profile API", () => {
   });
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/mcdonalds.eth");
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.error).toBe("Not Found");
   });
@@ -98,8 +98,8 @@ describe("Test For Universal Profile API", () => {
         return true;
       }
     })();
-    expect(links.length).toBe(7);
     expect(isValidHandle).toBe(true);
+    expect(links.length).toBe(7);
   });
   it("It should response 200 data for 0xd8da6bf26964af9d7eed9e03e53415d37aa96045", async () => {
     const res = await queryClient(

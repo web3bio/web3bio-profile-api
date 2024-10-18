@@ -16,4 +16,5 @@ export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
   regexNext = /^0x[a-f0-9]{66}$/i,
   regexEIP = /^eip155:(\d+)\/(erc1155|erc721):(.+)\/(.+)$/,
   regexDomain = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/,
-  regexCluster = /^[\w-]+\/[\w-]+$/;
+  regexCluster = /^[\w-]+\/[\w-]+$/,
+  regexTwitterLink = /(\S*)(.|@)twitter/i;

@@ -1,14 +1,13 @@
 import { isValidEthereumAddress } from "@/utils/base";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
-import { regexEns } from "@/utils/regexp";
+import { regexEns, regexTwitterLink } from "@/utils/regexp";
 import { createPublicClient, http } from "viem";
 import { mainnet } from "viem/chains";
 import { normalize } from "viem/ens";
 import { ErrorMessages } from "@/utils/types";
 
 const originBase = "https://api.warpcast.com/v2/";
-const regexTwitterLink = /(\S*)(.|@)twitter/i;
 const regexFid = /fid:(\d*)/i;
 
 const fetcher = (url: string) => {
