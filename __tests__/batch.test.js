@@ -5,10 +5,10 @@ describe("Test For Batch Profile API", () => {
     method: "POST",
     body: JSON.stringify({
       ids: [
-        "ethereum,0x0d3f5a7a1ee78e743e25c18e66942fcbcd84ccad",
-        "ethereum,0x2332a02fea96b42fc3095ae7c73963980db9331b",
-        "ethereum,0x111111176b0b13ffc31d387d08726772a0492948",
-        "ethereum,0x8eddf5431f5b31933bfbd8111d54fc6e9456e6c1",
+        "ethereum,0x5d25e3ebb10f4debf1d7b76eb94302d2d74c7035",
+        "ethereum,0x6b0bda3f2ffed5efc83fa8c024acff1dd45793f1",
+        "ethereum,0xadd746be46ff36f10c81d6e3ba282537f4c68077",
+        "ethereum,0x0c7d81aeee69ce8b70159269cfce60588e2d5eac",
       ],
     }),
   };
@@ -20,7 +20,6 @@ describe("Test For Batch Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    console.log(json)
     expect(json.length > 0);
   });
 });

@@ -13,6 +13,9 @@ import {
   regexSns,
   regexBtc,
   regexSolana,
+  regexBasenames,
+  regexGenome,
+  regexCluster,
 } from "./regexp";
 import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
@@ -109,35 +112,31 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   return false;
 };
 
+const platformMap = new Map([
+  [regexBasenames, PlatformType.basenames],
+  [regexEns, PlatformType.ens],
+  [regexEth, PlatformType.ethereum],
+  [regexLens, PlatformType.lens],
+  [regexUnstoppableDomains, PlatformType.unstoppableDomains],
+  [regexSpaceid, PlatformType.space_id],
+  [regexCrossbell, PlatformType.crossbell],
+  [regexDotbit, PlatformType.dotbit],
+  [regexSns, PlatformType.sns],
+  [regexGenome, PlatformType.genome],
+  [regexBtc, PlatformType.bitcoin],
+  [regexSolana, PlatformType.solana],
+  [regexCluster, PlatformType.clusters],
+  [regexTwitter, PlatformType.twitter],
+  [regexFarcaster, PlatformType.farcaster],
+]);
+
 export const handleSearchPlatform = (term: string) => {
-  switch (!!term) {
-    case regexEns.test(term):
-      return PlatformType.ens;
-    case regexEth.test(term):
-      return PlatformType.ethereum;
-    case regexLens.test(term):
-      return PlatformType.lens;
-    case regexUnstoppableDomains.test(term):
-      return PlatformType.unstoppableDomains;
-    case regexSpaceid.test(term):
-      return PlatformType.space_id;
-    case regexCrossbell.test(term):
-      return PlatformType.crossbell;
-    case regexDotbit.test(term):
-      return PlatformType.dotbit;
-    case regexSns.test(term):
-      return PlatformType.sns;
-    case regexBtc.test(term):
-      return PlatformType.bitcoin;
-    case regexSolana.test(term):
-      return PlatformType.solana;
-    case regexTwitter.test(term):
-      return PlatformType.twitter;
-    case regexFarcaster.test(term):
-      return PlatformType.farcaster;
-    default:
-      return PlatformType.nextid;
+  for (const [regex, platformType] of platformMap) {
+    if (regex.test(term)) {
+      return platformType;
+    }
   }
+  return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
 };
 
 export const prettify = (input: string) => {
