@@ -1,4 +1,5 @@
-import { PLATFORMS_TO_EXCLUDE } from "./base";
+import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
+import { PLATFORMS_TO_EXCLUDE, handleSearchPlatform } from "./base";
 import { PlatformType } from "./platform";
 import { IdentityRecord, RelationServiceQueryResponse } from "./types";
 
@@ -8,6 +9,36 @@ const directPass = (identity: IdentityRecord) => {
     identity.platform
   );
 };
+
+export const GET_SINGLE_PROFILE = `
+ query GET_SINGLE_PROFILE($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
+        identity
+        platform
+        isPrimary
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+          contenthash
+          texts
+          addresses {
+            network
+            address
+          }
+          social {
+            uid
+            following
+            follower
+            updateAt
+          }
+        }
+      }
+  }
+`;
 
 export const GET_PROFILES = `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
@@ -167,3 +198,27 @@ export const BATCH_GET_PROFILES = `
   }
 }
 `;
+
+export async function queryIdentityGraph(
+  handle: string,
+  platform: PlatformType = handleSearchPlatform(handle)!
+): Promise<any> {
+  try {
+    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: GET_SINGLE_PROFILE,
+        variables: {
+          identity: handle,
+          platform,
+        },
+      }),
+    });
+    return await response.json();
+  } catch (e) {
+    return { errors: e };
+  }
+}

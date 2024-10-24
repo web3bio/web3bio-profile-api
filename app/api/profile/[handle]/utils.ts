@@ -21,7 +21,6 @@ import {
   ProfileRecord,
 } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { ensRecordsDefaultOrShouldSkipText } from "../ens/[handle]/utils";
 import { regexTwitterLink } from "@/utils/regexp";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
@@ -39,16 +38,14 @@ function generateSocialLinks(data: ProfileRecord) {
       if (!texts) return {};
       let key = null;
       keys.forEach((i) => {
-        if (!ensRecordsDefaultOrShouldSkipText.has(i)) {
-          key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-            PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
-          );
-          if (key) {
-            res[key] = {
-              link: getSocialMediaLink(texts[i], key),
-              handle: resolveHandle(texts[i]),
-            };
-          }
+        key = Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+        );
+        if (key) {
+          res[key] = {
+            link: getSocialMediaLink(texts[i], key),
+            handle: resolveHandle(texts[i]),
+          };
         }
       });
       break;
@@ -133,10 +130,10 @@ export async function generateProfileStruct(
 
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
+  PlatformType.basenames,
+  PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
-  PlatformType.unstoppableDomains,
-  PlatformType.ethereum,
 ];
 
 async function resolveHandleFromRelationService(
@@ -241,7 +238,7 @@ export const resolveUniversalRespondFromRelation = async ({
       message: ErrorMessages.invalidResolved,
       platform,
     };
-  
+
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
     const obj = await generateProfileStruct(

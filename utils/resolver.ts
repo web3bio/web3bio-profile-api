@@ -3,7 +3,6 @@ import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
-import * as contentHash from "@ensdomains/content-hash";
 import { regexDomain, regexEIP } from "./regexp";
 
 export const resolveMediaURL = (url: string): string | null => {
@@ -106,21 +105,4 @@ export const resolveEipAssetURL = async (
   }
 
   return resolveMediaURL(source);
-};
-
-export const decodeContenthash = (encoded: string) => {
-  if (
-    !encoded ||
-    ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
-  ) {
-    return null;
-  }
-
-  try {
-    const codec = contentHash.getCodec(encoded);
-    const decodedId = contentHash.decode(encoded);
-    return `${codec}://${decodedId}`;
-  } catch (e) {
-    return null;
-  }
 };
