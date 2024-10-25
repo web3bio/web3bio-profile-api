@@ -8,7 +8,11 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { GET_PROFILES, primaryDomainResolvedRequestArray } from "@/utils/query";
+import {
+  GET_PROFILES,
+  primaryDomainResolvedRequestArray,
+  queryIdentityGraph,
+} from "@/utils/query";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -136,31 +140,6 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.lens,
 ];
 
-async function resolveHandleFromRelationService(
-  handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)!
-): Promise<any> {
-  try {
-    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
-      method: "POST",
-      headers: {
-        // Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: GET_PROFILES,
-        variables: {
-          identity: handle,
-          platform,
-        },
-      }),
-    });
-    return await response.json();
-  } catch (e) {
-    return { errors: e };
-  }
-}
-
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[] | ProfileNSResponse[],
   targetPlatform: PlatformType,
@@ -207,9 +186,10 @@ export const resolveUniversalRespondFromRelation = async ({
   req: NextRequest;
   ns?: boolean;
 }) => {
-  const responseFromRelation = await resolveHandleFromRelationService(
+  const responseFromRelation = await queryIdentityGraph(
     handle,
-    platform
+    platform,
+    GET_PROFILES
   );
   if (responseFromRelation?.errors)
     return {
@@ -223,21 +203,7 @@ export const resolveUniversalRespondFromRelation = async ({
     responseFromRelation,
     handle,
     platform
-  )
-    .filter(
-      (x) =>
-        x.platform !== PlatformType.unstoppableDomains ||
-        !x.identity.endsWith(".eth")
-    )
-    .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
-
-  if (!profilesArray.some((x) => x.platform !== PlatformType.nextid))
-    return {
-      identity: handle,
-      code: 404,
-      message: ErrorMessages.invalidResolved,
-      platform,
-    };
+  ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
 
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
@@ -314,7 +280,7 @@ export const resolveUniversalHandle = async (
   if (!handleToQuery || !platform)
     return errorHandle({
       identity: handle,
-      platform: PlatformType.nextid,
+      platform: PlatformType.ens,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });

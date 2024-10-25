@@ -199,16 +199,18 @@ export const BATCH_GET_PROFILES = `
 
 export async function queryIdentityGraph(
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)!
+  platform: PlatformType = handleSearchPlatform(handle)!,
+  query: string
 ): Promise<any> {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
+        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: GET_SINGLE_PROFILE,
+        query,
         variables: {
           identity: handle,
           platform,

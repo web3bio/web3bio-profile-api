@@ -6,10 +6,10 @@ import {
 import { LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { ErrorMessages } from "@/utils/types";
-import { queryIdentityGraph } from "@/utils/query";
+import { GET_SINGLE_PROFILE, queryIdentityGraph } from "@/utils/query";
 
 export const resolveLensHandle = async (handle: string) => {
-  const response = await queryIdentityGraph(handle, PlatformType.lens);
+  const response = await queryIdentityGraph(handle, PlatformType.lens, GET_SINGLE_PROFILE);
   const profile = response?.data?.identity?.profile;
 
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });

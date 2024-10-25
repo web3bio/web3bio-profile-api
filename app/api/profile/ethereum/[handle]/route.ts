@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveENSHandle } from "../../ens/[handle]/utils";
+import { resolveENSResponse } from "../../ens/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveENSHandle(handle);
+    const json = await resolveENSResponse(handle);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
