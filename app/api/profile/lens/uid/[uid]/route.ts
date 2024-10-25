@@ -1,30 +1,29 @@
-import { errorHandle, prettify, respondWithCache } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexFarcaster } from "@/utils/regexp";
+import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveFarcasterHandle } from "./utils";
+import { resolveLensHandle } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle")?.toLowerCase() || "";
+  const uid = searchParams.get("uid")?.toLowerCase() || "";
 
-  if (!regexFarcaster.test(handle) && !/#\d+/.test(handle))
+  if (!regexUID.test(uid))
     return errorHandle({
-      identity: handle,
-      platform: PlatformType.farcaster,
+      identity: uid,
+      platform: PlatformType.lens,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  const queryInput = prettify(handle);
 
   try {
-    const json = await resolveFarcasterHandle(queryInput);
+    const json = await resolveLensHandle(`#${uid}`);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
-      identity: queryInput,
-      platform: PlatformType.farcaster,
+      identity: uid,
+      platform: PlatformType.lens,
       code: e.cause || 500,
       message: e.message,
     });

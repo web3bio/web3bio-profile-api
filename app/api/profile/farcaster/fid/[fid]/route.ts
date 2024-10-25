@@ -1,29 +1,28 @@
-import { errorHandle, prettify, respondWithCache } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexFarcaster } from "@/utils/regexp";
+import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveFarcasterHandle } from "./utils";
+import { resolveFarcasterHandle } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle")?.toLowerCase() || "";
+  const fid = searchParams.get("handle")?.toLowerCase() || "";
 
-  if (!regexFarcaster.test(handle) && !/#\d+/.test(handle))
+  if (!regexUID.test(fid))
     return errorHandle({
-      identity: handle,
+      identity: fid,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  const queryInput = prettify(handle);
 
   try {
-    const json = await resolveFarcasterHandle(queryInput);
+    const json = await resolveFarcasterHandle(`#${fid}`);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
-      identity: queryInput,
+      identity: fid,
       platform: PlatformType.farcaster,
       code: e.cause || 500,
       message: e.message,

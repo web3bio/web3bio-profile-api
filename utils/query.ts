@@ -31,9 +31,8 @@ export const GET_SINGLE_PROFILE = `
           }
           social {
             uid
-            following
             follower
-            updateAt
+            following
           }
         }
       }
@@ -61,9 +60,8 @@ export const GET_PROFILES = `
           }
           social {
             uid
-            following
             follower
-            updateAt
+            following
           }
         }
         identityGraph {
@@ -94,8 +92,8 @@ export const GET_PROFILES = `
               }
               social {
                 uid
-                following
                 follower
+                following
               }
             }
           }
