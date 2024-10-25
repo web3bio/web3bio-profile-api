@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveFarcasterHandle } from "../../[handle]/utils";
+import { resolveFarcasterHandleNS } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     });
 
   try {
-    const json = await resolveFarcasterHandle(`#${fid}`);
+    const json = await resolveFarcasterHandleNS(`#${fid}`);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

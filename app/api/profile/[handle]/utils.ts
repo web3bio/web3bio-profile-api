@@ -2,7 +2,6 @@ import {
   PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
-  handleSearchPlatform,
   isValidEthereumAddress,
   prettify,
   respondWithCache,

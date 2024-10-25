@@ -206,7 +206,7 @@ export async function queryIdentityGraph(
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        // Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
