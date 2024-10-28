@@ -5,14 +5,14 @@ import {
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { ErrorMessages } from "@/utils/types";
-import { GET_SINGLE_PROFILE, queryIdentityGraph } from "@/utils/query";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS } from "@/utils/base";
 
 export const resolveLensHandle = async (handle: string) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.lens,
-    GET_SINGLE_PROFILE
+    GET_PROFILES(true)
   );
   const profile = response?.data?.identity?.profile;
 

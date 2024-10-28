@@ -7,7 +7,7 @@ import {
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEns } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { GET_SINGLE_PROFILE, queryIdentityGraph } from "@/utils/query";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 
 export const resolveENSResponse = async (handle: string) => {
   let identity,
@@ -26,7 +26,7 @@ export const resolveENSResponse = async (handle: string) => {
   const res = await queryIdentityGraph(
     identity,
     platform as PlatformType,
-    GET_SINGLE_PROFILE
+    GET_PROFILES(true)
   );
   const profile = res?.data?.identity?.profile;
 

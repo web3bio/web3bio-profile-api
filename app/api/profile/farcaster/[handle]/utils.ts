@@ -2,7 +2,7 @@ import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexTwitterLink } from "@/utils/regexp";
 import { ErrorMessages, ProfileRecord } from "@/utils/types";
-import { GET_SINGLE_PROFILE, queryIdentityGraph } from "@/utils/query";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 
 const resolveFarcasterLinks = (profile: ProfileRecord) => {
   const linksObj = {
@@ -27,7 +27,7 @@ export const resolveFarcasterHandle = async (handle: string) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.farcaster,
-    GET_SINGLE_PROFILE
+    GET_PROFILES(true)
   );
   const profile = response?.data?.identity?.profile;
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });

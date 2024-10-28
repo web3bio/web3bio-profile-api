@@ -4,8 +4,8 @@ import {
   shouldPlatformFetch,
 } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
-import { resolveUniversalRespondFromRelation } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/utils";
+import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const platform = handleSearchPlatform(name);
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
-    const profiles = (await resolveUniversalRespondFromRelation({
+    const profiles = (await resolveWithIdentityGraph({
       platform,
       handle: name,
       req,
@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
       }
       if (rawAvatarUrl?.includes(".webp")) {
         avatarURL = `${BASE_URL}/avatar/process?url=${encodeURIComponent(
-          rawAvatarUrl,
+          rawAvatarUrl
         )}`;
       }
       try {

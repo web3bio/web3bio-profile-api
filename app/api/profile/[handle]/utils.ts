@@ -175,7 +175,7 @@ function sortProfilesByPlatform(
   return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
 }
 
-export const resolveUniversalRespondFromRelation = async ({
+export const resolveWithIdentityGraph = async ({
   platform,
   handle,
   req,
@@ -189,7 +189,7 @@ export const resolveUniversalRespondFromRelation = async ({
   const responseFromRelation = await queryIdentityGraph(
     handle,
     platform,
-    GET_PROFILES
+    GET_PROFILES(false)
   );
   if (responseFromRelation?.errors)
     return {
@@ -295,7 +295,7 @@ export const resolveUniversalHandle = async (
       code: 404,
       message: ErrorMessages.invalidAddr,
     });
-  const res = (await resolveUniversalRespondFromRelation({
+  const res = (await resolveWithIdentityGraph({
     platform,
     handle: handleToQuery,
     req,

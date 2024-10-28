@@ -10,37 +10,8 @@ const directPass = (identity: IdentityRecord) => {
   );
 };
 
-export const GET_SINGLE_PROFILE = `
- query GET_SINGLE_PROFILE($platform: Platform!, $identity: String!) {
-      identity(platform: $platform, identity: $identity) {
-        identity
-        platform
-        isPrimary
-        aliases
-        profile {
-          identity
-          platform
-          address
-          displayName
-          avatar
-          description
-          contenthash
-          texts
-          addresses {
-            network
-            address
-          }
-          social {
-            uid
-            follower
-            following
-          }
-        }
-      }
-  }
-`;
 
-export const GET_PROFILES = `
+export const GET_PROFILES = (single?: boolean) => `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
         identity
@@ -66,7 +37,9 @@ export const GET_PROFILES = `
             following
           }
         }
-        identityGraph {
+        ${
+          !single
+            ? `identityGraph {
           vertices {
             identity
             platform
@@ -100,6 +73,8 @@ export const GET_PROFILES = `
               }
             }
           }
+        }`
+            : ``
         }
       }
   }
@@ -120,21 +95,15 @@ export const primaryDomainResolvedRequestArray = (
       return [defaultReturn];
     }
     if (
-      (directPass(resolvedRecord) ||
-        resolvedRecord.platform === PlatformType.nextid) &&
+      directPass(resolvedRecord) &&
       resolvedRecord.identityGraph.vertices.length > 0
     ) {
       const vertices = resolvedRecord.identityGraph?.vertices;
       const resolved = vertices
         .filter((x) => directPass(x))
-        .filter((x) => x.platform !== PlatformType.ethereum)
         .filter((x) => {
           if (x.platform === PlatformType.ens) {
-            const ownerAddress = x.ownerAddress[0].address;
-            const resolvedAddress = x.resolvedAddress.find(
-              (i) => i.network === x.ownerAddress[0].network
-            )?.address;
-            return ownerAddress === resolvedAddress;
+            x.isPrimary;
           } else {
             return true;
           }
