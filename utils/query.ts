@@ -17,7 +17,6 @@ export const GET_PROFILES = (single?: boolean) => `
         identity
         platform
         isPrimary
-        aliases
         profile {
           identity
           platform

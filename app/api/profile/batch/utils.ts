@@ -25,12 +25,15 @@ export async function fetchIdentityGraphBatch(
       }),
     });
     const json = await response.json();
-    let res = [];
+    let res = [] as any;
     if (json?.data?.identities?.length > 0) {
       for (let i = 0; i < json.data.identities.length; i++) {
-        const item = json.data.identities[i].profile;
+        const item = json.data.identities[i];
         if (item) {
-          res.push(await generateProfileStruct(item, ns));
+          res.push({
+            ...(await generateProfileStruct(item.profile, ns)),
+            aliases: item.aliases,
+          });
         }
       }
     }
