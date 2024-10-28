@@ -58,7 +58,7 @@ interface AddressRecord {
   network: string;
   __typename: "Address";
 }
-export interface RelationServiceQueryResponse {
+export interface IdentityGraphQueryResponse {
   data: {
     identity: IdentityRecord;
   };

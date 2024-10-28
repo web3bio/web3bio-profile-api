@@ -1,7 +1,7 @@
 import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
 import { PLATFORMS_TO_EXCLUDE, handleSearchPlatform } from "./base";
 import { PlatformType } from "./platform";
-import { IdentityRecord, RelationServiceQueryResponse } from "./types";
+import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary) return true;
@@ -80,11 +80,12 @@ export const GET_PROFILES = (single?: boolean) => `
 `;
 
 export const primaryDomainResolvedRequestArray = (
-  data: RelationServiceQueryResponse,
+  data: IdentityGraphQueryResponse,
   handle: string,
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
+  console.log(resolvedRecord,'kk')
   if (resolvedRecord) {
     const defaultReturn = {
       ...resolvedRecord.profile,
@@ -189,6 +190,7 @@ export async function queryIdentityGraph(
         },
       }),
     });
+
     return await response.json();
   } catch (e) {
     return { errors: e };

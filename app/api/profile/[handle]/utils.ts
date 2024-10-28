@@ -186,21 +186,21 @@ export const resolveWithIdentityGraph = async ({
   req: NextRequest;
   ns?: boolean;
 }) => {
-  const responseFromRelation = await queryIdentityGraph(
+  const response = await queryIdentityGraph(
     handle,
     platform,
     GET_PROFILES(false)
   );
-  if (responseFromRelation?.errors)
+  if (response?.errors)
     return {
       identity: handle,
       platform,
-      message: responseFromRelation?.errors[0]?.message,
+      message: response?.errors[0]?.message,
       code: 500,
     };
 
   const profilesArray = primaryDomainResolvedRequestArray(
-    responseFromRelation,
+    response,
     handle,
     platform
   ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));

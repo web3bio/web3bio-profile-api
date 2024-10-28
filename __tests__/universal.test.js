@@ -71,11 +71,11 @@ describe("Test For Universal Profile API", () => {
       json.find((x) => x.platform === "farcaster").social.follower
     ).toBeTruthy();
   });
-  it("It should response 404 for mcdonalds.eth", async () => {
+  it("It should response 200 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/mcdonalds.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json.address).toBe("0x782cf6b6e735496f7e608489b0c57ee27f407e7d");
   });
   it("It should response 200 data for stani.lens", async () => {
     const res = await queryClient("/profile/stani.lens");
