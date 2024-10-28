@@ -5,10 +5,16 @@ describe("Test For Batch Profile API", () => {
     method: "POST",
     body: JSON.stringify({
       ids: [
-        "ethereum,0x5d25e3ebb10f4debf1d7b76eb94302d2d74c7035",
-        "ethereum,0x6b0bda3f2ffed5efc83fa8c024acff1dd45793f1",
-        "ethereum,0xadd746be46ff36f10c81d6e3ba282537f4c68077",
-        "ethereum,0x0c7d81aeee69ce8b70159269cfce60588e2d5eac",
+        "ens,sujiyan.eth",
+        "farcaster,#3",
+        "farcaster,dwr",
+        "farcaster,#966",
+        "farcaster,#1111111",
+        "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "lens,#11874",
+        "lens,sujidaily.lens",
+        "lens,#966",
+        "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
       ],
     }),
   };

@@ -16,6 +16,7 @@ export const GET_SINGLE_PROFILE = `
         identity
         platform
         isPrimary
+        aliases
         profile {
           identity
           platform
@@ -45,6 +46,7 @@ export const GET_PROFILES = `
         identity
         platform
         isPrimary
+        aliases
         profile {
           identity
           platform
@@ -77,6 +79,7 @@ export const GET_PROFILES = `
               network
               address
             }
+            aliases
             profile {
               identity
               platform
@@ -172,6 +175,7 @@ export const primaryDomainResolvedRequestArray = (
 export const BATCH_GET_PROFILES = `
   query BATCH_GET_PROFILES($ids: [String!]!) {
   identities(ids: $ids) {
+    aliases
     profile {
       uid
       identity

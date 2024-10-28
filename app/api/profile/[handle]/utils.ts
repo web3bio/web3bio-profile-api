@@ -117,6 +117,7 @@ export async function generateProfileStruct(
     displayName: data.displayName,
     avatar: await resolveEipAssetURL(data.avatar),
     description: data.description,
+    aliases: data.aliases,
   };
   return ns
     ? nsObj

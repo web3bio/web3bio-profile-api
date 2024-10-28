@@ -94,6 +94,7 @@ export interface ProfileRecord {
   social: SocialRecord;
   texts: { [index: string]: string };
   addresses: AddressRecord[];
+  aliases?: string[]
 }
 
 export const enum LensParamType {
