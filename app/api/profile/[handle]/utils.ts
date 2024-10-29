@@ -44,7 +44,7 @@ function generateSocialLinks(data: ProfileRecord) {
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
         );
-        if (key) {
+        if (key && texts[i]) {
           res[key] = {
             link: getSocialMediaLink(texts[i], key),
             handle: resolveHandle(texts[i]),
@@ -125,7 +125,7 @@ export async function generateProfileStruct(
         ...nsObj,
         email: data.texts?.email || null,
         location: data.texts?.location || null,
-        header: data.texts?.header || null,
+        header: await resolveEipAssetURL(data.texts?.header),
         contenthash: data.contenthash || null,
         links: generateSocialLinks(data) || {},
         social: data.social || {},
