@@ -5,7 +5,9 @@ import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary) return true;
-  return identity.platform === PlatformType.farcaster;
+  return [PlatformType.farcaster, PlatformType.lens].includes(
+    identity.platform
+  );
 };
 
 export const GET_PROFILES = (single?: boolean) => `
@@ -118,7 +120,9 @@ export const primaryDomainResolvedRequestArray = (
           : defaultReturn;
       const vertices =
         resolvedRecord.identityGraph?.vertices
-          .filter((x) => x.platform === PlatformType.farcaster)
+          .filter((x) =>
+            [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
+          )
           .map((x) => ({
             ...x.profile,
             isPrimary: false,
