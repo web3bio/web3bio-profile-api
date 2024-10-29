@@ -9,7 +9,7 @@ export const resolveENSRespondNS = async (handle: string) => {
     const json = {
       address: profile.address,
       identity: profile.identity,
-      platform: PlatformType.ens,
+      platform: profile.platform,
       displayName: profile.displayName,
       avatar: profile.avatar,
       description: profile.description,

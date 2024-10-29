@@ -29,7 +29,22 @@ export const resolveENSResponse = async (handle: string) => {
     GET_PROFILES(true)
   );
   const profile = res?.data?.identity?.profile;
-
+  if (!profile) {
+    return {
+      address: res.data.identity.identity,
+      identity: res.data.identity.identity,
+      platform: PlatformType.ethereum,
+      displayName: null,
+      avatar: null,
+      description: null,
+      email: null,
+      location: null,
+      header: null,
+      contenthash: null,
+      links: {},
+      social: {},
+    };
+  }
   const linksObj = await getLinks(profile.texts);
   return {
     address: profile.address.toLowerCase(),
