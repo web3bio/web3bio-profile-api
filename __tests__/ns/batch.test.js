@@ -5,10 +5,22 @@ describe("Test For Batch Profile API", () => {
     method: "POST",
     body: JSON.stringify({
       ids: [
-        "ethereum,0x0d3f5a7a1ee78e743e25c18e66942fcbcd84ccad",
-        "ethereum,0x2332a02fea96b42fc3095ae7c73963980db9331b",
-        "ethereum,0x111111176b0b13ffc31d387d08726772a0492948",
-        "ethereum,0x8eddf5431f5b31933bfbd8111d54fc6e9456e6c1",
+        "ethereum,0x2888Eecd915fbb6BE65dac1d51cD48a340E3Ab1f",
+        "ethereum,0x2888Eecd915fbb6BE65dac1d51cD48a340E3Ab1f",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x2D08D08f066bEeF8d8e70E53daC408F365Bfc8F5",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "ethereum,0x00000000009726632680FB29d3F7A9734E3010E2",
+        "farcaster,mnhsu",
+        "lens,mnhsu.lens",
+        "ethereum,0x8e1bD5Da87C14dd8e08F7ecc2aBf9D1d558ea174",
+        "ethereum,0xd7F1Dd5D49206349CaE8b585fcB0Ce3D96f1696F",
+        "ethereum,0xDdA0483184E75a5579ef9635ED14BacCf9d50283",
       ],
     }),
   };
@@ -16,7 +28,7 @@ describe("Test For Batch Profile API", () => {
     const res = await queryClient(
       "/ns/batch",
       options,
-      "http://localhost:3000"
+      "http://localhost:3001"
     );
     expect(res.status).toBe(200);
     const json = await res.json();

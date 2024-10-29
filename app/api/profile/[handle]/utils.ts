@@ -114,10 +114,9 @@ export async function generateProfileStruct(
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName,
-    avatar: await resolveEipAssetURL(data.avatar),
-    description: data.description,
-    aliases: data.aliases,
+    displayName: data.displayName || null,
+    avatar: (await resolveEipAssetURL(data.avatar)) || null,
+    description: data.description || null,
   };
   return ns
     ? nsObj
@@ -125,7 +124,7 @@ export async function generateProfileStruct(
         ...nsObj,
         email: data.texts?.email || null,
         location: data.texts?.location || null,
-        header: await resolveEipAssetURL(data.texts?.header),
+        header: (await resolveEipAssetURL(data.texts?.header)) || null,
         contenthash: data.contenthash || null,
         links: generateSocialLinks(data) || {},
         social: data.social || {},
@@ -207,10 +206,7 @@ export const resolveWithIdentityGraph = async ({
 
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
-    const obj = await generateProfileStruct(
-      profilesArray[i] as ProfileRecord,
-      ns
-    );
+    const obj = await generateProfileStruct(profilesArray[i] as any, ns);
     responsesToSort.push(obj);
   }
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)

@@ -48,7 +48,6 @@ export const GET_PROFILES = (single?: boolean) => `
               network
               address
             }
-            aliases
             profile {
               identity
               platform
@@ -108,14 +107,23 @@ export const primaryDomainResolvedRequestArray = (
         resolvedRecord.platform
       )
     ) {
+      const defaultItem =
+        resolvedRecord.platform === PlatformType.ethereum
+          ? {
+              address: resolvedRecord.identity,
+              identity: resolvedRecord.identity,
+              platform: PlatformType.ethereum,
+              isPrimary: false,
+            }
+          : defaultReturn;
       const vertices =
         resolvedRecord.identityGraph?.vertices
           .filter((x) => x.platform === PlatformType.farcaster)
           .map((x) => ({
             ...x.profile,
-            isPrimary: null,
+            isPrimary: false,
           })) || [];
-      return [...vertices, defaultReturn];
+      return [...vertices, defaultItem];
     }
     return [defaultReturn];
   }
@@ -131,6 +139,8 @@ export const primaryDomainResolvedRequestArray = (
 export const BATCH_GET_PROFILES = `
   query BATCH_GET_PROFILES($ids: [String!]!) {
   identities(ids: $ids) {
+    identity
+    platform
     aliases
     profile {
       uid

@@ -31,7 +31,14 @@ export async function fetchIdentityGraphBatch(
         const item = json.data.identities[i];
         if (item) {
           res.push({
-            ...(await generateProfileStruct(item.profile, ns)),
+            ...(await generateProfileStruct(
+              item.profile || {
+                platform: item.platform,
+                address: item.identity.toLowerCase(),
+                identity: item.identity.toLowerCase(),
+              },
+              ns
+            )),
             aliases: item.aliases,
           });
         }
