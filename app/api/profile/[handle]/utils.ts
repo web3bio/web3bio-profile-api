@@ -58,7 +58,8 @@ function generateSocialLinks(data: ProfileRecord) {
         links: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
         handle: resolvedHandle,
       };
-      const twitterMatch = data.description.match(regexTwitterLink);
+      if (!data.description) break;
+      const twitterMatch = data.description?.match(regexTwitterLink);
       if (twitterMatch) {
         const matched = twitterMatch[1];
         const resolveMatch =
