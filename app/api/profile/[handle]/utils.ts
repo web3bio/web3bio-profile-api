@@ -128,7 +128,12 @@ export async function generateProfileStruct(
         header: (await resolveEipAssetURL(data.texts?.header)) || null,
         contenthash: data.contenthash || null,
         links: generateSocialLinks(data) || {},
-        social: data.social || {},
+        social: data.social
+          ? {
+              ...data.social,
+              uid: Number(data.social.uid),
+            }
+          : {},
       };
 }
 

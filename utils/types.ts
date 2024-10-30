@@ -45,11 +45,11 @@ export interface ProfileAPIResponse extends ProfileNSResponse {
   location: string | null;
   error?: string;
   links: Record<PlatformType, LinksItem> | {};
-  social: SocialRecord;
+  social: SocialRecord | {};
 }
 
 interface SocialRecord {
-  uid: string;
+  uid: number;
   follower: number;
   following: number;
 }
@@ -94,7 +94,7 @@ export interface ProfileRecord {
   social: SocialRecord;
   texts: { [index: string]: string };
   addresses: AddressRecord[];
-  aliases?: string[]
+  aliases?: string[];
 }
 
 export const enum LensParamType {

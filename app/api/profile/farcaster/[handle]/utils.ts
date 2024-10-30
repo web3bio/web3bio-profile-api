@@ -47,7 +47,7 @@ export const resolveFarcasterHandle = async (handle: string) => {
     links: links,
     social: {
       ...profile.social,
-      uid: Number(profile.social.uid),
+      uid: Number(profile?.social?.uid),
     },
   };
 };
