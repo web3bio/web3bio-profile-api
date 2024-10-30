@@ -98,6 +98,15 @@ export const primaryDomainResolvedRequestArray = (
       const vertices = resolvedRecord.identityGraph?.vertices;
       const resolved = vertices
         .filter((x) => directPass(x))
+        .filter((x) => {
+          if (x.platform === PlatformType.ens) {
+            return (
+              x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address
+            );
+          } else {
+            return true;
+          }
+        })
         .map((x) => ({
           ...x.profile,
           isPrimary: x.isPrimary,
