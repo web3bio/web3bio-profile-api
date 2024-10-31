@@ -16,6 +16,14 @@ export const GET_PROFILES = (single?: boolean) => `
         identity
         platform
         isPrimary
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
         profile {
           identity
           platform
@@ -94,6 +102,11 @@ export const primaryDomainResolvedRequestArray = (
     }
     if (
       directPass(resolvedRecord) &&
+      !(
+        resolvedRecord.platform === PlatformType.basenames &&
+        resolvedRecord.ownerAddress[0]?.address !==
+          resolvedRecord.resolvedAddress[0]?.address
+      ) &&
       resolvedRecord.identityGraph.vertices.length > 0
     ) {
       const vertices = resolvedRecord.identityGraph?.vertices;
@@ -115,9 +128,11 @@ export const primaryDomainResolvedRequestArray = (
       return [...resolved];
     }
     if (
-      [PlatformType.ethereum, PlatformType.ens].includes(
-        resolvedRecord.platform
-      )
+      [
+        PlatformType.ethereum,
+        PlatformType.ens,
+        PlatformType.basenames,
+      ].includes(resolvedRecord.platform)
     ) {
       const defaultItem =
         resolvedRecord.platform === PlatformType.ethereum
@@ -125,13 +140,21 @@ export const primaryDomainResolvedRequestArray = (
               address: resolvedRecord.identity,
               identity: resolvedRecord.identity,
               platform: PlatformType.ethereum,
-              isPrimary: false,
+              isPrimary: resolvedRecord.isPrimary,
             }
           : defaultReturn;
       const vertices =
         resolvedRecord.identityGraph?.vertices
-          .filter((x) =>
-            [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
+          .filter(
+            (x) =>
+              [
+                PlatformType.farcaster,
+                PlatformType.lens,
+                PlatformType.ens,
+              ].includes(x.platform) &&
+              x.profile?.addresses?.some(
+                (i) => i?.address === resolvedRecord.resolvedAddress[0]?.address
+              )
           )
           .map((x) => ({
             ...x.profile,
@@ -187,7 +210,6 @@ export async function queryIdentityGraph(
   query: string
 ): Promise<any> {
   try {
-
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
