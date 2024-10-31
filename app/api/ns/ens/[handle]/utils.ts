@@ -4,7 +4,7 @@ import { resolveENSResponse } from "@/app/api/profile/ens/[handle]/utils";
 
 export const resolveENSRespondNS = async (
   handle: string,
-  _platform: PlatformType.basenames
+  _platform?: PlatformType
 ) => {
   try {
     const profile = await resolveENSResponse(handle, _platform);

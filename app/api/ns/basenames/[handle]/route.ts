@@ -1,6 +1,6 @@
-import { errorHandle, prettify, uglify } from "@/utils/base";
+import { errorHandle, uglify } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexBasenames, regexEns, regexEth } from "@/utils/regexp";
+import { regexBasenames, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveENSRespondNS } from "../../ens/[handle]/utils";

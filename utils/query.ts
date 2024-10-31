@@ -83,7 +83,7 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
-  
+
   if (resolvedRecord) {
     const defaultReturn = {
       ...resolvedRecord.profile,
@@ -187,6 +187,7 @@ export async function queryIdentityGraph(
   query: string
 ): Promise<any> {
   try {
+
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
@@ -201,7 +202,6 @@ export async function queryIdentityGraph(
         },
       }),
     });
-
     return await response.json();
   } catch (e) {
     return { errors: e };
