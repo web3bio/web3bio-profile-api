@@ -120,6 +120,7 @@ export async function generateProfileStruct(
     avatar: (await resolveEipAssetURL(data.avatar)) || null,
     description: data.description || null,
   };
+
   return ns
     ? nsObj
     : {

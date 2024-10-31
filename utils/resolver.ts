@@ -88,7 +88,6 @@ export const resolveEipAssetURL = async (
   if (match) {
     const [full, chainId, protocol, contractAddress, tokenId] = match;
     const network = chainIdToNetwork(chainId);
-
     if (contractAddress && tokenId && network) {
       try {
         const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;

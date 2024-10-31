@@ -91,7 +91,6 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
-
   if (resolvedRecord) {
     const defaultReturn = {
       ...resolvedRecord.profile,
@@ -145,17 +144,23 @@ export const primaryDomainResolvedRequestArray = (
           : defaultReturn;
       const vertices =
         resolvedRecord.identityGraph?.vertices
-          .filter(
-            (x) =>
-              [
-                PlatformType.farcaster,
-                PlatformType.lens,
-                PlatformType.ens,
-              ].includes(x.platform) &&
-              x.profile?.addresses?.some(
+          .filter((x) => {
+            if (
+              [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
+            ) {
+              return x.profile?.addresses?.some(
                 (i) => i?.address === resolvedRecord.resolvedAddress[0]?.address
-              )
-          )
+              );
+            } else {
+              return (
+                x.isPrimary &&
+                x.profile?.addresses?.some(
+                  (i) =>
+                    i?.address === resolvedRecord.resolvedAddress[0]?.address
+                )
+              );
+            }
+          })
           .map((x) => ({
             ...x.profile,
             isPrimary: false,
