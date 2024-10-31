@@ -36,6 +36,7 @@ function generateSocialLinks(data: ProfileRecord) {
   const identity = data.identity;
   const res = {} as any;
   switch (platform) {
+    case PlatformType.basenames:
     case PlatformType.ethereum:
     case PlatformType.ens:
       if (!texts) return {};
