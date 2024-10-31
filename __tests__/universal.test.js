@@ -166,4 +166,9 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("shoni.eth");
   });
+  it("It should response 200 for alexgrover.base.eth", async () => {
+    const res = await queryClient("/profile/alexgrover.base");
+    const json = await res.json();
+    expect(json.some((x) => x.platform === "ens")).toBe(false);
+  });
 });

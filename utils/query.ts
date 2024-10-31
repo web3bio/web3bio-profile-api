@@ -83,6 +83,7 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
+  
   if (resolvedRecord) {
     const defaultReturn = {
       ...resolvedRecord.profile,
