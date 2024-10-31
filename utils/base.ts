@@ -97,6 +97,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   if (
     [
       PlatformType.ens,
+      PlatformType.basenames,
       PlatformType.ethereum,
       PlatformType.farcaster,
       PlatformType.lens,
@@ -154,7 +155,11 @@ export const uglify = (input: string, platform: PlatformType) => {
   if (!input) return "";
   switch (platform) {
     case PlatformType.basenames:
-      return input.endsWith(".base") ? `${input}.eth` : `${input}.base.eth`;
+      return input.endsWith(".base")
+        ? `${input}.eth`
+        : input.endsWith(".base.eth")
+        ? input
+        : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:

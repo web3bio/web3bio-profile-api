@@ -9,18 +9,21 @@ import { regexEns } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 
-export const resolveENSResponse = async (handle: string) => {
+export const resolveENSResponse = async (
+  handle: string,
+  _platform?: PlatformType
+) => {
   let identity,
     platform = "";
 
   if (isValidEthereumAddress(handle)) {
     identity = handle.toLowerCase();
-    platform = PlatformType.ethereum;
+    platform = _platform || PlatformType.ethereum;
   } else {
     if (!regexEns.test(handle))
       throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
     identity = handle;
-    platform = PlatformType.ens;
+    platform = _platform || PlatformType.ens;
   }
 
   const res = await queryIdentityGraph(
@@ -33,7 +36,7 @@ export const resolveENSResponse = async (handle: string) => {
     return {
       address: res.data.identity.identity,
       identity: res.data.identity.identity,
-      platform: PlatformType.ethereum,
+      platform: _platform || PlatformType.ethereum,
       displayName: null,
       avatar: null,
       description: null,
@@ -49,7 +52,7 @@ export const resolveENSResponse = async (handle: string) => {
   return {
     address: profile.address.toLowerCase(),
     identity: profile.identity,
-    platform: PlatformType.ens,
+    platform: _platform || PlatformType.ens,
     displayName: profile.displayName || handle,
     avatar: await resolveEipAssetURL(profile.avatar),
     description: profile.description,

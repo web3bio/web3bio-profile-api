@@ -2,9 +2,12 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { resolveENSResponse } from "@/app/api/profile/ens/[handle]/utils";
 
-export const resolveENSRespondNS = async (handle: string) => {
+export const resolveENSRespondNS = async (
+  handle: string,
+  _platform: PlatformType.basenames
+) => {
   try {
-    const profile = await resolveENSResponse(handle);
+    const profile = await resolveENSResponse(handle, _platform);
 
     const json = {
       address: profile.address,
