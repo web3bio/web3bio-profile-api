@@ -31,6 +31,7 @@ export const resolveENSResponse = async (
     platform as PlatformType,
     GET_PROFILES(true)
   );
+
   const profile = res?.data?.identity?.profile;
   if (!profile) {
     return {

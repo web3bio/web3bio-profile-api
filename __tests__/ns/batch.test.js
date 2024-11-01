@@ -11,11 +11,10 @@ describe("Test For Batch Profile API", () => {
     const res = await queryClient(
       "/ns/batch",
       options,
-      "http://localhost:3001"
+      "http://localhost:3000"
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    console.log(json)
     expect(json.length > 0);
   });
 });

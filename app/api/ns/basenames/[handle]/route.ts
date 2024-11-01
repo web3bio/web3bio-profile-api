@@ -1,4 +1,4 @@
-import { errorHandle, uglify } from "@/utils/base";
+import { errorHandle, isValidEthereumAddress, uglify } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexBasenames, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,10 +8,9 @@ import { resolveENSRespondNS } from "../../ens/[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
-  const lowercaseName = uglify(
-    inputName?.toLowerCase(),
-    PlatformType.basenames
-  );
+  const lowercaseName = isValidEthereumAddress(inputName)
+    ? inputName
+    : uglify(inputName?.toLowerCase(), PlatformType.basenames);
   if (!regexBasenames.test(lowercaseName) && !regexEth.test(lowercaseName))
     return errorHandle({
       identity: lowercaseName,

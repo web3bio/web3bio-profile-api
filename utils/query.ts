@@ -156,7 +156,10 @@ export const primaryDomainResolvedRequestArray = (
                 x.isPrimary &&
                 x.profile?.addresses?.some(
                   (i) =>
-                    i?.address === resolvedRecord.resolvedAddress[0]?.address
+                    i?.address ===
+                    (resolvedRecord.platform === PlatformType.ethereum
+                      ? resolvedRecord.identity
+                      : resolvedRecord.resolvedAddress[0]?.address)
                 )
               );
             }
