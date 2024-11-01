@@ -1,6 +1,6 @@
-import { resolveUDResponse } from "@/app/api/profile/unstoppabledomains/[handle]/utils";
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
@@ -20,15 +20,20 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { address, domain, metadata } = await resolveUDResponse(handle);
-
+    const response = await queryIdentityGraph(
+      handle,
+      PlatformType.unstoppableDomains,
+      GET_PROFILES(true)
+    );
+    const profile = response?.data?.identity?.profile;
+    if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
     const json = {
-      address,
-      identity: domain,
+      address: profile.address,
+      identity: profile.identity,
       platform: PlatformType.unstoppableDomains,
-      displayName: metadata.profile.displayName || handle,
-      avatar: metadata.profile.imagePath || null,
-      description: metadata.profile.description || null,
+      displayName: profile.displayName || handle,
+      avatar: profile.avatar || null,
+      description: profile.description || null,
     };
 
     return respondWithCache(JSON.stringify(json));
