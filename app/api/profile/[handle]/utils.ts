@@ -211,7 +211,6 @@ export const resolveWithIdentityGraph = async ({
     handle,
     platform
   ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
-  console.log(profilesArray,'kkk')
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
     const obj = await generateProfileStruct(profilesArray[i] as any, ns);
