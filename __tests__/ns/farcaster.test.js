@@ -31,7 +31,7 @@ describe("Test For Farcaster NS API", () => {
     expect(json.address).toBeTruthy();
   });
   it("It should response 200 for fid:3", async () => {
-    const res = await queryClient("/ns/farcaster/fid:3");
+    const res = await queryClient("/ns/farcaster/fid/3");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("dwr.eth");
