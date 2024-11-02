@@ -84,7 +84,7 @@ const getLinks = async (texts: any) => {
     if (key) {
       res[key] = {
         link: getSocialMediaLink(texts[i], key),
-        handle: resolveHandle(texts[i]),
+        handle: resolveHandle(texts[i], key),
       };
     }
   });

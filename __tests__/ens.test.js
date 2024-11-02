@@ -93,7 +93,7 @@ describe("Test For ENS Profile API", () => {
     const res = await queryClient("/profile/ens/gothgorl.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.links.website.handle).toBe("starcaster12");
+    expect(json.links.website.handle).toBe("linktr.ee/starcaster12");
   });
   it("It should response 200 for offchainexample.eth", async () => {
     const res = await queryClient("/profile/ens/offchainexample.eth");
