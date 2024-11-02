@@ -9,9 +9,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
-  const regexFid = /fid:(\d*)/i;
-
-  if (!regexFarcaster.test(handle) && !regexFid.test(handle))
+  if (!regexFarcaster.test(handle) && !/#\d+/.test(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.farcaster,

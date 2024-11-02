@@ -1,36 +1,33 @@
-import {
-  errorHandle,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexLens } from "@/utils/regexp";
+import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveLensHandleNS } from "./utils";
-
-export const runtime = "edge";
+import { resolveLensHandle } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
+  const { searchParams } = req.nextUrl;
+  const uid = searchParams.get("uid")?.toLowerCase() || "";
 
-  if (!regexLens.test(handle) && !regexEth.test(handle)) {
+  if (!regexUID.test(uid))
     return errorHandle({
-      identity: handle,
+      identity: uid,
       platform: PlatformType.lens,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  }
 
   try {
-    const json = await resolveLensHandleNS(handle);
+    const json = await resolveLensHandle(`#${uid}`);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
-      identity: handle,
+      identity: uid,
       platform: PlatformType.lens,
       code: e.cause || 500,
       message: e.message,
     });
   }
 }
+
+export const runtime = "edge";

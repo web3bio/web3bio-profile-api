@@ -1,27 +1,29 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns, regexEth } from "@/utils/regexp";
+import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveENSResponse } from "../../ens/[handle]/utils";
+import { resolveFarcasterHandle } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle")?.toLowerCase() || "";
-  if (!regexEns.test(handle) && !regexEth.test(handle))
+  const fid = searchParams.get("fid")?.toLowerCase() || "";
+
+  if (!regexUID.test(fid))
     return errorHandle({
-      identity: handle,
-      platform: PlatformType.ethereum,
+      identity: fid,
+      platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+
   try {
-    const json = await resolveENSResponse(handle);
+    const json = await resolveFarcasterHandle(`#${fid}`);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
-      identity: handle,
-      platform: PlatformType.ens,
+      identity: fid,
+      platform: PlatformType.farcaster,
       code: e.cause || 500,
       message: e.message,
     });

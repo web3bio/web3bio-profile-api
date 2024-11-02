@@ -3,7 +3,6 @@ import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
-import * as contentHash from "@ensdomains/content-hash";
 import { regexDomain, regexEIP } from "./regexp";
 
 export const resolveMediaURL = (url: string): string | null => {
@@ -57,7 +56,7 @@ export const getSocialMediaLink = (
   return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
 };
 
-export function resolveSocialMediaLink(
+function resolveSocialMediaLink(
   name: string,
   type: PlatformType | string,
 ): string {
@@ -89,7 +88,6 @@ export const resolveEipAssetURL = async (
   if (match) {
     const [full, chainId, protocol, contractAddress, tokenId] = match;
     const network = chainIdToNetwork(chainId);
-
     if (contractAddress && tokenId && network) {
       try {
         const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
@@ -106,21 +104,4 @@ export const resolveEipAssetURL = async (
   }
 
   return resolveMediaURL(source);
-};
-
-export const decodeContenthash = (encoded: string) => {
-  if (
-    !encoded ||
-    ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
-  ) {
-    return null;
-  }
-
-  try {
-    const codec = contentHash.getCodec(encoded);
-    const decodedId = contentHash.decode(encoded);
-    return `${codec}://${decodedId}`;
-  } catch (e) {
-    return null;
-  }
 };

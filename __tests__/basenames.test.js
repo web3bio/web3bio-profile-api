@@ -1,0 +1,19 @@
+import { queryClient } from "../utils/test-utils";
+
+describe("Test For BaseNames Profile API", () => {
+  it("It should response 200 for suji.base", async () => {
+    const res = await queryClient("/profile/basenames/suji.base");
+    const json = await res.json();
+    expect(json.address).toBe("0xc9d18042baabe51d38297d1f3520cfbef0c83c32");
+  });
+  it("It should response 200 for tony.base.eth", async () => {
+    const res = await queryClient("/profile/basenames/tony.base.eth");
+    const json = await res.json();
+    expect(json.links.twitter.handle).toBe("tonmfer");
+  });
+  it("It should response 200 for alexgrover.base.eth", async () => {
+    const res = await queryClient("/profile/basenames/alexgrover.base.eth");
+    const json = await res.json();
+    expect(json.address).toBe("0xd6507fc98605eab8775f851c25a5e09dc12ab7a7");
+  });
+});

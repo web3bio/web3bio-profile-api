@@ -17,12 +17,7 @@ const nextConfig = {
         source: "/api",
         destination: "/",
         permanent: true,
-      },
-      {
-        source: "/api/:path*",
-        destination: "/:path*",
-        permanent: true,
-      },
+      }
     ];
   },
   async headers() {
