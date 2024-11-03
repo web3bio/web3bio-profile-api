@@ -1,4 +1,4 @@
-import { isValidEthereumAddress } from "@/utils/base";
+import { formatText, isValidEthereumAddress } from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
@@ -34,20 +34,24 @@ export const resolveENSResponse = async (
 
   const profile = res?.data?.identity?.profile;
   if (!profile) {
-    return {
-      address: res.data.identity.identity,
-      identity: res.data.identity.identity,
-      platform: _platform || PlatformType.ethereum,
-      displayName: null,
-      avatar: null,
-      description: null,
-      email: null,
-      location: null,
-      header: null,
-      contenthash: null,
-      links: {},
-      social: {},
-    };
+    if (isValidEthereumAddress(handle)) {
+      return {
+        address: handle,
+        identity: handle,
+        platform: _platform || PlatformType.ethereum,
+        displayName: formatText(handle),
+        avatar: null,
+        description: null,
+        email: null,
+        location: null,
+        header: null,
+        contenthash: null,
+        links: {},
+        social: {},
+      };
+    } else {
+      throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+    }
   }
   const linksObj = await getLinks(profile.texts);
   return {
@@ -80,7 +84,7 @@ const getLinks = async (texts: any) => {
     if (key) {
       res[key] = {
         link: getSocialMediaLink(texts[i], key),
-        handle: resolveHandle(texts[i]),
+        handle: resolveHandle(texts[i], key),
       };
     }
   });

@@ -25,8 +25,8 @@ export async function GET(req: NextRequest) {
   const lowercaseName = inputName?.toLowerCase() || "";
 
   if (
-    [regexLens.test(lowercaseName), regexEth.test(lowercaseName)].every(
-      () => false
+    ![regexLens.test(lowercaseName), regexEth.test(lowercaseName)].some(
+      (x) => !!x
     )
   )
     return errorHandle({

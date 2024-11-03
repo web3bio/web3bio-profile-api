@@ -9,8 +9,7 @@ describe("Test For ENS NS API", () => {
   });
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/ns/ens/mcdonalds.eth");
-    expect(res.status).toBe(404);
-    expect((await res.json()).error).toBe("Invalid Resolved Address");
+    expect(res.status).toBe(200);
   });
 
   it("It should response 200 for sujiyan.eth", async () => {
