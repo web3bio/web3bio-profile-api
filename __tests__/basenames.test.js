@@ -23,6 +23,7 @@ describe("Test For BaseNames Profile API", () => {
     const res = await queryClient(
       "/profile/basenames/0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e"
     );
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("ibeace.base.eth");
   });
