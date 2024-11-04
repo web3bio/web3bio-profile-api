@@ -202,15 +202,17 @@ function sortProfilesByPlatform(
 export const resolveWithIdentityGraph = async ({
   platform,
   handle,
-  req,
   ns,
 }: {
   platform: PlatformType;
   handle: string;
-  req: NextRequest;
   ns?: boolean;
 }) => {
-  const response = await queryIdentityGraph(handle, platform, GET_PROFILES(false));
+  const response = await queryIdentityGraph(
+    handle,
+    platform,
+    GET_PROFILES(false)
+  );
   if (!response.data.identity)
     return {
       identity: handle,
@@ -290,7 +292,6 @@ export const resolveWithIdentityGraph = async ({
 
 export const resolveUniversalHandle = async (
   handle: string,
-  req: NextRequest,
   platform: PlatformType,
   ns?: boolean
 ) => {
@@ -317,7 +318,6 @@ export const resolveUniversalHandle = async (
   const res = (await resolveWithIdentityGraph({
     platform,
     handle: handleToQuery,
-    req,
     ns,
   })) as any;
 

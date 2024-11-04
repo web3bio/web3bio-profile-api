@@ -16,7 +16,6 @@ export async function GET(req: NextRequest) {
     const profiles = (await resolveWithIdentityGraph({
       platform,
       handle: name,
-      req,
       ns: true,
     })) as any;
     if (profiles?.length > 0) {
