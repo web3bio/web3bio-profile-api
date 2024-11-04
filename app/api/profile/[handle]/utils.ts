@@ -19,6 +19,7 @@ import {
 } from "@/utils/resolver";
 import {
   ErrorMessages,
+  IdentityGraphEdge,
   ProfileAPIResponse,
   ProfileNSResponse,
   ProfileRecord,
@@ -29,7 +30,7 @@ import { regexTwitterLink } from "@/utils/regexp";
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
 
-function generateSocialLinks(data: ProfileRecord) {
+function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
   const platform = data.platform;
   const texts = data.texts;
   const keys = texts ? Object.keys(texts) : [];
@@ -49,6 +50,7 @@ function generateSocialLinks(data: ProfileRecord) {
           res[key] = {
             link: getSocialMediaLink(texts[i], key),
             handle: resolveHandle(texts[i], key),
+            sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
           };
         }
       });
@@ -58,6 +60,10 @@ function generateSocialLinks(data: ProfileRecord) {
       res[PlatformType.farcaster] = {
         links: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
         handle: resolvedHandle,
+        sources: resolveVerifiedLink(
+          `${PlatformType.farcaster},${resolvedHandle}`,
+          edges
+        ),
       };
       if (!data.description) break;
       const twitterMatch = data.description?.match(regexTwitterLink);
@@ -68,6 +74,10 @@ function generateSocialLinks(data: ProfileRecord) {
         res[PlatformType.twitter] = {
           link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
           handle: resolveMatch,
+          sources: resolveVerifiedLink(
+            `${PlatformType.twitter},${resolveMatch}`,
+            edges
+          ),
         };
       }
       break;
@@ -76,6 +86,10 @@ function generateSocialLinks(data: ProfileRecord) {
       res[PlatformType.lens] = {
         links: getSocialMediaLink(pureHandle!, PlatformType.lens),
         handle: pureHandle,
+        sources: resolveVerifiedLink(
+          `${PlatformType.lens},${pureHandle}.lens`,
+          edges
+        ),
       };
       keys.forEach((i) => {
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
@@ -84,23 +98,25 @@ function generateSocialLinks(data: ProfileRecord) {
             (k) => k === i.toLowerCase()
           );
           if (key) {
+            const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
             res[key] = {
               link: getSocialMediaLink(texts[i], i),
-              handle: resolveHandle(texts[i], i as PlatformType),
+              handle: resolvedHandle,
+              sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
             };
           }
         }
       });
       break;
 
-    // todo: remain to do
-    case PlatformType.dotbit:
-      break;
-    case PlatformType.sns:
-    case PlatformType.solana:
-      break;
-    case PlatformType.unstoppableDomains:
-      break;
+    // // todo: remain to do
+    // case PlatformType.dotbit:
+    //   break;
+    // case PlatformType.sns:
+    // case PlatformType.solana:
+    //   break;
+    // case PlatformType.unstoppableDomains:
+    //   break;
     default:
       break;
   }
@@ -110,7 +126,8 @@ function generateSocialLinks(data: ProfileRecord) {
 
 export async function generateProfileStruct(
   data: ProfileRecord,
-  ns?: boolean
+  ns?: boolean,
+  edges?: IdentityGraphEdge[]
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
   const nsObj = {
     address: data.address,
@@ -129,7 +146,7 @@ export async function generateProfileStruct(
         location: data.texts?.location || null,
         header: (await resolveEipAssetURL(data.texts?.header)) || null,
         contenthash: data.contenthash || null,
-        links: generateSocialLinks(data) || {},
+        links: generateSocialLinks(data, edges) || {},
         social: data.social
           ? {
               ...data.social,
@@ -193,11 +210,7 @@ export const resolveWithIdentityGraph = async ({
   req: NextRequest;
   ns?: boolean;
 }) => {
-  const response = await queryIdentityGraph(
-    handle,
-    platform,
-    GET_PROFILES(false)
-  );
+  const response = await queryIdentityGraph(handle, platform, GET_PROFILES(false));
   if (!response.data.identity)
     return {
       identity: handle,
@@ -205,7 +218,6 @@ export const resolveWithIdentityGraph = async ({
       message: ErrorMessages.notFound,
       code: 404,
     };
-
   const profilesArray = primaryDomainResolvedRequestArray(
     response,
     handle,
@@ -213,7 +225,11 @@ export const resolveWithIdentityGraph = async ({
   ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
-    const obj = await generateProfileStruct(profilesArray[i] as any, ns);
+    const obj = await generateProfileStruct(
+      profilesArray[i] as any,
+      ns,
+      response.data.identity.identityGraph?.edges
+    );
     responsesToSort.push(obj);
   }
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
@@ -315,4 +331,20 @@ export const resolveUniversalHandle = async (
   } else {
     return respondWithCache(JSON.stringify(res));
   }
+};
+
+export const resolveVerifiedLink = (
+  key: PlatformType | string,
+  edges?: IdentityGraphEdge[]
+) => {
+  const res = [] as string[];
+
+  if (!edges?.length) return res;
+  edges
+    .filter((x) => x.target === key)
+    .forEach((x) => {
+      const source = x.source.split(",")[0];
+      if (!res.includes(source)) res.push(source);
+    });
+  return res;
 };

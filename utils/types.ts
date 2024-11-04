@@ -64,6 +64,10 @@ export interface IdentityGraphQueryResponse {
   };
 }
 
+export interface IdentityGraphEdge{
+  source: string,
+  target: string,
+}
 export interface IdentityRecord {
   id: string;
   expiredAt: number;
@@ -77,6 +81,7 @@ export interface IdentityRecord {
   profile: ProfileRecord;
   identityGraph: {
     vertices: IdentityRecord[];
+    edges: IdentityGraphEdge[]
   };
 }
 
