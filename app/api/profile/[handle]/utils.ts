@@ -213,12 +213,12 @@ export const resolveWithIdentityGraph = async ({
     platform,
     GET_PROFILES(false)
   );
-  if (!response.data.identity)
+  if (!response?.data?.identity || response?.errors)
     return {
       identity: handle,
       platform,
-      message: ErrorMessages.notFound,
-      code: 404,
+      message: response.errors ? response.errors : ErrorMessages.notFound,
+      code: response.errors ? 500 : 404,
     };
   const profilesArray = primaryDomainResolvedRequestArray(
     response,
