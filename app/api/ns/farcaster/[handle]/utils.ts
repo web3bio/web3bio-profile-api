@@ -2,7 +2,7 @@ import { resolveFarcasterHandle } from "@/app/api/profile/farcaster/[handle]/uti
 import { PlatformType } from "@/utils/platform";
 
 export const resolveFarcasterHandleNS = async (handle: string) => {
-  const profile = await resolveFarcasterHandle(handle);
+  const profile = await resolveFarcasterHandle(handle, true);
 
   return {
     address: profile.address,

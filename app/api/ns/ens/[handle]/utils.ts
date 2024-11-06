@@ -7,7 +7,7 @@ export const resolveENSRespondNS = async (
   _platform?: PlatformType
 ) => {
   try {
-    const profile = await resolveENSResponse(handle, _platform);
+    const profile = await resolveENSResponse(handle, _platform, true);
 
     const json = {
       address: profile.address,

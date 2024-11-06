@@ -7,12 +7,13 @@ import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS } from "@/utils/base";
+import { resolveVerifiedLink } from "../../[handle]/utils";
 
-export const resolveLensHandle = async (handle: string) => {
+export const resolveLensHandle = async (handle: string, ns?: boolean) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.lens,
-    GET_PROFILES(true)
+    GET_PROFILES(ns)
   );
   const profile = response?.data?.identity?.profile;
 
@@ -23,6 +24,10 @@ export const resolveLensHandle = async (handle: string) => {
     [PlatformType.lens]: {
       link: getSocialMediaLink(pureHandle, PlatformType.lens),
       handle: pureHandle,
+      sources: resolveVerifiedLink(
+        `${PlatformType.lens},${profile.identity}`,
+        response.data.identity.identityGraph?.edges
+      ),
     },
   } as any;
   if (profile.texts) {
@@ -34,9 +39,14 @@ export const resolveLensHandle = async (handle: string) => {
           (k) => k === i.toLowerCase()
         );
         if (key) {
+          const resolvedHandle = resolveHandle(profile.texts[i]);
           linksObj[key] = {
             link: getSocialMediaLink(profile.texts[i], i),
-            handle: resolveHandle(profile.texts[i]),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(
+              resolvedHandle || "",
+              response.data.identity.identityGraph?.edges
+            ),
           };
         }
       }

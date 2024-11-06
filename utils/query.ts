@@ -78,6 +78,13 @@ export const GET_PROFILES = (single?: boolean) => `
               }
             }
           }
+            
+          edges {
+          source
+          target
+          dataSource
+          edgeType
+        }
         }`
             : ``
         }

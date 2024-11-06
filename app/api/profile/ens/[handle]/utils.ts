@@ -6,12 +6,14 @@ import {
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEns } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
+import { ErrorMessages, IdentityGraphEdge } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { resolveVerifiedLink } from "../../[handle]/utils";
 
 export const resolveENSResponse = async (
   handle: string,
-  _platform?: PlatformType
+  _platform?: PlatformType,
+  ns?: boolean
 ) => {
   let identity,
     platform = "";
@@ -29,7 +31,7 @@ export const resolveENSResponse = async (
   const res = await queryIdentityGraph(
     identity,
     platform as PlatformType,
-    GET_PROFILES(true)
+    GET_PROFILES(ns)
   );
 
   const profile = res?.data?.identity?.profile;
@@ -53,7 +55,10 @@ export const resolveENSResponse = async (
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
   }
-  const linksObj = await getLinks(profile.texts);
+  const linksObj = await getLinks(
+    profile.texts,
+    res.data.identity.identityGraph?.edges
+  );
   return {
     address: profile.address.toLowerCase(),
     identity: profile.identity,
@@ -72,7 +77,7 @@ export const resolveENSResponse = async (
   };
 };
 
-const getLinks = async (texts: any) => {
+const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
   if (!texts) return {};
   const keys = Object.keys(texts);
   let key = null;
@@ -85,6 +90,7 @@ const getLinks = async (texts: any) => {
       res[key] = {
         link: getSocialMediaLink(texts[i], key),
         handle: resolveHandle(texts[i], key),
+        sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
       };
     }
   });
