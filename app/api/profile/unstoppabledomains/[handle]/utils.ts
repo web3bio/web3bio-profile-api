@@ -51,7 +51,6 @@ const resolveUDHandle = async (handle: string) => {
       }
     });
   }
-
   return {
     address: profile.address,
     identity: profile.identity,
@@ -59,9 +58,9 @@ const resolveUDHandle = async (handle: string) => {
     displayName: profile.displayName || profile.handle,
     avatar: profile.avatar,
     description: profile.description,
-    email: profile.texts?.email,
-    location: profile.texts?.location,
-    header: profile.texts?.header,
+    email: profile.texts?.email || null,
+    location: profile.texts?.location || null,
+    header: profile.texts?.header || null,
     contenthash: formatContenthash(profile.contenthash),
     links: linksObj,
     social: {
