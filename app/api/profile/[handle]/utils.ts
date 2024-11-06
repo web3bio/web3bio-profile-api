@@ -144,7 +144,7 @@ export async function generateProfileStruct(
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName || null,
-    avatar: (await resolveEipAssetURL(data.avatar)) || null,
+    avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
     description: data.description || null,
   };
 

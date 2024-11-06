@@ -64,7 +64,7 @@ export const resolveENSResponse = async (
     identity: profile.identity,
     platform: _platform || PlatformType.ens,
     displayName: profile.displayName || handle,
-    avatar: await resolveEipAssetURL(profile.avatar),
+    avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description,
     email: profile.texts?.email,
     location: profile.texts?.location,
