@@ -23,6 +23,6 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, req, platform, true);
+  return await resolveUniversalHandle(inputName, platform, true);
 }
 export const runtime = "edge";
