@@ -14,7 +14,7 @@ const formatContenthash = (string: string) => {
   return null;
 };
 
-const UDSocialAccountsList = [
+export const UDSocialAccountsList = [
   PlatformType.twitter,
   PlatformType.discord,
   PlatformType.reddit,

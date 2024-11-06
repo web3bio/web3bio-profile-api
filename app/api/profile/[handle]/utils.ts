@@ -24,8 +24,8 @@ import {
   ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
-import { NextRequest } from "next/server";
 import { regexTwitterLink } from "@/utils/regexp";
+import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
@@ -115,8 +115,18 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     // case PlatformType.sns:
     // case PlatformType.solana:
     //   break;
-    // case PlatformType.unstoppableDomains:
-    //   break;
+    case PlatformType.unstoppableDomains:
+      UDSocialAccountsList.forEach((x) => {
+        const item = texts[x];
+        if (item && PLATFORM_DATA.get(x)) {
+          const resolvedHandle = resolveHandle(item, x);
+          res[x] = {
+            link: getSocialMediaLink(resolvedHandle, x),
+            handle: resolvedHandle,
+          };
+        }
+      });
+      break;
     default:
       break;
   }
@@ -162,6 +172,7 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
+  PlatformType.unstoppableDomains,
 ];
 
 function sortProfilesByPlatform(
@@ -213,6 +224,7 @@ export const resolveWithIdentityGraph = async ({
     platform,
     GET_PROFILES(false)
   );
+
   if (!response?.data?.identity || response?.errors)
     return {
       identity: handle,
@@ -226,6 +238,7 @@ export const resolveWithIdentityGraph = async ({
     platform
   ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
   let responsesToSort = [];
+
   for (let i = 0; i < profilesArray.length; i++) {
     const obj = await generateProfileStruct(
       profilesArray[i] as any,

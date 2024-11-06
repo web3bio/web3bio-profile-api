@@ -138,6 +138,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.ethereum,
         PlatformType.ens,
         PlatformType.basenames,
+        PlatformType.unstoppableDomains
       ].includes(resolvedRecord.platform)
     ) {
       const defaultItem =
