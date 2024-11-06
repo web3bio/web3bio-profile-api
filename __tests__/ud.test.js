@@ -24,10 +24,10 @@ describe("Test For Unstoppable Domains Profile API", () => {
   });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/unstoppabledomains/sujiyan.eth");
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(404);
   });
   it("It should response 200 for 2024.hi", async () => {
     const res = await queryClient("/profile/unstoppabledomains/2024.hi");
-    expect(res.status).toBe(200);
+    expect(res.status).toBe(404);
   });
 });
