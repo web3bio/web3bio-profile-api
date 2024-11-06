@@ -48,7 +48,7 @@ function generateSocialLinks(data: ProfileRecord) {
         if (key && texts[i]) {
           res[key] = {
             link: getSocialMediaLink(texts[i], key),
-            handle: resolveHandle(texts[i]),
+            handle: resolveHandle(texts[i], key),
           };
         }
       });
@@ -86,7 +86,7 @@ function generateSocialLinks(data: ProfileRecord) {
           if (key) {
             res[key] = {
               link: getSocialMediaLink(texts[i], i),
-              handle: resolveHandle(texts[i]),
+              handle: resolveHandle(texts[i], i as PlatformType),
             };
           }
         }
@@ -211,7 +211,6 @@ export const resolveWithIdentityGraph = async ({
     handle,
     platform
   ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
-
   let responsesToSort = [];
   for (let i = 0; i < profilesArray.length; i++) {
     const obj = await generateProfileStruct(profilesArray[i] as any, ns);

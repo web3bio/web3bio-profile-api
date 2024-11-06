@@ -10,6 +10,7 @@ export async function POST(req: NextRequest) {
     const queryIds = ids.filter((x: string) => {
       return [
         PlatformType.ens,
+        PlatformType.basenames,
         PlatformType.ethereum,
         PlatformType.lens,
         PlatformType.farcaster,

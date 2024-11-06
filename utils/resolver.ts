@@ -20,7 +20,6 @@ export const resolveHandle = (
   platform?: PlatformType,
 ): string | null => {
   if (!handle) return null;
-
   if (platform === PlatformType.website) {
     return handle.replace(/^https?:\/\//i, "").replace(/\/$/g, "");
   }
@@ -42,7 +41,7 @@ export const resolveHandle = (
     const parts = handle.split("/");
     return (
       handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
-    ).replace(/@/g, "");
+    ).replace(/@/g, "").split('?')[0];
   }
 
   return handle.replace(/@/g, "");

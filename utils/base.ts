@@ -125,9 +125,9 @@ const platformMap = new Map([
   [regexGenome, PlatformType.genome],
   [regexBtc, PlatformType.bitcoin],
   [regexSolana, PlatformType.solana],
+  [regexFarcaster, PlatformType.farcaster],
   [regexCluster, PlatformType.clusters],
   [regexTwitter, PlatformType.twitter],
-  [regexFarcaster, PlatformType.farcaster],
 ]);
 
 export const handleSearchPlatform = (term: string) => {
