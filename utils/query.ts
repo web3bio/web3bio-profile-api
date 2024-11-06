@@ -116,6 +116,7 @@ export const primaryDomainResolvedRequestArray = (
       resolvedRecord.identityGraph.vertices.length > 0
     ) {
       const vertices = resolvedRecord.identityGraph?.vertices;
+
       const resolved = vertices
         .filter((x) => directPass(x))
         .filter((x) => {
@@ -138,7 +139,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.ethereum,
         PlatformType.ens,
         PlatformType.basenames,
-        PlatformType.unstoppableDomains
+        PlatformType.unstoppableDomains,
       ].includes(resolvedRecord.platform)
     ) {
       const defaultItem =
@@ -156,6 +157,7 @@ export const primaryDomainResolvedRequestArray = (
         resolvedRecord.identityGraph?.vertices
           .filter((x) => {
             if (
+              x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
               return x.profile?.addresses?.some(
@@ -164,17 +166,6 @@ export const primaryDomainResolvedRequestArray = (
                   (resolvedRecord.platform === PlatformType.ethereum
                     ? resolvedRecord.identity
                     : resolvedRecord.resolvedAddress[0]?.address)
-              );
-            } else {
-              return (
-                x.isPrimary &&
-                x.profile?.addresses?.some(
-                  (i) =>
-                    i?.address ===
-                    (resolvedRecord.platform === PlatformType.ethereum
-                      ? resolvedRecord.identity
-                      : resolvedRecord.resolvedAddress[0]?.address)
-                )
               );
             }
           })

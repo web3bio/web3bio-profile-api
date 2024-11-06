@@ -22,12 +22,16 @@ describe("Test For Unstoppable Domains Profile API", () => {
     const json = await res.json();
     expect(json.address).toBe("0x2ccff304ef578b238ee82e1d1d53c34e80b48ad6");
   });
-  it("It should response 200 for sujiyan.eth", async () => {
+  it("It should response 404 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/unstoppabledomains/sujiyan.eth");
+    expect(res.status).toBe(404);
+  });
+  it("It should response 404 for nyk.app", async () => {
+    const res = await queryClient("/profile/unstoppabledomains/nyk.app");
     expect(res.status).toBe(404);
   });
   it("It should response 200 for 2024.hi", async () => {
     const res = await queryClient("/profile/unstoppabledomains/2024.hi");
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
   });
 });

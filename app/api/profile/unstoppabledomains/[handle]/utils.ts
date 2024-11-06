@@ -39,6 +39,7 @@ const resolveUDHandle = async (handle: string) => {
       handle: string | null;
     };
   } = {};
+
   if (profile.texts) {
     UDSocialAccountsList.forEach((x) => {
       const item = profile.texts[x];

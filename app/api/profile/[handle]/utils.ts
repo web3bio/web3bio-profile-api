@@ -117,7 +117,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     //   break;
     case PlatformType.unstoppableDomains:
       UDSocialAccountsList.forEach((x) => {
-        const item = texts[x];
+        const item = texts?.[x];
         if (item && PLATFORM_DATA.get(x)) {
           const resolvedHandle = resolveHandle(item, x);
           res[x] = {
@@ -160,7 +160,9 @@ export async function generateProfileStruct(
         social: data.social
           ? {
               ...data.social,
-              uid: Number(data.social.uid),
+              uid: isNaN(data.social.uid)
+                ? data.social.uid
+                : Number(data.social.uid),
             }
           : {},
       };
@@ -191,12 +193,12 @@ function sortProfilesByPlatform(
     (acc, response) => {
       const { platform } = response;
       const index = order.indexOf(platform as PlatformType);
-      if (index >= 0 && index < 5) {
+      if (index >= 0 && index < 6) {
         acc[index].push(response);
       }
       return acc;
     },
-    Array.from({ length: 5 }, (_, i) =>
+    Array.from({ length: 6 }, (_, i) =>
       i === 0
         ? [
             responses.find(
@@ -236,7 +238,18 @@ export const resolveWithIdentityGraph = async ({
     response,
     handle,
     platform
-  ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+  )
+    .reduce((pre, cur) => {
+      if (
+        !pre.some(
+          (i) => i.platform === cur.platform && i.identity === cur.identity
+        )
+      ) {
+        pre.push(cur);
+      }
+      return pre;
+    }, new Array())
+    .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
   let responsesToSort = [];
 
   for (let i = 0; i < profilesArray.length; i++) {
