@@ -98,11 +98,20 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
+
   if (resolvedRecord) {
-    const defaultReturn = {
-      ...resolvedRecord.profile,
-      isPrimary: resolvedRecord.isPrimary,
-    };
+    const defaultReturn = resolvedRecord.profile
+      ? {
+          ...resolvedRecord.profile,
+          isPrimary: resolvedRecord.isPrimary,
+        }
+      : {
+          address: resolvedRecord.identity,
+          identity: resolvedRecord.identity,
+          platform: resolvedRecord.platform,
+          displayName: formatText(resolvedRecord.identity),
+          isPrimary: resolvedRecord.isPrimary,
+        };
     if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
       return [defaultReturn];
     }

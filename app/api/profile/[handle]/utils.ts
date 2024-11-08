@@ -237,11 +237,14 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   ns?: boolean;
 }) => {
+
+
   const response = await queryIdentityGraph(
     handle,
     platform,
     GET_PROFILES(false)
   );
+
 
   if (!response?.data?.identity || response?.errors)
     return {
@@ -266,6 +269,7 @@ export const resolveWithIdentityGraph = async ({
       return pre;
     }, new Array())
     .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+
   let responsesToSort = [];
 
   for (let i = 0; i < profilesArray.length; i++) {
