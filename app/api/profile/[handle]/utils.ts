@@ -26,6 +26,7 @@ import {
 } from "@/utils/types";
 import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
+import { recordsShouldFetch } from "../sns/[handle]/utils";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
@@ -113,9 +114,20 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     // case PlatformType.dotbit:
     //   break;
     case PlatformType.sns:
-
-    console.log(texts,'kkk')
-    break;
+      recordsShouldFetch.forEach((x) => {
+        const handle = resolveHandle(texts[x]);
+        if (handle) {
+          const type = ["CNAME", PlatformType.url].includes(x)
+            ? PlatformType.website
+            : x;
+          res[type] = {
+            link: getSocialMediaLink(handle, type)!,
+            handle: handle,
+            sources: resolveVerifiedLink(`${type},${handle}`, edges),
+          };
+        }
+      });
+      break;
     // case PlatformType.solana:
     //   break;
     case PlatformType.unstoppableDomains:
@@ -126,6 +138,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
           res[x] = {
             link: getSocialMediaLink(resolvedHandle, x),
             handle: resolvedHandle,
+            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
           };
         }
       });

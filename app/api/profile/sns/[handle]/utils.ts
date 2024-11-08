@@ -5,6 +5,7 @@ import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
 import { formatText } from "@/utils/base";
 import { regexSolana } from "@/utils/regexp";
+import { resolveVerifiedLink } from "../../[handle]/utils";
 
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
@@ -19,7 +20,7 @@ export const resolveContentIPNS = async (handle: string) => {
   return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
 };
 
-const recordsShouldFetch = [
+export const recordsShouldFetch = [
   PlatformType.twitter,
   PlatformType.telegram,
   PlatformType.reddit,
@@ -29,10 +30,7 @@ const recordsShouldFetch = [
   "CNAME",
 ];
 
-export const resolveSNSHandle = async (
-  handle: string,
-  ns?: boolean
-) => {
+export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.sns,
@@ -66,6 +64,7 @@ export const resolveSNSHandle = async (
     {
       link: string;
       handle: string;
+      sources: string[];
     }
   > = {};
   if (profile.texts) {
@@ -78,6 +77,10 @@ export const resolveSNSHandle = async (
         linksObj[type] = {
           link: getSocialMediaLink(handle, type)!,
           handle: handle,
+          sources: resolveVerifiedLink(
+            `${type},${handle}`,
+            response.identityGraph?.edges
+          ),
         };
       }
     });

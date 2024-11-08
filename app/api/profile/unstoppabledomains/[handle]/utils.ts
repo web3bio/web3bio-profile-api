@@ -3,6 +3,7 @@ import { ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
+import { resolveVerifiedLink } from "../../[handle]/utils";
 
 const formatContenthash = (string: string) => {
   if (string) {
@@ -37,6 +38,7 @@ const resolveUDHandle = async (handle: string) => {
     [key in PlatformType]?: {
       link: string | null;
       handle: string | null;
+      sources?: string[];
     };
   } = {};
 
@@ -48,6 +50,10 @@ const resolveUDHandle = async (handle: string) => {
         linksObj[x] = {
           link: getSocialMediaLink(resolvedHandle, x),
           handle: resolvedHandle,
+          sources: resolveVerifiedLink(
+            `${x},${resolvedHandle}`,
+            response.identityGraph?.edges
+          ),
         };
       }
     });
