@@ -92,7 +92,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
           edges
         ),
       };
-      keys.forEach((i) => {
+      keys?.forEach((i) => {
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
           let key = null;
           key = Array.from(PLATFORM_DATA.keys()).find(
@@ -115,7 +115,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     //   break;
     case PlatformType.sns:
       recordsShouldFetch.forEach((x) => {
-        const handle = resolveHandle(texts[x]);
+        const handle = resolveHandle(texts?.[x]);
         if (handle) {
           const type = ["CNAME", PlatformType.url].includes(x)
             ? PlatformType.website
