@@ -112,7 +112,10 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     // // todo: remain to do
     // case PlatformType.dotbit:
     //   break;
-    // case PlatformType.sns:
+    case PlatformType.sns:
+
+    console.log(texts,'kkk')
+    break;
     // case PlatformType.solana:
     //   break;
     case PlatformType.unstoppableDomains:

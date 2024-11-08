@@ -1,25 +1,12 @@
-import { Connection, clusterApiUrl } from "@solana/web3.js";
-import {
-  Record as SNSRecord,
-  getRecordV2,
-  resolve,
-} from "@bonfida/spl-name-service";
-import { formatText } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexSns } from "@/utils/regexp";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
+import { formatText } from "@/utils/base";
+import { regexSolana } from "@/utils/regexp";
 
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
-
-export const reverseWithProxy = async (address: string) => {
-  const res = await fetch(SnsSDKProxyEndpoint + "favorite-domain/" + address)
-    .then((res) => res.json())
-    .catch(() => null);
-  if (!res || res?.s === "error") return "";
-  return res?.result?.reverse + ".sol";
-};
 
 export const resolveContentIPNS = async (handle: string) => {
   const res = await fetch(SnsSDKProxyEndpoint + "domain-data/" + handle)
@@ -32,84 +19,48 @@ export const resolveContentIPNS = async (handle: string) => {
   return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
 };
 
-export const resolveWithProxy = async (handle: string) => {
-  const res = await fetch(SnsSDKProxyEndpoint + "resolve/" + handle)
-    .then((res) => res.json())
-    .catch(() => null);
-  if (!res || res?.s === "error") return "";
-  return res?.result;
-};
-
-export const getSNSRecord = async (
-  connection: Connection,
-  domain: string,
-  record: SNSRecord,
-) => {
-  try {
-    return await getRecordV2(connection, domain.slice(0, -4), record, {
-      deserialize: true,
-    }).then((res) => res?.deserializedContent);
-  } catch (e) {
-    return null;
-  }
-};
-
-export const resolveSNSDomain = async (
-  connection: Connection,
-  handle: string,
-) => {
-  try {
-    return (await resolve(connection, handle))?.toBase58();
-  } catch (e) {
-    console.log(e, "error");
-    return await resolveWithProxy(handle);
-  }
-};
-
-const solanaRPCURL =
-  process.env.NEXT_PUBLIC_SOLANA_RPC_URL || clusterApiUrl("mainnet-beta");
-
 const recordsShouldFetch = [
-  SNSRecord.Twitter,
-  SNSRecord.Telegram,
-  SNSRecord.Reddit,
-  SNSRecord.Url,
-  SNSRecord.Github,
-  SNSRecord.Discord,
-  SNSRecord.CNAME,
+  PlatformType.twitter,
+  PlatformType.telegram,
+  PlatformType.reddit,
+  PlatformType.url,
+  PlatformType.github,
+  PlatformType.discord,
+  "CNAME",
 ];
 
-export const resolveSNSHandle = async (handle: string) => {
-  let domain, address;
-  const connection = new Connection(solanaRPCURL);
+export const resolveSNSHandle = async (
+  handle: string,
+  ns?: boolean
+) => {
+  const response = await queryIdentityGraph(
+    handle,
+    PlatformType.sns,
+    GET_PROFILES(ns)
+  );
 
-  if (!connection) throw new Error(ErrorMessages.networkError, { cause: 500 });
-  if (regexSns.test(handle)) {
-    domain = handle;
-    address = await resolveSNSDomain(connection, handle);
-  } else {
-    address = handle;
-    domain = await reverseWithProxy(handle);
+  const profile = response?.data?.identity?.profile;
+  if (!profile) {
+    if (regexSolana.test(handle)) {
+      return {
+        address: handle,
+        identity: handle,
+        platform: PlatformType.solana,
+        displayName: formatText(handle),
+        avatar: null,
+        description: null,
+        email: null,
+        location: null,
+        header: null,
+        contenthash: null,
+        links: {},
+        social: {},
+      };
+    } else {
+      throw new Error(ErrorMessages.notFound, { cause: 404 });
+    }
   }
-  if (!address) {
-    throw new Error(ErrorMessages.notFound, { cause: 404 });
-  }
-  if (address && !domain) {
-    return {
-      address,
-      identity: address,
-      platform: PlatformType.solana,
-      displayName: formatText(address),
-      avatar: null,
-      description: null,
-      email: null,
-      location: null,
-      header: null,
-      contenthash: null,
-      links: {},
-      social: {},
-    };
-  }
+
   const linksObj: Record<
     string,
     {
@@ -117,38 +68,41 @@ export const resolveSNSHandle = async (handle: string) => {
       handle: string;
     }
   > = {};
-
-  for (let i = 0; i < recordsShouldFetch.length; i++) {
-    const recordType = recordsShouldFetch[i];
-    const linkHandle = await getSNSRecord(connection, domain, recordType);
-    if (linkHandle) {
-      const resolved = resolveHandle(linkHandle);
-      const type = [SNSRecord.CNAME, SNSRecord.Url].includes(recordType)
-        ? PlatformType.website
-        : recordType;
-      linksObj[type] = {
-        link: getSocialMediaLink(resolved, type)!,
-        handle: resolved!,
-      };
-    }
+  if (profile.texts) {
+    recordsShouldFetch.forEach((x) => {
+      const handle = resolveHandle(profile?.texts[x]);
+      if (handle) {
+        const type = ["CNAME", PlatformType.url].includes(x)
+          ? PlatformType.website
+          : x;
+        linksObj[type] = {
+          link: getSocialMediaLink(handle, type)!,
+          handle: handle,
+        };
+      }
+    });
   }
 
-  return {
-    address,
-    identity: domain,
+  const nsObj = {
+    address: profile.address,
+    identity: profile.identity,
     platform: PlatformType.sns,
-    displayName: domain || null,
-    avatar: resolveIPFS_URL(
-      (await getSNSRecord(connection, domain, SNSRecord.Pic)) || null,
-    ),
-    description: await getSNSRecord(connection, domain, SNSRecord.TXT),
-    email: await getSNSRecord(connection, domain, SNSRecord.Email),
-    location: null,
-    header: await getSNSRecord(connection, domain, SNSRecord.Background),
-    contenthash:
-      (await getSNSRecord(connection, domain, SNSRecord.IPNS)) ||
-      (await getSNSRecord(connection, domain, SNSRecord.IPFS)) ||
-      (await resolveContentIPNS(domain)),
-    links: linksObj,
+    displayName: profile.displayName,
+    avatar: resolveIPFS_URL(profile.avatar),
+    description: profile.description,
   };
+
+  return ns
+    ? nsObj
+    : {
+        ...nsObj,
+        email: profile.texts?.email || null,
+        location: profile.texts?.location || null,
+        header: profile.texts?.background || null,
+        contenthash:
+          profile.texts?.["IPNS"] ||
+          profile.texts?.["IPFS"] ||
+          (await resolveContentIPNS(profile.identity)),
+        links: linksObj,
+      };
 };
