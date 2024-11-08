@@ -1,22 +1,32 @@
 import { errorHandle, prettify, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexFarcaster } from "@/utils/regexp";
+import { regexEth, regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveFarcasterHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle")?.toLowerCase() || "";
+  const handle = searchParams.get("handle") || "";
+  const resolvedHandle = regexSolana.test(handle)
+    ? handle
+    : handle.toLowerCase();
 
-  if (!regexFarcaster.test(handle) && !/#\d+/.test(handle))
+  if (
+    ![
+      regexEth.test(resolvedHandle),
+      regexSolana.test(resolvedHandle),
+      regexFarcaster.test(resolvedHandle),
+      /#\d+/.test(handle),
+    ].some((x) => !!x)
+  )
     return errorHandle({
-      identity: handle,
+      identity: resolvedHandle,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  const queryInput = prettify(handle);
+  const queryInput = prettify(resolvedHandle);
 
   try {
     const json = await resolveFarcasterHandle(queryInput);

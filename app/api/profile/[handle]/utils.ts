@@ -24,8 +24,9 @@ import {
   ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
-import { NextRequest } from "next/server";
 import { regexTwitterLink } from "@/utils/regexp";
+import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
+import { recordsShouldFetch } from "../sns/[handle]/utils";
 
 export const NEXTID_GRAPHQL_ENDPOINT =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
@@ -91,7 +92,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
           edges
         ),
       };
-      keys.forEach((i) => {
+      keys?.forEach((i) => {
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
           let key = null;
           key = Array.from(PLATFORM_DATA.keys()).find(
@@ -112,11 +113,36 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     // // todo: remain to do
     // case PlatformType.dotbit:
     //   break;
-    // case PlatformType.sns:
+    case PlatformType.sns:
+      recordsShouldFetch.forEach((x) => {
+        const handle = resolveHandle(texts?.[x]);
+        if (handle) {
+          const type = ["CNAME", PlatformType.url].includes(x)
+            ? PlatformType.website
+            : x;
+          res[type] = {
+            link: getSocialMediaLink(handle, type)!,
+            handle: handle,
+            sources: resolveVerifiedLink(`${type},${handle}`, edges),
+          };
+        }
+      });
+      break;
     // case PlatformType.solana:
     //   break;
-    // case PlatformType.unstoppableDomains:
-    //   break;
+    case PlatformType.unstoppableDomains:
+      UDSocialAccountsList.forEach((x) => {
+        const item = texts?.[x];
+        if (item && PLATFORM_DATA.get(x)) {
+          const resolvedHandle = resolveHandle(item, x);
+          res[x] = {
+            link: getSocialMediaLink(resolvedHandle, x),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
+          };
+        }
+      });
+      break;
     default:
       break;
   }
@@ -134,7 +160,7 @@ export async function generateProfileStruct(
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName || null,
-    avatar: (await resolveEipAssetURL(data.avatar)) || null,
+    avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
     description: data.description || null,
   };
 
@@ -150,7 +176,9 @@ export async function generateProfileStruct(
         social: data.social
           ? {
               ...data.social,
-              uid: Number(data.social.uid),
+              uid: isNaN(data.social.uid)
+                ? data.social.uid
+                : Number(data.social.uid),
             }
           : {},
       };
@@ -162,6 +190,7 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
+  PlatformType.unstoppableDomains,
 ];
 
 function sortProfilesByPlatform(
@@ -180,12 +209,12 @@ function sortProfilesByPlatform(
     (acc, response) => {
       const { platform } = response;
       const index = order.indexOf(platform as PlatformType);
-      if (index >= 0 && index < 5) {
+      if (index >= 0 && index < 6) {
         acc[index].push(response);
       }
       return acc;
     },
-    Array.from({ length: 5 }, (_, i) =>
+    Array.from({ length: 6 }, (_, i) =>
       i === 0
         ? [
             responses.find(
@@ -208,11 +237,15 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   ns?: boolean;
 }) => {
+
+
   const response = await queryIdentityGraph(
     handle,
     platform,
     GET_PROFILES(false)
   );
+
+
   if (!response?.data?.identity || response?.errors)
     return {
       identity: handle,
@@ -224,8 +257,21 @@ export const resolveWithIdentityGraph = async ({
     response,
     handle,
     platform
-  ).sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+  )
+    .reduce((pre, cur) => {
+      if (
+        !pre.some(
+          (i) => i.platform === cur.platform && i.identity === cur.identity
+        )
+      ) {
+        pre.push(cur);
+      }
+      return pre;
+    }, new Array())
+    .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+
   let responsesToSort = [];
+
   for (let i = 0; i < profilesArray.length; i++) {
     const obj = await generateProfileStruct(
       profilesArray[i] as any,

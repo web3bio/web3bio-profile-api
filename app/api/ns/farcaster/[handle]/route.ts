@@ -1,22 +1,32 @@
 import { errorHandle, prettify, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexFarcaster } from "@/utils/regexp";
+import { regexEth, regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveFarcasterHandleNS } from "./utils";
 
 export const runtime = "edge";
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
+  const { searchParams } = req.nextUrl;
+  const handle = searchParams.get("handle") || "";
+  const resolvedHandle = regexSolana.test(handle)
+    ? handle
+    : handle.toLowerCase();
 
-  if (!regexFarcaster.test(handle) && !regexEth.test(handle)) {
+  if (
+    ![
+      regexEth.test(resolvedHandle),
+      regexSolana.test(resolvedHandle),
+      regexFarcaster.test(resolvedHandle),
+      /#\d+/.test(handle),
+    ].some((x) => !!x)
+  )
     return errorHandle({
-      identity: handle,
+      identity: resolvedHandle,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  }
 
   const queryInput = prettify(handle);
 

@@ -98,11 +98,20 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
+
   if (resolvedRecord) {
-    const defaultReturn = {
-      ...resolvedRecord.profile,
-      isPrimary: resolvedRecord.isPrimary,
-    };
+    const defaultReturn = resolvedRecord.profile
+      ? {
+          ...resolvedRecord.profile,
+          isPrimary: resolvedRecord.isPrimary,
+        }
+      : {
+          address: resolvedRecord.identity,
+          identity: resolvedRecord.identity,
+          platform: resolvedRecord.platform,
+          displayName: formatText(resolvedRecord.identity),
+          isPrimary: resolvedRecord.isPrimary,
+        };
     if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
       return [defaultReturn];
     }
@@ -116,6 +125,7 @@ export const primaryDomainResolvedRequestArray = (
       resolvedRecord.identityGraph.vertices.length > 0
     ) {
       const vertices = resolvedRecord.identityGraph?.vertices;
+
       const resolved = vertices
         .filter((x) => directPass(x))
         .filter((x) => {
@@ -138,6 +148,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.ethereum,
         PlatformType.ens,
         PlatformType.basenames,
+        PlatformType.unstoppableDomains,
       ].includes(resolvedRecord.platform)
     ) {
       const defaultItem =
@@ -155,6 +166,7 @@ export const primaryDomainResolvedRequestArray = (
         resolvedRecord.identityGraph?.vertices
           .filter((x) => {
             if (
+              x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
               return x.profile?.addresses?.some(
@@ -163,17 +175,6 @@ export const primaryDomainResolvedRequestArray = (
                   (resolvedRecord.platform === PlatformType.ethereum
                     ? resolvedRecord.identity
                     : resolvedRecord.resolvedAddress[0]?.address)
-              );
-            } else {
-              return (
-                x.isPrimary &&
-                x.profile?.addresses?.some(
-                  (i) =>
-                    i?.address ===
-                    (resolvedRecord.platform === PlatformType.ethereum
-                      ? resolvedRecord.identity
-                      : resolvedRecord.resolvedAddress[0]?.address)
-                )
               );
             }
           })
