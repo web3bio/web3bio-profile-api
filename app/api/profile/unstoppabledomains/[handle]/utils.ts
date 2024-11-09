@@ -62,7 +62,7 @@ const resolveUDHandle = async (handle: string) => {
     address: profile.address,
     identity: profile.identity,
     platform: PlatformType.unstoppableDomains,
-    displayName: profile.displayName || profile.handle,
+    displayName: profile.displayName || profile.identity,
     avatar: profile.avatar,
     description: profile.description,
     email: profile.texts?.email || null,

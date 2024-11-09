@@ -8,7 +8,7 @@ export const resolveFarcasterHandleNS = async (handle: string) => {
     address: profile.address,
     identity: profile.identity,
     platform: PlatformType.farcaster,
-    displayName: profile.displayName,
+    displayName: profile.displayName || profile.identity,
     avatar: profile.avatar,
     description: profile.description,
   };
