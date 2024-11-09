@@ -98,7 +98,6 @@ export const primaryDomainResolvedRequestArray = (
   platform: PlatformType
 ) => {
   const resolvedRecord = data?.data?.identity;
-
   if (resolvedRecord) {
     const defaultReturn = resolvedRecord.profile
       ? {
@@ -122,9 +121,9 @@ export const primaryDomainResolvedRequestArray = (
         resolvedRecord.ownerAddress[0]?.address !==
           resolvedRecord.resolvedAddress[0]?.address
       ) &&
-      resolvedRecord.identityGraph.vertices.length > 0
+      resolvedRecord.identityGraph?.vertices?.length > 0
     ) {
-      const vertices = resolvedRecord.identityGraph?.vertices;
+      const vertices = resolvedRecord.identityGraph.vertices;
 
       const resolved = vertices
         .filter((x) => directPass(x))
@@ -151,16 +150,17 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.unstoppableDomains,
       ].includes(resolvedRecord.platform)
     ) {
-      const defaultItem =
-        resolvedRecord.platform === PlatformType.ethereum
-          ? {
-              address: resolvedRecord.identity,
-              identity: resolvedRecord.identity,
-              platform: PlatformType.ethereum,
-              displayName: formatText(resolvedRecord.identity),
-              isPrimary: resolvedRecord.isPrimary,
-            }
-          : defaultReturn;
+      const defaultItem = resolvedRecord?.profile
+        ? defaultReturn
+        : resolvedRecord.platform === PlatformType.ethereum
+        ? {
+            address: resolvedRecord.identity,
+            identity: resolvedRecord.identity,
+            platform: PlatformType.ethereum,
+            displayName: formatText(resolvedRecord.identity),
+            isPrimary: resolvedRecord.isPrimary,
+          }
+        : defaultReturn;
 
       const vertices =
         resolvedRecord.identityGraph?.vertices
