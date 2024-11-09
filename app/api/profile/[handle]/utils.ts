@@ -45,7 +45,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
       let key = null;
       keys.forEach((i) => {
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
         );
         if (key && texts[i]) {
           res[key] = {
@@ -63,7 +63,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         handle: resolvedHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.farcaster},${resolvedHandle}`,
-          edges
+          edges,
         ),
       };
       if (!data.description) break;
@@ -77,7 +77,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
           handle: resolveMatch,
           sources: resolveVerifiedLink(
             `${PlatformType.twitter},${resolveMatch}`,
-            edges
+            edges,
           ),
         };
       }
@@ -89,14 +89,14 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         handle: pureHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.lens},${pureHandle}.lens`,
-          edges
+          edges,
         ),
       };
       keys?.forEach((i) => {
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
           let key = null;
           key = Array.from(PLATFORM_DATA.keys()).find(
-            (k) => k === i.toLowerCase()
+            (k) => k === i.toLowerCase(),
           );
           if (key) {
             const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
@@ -153,13 +153,13 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
 export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
   const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || null,
+    displayName: data.displayName || data.identity,
     avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
     description: data.description || null,
   };
@@ -196,7 +196,7 @@ const DEFAULT_PLATFORM_ORDER = [
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[] | ProfileNSResponse[],
   targetPlatform: PlatformType,
-  handle: string
+  handle: string,
 ): ProfileAPIResponse[] {
   const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
     ? [
@@ -218,11 +218,11 @@ function sortProfilesByPlatform(
       i === 0
         ? [
             responses.find(
-              (x) => x.identity === handle && x.platform === targetPlatform
+              (x) => x.identity === handle && x.platform === targetPlatform,
             ),
           ]
-        : []
-    )
+        : [],
+    ),
   );
 
   return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
@@ -237,14 +237,11 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   ns?: boolean;
 }) => {
-
-
   const response = await queryIdentityGraph(
     handle,
     platform,
-    GET_PROFILES(false)
+    GET_PROFILES(false),
   );
-
 
   if (!response?.data?.identity || response?.errors)
     return {
@@ -256,12 +253,12 @@ export const resolveWithIdentityGraph = async ({
   const profilesArray = primaryDomainResolvedRequestArray(
     response,
     handle,
-    platform
+    platform,
   )
     .reduce((pre, cur) => {
       if (
         !pre.some(
-          (i) => i.platform === cur.platform && i.identity === cur.identity
+          (i) => i.platform === cur.platform && i.identity === cur.identity,
         )
       ) {
         pre.push(cur);
@@ -276,7 +273,7 @@ export const resolveWithIdentityGraph = async ({
     const obj = await generateProfileStruct(
       profilesArray[i] as any,
       ns,
-      response.data.identity.identityGraph?.edges
+      response.data.identity.identityGraph?.edges,
     );
     responsesToSort.push(obj);
   }
@@ -309,7 +306,7 @@ export const resolveWithIdentityGraph = async ({
             location: null,
             header: null,
             links: {},
-          }) as ProfileAPIResponse
+          }) as ProfileAPIResponse,
     );
   }
 
@@ -318,7 +315,7 @@ export const resolveWithIdentityGraph = async ({
       cur &&
       !pre.find(
         (x: ProfileAPIResponse) =>
-          x.platform === cur.platform && x.identity === cur.identity
+          x.platform === cur.platform && x.identity === cur.identity,
       )
     ) {
       pre.push(cur as ProfileAPIResponse);
@@ -339,7 +336,7 @@ export const resolveWithIdentityGraph = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   platform: PlatformType,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   const handleToQuery = prettify(handle);
 
@@ -381,7 +378,7 @@ export const resolveUniversalHandle = async (
 
 export const resolveVerifiedLink = (
   key: PlatformType | string,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ) => {
   const res = [] as string[];
 

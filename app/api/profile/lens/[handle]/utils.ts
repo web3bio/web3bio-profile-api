@@ -13,7 +13,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.lens,
-    GET_PROFILES(ns)
+    GET_PROFILES(ns),
   );
   const profile = response?.data?.identity?.profile;
 
@@ -26,7 +26,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
       handle: pureHandle,
       sources: resolveVerifiedLink(
         `${PlatformType.lens},${profile.identity}`,
-        response.data.identity.identityGraph?.edges
+        response.data.identity.identityGraph?.edges,
       ),
     },
   } as any;
@@ -36,7 +36,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
       if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
         let key = null;
         key = Array.from(PLATFORM_DATA.keys()).find(
-          (k) => k === i.toLowerCase()
+          (k) => k === i.toLowerCase(),
         );
         if (key) {
           const resolvedHandle = resolveHandle(profile.texts[i]);
@@ -45,7 +45,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
             handle: resolvedHandle,
             sources: resolveVerifiedLink(
               resolvedHandle || "",
-              response.data.identity.identityGraph?.edges
+              response.data.identity.identityGraph?.edges,
             ),
           };
         }
@@ -56,7 +56,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
   const avatarUri =
     profile.avatar ||
     (await resolveEipAssetURL(
-      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${profile.social.uid}`
+      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${profile.social.uid}`,
     ));
   const resJSON = {
     address: profile.address,
@@ -68,7 +68,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
     description: profile.description,
     location: profile.texts?.location || null,
     header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner
+      profile.texts?.header || profile.texts?.banner,
     ),
     contenthash: null,
     links: linksObj,
