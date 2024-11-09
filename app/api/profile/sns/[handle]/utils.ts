@@ -40,20 +40,25 @@ export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
   const profile = response?.data?.identity?.profile;
   if (!profile) {
     if (regexSolana.test(handle)) {
-      return {
+      const nsObj = {
         address: handle,
         identity: handle,
         platform: PlatformType.solana,
         displayName: formatText(handle),
         avatar: null,
         description: null,
-        email: null,
-        location: null,
-        header: null,
-        contenthash: null,
-        links: {},
-        social: {},
       };
+      return ns
+        ? nsObj
+        : {
+            ...nsObj,
+            email: null,
+            location: null,
+            header: null,
+            contenthash: null,
+            links: {},
+            social: {},
+          };
     } else {
       throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
@@ -90,7 +95,7 @@ export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
     address: profile.address,
     identity: profile.identity,
     platform: PlatformType.sns,
-    displayName: profile.displayName,
+    displayName: profile.displayName || profile.identity,
     avatar: resolveIPFS_URL(profile.avatar),
     description: profile.description,
   };

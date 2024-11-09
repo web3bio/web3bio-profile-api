@@ -13,7 +13,7 @@ export const resolveENSRespondNS = async (
       address: profile.address,
       identity: profile.identity,
       platform: profile.platform,
-      displayName: profile.displayName,
+      displayName: profile.displayName || profile.identity,
       avatar: profile.avatar,
       description: profile.description,
     };
