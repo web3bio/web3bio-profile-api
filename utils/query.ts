@@ -176,7 +176,7 @@ export const primaryDomainResolvedRequestArray = (
           })
           .map((x) => ({
             ...x.profile,
-            isPrimary: false,
+            isPrimary: x.isPrimary,
           })) || [];
       return resolvedRecord.platform === PlatformType.ethereum
         ? [...vertices]
