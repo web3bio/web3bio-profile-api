@@ -155,17 +155,6 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.unstoppableDomains,
       ].includes(resolvedRecord.platform)
     ) {
-      const defaultItem = resolvedRecord?.profile
-        ? defaultReturn
-        : resolvedRecord.platform === PlatformType.ethereum
-        ? {
-            address: resolvedRecord.identity,
-            identity: resolvedRecord.identity,
-            platform: PlatformType.ethereum,
-            displayName: formatText(resolvedRecord.identity),
-            isPrimary: resolvedRecord.isPrimary,
-          }
-        : defaultReturn;
       const vertices =
         resolvedRecord.identityGraph?.vertices
           .filter((x) => {
@@ -189,7 +178,9 @@ export const primaryDomainResolvedRequestArray = (
             ...x.profile,
             isPrimary: false,
           })) || [];
-      return [...vertices, defaultItem];
+      return resolvedRecord.platform === PlatformType.ethereum
+        ? [...vertices]
+        : [...vertices, defaultReturn];
     }
     return [defaultReturn];
   }
