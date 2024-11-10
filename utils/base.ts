@@ -33,6 +33,13 @@ export const PLATFORMS_TO_EXCLUDE = [
   PlatformType.solana,
 ];
 
+export function isSameAddress(
+  address?: string | undefined,
+  otherAddress?: string | undefined
+): boolean {
+  if (!address || !otherAddress) return false;
+  return address.toLowerCase() === otherAddress.toLowerCase();
+}
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(

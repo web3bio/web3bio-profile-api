@@ -1,5 +1,10 @@
 import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
-import { PLATFORMS_TO_EXCLUDE, formatText, handleSearchPlatform } from "./base";
+import {
+  PLATFORMS_TO_EXCLUDE,
+  formatText,
+  handleSearchPlatform,
+  isSameAddress,
+} from "./base";
 import { PlatformType } from "./platform";
 import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
 
@@ -161,7 +166,6 @@ export const primaryDomainResolvedRequestArray = (
             isPrimary: resolvedRecord.isPrimary,
           }
         : defaultReturn;
-
       const vertices =
         resolvedRecord.identityGraph?.vertices
           .filter((x) => {
@@ -169,12 +173,15 @@ export const primaryDomainResolvedRequestArray = (
               x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
-              return x.profile?.addresses?.some(
-                (i) =>
-                  i?.address ===
-                  (resolvedRecord.platform === PlatformType.ethereum
-                    ? resolvedRecord.identity
-                    : resolvedRecord.resolvedAddress[0]?.address)
+              const sourceAddr =
+                resolvedRecord.platform === PlatformType.ethereum
+                  ? resolvedRecord.identity
+                  : resolvedRecord.resolvedAddress[0]?.address;
+              return (
+                isSameAddress(x.profile?.address, sourceAddr) ||
+                x.profile?.addresses?.some((i) =>
+                  isSameAddress(i?.address, sourceAddr)
+                )
               );
             }
           })
