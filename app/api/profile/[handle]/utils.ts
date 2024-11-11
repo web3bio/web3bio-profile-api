@@ -266,7 +266,6 @@ export const resolveWithIdentityGraph = async ({
       return pre;
     }, new Array())
     .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
-
   let responsesToSort = [];
 
   for (let i = 0; i < profilesArray.length; i++) {
@@ -280,13 +279,6 @@ export const resolveWithIdentityGraph = async ({
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
     : sortProfilesByPlatform(responsesToSort, platform, handle);
-
-  if (
-    platform === PlatformType.ethereum &&
-    !returnRes.some((x) => x?.address === handle)
-  ) {
-    returnRes.unshift(responsesToSort.find((x) => x?.address === handle)!);
-  }
 
   if (!returnRes.length && platform === PlatformType.ethereum) {
     const nsObj = {
