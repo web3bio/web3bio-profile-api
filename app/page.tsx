@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/base";
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity Resolver";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Farcaster, Lens Protocol, Unstoppable Domains, Solana Name Service, and Next.ID into their applications.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Basenames, Farcaster, Lens Protocol, Unstoppable Domains, and Solana Name Service into their applications.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -96,8 +96,7 @@ export default function Home() {
               >
                 Solana (SNS)
               </span>
-              , <span className="text-underline">.bit</span> and{" "}
-              <span className="text-underline">Next.ID</span> into their
+              , and <span className="text-underline">.bit</span> into their
               applications. These APIs are already integrated into{" "}
               <a
                 href="https://web3.bio"
@@ -678,8 +677,8 @@ export default function Home() {
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
                 An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), a Next.ID address, or an
-                Unstoppable Domains domain.
+                username (ends with .farcaster), or an Unstoppable Domains
+                domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -743,22 +742,6 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a href={`${BASE_URL}/ns/sandy.nft`} target="_blank">
                   /ns/sandy.nft
-                </a>
-              </li>
-              <li>
-                <span className="label">Next.ID</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
-                  target="_blank"
-                >
-                  /profile/0x028f......3e50
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50`}
-                  target="_blank"
-                >
-                  /ns/0x028f......3e50
                 </a>
               </li>
             </ul>
@@ -1862,16 +1845,6 @@ export default function Home() {
               <li>
                 <span className="label label-primary">Update</span> Added ENS
                 username support in the Farcaster Profile API.
-              </li>
-            </ul>
-            <h3 className="text-bold h6 mt-4">
-              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
-              July Update
-            </h3>
-            <ul>
-              <li>
-                <span className="label label-primary">Feature</span> Added
-                Next.ID query support to the Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">

@@ -36,6 +36,6 @@ describe("Test For Ethereum Profile API", () => {
   });
   it("It should response 404 for taoli.eth", async () => {
     const res = await queryClient("/profile/ethereum/taoli.eth");
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
   });
 });

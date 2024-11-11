@@ -1,85 +1,186 @@
-import { PLATFORMS_TO_EXCLUDE } from "./base";
+import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
+import {
+  PLATFORMS_TO_EXCLUDE,
+  formatText,
+  handleSearchPlatform,
+  isSameAddress,
+} from "./base";
 import { PlatformType } from "./platform";
-import { IdentityRecord, RelationServiceQueryResponse } from "./types";
+import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
-  if (identity.reverse) return true;
+  if (identity.isPrimary) return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
     identity.platform
   );
 };
 
-export const GET_PROFILES = `
-query GET_PROFILES($platform: String, $identity: String) {
-  identity(platform: $platform, identity: $identity) {
-    identity
-    platform
-    displayName
-    uid
-    reverse
-    expiredAt
-    identityGraph{
-      vertices {
-        uuid
+export const GET_PROFILES = (single?: boolean) => `
+  query GET_PROFILES($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
         identity
         platform
-        displayName
-        uid
-        reverse
-        expiredAt
+        isPrimary
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+          contenthash
+          texts
+          addresses {
+            network
+            address
+          }
+          social {
+            uid
+            follower
+            following
+          }
+        }
+        ${
+          !single
+            ? `identityGraph {
+          vertices {
+            identity
+            platform
+            isPrimary
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
+            profile {
+              identity
+              platform
+              address
+              displayName
+              avatar
+              description
+              contenthash
+              texts
+              addresses {
+                network
+                address
+              }
+              social {
+                uid
+                follower
+                following
+              }
+            }
+          }
+            
+          edges {
+          source
+          target
+          dataSource
+          edgeType
+        }
+        }`
+            : ``
+        }
       }
-    }
   }
-}
 `;
 
 export const primaryDomainResolvedRequestArray = (
-  data: RelationServiceQueryResponse,
+  data: IdentityGraphQueryResponse,
   handle: string,
   platform: PlatformType
 ) => {
-  if (data?.data?.identity) {
-    const resolvedRecord = data?.data?.identity;
-    const defaultReturn = {
-      identity: resolvedRecord.identity,
-      platform: resolvedRecord.platform,
-      reverse: false,
-    };
+  const resolvedRecord = data?.data?.identity;
+  if (resolvedRecord) {
+    const defaultReturn = resolvedRecord.profile
+      ? {
+          ...resolvedRecord.profile,
+          isPrimary: resolvedRecord.isPrimary,
+        }
+      : {
+          address: resolvedRecord.identity,
+          identity: resolvedRecord.identity,
+          platform: resolvedRecord.platform,
+          displayName: formatText(resolvedRecord.identity),
+          isPrimary: resolvedRecord.isPrimary,
+        };
     if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
       return [defaultReturn];
     }
     if (
-      (directPass(resolvedRecord) ||
-        resolvedRecord.platform === PlatformType.nextid) &&
+      directPass(resolvedRecord) &&
+      !(
+        resolvedRecord.platform === PlatformType.basenames &&
+        resolvedRecord.ownerAddress[0]?.address !==
+          resolvedRecord.resolvedAddress[0]?.address
+      ) &&
       resolvedRecord.identityGraph?.vertices?.length > 0
     ) {
-      const vertices = resolvedRecord.identityGraph?.vertices;
+      const vertices = resolvedRecord.identityGraph.vertices;
+
       const resolved = vertices
         .filter((x) => directPass(x))
-        .filter((x) => x.platform !== PlatformType.ethereum)
+        .filter((x) => {
+          if (x.platform === PlatformType.ens) {
+            return (
+              x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address
+            );
+          } else {
+            return true;
+          }
+        })
         .map((x) => ({
-          identity: x.identity,
-          platform: x.platform,
-          reverse: x.reverse,
+          ...x.profile,
+          isPrimary: x.isPrimary,
         }));
       return [...resolved];
     }
     if (
-      [PlatformType.ethereum, PlatformType.ens].includes(
-        resolvedRecord.platform
-      )
+      [
+        PlatformType.ethereum,
+        PlatformType.ens,
+        PlatformType.basenames,
+        PlatformType.unstoppableDomains,
+      ].includes(resolvedRecord.platform)
     ) {
       const vertices =
         resolvedRecord.identityGraph?.vertices
-          .filter((x) =>
-            [PlatformType.lens, PlatformType.farcaster].includes(x.platform)
-          )
+          .filter((x) => {
+            if (
+              x.isPrimary ||
+              [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
+            ) {
+              const sourceAddr =
+                resolvedRecord.platform === PlatformType.ethereum
+                  ? resolvedRecord.identity
+                  : resolvedRecord.resolvedAddress[0]?.address;
+              return (
+                isSameAddress(x.profile?.address, sourceAddr) ||
+                x.profile?.addresses?.some((i) =>
+                  isSameAddress(i?.address, sourceAddr)
+                )
+              );
+            }
+          })
           .map((x) => ({
-            identity: x.identity,
-            platform: x.platform,
-            reverse: null,
+            ...x.profile,
+            isPrimary: x.isPrimary,
           })) || [];
-      return [...vertices, defaultReturn];
+      return resolvedRecord.platform === PlatformType.ethereum
+        ? [...vertices]
+        : [...vertices, defaultReturn];
     }
     return [defaultReturn];
   }
@@ -87,7 +188,64 @@ export const primaryDomainResolvedRequestArray = (
     {
       identity: handle,
       platform: platform,
-      reverse: null,
+      isPrimary: null,
     },
   ];
 };
+
+export const BATCH_GET_PROFILES = `
+  query BATCH_GET_PROFILES($ids: [String!]!) {
+  identities(ids: $ids) {
+    identity
+    platform
+    aliases
+    profile {
+      uid
+      identity
+      platform
+      network
+      address
+      displayName
+      avatar
+      description
+      contenthash
+      texts
+      addresses {
+        network
+        address
+      }
+      social {
+        uid
+        following
+        follower
+      }
+    }
+  }
+}
+`;
+
+export async function queryIdentityGraph(
+  handle: string,
+  platform: PlatformType = handleSearchPlatform(handle)!,
+  query: string
+): Promise<any> {
+  try {
+    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+      method: "POST",
+      headers: {
+        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query,
+        variables: {
+          identity: handle,
+          platform,
+        },
+      }),
+    });
+    return await response.json();
+  } catch (e) {
+    return { errors: e };
+  }
+}

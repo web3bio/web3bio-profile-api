@@ -1,42 +1,37 @@
 import { errorHandle, prettify, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexFarcaster } from "@/utils/regexp";
+import { regexEth, regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveFarcasterResponse } from "../../../profile/farcaster/[handle]/utils";
 import { NextRequest } from "next/server";
+import { resolveFarcasterHandleNS } from "./utils";
 
 export const runtime = "edge";
-const regexFid = /fid:(\d*)/i;
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
+  const { searchParams } = req.nextUrl;
+  const handle = searchParams.get("handle") || "";
+  const resolvedHandle = regexSolana.test(handle)
+    ? handle
+    : handle.toLowerCase();
 
-  if (!regexFarcaster.test(handle) && !regexFid.test(handle)) {
+  if (
+    ![
+      regexEth.test(resolvedHandle),
+      regexSolana.test(resolvedHandle),
+      regexFarcaster.test(resolvedHandle),
+      /#\d+/.test(handle),
+    ].some((x) => !!x)
+  )
     return errorHandle({
-      identity: handle,
+      identity: resolvedHandle,
       platform: PlatformType.farcaster,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  }
 
   const queryInput = prettify(handle);
 
   try {
-    const response = await resolveFarcasterResponse(queryInput);
-
-    if (!response?.fid) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
-    }
-
-    const json = {
-      address: response.address || null,
-      identity: response.username,
-      platform: PlatformType.farcaster,
-      displayName: response.displayName || response.username,
-      avatar: response.pfp.url,
-      description: response.profile.bio.text || null,
-    };
-
+    const json = await resolveFarcasterHandleNS(queryInput);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

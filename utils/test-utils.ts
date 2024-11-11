@@ -1,7 +1,7 @@
-import { BASE_URL } from "./base";
-
-// const baseURL = 'https://api.web3.bio'
-
-export const queryClient = async (path: string) => {
-  return await fetch(BASE_URL + path);
+export const queryClient = async (
+  path: string,
+  options?: any,
+  base?: string
+) => {
+  return await fetch((base || 'http://localhost:3000') + path, { ...options });
 };

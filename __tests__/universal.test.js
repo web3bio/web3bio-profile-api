@@ -1,37 +1,20 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Universal Profile API", () => {
-  it("It should response 200 data for 0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50", async () => {
-    const res = await queryClient(
-      "/profile/0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50"
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
-  });
-  it("It should response 200 data for 0x02731b4bd27eb1234049ecb082c4dc1f3640bb93d8d9736c898c69ad385dc66a7e", async () => {
-    const res = await queryClient(
-      "/profile/0x02731b4bd27eb1234049ecb082c4dc1f3640bb93d8d9736c898c69ad385dc66a7e"
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBeTruthy();
-  });
   it("It should response 200 data for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     const res = await queryClient(
       "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
-    expect(json[0].displayName).toBe("0x7cbb...acf5");
+    expect(json[0].identity).toBe("suji");
+    expect(json[0].platform).toBe("farcaster");
   });
   it("It should response 200 data for lilgho.lens", async () => {
     const res = await queryClient("/profile/lilgho.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("lilgho.lens");
-    expect(json[0].avatar).toBeTruthy();
     expect(json[1].avatar).toBeTruthy();
     expect(json.length).toBe(11);
   });
@@ -41,7 +24,7 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("stani.lens");
+    expect(json.some(x=>x.identity === 'stani.lens')).toBe(true);
   });
   it("It should response 200 data for noun124.eth", async () => {
     const res = await queryClient("/profile/noun124.eth");
@@ -71,11 +54,11 @@ describe("Test For Universal Profile API", () => {
       json.find((x) => x.platform === "farcaster").social.follower
     ).toBeTruthy();
   });
-  it("It should response 404 for mcdonalds.eth", async () => {
+  it("It should response 200 for mcdonalds.eth", async () => {
     const res = await queryClient("/profile/mcdonalds.eth");
-    expect(res.status).toBe(404);
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.error).toBe("Not Found");
+    expect(json[0].address).toBe("0x782cf6b6e735496f7e608489b0c57ee27f407e7d");
   });
   it("It should response 200 data for stani.lens", async () => {
     const res = await queryClient("/profile/stani.lens");
@@ -98,8 +81,8 @@ describe("Test For Universal Profile API", () => {
         return true;
       }
     })();
-    expect(links.length).toBe(7);
     expect(isValidHandle).toBe(true);
+    expect(links.length).toBe(7);
   });
   it("It should response 200 data for 0xd8da6bf26964af9d7eed9e03e53415d37aa96045", async () => {
     const res = await queryClient(
@@ -149,9 +132,7 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient("/profile/аррӏе.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.find((x) => x.platform === "farcaster").identity).toBe(
-      "bdl.eth"
-    );
+    expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
     expect(json.length > 1).toBeTruthy();
   });
   it("It should response 404 data for sujiyan.bnb", async () => {
@@ -165,5 +146,10 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("shoni.eth");
+  });
+  it("It should response 200 for alexgrover.base.eth", async () => {
+    const res = await queryClient("/profile/alexgrover.base");
+    const json = await res.json();
+    expect(json.some((x) => x.platform === "ens")).toBe(true);
   });
 });

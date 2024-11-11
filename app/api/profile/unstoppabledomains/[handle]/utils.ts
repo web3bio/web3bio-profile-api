@@ -1,45 +1,91 @@
-import { isValidEthereumAddress } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/base";
 import { ErrorMessages } from "@/utils/types";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
+import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
+import { resolveVerifiedLink } from "../../[handle]/utils";
 
-const UDBaseEndpoint = "https://api.unstoppabledomains.com/";
-
-const fetchUDBase = async (path: string) => {
-  return fetch(UDBaseEndpoint + path, {
-    method: "GET",
-    headers: {
-      Authorization: process.env.NEXT_PUBLIC_UD_API_KEY || "",
-    },
-  }).then((res) => res.json());
-};
-const fetchUDProfile = async (domain: string) => {
-  return fetch(
-    `${UDBaseEndpoint}/profile/public/${domain}?fields=profile,records,socialAccounts`,
-    {
-      method: "GET",
+const formatContenthash = (string: string) => {
+  if (string) {
+    if (string.startsWith("/ipns")) {
+      return `ipns://${string.replace("/ipns/", "")}`;
     }
-  ).then((res) => res.json());
-};
-
-export const resolveUDResponse = async (handle: string) => {
-  let address;
-  let domain;
-  if (isValidEthereumAddress(handle)) {
-    const res = await fetchUDBase(`resolve/reverse/${handle}`);
-    if (!res?.meta) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
-    }
-    address = handle;
-    domain = res.meta.domain;
-  } else {
-    const res = await fetchUDBase(`resolve/domains/${handle}`);
-
-    if (!res?.meta) {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
-    }
-    domain = res.meta.domain || handle;
-    address = res.meta.owner.toLowerCase();
+    return `ipfs://${string}`;
   }
-  const metadata = await fetchUDProfile(domain);
+  return null;
+};
 
-  return { address, domain, metadata };
+export const UDSocialAccountsList = [
+  PlatformType.twitter,
+  PlatformType.discord,
+  PlatformType.reddit,
+  PlatformType.lens,
+  PlatformType.telegram,
+  PlatformType.youtube,
+  PlatformType.website,
+  PlatformType.url,
+];
+
+const resolveUDHandle = async (handle: string) => {
+  const response = await queryIdentityGraph(
+    handle,
+    PlatformType.unstoppableDomains,
+    GET_PROFILES(true)
+  );
+  const profile = response?.data?.identity?.profile;
+  if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
+  const linksObj: {
+    [key in PlatformType]?: {
+      link: string | null;
+      handle: string | null;
+      sources?: string[];
+    };
+  } = {};
+
+  if (profile.texts) {
+    UDSocialAccountsList.forEach((x) => {
+      const item = profile.texts[x];
+      if (item && PLATFORM_DATA.get(x)) {
+        const resolvedHandle = resolveHandle(item, x);
+        linksObj[x] = {
+          link: getSocialMediaLink(resolvedHandle, x),
+          handle: resolvedHandle,
+          sources: resolveVerifiedLink(
+            `${x},${resolvedHandle}`,
+            response.identityGraph?.edges
+          ),
+        };
+      }
+    });
+  }
+  return {
+    address: profile.address,
+    identity: profile.identity,
+    platform: PlatformType.unstoppableDomains,
+    displayName: profile.displayName || profile.identity,
+    avatar: profile.avatar,
+    description: profile.description,
+    email: profile.texts?.email || null,
+    location: profile.texts?.location || null,
+    header: profile.texts?.header || null,
+    contenthash: formatContenthash(profile.contenthash),
+    links: linksObj,
+    social: {
+      ...profile.social,
+    },
+  };
+};
+
+export const resolveUDRespond = async (handle: string) => {
+  try {
+    const json = await resolveUDHandle(handle);
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: handle,
+      platform: PlatformType.unstoppableDomains,
+      code: e.cause || 500,
+      message: e.message,
+    });
+  }
 };

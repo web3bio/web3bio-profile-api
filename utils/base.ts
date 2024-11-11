@@ -13,13 +13,15 @@ import {
   regexSns,
   regexBtc,
   regexSolana,
+  regexBasenames,
+  regexGenome,
+  regexCluster,
 } from "./regexp";
 import { errorHandleProps } from "./types";
 import { NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
-export const LENS_GRAPHQL_ENDPOINT = "https://api-v2.lens.dev/";
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
 export const BASE_URL =
@@ -31,6 +33,13 @@ export const PLATFORMS_TO_EXCLUDE = [
   PlatformType.solana,
 ];
 
+export function isSameAddress(
+  address?: string | undefined,
+  otherAddress?: string | undefined
+): boolean {
+  if (!address || !otherAddress) return false;
+  return address.toLowerCase() === otherAddress.toLowerCase();
+}
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
@@ -95,6 +104,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   if (
     [
       PlatformType.ens,
+      PlatformType.basenames,
       PlatformType.ethereum,
       PlatformType.farcaster,
       PlatformType.lens,
@@ -109,35 +119,31 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   return false;
 };
 
+const platformMap = new Map([
+  [regexBasenames, PlatformType.basenames],
+  [regexEns, PlatformType.ens],
+  [regexEth, PlatformType.ethereum],
+  [regexLens, PlatformType.lens],
+  [regexUnstoppableDomains, PlatformType.unstoppableDomains],
+  [regexSpaceid, PlatformType.space_id],
+  [regexCrossbell, PlatformType.crossbell],
+  [regexDotbit, PlatformType.dotbit],
+  [regexSns, PlatformType.sns],
+  [regexGenome, PlatformType.genome],
+  [regexBtc, PlatformType.bitcoin],
+  [regexSolana, PlatformType.solana],
+  [regexFarcaster, PlatformType.farcaster],
+  [regexCluster, PlatformType.clusters],
+  [regexTwitter, PlatformType.twitter],
+]);
+
 export const handleSearchPlatform = (term: string) => {
-  switch (!!term) {
-    case regexEns.test(term):
-      return PlatformType.ens;
-    case regexEth.test(term):
-      return PlatformType.ethereum;
-    case regexLens.test(term):
-      return PlatformType.lens;
-    case regexUnstoppableDomains.test(term):
-      return PlatformType.unstoppableDomains;
-    case regexSpaceid.test(term):
-      return PlatformType.space_id;
-    case regexCrossbell.test(term):
-      return PlatformType.crossbell;
-    case regexDotbit.test(term):
-      return PlatformType.dotbit;
-    case regexSns.test(term):
-      return PlatformType.sns;
-    case regexBtc.test(term):
-      return PlatformType.bitcoin;
-    case regexSolana.test(term):
-      return PlatformType.solana;
-    case regexTwitter.test(term):
-      return PlatformType.twitter;
-    case regexFarcaster.test(term):
-      return PlatformType.farcaster;
-    default:
-      return PlatformType.nextid;
+  for (const [regex, platformType] of platformMap) {
+    if (regex.test(term)) {
+      return platformType;
+    }
   }
+  return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
 };
 
 export const prettify = (input: string) => {
@@ -156,7 +162,11 @@ export const uglify = (input: string, platform: PlatformType) => {
   if (!input) return "";
   switch (platform) {
     case PlatformType.basenames:
-      return input.endsWith(".base") ? `${input}.eth` : `${input}.base.eth`;
+      return input.endsWith(".base")
+        ? `${input}.eth`
+        : input.endsWith(".base.eth")
+        ? input
+        : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:

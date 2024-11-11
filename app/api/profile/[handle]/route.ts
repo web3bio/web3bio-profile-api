@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
     ? handle
     : handle.toLowerCase();
   const platform = handleSearchPlatform(inputName);
+
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {
     return errorHandle({
       identity: inputName,
@@ -23,7 +24,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, req, platform, false);
+  return await resolveUniversalHandle(inputName, platform, false);
 }
 
 export const runtime = "edge";

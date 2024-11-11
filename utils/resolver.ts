@@ -1,27 +1,28 @@
-import { ARWEAVE_ASSET_PREFIX, SIMPLEHASH_URL } from "./base";
+import { ARWEAVE_ASSET_PREFIX, BASE_URL, SIMPLEHASH_URL } from "./base";
 import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
-import * as contentHash from "@ensdomains/content-hash";
 import { regexDomain, regexEIP } from "./regexp";
 
-export const resolveMediaURL = (url: string): string | null => {
+export const resolveMediaURL = (
+  url: string,
+  fallback?: string
+): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https:")) return url;
   if (url.startsWith("ar://"))
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
     return resolveIPFS_URL(url) || url;
-  return url;
+  return fallback || url;
 };
 
 export const resolveHandle = (
   handle: string,
-  platform?: PlatformType,
+  platform?: PlatformType
 ): string | null => {
   if (!handle) return null;
-
   if (platform === PlatformType.website) {
     return handle.replace(/^https?:\/\//i, "").replace(/\/$/g, "");
   }
@@ -43,7 +44,9 @@ export const resolveHandle = (
     const parts = handle.split("/");
     return (
       handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
-    ).replace(/@/g, "");
+    )
+      .replace(/@/g, "")
+      .split("?")[0];
   }
 
   return handle.replace(/@/g, "");
@@ -51,15 +54,15 @@ export const resolveHandle = (
 
 export const getSocialMediaLink = (
   url: string | null,
-  type: PlatformType | string,
+  type: PlatformType | string
 ): string | null => {
   if (!url) return null;
   return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
 };
 
-export function resolveSocialMediaLink(
+function resolveSocialMediaLink(
   name: string,
-  type: PlatformType | string,
+  type: PlatformType | string
 ): string {
   if (!Object.prototype.hasOwnProperty.call(PlatformType, type)) {
     return `https://web3.bio/?s=${name}`;
@@ -82,6 +85,7 @@ export function resolveSocialMediaLink(
 
 export const resolveEipAssetURL = async (
   source: string,
+  identity?: string
 ): Promise<string | null> => {
   if (!source) return null;
 
@@ -89,38 +93,15 @@ export const resolveEipAssetURL = async (
   if (match) {
     const [full, chainId, protocol, contractAddress, tokenId] = match;
     const network = chainIdToNetwork(chainId);
-
     if (contractAddress && tokenId && network) {
-      try {
-        const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
-        const res = await _fetcher(fetchURL);
-        if (res?.nft_id) {
-          return resolveMediaURL(
-            res.image_url || res.previews?.image_large_url,
-          );
-        }
-      } catch (e) {
-        console.error("Error fetching NFT data:", e);
+      const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
+      const res = await _fetcher(fetchURL);
+      if (res?.nft_id) {
+        return resolveMediaURL(res.image_url || res.previews?.image_large_url);
+      } else {
       }
     }
   }
 
-  return resolveMediaURL(source);
-};
-
-export const decodeContenthash = (encoded: string) => {
-  if (
-    !encoded ||
-    ["0x", "0x0000000000000000000000000000000000000000"].includes(encoded)
-  ) {
-    return null;
-  }
-
-  try {
-    const codec = contentHash.getCodec(encoded);
-    const decodedId = contentHash.decode(encoded);
-    return `${codec}://${decodedId}`;
-  } catch (e) {
-    return null;
-  }
+  return resolveMediaURL(source, `https://api.web3.bio/api/avatar/svg?hanlde=${identity}`);
 };
