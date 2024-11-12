@@ -109,6 +109,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         }
       });
       break;
+    case PlatformType.solana:
     case PlatformType.sns:
       recordsShouldFetch.forEach((x) => {
         const handle = resolveHandle(texts?.[x]);
@@ -124,8 +125,6 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         }
       });
       break;
-    // case PlatformType.solana:
-    //   break;
     case PlatformType.unstoppableDomains:
       UDSocialAccountsList.forEach((x) => {
         const item = texts?.[x];
@@ -395,7 +394,6 @@ export const resolveVerifiedLink = (
   edges?: IdentityGraphEdge[]
 ) => {
   const res = [] as PlatformType[];
-  console.log(edges, "kkkk", key);
   if (!edges?.length) return res;
 
   edges
