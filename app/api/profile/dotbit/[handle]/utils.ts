@@ -24,7 +24,7 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
     identity: profile.identity || handle,
     platform: PlatformType.dotbit,
     displayName: profile.displayName || profile.identity,
-    avatar: resolveEipAssetURL(profile.avatar || null) || null,
+    avatar: profile.avatar ? resolveEipAssetURL(profile.avatar) : null,
     description: profile.description || null,
   };
   const linksObj: Record<string, LinksItem> = {};
@@ -53,7 +53,7 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
         location: profile.texts?.location || null,
         header: profile.texts?.header || null,
         contenthash: profile.contenthash || null,
-        links: {},
+        links: linksObj,
         social: {},
       };
 };
