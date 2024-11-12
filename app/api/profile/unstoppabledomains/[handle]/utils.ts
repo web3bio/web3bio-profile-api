@@ -26,11 +26,11 @@ export const UDSocialAccountsList = [
   PlatformType.url,
 ];
 
-const resolveUDHandle = async (handle: string) => {
+export const resolveUDHandle = async (handle: string, ns?: boolean) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.unstoppableDomains,
-    GET_PROFILES(true)
+    GET_PROFILES(ns)
   );
   const profile = response?.data?.identity?.profile;
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -42,6 +42,19 @@ const resolveUDHandle = async (handle: string) => {
     };
   } = {};
 
+  const nsObj = {
+    address: profile.address,
+    identity: profile.identity,
+    platform: PlatformType.unstoppableDomains,
+    displayName: profile.displayName || profile.identity,
+    avatar: profile.avatar,
+    description: profile.description,
+  };
+
+  if (ns) {
+    return nsObj;
+  }
+
   if (profile.texts) {
     UDSocialAccountsList.forEach((x) => {
       const item = profile.texts[x];
@@ -52,19 +65,14 @@ const resolveUDHandle = async (handle: string) => {
           handle: resolvedHandle,
           sources: resolveVerifiedLink(
             `${x},${resolvedHandle}`,
-            response.identityGraph?.edges
+            response?.data?.identity?.identityGraph?.edges
           ),
         };
       }
     });
   }
   return {
-    address: profile.address,
-    identity: profile.identity,
-    platform: PlatformType.unstoppableDomains,
-    displayName: profile.displayName || profile.identity,
-    avatar: profile.avatar,
-    description: profile.description,
+    ...nsObj,
     email: profile.texts?.email || null,
     location: profile.texts?.location || null,
     header: profile.texts?.header || null,
