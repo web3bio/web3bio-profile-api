@@ -109,10 +109,6 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         }
       });
       break;
-
-    // // todo: remain to do
-    // case PlatformType.dotbit:
-    //   break;
     case PlatformType.sns:
       recordsShouldFetch.forEach((x) => {
         const handle = resolveHandle(texts?.[x]);
@@ -143,6 +139,32 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         }
       });
       break;
+    case PlatformType.sns:
+    case PlatformType.solana:
+      recordsShouldFetch.forEach((x) => {
+        const handle = resolveHandle(texts[x]);
+        if (handle) {
+          const type = ["CNAME", PlatformType.url].includes(x)
+            ? PlatformType.website
+            : x;
+          res[type] = {
+            link: getSocialMediaLink(handle, type)!,
+            handle: handle,
+            sources: resolveVerifiedLink(`${type},${handle}`, edges),
+          };
+        }
+      });
+      break;
+    case PlatformType.dotbit:
+      keys.forEach((x) => {
+        const item = texts[x];
+        const handle = resolveHandle(item, x as PlatformType);
+        res[x] = {
+          link: getSocialMediaLink(item, x as PlatformType)!,
+          handle,
+          sources: resolveVerifiedLink(`${x},${handle}`, edges),
+        };
+      });
     default:
       break;
   }
@@ -373,7 +395,7 @@ export const resolveVerifiedLink = (
   edges?: IdentityGraphEdge[]
 ) => {
   const res = [] as PlatformType[];
-  console.log(edges,'kkkk', key)
+  console.log(edges, "kkkk", key);
   if (!edges?.length) return res;
 
   edges
