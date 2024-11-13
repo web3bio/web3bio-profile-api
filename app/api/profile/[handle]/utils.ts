@@ -128,7 +128,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     case PlatformType.unstoppableDomains:
       UDSocialAccountsList.forEach((x) => {
         const item = texts?.[x];
-        if (item && PLATFORM_DATA.get(x)) {
+        if (item && PLATFORM_DATA.has(x)) {
           const resolvedHandle = resolveHandle(item, x);
           res[x] = {
             link: getSocialMediaLink(resolvedHandle, x),
@@ -156,13 +156,15 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
       break;
     case PlatformType.dotbit:
       keys.forEach((x) => {
-        const item = texts[x];
-        const handle = resolveHandle(item, x as PlatformType);
-        res[x] = {
-          link: getSocialMediaLink(item, x as PlatformType)!,
-          handle,
-          sources: resolveVerifiedLink(`${x},${handle}`, edges),
-        };
+        if (PLATFORM_DATA.has(x as PlatformType)) {
+          const item = texts[x];
+          const handle = resolveHandle(item, x as PlatformType);
+          res[x] = {
+            link: getSocialMediaLink(item, x as PlatformType)!,
+            handle,
+            sources: resolveVerifiedLink(`${x},${handle}`, edges),
+          };
+        }
       });
     default:
       break;

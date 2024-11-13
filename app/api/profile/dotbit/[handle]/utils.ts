@@ -3,7 +3,7 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import { PlatformType } from "@/utils/platform";
+import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { ErrorMessages, LinksItem } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "../../[handle]/utils";
@@ -24,7 +24,7 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
     identity: profile.identity || handle,
     platform: PlatformType.dotbit,
     displayName: profile.displayName || profile.identity,
-    avatar: profile.avatar ? resolveEipAssetURL(profile.avatar) : null,
+    avatar: resolveEipAssetURL(profile.avatar),
     description: profile.description || null,
   };
   const linksObj: Record<string, LinksItem> = {};
@@ -32,16 +32,18 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
   if (profile?.texts) {
     const keys = Object.keys(profile.texts);
     keys.forEach((x) => {
-      const item = profile.texts[x];
-      const handle = resolveHandle(item, x as PlatformType);
-      linksObj[x] = {
-        link: getSocialMediaLink(item, x as PlatformType)!,
-        handle,
-        sources: resolveVerifiedLink(
-          `${x},${handle}`,
-          response?.data?.identityGraph?.edges
-        ),
-      };
+      if (PLATFORM_DATA.has(x as PlatformType)) {
+        const item = profile.texts[x];
+        const handle = resolveHandle(item, x as PlatformType);
+        linksObj[x] = {
+          link: getSocialMediaLink(item, x as PlatformType)!,
+          handle,
+          sources: resolveVerifiedLink(
+            `${x},${handle}`,
+            response?.data?.identityGraph?.edges
+          ),
+        };
+      }
     });
   }
 
