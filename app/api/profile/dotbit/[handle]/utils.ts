@@ -24,9 +24,11 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
     identity: profile.identity || handle,
     platform: PlatformType.dotbit,
     displayName: profile.displayName || profile.identity,
-    avatar: resolveEipAssetURL(profile.avatar),
+    avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description || null,
   };
+
+  if (ns) return nsObj;
   const linksObj: Record<string, LinksItem> = {};
 
   if (profile?.texts) {
@@ -47,15 +49,13 @@ export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
     });
   }
 
-  return ns
-    ? nsObj
-    : {
-        ...nsObj,
-        email: profile.texts?.email || null,
-        location: profile.texts?.location || null,
-        header: profile.texts?.header || null,
-        contenthash: profile.contenthash || null,
-        links: linksObj,
-        social: {},
-      };
+  return {
+    ...nsObj,
+    email: profile.texts?.email || null,
+    location: profile.texts?.location || null,
+    header: profile.texts?.header || null,
+    contenthash: profile.contenthash || null,
+    links: linksObj,
+    social: {},
+  };
 };
