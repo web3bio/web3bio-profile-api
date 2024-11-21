@@ -2,7 +2,7 @@ import { PlatformType } from "@/utils/platform";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { ErrorMessages } from "@/utils/types";
+import { ErrorMessages, LinksItem } from "@/utils/types";
 import { formatText } from "@/utils/base";
 import { regexSolana } from "@/utils/regexp";
 import { resolveVerifiedLink } from "../../[handle]/utils";
@@ -64,14 +64,7 @@ export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
     }
   }
 
-  const linksObj: Record<
-    string,
-    {
-      link: string;
-      handle: string;
-      sources: string[];
-    }
-  > = {};
+  const linksObj: Record<string, LinksItem> = {};
   if (profile.texts) {
     recordsShouldFetch.forEach((x) => {
       const handle = resolveHandle(profile?.texts[x]);
@@ -84,7 +77,7 @@ export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
           handle: handle,
           sources: resolveVerifiedLink(
             `${type},${handle}`,
-            response.identityGraph?.edges
+            response?.data?.identity?.identityGraph?.edges
           ),
         };
       }

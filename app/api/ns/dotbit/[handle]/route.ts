@@ -2,7 +2,7 @@ import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveDotbitResponse } from "@/app/api/profile/dotbit/[handle]/utils";
+import { resolveDotbitHandle } from "@/app/api/profile/dotbit/[handle]/utils";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";
@@ -20,17 +20,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const { address, domain, recordsMap } = await resolveDotbitResponse(handle);
-
-    const json = {
-      address,
-      identity: domain,
-      platform: PlatformType.dotbit,
-      displayName: domain || null,
-      avatar: recordsMap.get("profile.avatar")?.value || null,
-      description: recordsMap.get("profile.description")?.value || null,
-    };
-
+    const json = await resolveDotbitHandle(handle, true);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
