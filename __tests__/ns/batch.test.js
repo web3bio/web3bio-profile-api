@@ -17,4 +17,17 @@ describe("Test For Batch Profile API", () => {
     // console.log(json);
     expect(json.length).toBe(5);
   });
+  it("It should response 200 for Batch Profile API GET", async () => {
+    const ids = [
+      "ens,sujiyan.eth",
+      "ens,vitalik.eth",
+      "basenames,tony.base.eth",
+      "farcaster,dwr.eth",
+    ];
+    const url = `/ns/batch?ids=${encodeURIComponent(ids)}`;
+    const res = await queryClient(url);
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.length).toBe(4);
+  });
 });

@@ -10,9 +10,8 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "dotenv": "^16.1.4",
     "graphql": "^16.8.1",
-    "next": "^14.2.17",
+    "next": "^14.2.18",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "sharp": "^0.32.6",
