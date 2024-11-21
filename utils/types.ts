@@ -9,6 +9,7 @@ export interface ParamsType {
 export type LinksItem = {
   link: string | null;
   handle: string | null;
+  sources: PlatformType[]
 };
 
 export interface errorHandleProps {

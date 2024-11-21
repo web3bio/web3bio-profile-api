@@ -31,7 +31,7 @@ describe("Test For Dotbit Profile API", () => {
     const res = await queryClient("/profile/dotbit/phone.bit");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("tbrkixogyva7xmysduyis6asvapxkkk8ra");
+    expect(json.address).toBe("TBRKixoGyVA7XMYSDUYiS6aSVAPXKkk8RA");
   });
   it("It should response 200 for bestcase.bit", async () => {
     const res = await queryClient("/profile/dotbit/bestcase.bit");

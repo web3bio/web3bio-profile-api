@@ -10,7 +10,7 @@ export const resolveMediaURL = (
   fallback?: string
 ): string | null => {
   if (!url) return null;
-  if (url.startsWith("data:") || url.startsWith("https:")) return url;
+  if (url.startsWith("data:") || url.startsWith("https://")) return url;
   if (url.startsWith("ar://"))
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
