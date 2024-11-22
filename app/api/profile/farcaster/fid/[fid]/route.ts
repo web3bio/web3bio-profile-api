@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,7 +8,7 @@ import { resolveFarcasterHandle } from "../../[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const fid = searchParams.get("fid")?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (!regexUID.test(fid))
     return errorHandle({
       identity: fid,
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     });
 
   try {
-    const json = await resolveFarcasterHandle(`#${fid}`);
+    const json = await resolveFarcasterHandle(`#${fid}`, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
