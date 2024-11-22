@@ -19,7 +19,10 @@ export async function GET(req: NextRequest) {
       platform,
       handle: name,
       ns: true,
-      headers,
+      headers: {
+        ...headers,
+        authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+      },
     })) as any;
     if (profiles.message) {
       return NextResponse.json(profiles);
