@@ -6,12 +6,13 @@ import {
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEns } from "@/utils/regexp";
-import { ErrorMessages, IdentityGraphEdge } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, IdentityGraphEdge } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
 export const resolveENSResponse = async (
   handle: string,
+  headers: AuthHeaders,
   _platform?: PlatformType,
   ns?: boolean
 ) => {
@@ -27,12 +28,21 @@ export const resolveENSResponse = async (
     identity = handle;
     platform = _platform || PlatformType.ens;
   }
-
   const res = await queryIdentityGraph(
     identity,
     platform as PlatformType,
-    GET_PROFILES(ns)
+    GET_PROFILES(ns),
+    headers
   );
+
+  if (res.errors || res.msg) {
+    return {
+      identity: handle,
+      platform: _platform || PlatformType.ethereum,
+      message: res.msg,
+      code: res.code,
+    }
+  }
 
   const profile = res?.data?.identity?.profile;
   if (!profile) {

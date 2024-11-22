@@ -1,5 +1,6 @@
 import {
   errorHandle,
+  getUserHeaders,
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
@@ -10,6 +11,7 @@ import { regexSolana, regexBtc } from "@/utils/regexp";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
+  const headers = getUserHeaders(req);
   const handle = searchParams.get("handle") || "";
   const inputName = [regexSolana, regexBtc].some((x) => x.test(handle))
     ? handle
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, platform, false);
+  return await resolveUniversalHandle(inputName, platform, headers, false);
 }
 
 export const runtime = "edge";

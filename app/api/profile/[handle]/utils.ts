@@ -18,6 +18,7 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import {
+  AuthHeaders,
   ErrorMessages,
   IdentityGraphEdge,
   ProfileAPIResponse,
@@ -255,17 +256,28 @@ export const resolveWithIdentityGraph = async ({
   platform,
   handle,
   ns,
+  headers,
 }: {
   platform: PlatformType;
   handle: string;
   ns?: boolean;
+  headers: AuthHeaders;
 }) => {
   const response = await queryIdentityGraph(
     handle,
     platform,
-    GET_PROFILES(false)
+    GET_PROFILES(false),
+    headers
   );
 
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform,
+      message: response.msg,
+      code: response.code || 500,
+    };
+  }
   if (!response?.data?.identity || response?.errors)
     return {
       identity: handle,
@@ -351,6 +363,7 @@ export const resolveWithIdentityGraph = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   platform: PlatformType,
+  headers: AuthHeaders,
   ns?: boolean
 ) => {
   const handleToQuery = prettify(handle);
@@ -377,6 +390,7 @@ export const resolveUniversalHandle = async (
     platform,
     handle: handleToQuery,
     ns,
+    headers,
   })) as any;
 
   if (res.message) {

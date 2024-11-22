@@ -1,5 +1,6 @@
 import {
   BASE_URL,
+  getUserHeaders,
   handleSearchPlatform,
   shouldPlatformFetch,
 } from "@/utils/base";
@@ -10,6 +11,7 @@ import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const name = searchParams.get("handle") || "";
+  const headers = getUserHeaders(req);
   const platform = handleSearchPlatform(name);
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
@@ -17,6 +19,7 @@ export async function GET(req: NextRequest) {
       platform,
       handle: name,
       ns: true,
+      headers,
     })) as any;
     if (profiles?.length > 0) {
       const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;

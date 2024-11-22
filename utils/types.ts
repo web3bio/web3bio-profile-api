@@ -1,5 +1,10 @@
 import { PlatformType } from "./platform";
 
+export interface AuthHeaders {
+  authorization: string;
+  ["x-client-ip"]: string;
+}
+
 export interface ParamsType {
   params: {
     handle: string;
@@ -9,7 +14,7 @@ export interface ParamsType {
 export type LinksItem = {
   link: string | null;
   handle: string | null;
-  sources: PlatformType[]
+  sources: PlatformType[];
 };
 
 export interface errorHandleProps {
@@ -65,9 +70,9 @@ export interface IdentityGraphQueryResponse {
   };
 }
 
-export interface IdentityGraphEdge{
-  source: string,
-  target: string,
+export interface IdentityGraphEdge {
+  source: string;
+  target: string;
 }
 export interface IdentityRecord {
   id: string;
@@ -82,7 +87,7 @@ export interface IdentityRecord {
   profile: ProfileRecord;
   identityGraph: {
     vertices: IdentityRecord[];
-    edges: IdentityGraphEdge[]
+    edges: IdentityGraphEdge[];
   };
 }
 

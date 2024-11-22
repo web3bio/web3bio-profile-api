@@ -18,7 +18,7 @@ import {
   regexCluster,
 } from "./regexp";
 import { errorHandleProps } from "./types";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -32,6 +32,29 @@ export const PLATFORMS_TO_EXCLUDE = [
   PlatformType.sns,
   PlatformType.solana,
 ];
+
+export function getUserHeaders(req: NextRequest) {
+  let ip = req.headers?.get("x-forwarded-for") || req?.ip;
+
+  if (ip && ip.includes(",")) {
+    ip = ip.split(",")[0].trim();
+  }
+
+  const isTrustedDomain =
+    req.headers.get("host")?.includes("web3.bio") ||
+    req.headers.get("origin")?.includes("web3.bio");
+    
+  const apiKey = req.headers?.get("authorization")
+    ? req.headers.get("authorization")
+    : isTrustedDomain
+    ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
+    : "";
+
+  return {
+    "x-client-ip": ip || "",
+    authorization: apiKey || "",
+  };
+}
 
 export function isSameAddress(
   address?: string | undefined,

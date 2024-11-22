@@ -1,4 +1,9 @@
-import { errorHandle, isValidEthereumAddress, uglify } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+  uglify,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexBasenames, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -7,6 +12,7 @@ import { resolveENSRespondNS } from "../../ens/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
+  const headers = getUserHeaders(req);
   const inputName = searchParams.get("handle") || "";
   const lowercaseName = isValidEthereumAddress(inputName)
     ? inputName
@@ -18,7 +24,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveENSRespondNS(lowercaseName, PlatformType.basenames);
+  return resolveENSRespondNS(lowercaseName, headers, PlatformType.basenames);
 }
 
 export const runtime = "edge";

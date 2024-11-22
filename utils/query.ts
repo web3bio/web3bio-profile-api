@@ -6,7 +6,7 @@ import {
   isSameAddress,
 } from "./base";
 import { PlatformType } from "./platform";
-import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
+import { IdentityRecord, IdentityGraphQueryResponse, AuthHeaders } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary) return true;
@@ -227,13 +227,14 @@ export const BATCH_GET_PROFILES = `
 export async function queryIdentityGraph(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
-  query: string
+  query: string,
+  headers: AuthHeaders
 ): Promise<any> {
   try {
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        ...headers,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -244,6 +245,7 @@ export async function queryIdentityGraph(
         },
       }),
     });
+
     return await response.json();
   } catch (e) {
     return { errors: e };
