@@ -21,6 +21,9 @@ export async function GET(req: NextRequest) {
       ns: true,
       headers,
     })) as any;
+    if (profiles.message) {
+      return NextResponse.json(profiles);
+    }
     if (profiles?.length > 0) {
       const rawAvatarUrl = profiles?.find((x: any) => !!x.avatar)?.avatar;
       try {
