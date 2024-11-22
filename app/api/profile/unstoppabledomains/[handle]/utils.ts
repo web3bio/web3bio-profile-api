@@ -1,5 +1,5 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
-import { ErrorMessages } from "@/utils/types";
+import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
@@ -26,12 +26,26 @@ export const UDSocialAccountsList = [
   PlatformType.url,
 ];
 
-export const resolveUDHandle = async (handle: string, ns?: boolean) => {
+export const resolveUDHandle = async (
+  handle: string,
+  headers: AuthHeaders,
+  ns?: boolean
+) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.unstoppableDomains,
-    GET_PROFILES(ns)
+    GET_PROFILES(ns),
+    headers
   );
+
+  if(response.msg){
+    return {
+      identity: handle,
+      platform: PlatformType.unstoppableDomains,
+      message: response.msg,
+      code: response.code
+    }
+  }
   const profile = response?.data?.identity?.profile;
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const linksObj: {
@@ -84,9 +98,12 @@ export const resolveUDHandle = async (handle: string, ns?: boolean) => {
   };
 };
 
-export const resolveUDRespond = async (handle: string) => {
+export const resolveUDRespond = async (
+  handle: string,
+  headers: AuthHeaders
+) => {
   try {
-    const json = await resolveUDHandle(handle);
+    const json = await resolveUDHandle(handle, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,7 +8,7 @@ import { resolveLensHandle } from "../../[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const uid = searchParams.get("uid")?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (!regexUID.test(uid))
     return errorHandle({
       identity: uid,
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     });
 
   try {
-    const json = await resolveLensHandle(`#${uid}`);
+    const json = await resolveLensHandle(`#${uid}`, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

@@ -1,4 +1,4 @@
-import { respondWithCache } from "@/utils/base";
+import { getUserHeaders, respondWithCache } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { PlatformType } from "@/utils/platform";
 import { fetchIdentityGraphBatch } from "../../profile/batch/utils";
@@ -16,10 +16,11 @@ const filterIds = (ids: string[]) =>
 
 export async function POST(req: NextRequest) {
   const { ids } = await req.json();
+  const headers = getUserHeaders(req);
   if (!ids.length) return NextResponse.json([]);
   try {
     const queryIds = filterIds(ids);
-    const json = await fetchIdentityGraphBatch(queryIds, true);
+    const json = await fetchIdentityGraphBatch(queryIds, true, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return NextResponse.json({
@@ -30,6 +31,7 @@ export async function POST(req: NextRequest) {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
+  const headers = getUserHeaders(req);
   try {
     const ids = searchParams.get("ids")?.split(",") || [];
     const mergedIds = [];
@@ -37,7 +39,7 @@ export async function GET(req: NextRequest) {
       mergedIds.push(`${ids[i]},${ids[i + 1]}`);
     }
     const queryIds = filterIds(mergedIds);
-    const json = await fetchIdentityGraphBatch(queryIds, true);
+    const json = await fetchIdentityGraphBatch(queryIds, true, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return NextResponse.json({

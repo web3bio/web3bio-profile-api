@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,6 +8,7 @@ import { resolveSNSHandle } from "../../sns/[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
+  const headers = getUserHeaders(req);
   if (!regexSns.test(handle) && !regexSolana.test(handle))
     return errorHandle({
       identity: handle,
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveSNSHandle(handle);
+    const json = await resolveSNSHandle(handle, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

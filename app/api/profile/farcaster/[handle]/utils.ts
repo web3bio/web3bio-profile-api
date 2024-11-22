@@ -1,7 +1,12 @@
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { PlatformType } from "@/utils/platform";
 import { regexTwitterLink } from "@/utils/regexp";
-import { ErrorMessages, IdentityGraphEdge, ProfileRecord } from "@/utils/types";
+import {
+  AuthHeaders,
+  ErrorMessages,
+  IdentityGraphEdge,
+  ProfileRecord,
+} from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
@@ -35,12 +40,26 @@ const resolveFarcasterLinks = (
   return linksObj;
 };
 
-export const resolveFarcasterHandle = async (handle: string, ns?: boolean) => {
+export const resolveFarcasterHandle = async (
+  handle: string,
+  headers: AuthHeaders,
+  ns?: boolean
+) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.farcaster,
-    GET_PROFILES(ns)
+    GET_PROFILES(ns),
+    headers
   );
+
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform: PlatformType.farcaster,
+      message: response.msg,
+      code: response.code,
+    };
+  }
   const profile = response?.data?.identity?.profile;
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const links = resolveFarcasterLinks(

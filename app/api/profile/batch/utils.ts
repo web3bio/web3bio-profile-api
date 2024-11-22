@@ -3,10 +3,15 @@ import {
   generateProfileStruct,
 } from "../[handle]/utils";
 import { BATCH_GET_PROFILES } from "@/utils/query";
-import { ProfileAPIResponse, ProfileNSResponse } from "@/utils/types";
+import {
+  AuthHeaders,
+  ProfileAPIResponse,
+  ProfileNSResponse,
+} from "@/utils/types";
 export async function fetchIdentityGraphBatch(
   ids: string[],
-  ns: boolean
+  ns: boolean,
+  headers: AuthHeaders
 ): Promise<
   ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
 > {
@@ -14,7 +19,7 @@ export async function fetchIdentityGraphBatch(
     const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
       method: "POST",
       headers: {
-        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        ...headers,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({

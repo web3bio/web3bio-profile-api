@@ -19,7 +19,7 @@ export const resolveDotbitHandle = async (
     GET_PROFILES(ns),
     headers
   );
-  if (response.errors || response.msg) {
+  if (response.msg) {
     return {
       identity: handle,
       platform: PlatformType.dotbit,

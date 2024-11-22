@@ -35,13 +35,13 @@ export const resolveENSResponse = async (
     headers
   );
 
-  if (res.errors || res.msg) {
+  if (res.msg) {
     return {
       identity: handle,
       platform: _platform || PlatformType.ethereum,
       message: res.msg,
       code: res.code,
-    }
+    };
   }
 
   const profile = res?.data?.identity?.profile;
