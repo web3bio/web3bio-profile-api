@@ -4,17 +4,31 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { ErrorMessages } from "@/utils/types";
+import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS } from "@/utils/base";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
-export const resolveLensHandle = async (handle: string, ns?: boolean) => {
+export const resolveLensHandle = async (
+  handle: string,
+  headers: AuthHeaders,
+  ns?: boolean
+) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.lens,
     GET_PROFILES(ns),
+    headers
   );
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform: PlatformType.lens,
+      message: response.msg,
+      code: response.code,
+    };
+  }
+
   const profile = response?.data?.identity?.profile;
 
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -26,7 +40,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
       handle: pureHandle,
       sources: resolveVerifiedLink(
         `${PlatformType.lens},${profile.identity}`,
-        response.data.identity.identityGraph?.edges,
+        response.data.identity.identityGraph?.edges
       ),
     },
   } as any;
@@ -36,7 +50,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
       if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
         let key = null;
         key = Array.from(PLATFORM_DATA.keys()).find(
-          (k) => k === i.toLowerCase(),
+          (k) => k === i.toLowerCase()
         );
         if (key) {
           const resolvedHandle = resolveHandle(profile.texts[i]);
@@ -45,7 +59,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
             handle: resolvedHandle,
             sources: resolveVerifiedLink(
               resolvedHandle || "",
-              response.data.identity.identityGraph?.edges,
+              response.data.identity.identityGraph?.edges
             ),
           };
         }
@@ -56,7 +70,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
   const avatarUri =
     profile.avatar ||
     (await resolveEipAssetURL(
-      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${profile.social.uid}`,
+      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${profile.social.uid}`
     ));
   const resJSON = {
     address: profile.address,
@@ -68,7 +82,7 @@ export const resolveLensHandle = async (handle: string, ns?: boolean) => {
     description: profile.description,
     location: profile.texts?.location || null,
     header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner,
+      profile.texts?.header || profile.texts?.banner
     ),
     contenthash: null,
     links: linksObj,

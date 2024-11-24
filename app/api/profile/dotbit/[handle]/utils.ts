@@ -4,17 +4,29 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { ErrorMessages, LinksItem } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
-export const resolveDotbitHandle = async (handle: string, ns?: boolean) => {
+export const resolveDotbitHandle = async (
+  handle: string,
+  headers: AuthHeaders,
+  ns?: boolean
+) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.dotbit,
-    GET_PROFILES(ns)
+    GET_PROFILES(ns),
+    headers
   );
-
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform: PlatformType.dotbit,
+      message: response.msg,
+      code: response.code,
+    };
+  }
   const profile = response?.data?.identity?.profile;
 
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });

@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,7 +8,7 @@ import { resolveDotbitHandle } from "./utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (!regexDotbit.test(handle) && !regexEth.test(handle))
     return errorHandle({
       identity: handle,
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveDotbitHandle(handle);
+    const json = await resolveDotbitHandle(handle, headers);
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
