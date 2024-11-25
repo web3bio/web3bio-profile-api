@@ -1,5 +1,5 @@
 import {
-  NEXTID_GRAPHQL_ENDPOINT,
+  IDENTITY_GRAPH_SERVER,
   generateProfileStruct,
 } from "../[handle]/utils";
 import { BATCH_GET_PROFILES } from "@/utils/query";
@@ -16,7 +16,7 @@ export async function fetchIdentityGraphBatch(
   ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
 > {
   try {
-    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
         ...headers,

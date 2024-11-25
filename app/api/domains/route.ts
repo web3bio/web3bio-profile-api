@@ -1,7 +1,7 @@
 import { getUserHeaders, respondWithCache } from "@/utils/base";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
-import { NEXTID_GRAPHQL_ENDPOINT } from "../profile/[handle]/utils";
+import { IDENTITY_GRAPH_SERVER } from "../profile/[handle]/utils";
 
 const GET_AVAILABLE_DOMAINS = `
   query GET_AVAILABLE_DOMAINS($name: String!) {
@@ -17,7 +17,7 @@ const GET_AVAILABLE_DOMAINS = `
 
 const queryDomains = async (handle: string, headers: AuthHeaders) => {
   try {
-    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
         ...headers,
