@@ -29,6 +29,7 @@ export async function fetchIdentityGraphBatch(
         },
       }),
     });
+
     const json = await response.json();
     let res = [] as any;
     if (json?.data?.identities?.length > 0) {

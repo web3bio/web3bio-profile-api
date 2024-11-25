@@ -16,6 +16,7 @@ import {
   regexBasenames,
   regexGenome,
   regexCluster,
+  regexNext,
 } from "./regexp";
 import { errorHandleProps } from "./types";
 import { NextRequest, NextResponse } from "next/server";
@@ -33,6 +34,18 @@ export const PLATFORMS_TO_EXCLUDE = [
   PlatformType.solana,
 ];
 
+const web3AddressRegexes = [
+  regexEth,
+  regexCrossbell,
+  regexBtc,
+  regexSolana,
+  regexNext,
+];
+
+export function isWeb3Address(address: string): boolean {
+  return web3AddressRegexes.some((regex) => regex.test(address));
+}
+
 export function getUserHeaders(req: NextRequest) {
   let ip = req.headers?.get("x-forwarded-for") || req?.ip;
 
@@ -43,7 +56,7 @@ export function getUserHeaders(req: NextRequest) {
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
-    
+
   const apiKey = req.headers?.get("authorization")
     ? req.headers.get("authorization")
     : isTrustedDomain

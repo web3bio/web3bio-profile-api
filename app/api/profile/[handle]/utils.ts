@@ -3,6 +3,7 @@ import {
   errorHandle,
   formatText,
   isValidEthereumAddress,
+  isWeb3Address,
   prettify,
   respondWithCache,
 } from "@/utils/base";
@@ -183,7 +184,10 @@ export async function generateProfileStruct(
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || data.identity,
+    displayName:
+      data.displayName || isWeb3Address(data.identity)
+        ? formatText(data.identity)
+        : data.identity,
     avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
     description: data.description || null,
   };
