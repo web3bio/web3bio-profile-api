@@ -3,6 +3,7 @@ import {
   errorHandle,
   formatText,
   isValidEthereumAddress,
+  isWeb3Address,
   prettify,
   respondWithCache,
 } from "@/utils/base";
@@ -29,8 +30,7 @@ import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
 
-export const NEXTID_GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
+export const IDENTITY_GRAPH_SERVER = process.env.NEXT_PUBLIC_GRAPHQL_SERVER || '';
 
 function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
   const platform = data.platform;
@@ -183,7 +183,10 @@ export async function generateProfileStruct(
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || data.identity,
+    displayName:
+      data.displayName || isWeb3Address(data.identity)
+        ? formatText(data.identity)
+        : data.identity,
     avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
     description: data.description || null,
   };

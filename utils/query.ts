@@ -1,4 +1,4 @@
-import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
+import { IDENTITY_GRAPH_SERVER } from "@/app/api/profile/[handle]/utils";
 import {
   PLATFORMS_TO_EXCLUDE,
   formatText,
@@ -6,7 +6,11 @@ import {
   isSameAddress,
 } from "./base";
 import { PlatformType } from "./platform";
-import { IdentityRecord, IdentityGraphQueryResponse, AuthHeaders } from "./types";
+import {
+  IdentityRecord,
+  IdentityGraphQueryResponse,
+  AuthHeaders,
+} from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary) return true;
@@ -231,7 +235,7 @@ export async function queryIdentityGraph(
   headers: AuthHeaders
 ): Promise<any> {
   try {
-    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
         ...headers,

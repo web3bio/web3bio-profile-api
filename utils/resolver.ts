@@ -7,7 +7,7 @@ import { regexDomain, regexEIP } from "./regexp";
 
 export const resolveMediaURL = (
   url: string,
-  fallback?: string
+  identity?: string
 ): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https://")) return url;
@@ -15,7 +15,9 @@ export const resolveMediaURL = (
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
     return resolveIPFS_URL(url) || url;
-  return fallback || url;
+  return identity
+    ? `https://api.web3.bio/api/avatar/svg?hanlde=${identity}`
+    : url;
 };
 
 export const resolveHandle = (
@@ -88,8 +90,7 @@ export const resolveEipAssetURL = async (
   identity?: string
 ): Promise<string | null> => {
   if (!source) return null;
-
-  const match = source.match(regexEIP);
+  const match = source?.match(regexEIP);
   if (match) {
     const [full, chainId, protocol, contractAddress, tokenId] = match;
     const network = chainIdToNetwork(chainId);
@@ -98,10 +99,9 @@ export const resolveEipAssetURL = async (
       const res = await _fetcher(fetchURL);
       if (res?.nft_id) {
         return resolveMediaURL(res.image_url || res.previews?.image_large_url);
-      } else {
       }
     }
   }
 
-  return resolveMediaURL(source, `https://api.web3.bio/api/avatar/svg?hanlde=${identity}`);
+  return resolveMediaURL(source, identity);
 };
