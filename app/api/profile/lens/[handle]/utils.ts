@@ -67,17 +67,17 @@ export const resolveLensHandle = async (
     });
   }
 
-  const avatarUri =
-    profile.avatar ||
-    (await resolveEipAssetURL(
-      `eip155:137/erc721:${LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS}/${profile.social.uid}`
-    ));
+  const avatarUri = profile.avatar
+    ? resolveEipAssetURL(profile?.avatar)
+    : profile?.social?.uid
+    ? `https://api.hey.xyz/avatar?id=${Number(profile?.social?.uid)}`
+    : null;
   const resJSON = {
     address: profile.address,
     identity: profile.identity,
     platform: PlatformType.lens,
     displayName: profile.displayName || profile.identity,
-    avatar: await resolveEipAssetURL(avatarUri),
+    avatar: avatarUri,
     email: profile.texts?.email || null,
     description: profile.description,
     location: profile.texts?.location || null,
