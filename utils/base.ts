@@ -97,15 +97,14 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
-export const respondWithCache = (
-  json: string,
-  headers?: { [index: string]: string }
-) => {
+export const respondWithCache = (json: string, headers?: AuthHeaders) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      "Cache-Control": !headers?.authorization
+        ? "no-cache"
+        : "public, s-maxage=604800, stale-while-revalidate=86400",
       ...headers,
     },
   });

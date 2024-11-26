@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
       headers
     );
 
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e) {
     return NextResponse.json({
       error: e,
@@ -84,7 +84,10 @@ export async function GET(req: NextRequest) {
       headers
     );
 
-    return respondWithCache(JSON.stringify(await processJson(rawJson)));
+    return respondWithCache(
+      JSON.stringify(await processJson(rawJson)),
+      headers
+    );
   } catch (e) {
     return NextResponse.json({
       error: e,

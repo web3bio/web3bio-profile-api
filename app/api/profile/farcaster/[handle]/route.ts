@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const json = await resolveFarcasterHandle(queryInput, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: queryInput,

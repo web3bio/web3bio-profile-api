@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
   const headers = getUserHeaders(req);
   try {
     const json = await queryDomains(body.name, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e) {
     return NextResponse.json({
       error: e,
@@ -64,7 +64,7 @@ export async function GET(req: NextRequest) {
   try {
     const json = await queryDomains(name, headers);
 
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e) {
     return NextResponse.json({
       error: e,

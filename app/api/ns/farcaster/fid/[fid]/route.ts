@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const json = await resolveFarcasterHandleNS(`#${fid}`, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: fid,

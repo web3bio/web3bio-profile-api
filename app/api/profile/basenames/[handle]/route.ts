@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
       headers,
       PlatformType.basenames
     );
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: inputName,

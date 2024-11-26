@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     });
   try {
     const json = await resolveSNSHandle(handle, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: handle,

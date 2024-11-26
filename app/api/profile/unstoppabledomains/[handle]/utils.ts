@@ -38,13 +38,13 @@ export const resolveUDHandle = async (
     headers
   );
 
-  if(response.msg){
+  if (response.msg) {
     return {
       identity: handle,
       platform: PlatformType.unstoppableDomains,
       message: response.msg,
-      code: response.code
-    }
+      code: response.code,
+    };
   }
   const profile = response?.data?.identity?.profile;
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
@@ -104,7 +104,7 @@ export const resolveUDRespond = async (
 ) => {
   try {
     const json = await resolveUDHandle(handle, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: handle,

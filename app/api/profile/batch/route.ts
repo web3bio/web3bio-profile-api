@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
   try {
     const queryIds = filterIds(ids);
     const json = await fetchIdentityGraphBatch(queryIds, false, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return NextResponse.json({
       error: e.message,
@@ -40,7 +40,7 @@ export async function GET(req: NextRequest) {
     }
     const queryIds = filterIds(mergedIds);
     const json = await fetchIdentityGraphBatch(queryIds, false, headers);
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return NextResponse.json({
       error: e.message,
