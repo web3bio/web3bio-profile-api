@@ -1,3 +1,4 @@
+import { formatText, isWeb3Address } from "@/utils/base";
 import {
   IDENTITY_GRAPH_SERVER,
   generateProfileStruct,
@@ -40,8 +41,11 @@ export async function fetchIdentityGraphBatch(
             ...(await generateProfileStruct(
               item.profile || {
                 platform: item.platform,
-                address: item.identity.toLowerCase(),
-                identity: item.identity.toLowerCase(),
+                address: item.identity,
+                identity: item.identity,
+                displayName: isWeb3Address(item.identity)
+                  ? formatText(item.identity)
+                  : item.identity,
               },
               ns
             )),

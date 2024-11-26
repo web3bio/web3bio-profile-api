@@ -65,6 +65,7 @@ export function getUserHeaders(req: NextRequest) {
 
   return {
     "x-client-ip": ip || "",
+    // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
     authorization: apiKey || "",
   };
 }
