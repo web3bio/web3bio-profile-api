@@ -53,6 +53,8 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
     ip = ip.split(",")[0].trim();
   }
   const header: AuthHeaders = {
+    // test for local dev 
+    // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY,
     "x-client-ip": ip || "",
   };
   const isTrustedDomain =
