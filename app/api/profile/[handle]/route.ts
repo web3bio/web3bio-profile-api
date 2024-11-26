@@ -22,7 +22,7 @@ export async function GET(req: NextRequest) {
     return errorHandle({
       identity: inputName,
       code: 404,
-      platform: 'universal',
+      platform: platform || "universal",
       message: ErrorMessages.invalidIdentity,
     });
   }
