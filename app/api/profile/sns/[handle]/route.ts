@@ -18,7 +18,15 @@ export async function GET(req: NextRequest) {
     });
 
   try {
-    const json = await resolveSNSHandle(handle, headers);
+    const json = (await resolveSNSHandle(handle, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.sns,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

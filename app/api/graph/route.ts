@@ -1,28 +1,9 @@
-import { getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { ErrorMessages, ProfileRecord } from "@/utils/types";
 import { NextRequest, NextResponse } from "next/server";
-
-export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const headers = getUserHeaders(req);
-  try {
-    const json = await queryIdentityGraph(
-      body.identity,
-      body.platform,
-      GET_PROFILES(false),
-      headers
-    );
-
-    return respondWithCache(JSON.stringify(json));
-  } catch (e) {
-    return NextResponse.json({
-      error: e,
-    });
-  }
-}
 
 const processAvatar = async (profile: ProfileRecord) => {
   if (!profile) return null;
@@ -66,13 +47,52 @@ const processJson = async (json: any) => {
   return _json;
 };
 
+export async function POST(req: NextRequest) {
+  const body = await req.json();
+  const headers = getUserHeaders(req);
+  if (!body?.identity || !body?.platform)
+    return errorHandle({
+      identity: body?.identity,
+      platform: body?.platform || "graph",
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  try {
+    const json = await queryIdentityGraph(
+      body.identity,
+      body.platform,
+      GET_PROFILES(false),
+      headers
+    );
+    if (json.code) {
+      return errorHandle({
+        identity: body?.identity,
+        platform: body?.platform || "graph",
+        code: json.code,
+        message: json.msg || ErrorMessages.notFound,
+      });
+    }
+
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: body?.identity,
+      platform: body?.platform,
+      code: e.cause || 500,
+      message: e.message || ErrorMessages.notFound,
+    });
+  }
+}
+
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as PlatformType;
   const headers = getUserHeaders(req);
   if (!identity || !platform)
-    return NextResponse.json({
+    return errorHandle({
+      identity: identity,
+      platform: platform || "graph",
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
@@ -83,11 +103,22 @@ export async function GET(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
+    if (rawJson.code) {
+      return errorHandle({
+        identity: identity,
+        platform: platform || "graph",
+        code: rawJson.code,
+        message: rawJson.msg || ErrorMessages.notFound,
+      });
+    }
 
     return respondWithCache(JSON.stringify(await processJson(rawJson)));
-  } catch (e) {
-    return NextResponse.json({
-      error: e,
+  } catch (e: any) {
+    return errorHandle({
+      identity: identity,
+      platform: platform,
+      code: e.cause || 500,
+      message: e.message || ErrorMessages.notFound,
     });
   }
 }

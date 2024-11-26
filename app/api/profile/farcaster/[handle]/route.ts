@@ -36,6 +36,14 @@ export async function GET(req: NextRequest) {
 
   try {
     const json = await resolveFarcasterHandle(queryInput, headers);
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

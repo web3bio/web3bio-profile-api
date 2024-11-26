@@ -18,7 +18,7 @@ import {
   regexCluster,
   regexNext,
 } from "./regexp";
-import { errorHandleProps } from "./types";
+import { AuthHeaders, errorHandleProps } from "./types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
@@ -46,13 +46,15 @@ export function isWeb3Address(address: string): boolean {
   return web3AddressRegexes.some((regex) => regex.test(address));
 }
 
-export function getUserHeaders(req: NextRequest) {
+export function getUserHeaders(req: NextRequest): AuthHeaders {
   let ip = req.headers?.get("x-forwarded-for") || req?.ip;
 
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[0].trim();
   }
-
+  const header: AuthHeaders = {
+    "x-client-ip": ip || "",
+  };
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
@@ -62,12 +64,10 @@ export function getUserHeaders(req: NextRequest) {
     : isTrustedDomain
     ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
     : "";
-
-  return {
-    "x-client-ip": ip || "",
-    // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
-    authorization: apiKey || "",
-  };
+  if (apiKey?.length) {
+    header.authorization = apiKey;
+  }
+  return header;
 }
 
 export function isSameAddress(
@@ -82,7 +82,7 @@ export const errorHandle = (props: errorHandleProps) => {
   return NextResponse.json(
     {
       address: isValidAddress ? props.identity : null,
-      identity: !isValidAddress ? props.identity : null,
+      identity: isValidAddress ? null : props.identity,
       platform: props.platform,
       error: props.message,
     },
@@ -103,7 +103,8 @@ export const respondWithCache = (
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      // "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      "Cache-Control": "no-cache",
       ...headers,
     },
   });

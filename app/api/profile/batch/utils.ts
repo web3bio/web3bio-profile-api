@@ -6,6 +6,7 @@ import {
 import { BATCH_GET_PROFILES } from "@/utils/query";
 import {
   AuthHeaders,
+  ErrorMessages,
   ProfileAPIResponse,
   ProfileNSResponse,
 } from "@/utils/types";
@@ -32,6 +33,7 @@ export async function fetchIdentityGraphBatch(
     });
 
     const json = await response.json();
+    if (json.code) return json;
     let res = [] as any;
     if (json?.data?.identities?.length > 0) {
       for (let i = 0; i < json.data.identities.length; i++) {
@@ -56,6 +58,6 @@ export async function fetchIdentityGraphBatch(
     }
     return res;
   } catch (e: any) {
-    return { error: e.message };
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }

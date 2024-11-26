@@ -6,7 +6,6 @@ import {
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS } from "@/utils/base";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
 export const resolveLensHandle = async (
@@ -66,9 +65,8 @@ export const resolveLensHandle = async (
       }
     });
   }
-
   const avatarUri = profile.avatar
-    ? resolveEipAssetURL(profile?.avatar)
+    ? await resolveEipAssetURL(profile?.avatar)
     : profile?.social?.uid
     ? `https://api.hey.xyz/avatar?id=${Number(profile?.social?.uid)}`
     : null;

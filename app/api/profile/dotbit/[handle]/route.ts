@@ -17,7 +17,15 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveDotbitHandle(handle, headers);
+    const json = (await resolveDotbitHandle(handle, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.dotbit,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

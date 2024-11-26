@@ -19,6 +19,14 @@ export async function GET(req: NextRequest) {
 
   try {
     const json = await resolveFarcasterHandle(`#${fid}`, headers);
+    if (json.code) {
+      return errorHandle({
+        identity: `#${fid}`,
+        platform: PlatformType.farcaster,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
