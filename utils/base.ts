@@ -57,8 +57,8 @@ export function getUserHeaders(req: NextRequest) {
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
 
-  const apiKey = req.headers?.get("authorization")
-    ? req.headers.get("authorization")
+  const apiKey = req.headers?.get("x-api-key")
+    ? req.headers.get("x-api-key")
     : isTrustedDomain
     ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
     : "";
