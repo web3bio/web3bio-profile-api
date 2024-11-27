@@ -54,7 +54,7 @@ const processJson = async (json: any) => {
       );
       if (index !== -1) {
         const item = identity.identityGraph.vertices[index];
-        identity.identityGraph.vertices.slice(index, 1);
+        identity.identityGraph.vertices.splice(index, 1);
         identity.identityGraph.vertices.unshift(item);
       }
     }
