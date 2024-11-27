@@ -101,10 +101,9 @@ export const respondWithCache = (json: string, headers?: AuthHeaders) => {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "no-cache",
-      // "Cache-Control": !headers?.authorization
-      //   ? "no-cache"
-      //   : "public, s-maxage=604800, stale-while-revalidate=86400",
+      "Cache-Control": headers?.authorization
+        ? "public, s-maxage=604800, stale-while-revalidate=86400"
+        : "no-cache",
       ...headers,
     },
   });
