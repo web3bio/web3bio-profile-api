@@ -2,7 +2,7 @@ import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveEipAssetURL } from "@/utils/resolver";
-import { ErrorMessages, ProfileRecord } from "@/utils/types";
+import { ErrorMessages, IdentityRecord, ProfileRecord } from "@/utils/types";
 import { NextRequest } from "next/server";
 
 const processAvatar = async (profile: ProfileRecord) => {
@@ -36,7 +36,29 @@ const processJson = async (json: any) => {
   if (identity?.profile) {
     identity.profile = await processAvatar(identity.profile);
   }
+
   if (identity?.identityGraph?.vertices?.length > 0) {
+    if (
+      !identity?.identityGraph?.vertices?.some(
+        (x: IdentityRecord) =>
+          x.identity === identity.identity && x.platform === identity.platform
+      )
+    ) {
+      const _identity = JSON.parse(JSON.stringify(identity));
+      delete _identity.identityGraph;
+      identity?.identityGraph?.vertices.unshift(_identity);
+    } else {
+      const index = identity.identityGraph.vertices.findIndex(
+        (x: IdentityRecord) =>
+          x.platform === identity.platform && x.identity === identity.identity
+      );
+      if (index !== -1) {
+        const item = identity.identityGraph.vertices[index];
+        identity.identityGraph.vertices.slice(index, 1);
+        identity.identityGraph.vertices.unshift(item);
+      }
+    }
+
     for (let i = 0; i < identity.identityGraph.vertices.length; i++) {
       const item = identity.identityGraph.vertices[i];
       if (item?.profile) {
