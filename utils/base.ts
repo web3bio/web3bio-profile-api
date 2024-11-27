@@ -53,7 +53,7 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
     ip = ip.split(",")[0].trim();
   }
   const header: AuthHeaders = {
-    // test for local dev 
+    // test for local dev
     // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY,
     "x-client-ip": ip || "",
   };
@@ -61,8 +61,8 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
 
-  const apiKey = req.headers?.get("authorization")
-    ? req.headers.get("authorization")
+  const apiKey = req.headers?.get("x-api-key")
+    ? req.headers.get("x-api-key")
     : isTrustedDomain
     ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
     : "";
@@ -105,8 +105,7 @@ export const respondWithCache = (
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      // "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
-      "Cache-Control": "no-cache",
+      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
       ...headers,
     },
   });
