@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { ErrorMessages, ProfileRecord } from "@/utils/types";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 
 const processAvatar = async (profile: ProfileRecord) => {
   if (!profile) return null;

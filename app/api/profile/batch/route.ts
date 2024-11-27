@@ -1,5 +1,5 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { fetchIdentityGraphBatch } from "./utils";
 import { PlatformType } from "@/utils/platform";
 import { ErrorMessages } from "@/utils/types";

@@ -60,7 +60,6 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
-
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
     : isTrustedDomain
@@ -97,15 +96,15 @@ export const errorHandle = (props: errorHandleProps) => {
     }
   );
 };
-export const respondWithCache = (
-  json: string,
-  headers?: { [index: string]: string }
-) => {
+export const respondWithCache = (json: string, headers?: AuthHeaders) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      "Cache-Control": "no-cache",
+      // "Cache-Control": !headers?.authorization
+      //   ? "no-cache"
+      //   : "public, s-maxage=604800, stale-while-revalidate=86400",
       ...headers,
     },
   });

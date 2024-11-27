@@ -1,6 +1,6 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest } from "next/server";
 import { IDENTITY_GRAPH_SERVER } from "../profile/[handle]/utils";
 
 const GET_AVAILABLE_DOMAINS = `
