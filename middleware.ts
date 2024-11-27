@@ -8,7 +8,6 @@ async function verifyAuth(token: string) {
       token,
       new TextEncoder().encode(process.env.JWT_KEY)
     );
-    console.log(verified, "verified");
     return verified.payload;
   } catch (err) {
     throw new Error("Invalid API Token");
@@ -57,10 +56,14 @@ export const config = {
 
 export async function middleware(req: NextRequest) {
   const userToken = req.headers.get("x-api-key");
+
   if (!userToken) {
     return NextResponse.next();
   }
-  const verifiedToken = await verifyAuth(userToken).catch((err) => {
+
+  const verifiedToken = await verifyAuth(
+    userToken.includes("Bearer") ? userToken.split("Bearer ")[0] : userToken
+  ).catch((err) => {
     // todo: do some log
     console.error(err.message);
   });
@@ -68,13 +71,13 @@ export async function middleware(req: NextRequest) {
   if (!verifiedToken) {
     const { identity, platform } = getIdentityPlatform(req);
 
-    return new NextResponse(
-      JSON.stringify({
+    return NextResponse.json(
+      {
         address: identity && isValidEthereumAddress(identity) ? identity : null,
         identity,
         platform,
         error: "Invalid API Token",
-      }),
+      },
       { status: 403 }
     );
   }
