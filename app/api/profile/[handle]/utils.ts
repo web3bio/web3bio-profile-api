@@ -184,7 +184,11 @@ export async function generateProfileStruct(
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName,
-    avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
+    avatar: data.avatar
+      ? await resolveEipAssetURL(data.avatar, data.identity)
+      : data.platform === PlatformType.lens && data?.social?.uid
+      ? `https://api.hey.xyz/avatar?id=${Number(data.social.uid)}`
+      : null,
     description: data.description || null,
   };
 
