@@ -857,6 +857,454 @@ export default function Home() {
           </section>
 
           <section
+            className="pt-4 pb-4"
+            id="batch-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Batch Profile API</h2>
+            <p>Retrieve profiles or name service resolution from query ids </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  batch?ids= {"["}ids{"]"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  batch?ids= {"["}ids{"]"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>ids</strong> <span className="label">string[]</span>{" "}
+                <br />
+                An array of strings consisting of
+                <span className="label">platform,identity</span> with{" "}
+                <span className="label">encodeURIComponent</span> format,
+                maximum of 30 items can be queried at a time
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters Format
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                  )}`}
+                  target="_blank"
+                >
+                  ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                </a>
+              </li>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "ens,vitalik.eth"
+                  )}`}
+                  target="_blank"
+                >
+                  ens,vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "farcaster,dwr.eth"
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,dwr.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "farcaster,#3"
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,#3
+                </a>
+              </li>
+              <li>
+                <span className="label">Lens</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "lens,stani.lens"
+                  )}`}
+                  target="_blank"
+                >
+                  lens,stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+                  )}`}
+                  target="_blank"
+                >
+                  lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "lens,#1"
+                  )}`}
+                  target="_blank"
+                >
+                  lens,#1
+                </a>
+              </li>
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "basenames,tony.base.eth"
+                  )}`}
+                  target="_blank"
+                >
+                  basenames,tony.base.eth
+                </a>
+              </li>
+              {/* <li>
+                <span className="label">SNS</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "sns,bonfida.sol"
+                  )}`}
+                  target="_blank"
+                >
+                  sns,bonfida.sol
+                </a>
+              </li>
+              <li>
+                <span className="label">Solana</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "solana,24ywRTze3X2fUez6mkC9WCaKPVdMF6ykgzLq7wavjvap"
+                  )}`}
+                  target="_blank"
+                >
+                  solana,24ywRTze3X2fUez6mkC9WCaKPVdMF6ykgzLq7wavjvap
+                </a>
+              </li>
+              <li>
+                <span className="label">Clusters</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "clusters,suji/sujieth"
+                  )}`}
+                  target="_blank"
+                >
+                  clusters,suji/sujieth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    "clusters,sujieth"
+                  )}`}
+                  target="_blank"
+                >
+                  clusters,sujieth
+                </a>
+              </li> */}
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                )}`}</span>
+                <br />
+                {`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ens",
+        "displayName": "vitalik.eth",
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati",
+        "email": null,
+        "location": null,
+        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
+        "links": {
+            "website": {
+                "link": "https://vitalik.ca",
+                "handle": "vitalik.ca",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/vbuterin",
+                "handle": "vbuterin",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/VitalikButerin",
+                "handle": "VitalikButerin",
+                "sources": []
+            }
+        },
+        "social": {},
+        "aliases": [
+            "ens,vitalik.eth",
+            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+        ]
+    },
+    {
+        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+        "identity": "stani.lens",
+        "platform": "lens",
+        "displayName": "Stani",
+        "avatar": "https://api.hey.xyz/avatar?id=5",
+        "description": "@Avara (@Aave @Lens @Family)",
+        "email": null,
+        "location": null,
+        "header": null,
+        "contenthash": null,
+        "links": {
+            "lens": {
+                "links": "https://www.lensfrens.xyz/stani",
+                "handle": "stani",
+                "sources": []
+            }
+        },
+        "social": {
+            "uid": 5,
+            "following": 1263,
+            "follower": 114891
+        },
+        "aliases": [
+            "lens,#5",
+            "lens,stani.lens",
+            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+        ]
+    },
+    {
+        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+        "identity": "dwr.eth",
+        "platform": "farcaster",
+        "displayName": "Dan Romero",
+        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+        "description": "Working on Farcaster and Warpcast.",
+        "email": null,
+        "location": null,
+        "header": null,
+        "contenthash": null,
+        "links": {
+            "farcaster": {
+                "links": "https://warpcast.com/dwr.eth",
+                "handle": "dwr.eth",
+                "sources": []
+            }
+        },
+        "social": {
+            "uid": 3,
+            "following": 3510,
+            "follower": 492198
+        },
+        "aliases": [
+            "farcaster,#3",
+            "farcaster,dwr",
+            "farcaster,dwr.eth",
+            "farcaster,danromero.eth",
+            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+        ]
+    },
+    {
+        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+        "identity": "tony.base.eth",
+        "platform": "basenames",
+        "displayName": "tony.base.eth",
+        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+        "description": "mfer building on base",
+        "email": null,
+        "location": null,
+        "header": null,
+        "contenthash": null,
+        "links": {
+            "website": {
+                "link": "https://mint.club",
+                "handle": "mint.club",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/tonymfer",
+                "handle": "tonymfer",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/tonmfer",
+                "handle": "tonmfer",
+                "sources": []
+            },
+            "farcaster": {
+                "link": "https://warpcast.com/to",
+                "handle": "to",
+                "sources": []
+            }
+        },
+        "social": {},
+        "aliases": [
+            "basenames,tony.base.eth",
+            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+        ]
+    },
+    {
+        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+        "identity": "sujiyan.eth",
+        "platform": "ens",
+        "displayName": "sujiyan.eth",
+        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+        "description": null,
+        "email": "suji.yan@dimension.im",
+        "location": null,
+        "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
+        "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
+        "links": {
+            "website": {
+                "link": "https://mask.io",
+                "handle": "mask.io",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/tedko",
+                "handle": "tedko",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/suji_yan",
+                "handle": "suji_yan",
+                "sources": []
+            },
+            "instagram": {
+                "link": "https://www.instagram.com/suji_yan_",
+                "handle": "suji_yan_",
+                "sources": []
+            }
+        },
+        "social": {},
+        "aliases": [
+            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+        ]
+    }
+]`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/batch?ids=${encodeURIComponent(
+                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                )}`}</span>
+                <br />
+                {`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ens",
+        "displayName": "vitalik.eth",
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati",
+        "aliases": [
+            "ens,vitalik.eth",
+            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+        ]
+    },
+    {
+        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+        "identity": "stani.lens",
+        "platform": "lens",
+        "displayName": "Stani",
+        "avatar": "https://api.hey.xyz/avatar?id=5",
+        "description": "@Avara (@Aave @Lens @Family)",
+        "aliases": [
+            "lens,#5",
+            "lens,stani.lens",
+            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+        ]
+    },
+    {
+        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+        "identity": "dwr.eth",
+        "platform": "farcaster",
+        "displayName": "Dan Romero",
+        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+        "description": "Working on Farcaster and Warpcast.",
+        "aliases": [
+            "farcaster,#3",
+            "farcaster,dwr",
+            "farcaster,dwr.eth",
+            "farcaster,danromero.eth",
+            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+        ]
+    },
+    {
+        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+        "identity": "tony.base.eth",
+        "platform": "basenames",
+        "displayName": "tony.base.eth",
+        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+        "description": "mfer building on base",
+        "aliases": [
+            "basenames,tony.base.eth",
+            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+        ]
+    },
+    {
+        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+        "identity": "sujiyan.eth",
+        "platform": "ens",
+        "displayName": "sujiyan.eth",
+        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+        "description": null,
+        "aliases": [
+            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+        ]
+    }
+]`}
+              </code>
+            </pre>
+          </section>
+
+          <section
             className="pb-4"
             id="ens-profile-api"
             style={{ paddingTop: "4rem" }}
