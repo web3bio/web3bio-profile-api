@@ -157,6 +157,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.ens,
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
+        PlatformType.dotbit,
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =

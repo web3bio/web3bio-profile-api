@@ -214,7 +214,6 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
-  PlatformType.unstoppableDomains,
 ];
 
 function sortProfilesByPlatform(
@@ -222,12 +221,10 @@ function sortProfilesByPlatform(
   targetPlatform: PlatformType,
   handle: string
 ): ProfileAPIResponse[] {
-  const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
-    ? [
-        targetPlatform,
-        ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
-      ]
-    : DEFAULT_PLATFORM_ORDER;
+  const order = [
+    targetPlatform,
+    ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
+  ];
 
   const sortedResponses = responses.reduce(
     (acc, response) => {

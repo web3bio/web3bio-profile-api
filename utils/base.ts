@@ -29,7 +29,6 @@ export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
 export const PLATFORMS_TO_EXCLUDE = [
-  PlatformType.dotbit,
   PlatformType.sns,
   PlatformType.solana,
 ];
