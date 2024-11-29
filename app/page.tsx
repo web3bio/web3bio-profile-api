@@ -916,10 +916,11 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <strong>ids</strong> <span className="label">string[]</span>{" "}
+                <strong>ids</strong> <span className="label">string</span>{" "}
                 <br />
                 An array of strings consisting of
-                <span className="label">platform,identity</span> with{" "}
+                <span className="label">platform,identity</span> split with{" "}
+                <span className="label">,</span> and with{" "}
                 <span className="label">encodeURIComponent</span> format,
                 maximum of 30 items can be queried at a time
               </li>
