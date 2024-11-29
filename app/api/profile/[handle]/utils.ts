@@ -28,6 +28,7 @@ import {
 import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
+import { processJson } from "../../graph/utils";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -286,8 +287,10 @@ export const resolveWithIdentityGraph = async ({
       message: response.errors ? response.errors : ErrorMessages.notFound,
       code: response.errors ? 500 : 404,
     };
+  const resolvedResponse = await processJson(response)
+
   const profilesArray = primaryDomainResolvedRequestArray(
-    response,
+    resolvedResponse,
     handle,
     platform
   )

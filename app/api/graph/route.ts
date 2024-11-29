@@ -1,73 +1,9 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveEipAssetURL } from "@/utils/resolver";
-import { ErrorMessages, IdentityRecord, ProfileRecord } from "@/utils/types";
+import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-
-const processAvatar = async (profile: ProfileRecord) => {
-  if (!profile) return null;
-  const _profile = JSON.parse(JSON.stringify(profile));
-
-  try {
-    _profile.avatar = await resolveEipAssetURL(
-      _profile?.avatar,
-      profile.identity
-    );
-  } catch {
-    _profile.avatar = null;
-  }
-  if (
-    _profile.platform === PlatformType.lens &&
-    !_profile.avatar &&
-    _profile?.social?.uid
-  ) {
-    _profile.avatar = `https://api.hey.xyz/avatar?id=${Number(
-      _profile.social.uid
-    )}`;
-  }
-
-  return _profile;
-};
-
-const processJson = async (json: any) => {
-  const _json = JSON.parse(JSON.stringify(json));
-  const identity = _json?.data?.identity;
-  if (identity?.profile) {
-    identity.profile = await processAvatar(identity.profile);
-  }
-
-  if (identity?.identityGraph?.vertices?.length > 0) {
-    if (
-      !identity?.identityGraph?.vertices?.some(
-        (x: IdentityRecord) =>
-          x.identity === identity.identity && x.platform === identity.platform
-      )
-    ) {
-      const _identity = JSON.parse(JSON.stringify(identity));
-      delete _identity.identityGraph;
-      identity?.identityGraph?.vertices.unshift(_identity);
-    } else {
-      const index = identity.identityGraph.vertices.findIndex(
-        (x: IdentityRecord) =>
-          x.platform === identity.platform && x.identity === identity.identity
-      );
-      if (index !== -1) {
-        const item = identity.identityGraph.vertices[index];
-        identity.identityGraph.vertices.splice(index, 1);
-        identity.identityGraph.vertices.unshift(item);
-      }
-    }
-
-    for (let i = 0; i < identity.identityGraph.vertices.length; i++) {
-      const item = identity.identityGraph.vertices[i];
-      if (item?.profile) {
-        item.profile = await processAvatar(item.profile);
-      }
-    }
-  }
-  return _json;
-};
+import { processJson } from "./utils";
 
 export async function POST(req: NextRequest) {
   const body = await req.json();
@@ -94,8 +30,9 @@ export async function POST(req: NextRequest) {
         message: json.msg || ErrorMessages.notFound,
       });
     }
+    const result = await processJson(json);
 
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(result));
   } catch (e: any) {
     return errorHandle({
       identity: body?.identity,
@@ -133,8 +70,9 @@ export async function GET(req: NextRequest) {
         message: rawJson.msg || ErrorMessages.notFound,
       });
     }
+    const result = await processJson(rawJson);
 
-    return respondWithCache(JSON.stringify(await processJson(rawJson)));
+    return respondWithCache(JSON.stringify(result));
   } catch (e: any) {
     return errorHandle({
       identity: identity,
