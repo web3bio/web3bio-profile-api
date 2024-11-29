@@ -28,10 +28,7 @@ export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
-export const PLATFORMS_TO_EXCLUDE = [
-  PlatformType.sns,
-  PlatformType.solana,
-];
+export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
 
 const web3AddressRegexes = [
   regexEth,
@@ -52,9 +49,12 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
     ip = ip.split(",")[0].trim();
   }
   const header: AuthHeaders = {
-    authorization: process.env.GENERAL_IDENTITY_GRAPH_API_KEY,
     "x-client-ip": ip || "",
   };
+
+  if (process.env.GENERAL_IDENTITY_GRAPH_API_KEY) {
+    header.authorization = process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
+  }
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
