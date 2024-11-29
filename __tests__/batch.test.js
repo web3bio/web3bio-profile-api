@@ -6,9 +6,9 @@ describe("Test For Batch Profile API", () => {
     body: JSON.stringify({
       ids: [
         "ens,sujiyan.eth",
-        "ens,vitalik.eth",
         "tony.base.eth",
         "dwr.eth.farcaster",
+        "farcaster,suji",
         "lens,stani.lens",
       ],
     }),

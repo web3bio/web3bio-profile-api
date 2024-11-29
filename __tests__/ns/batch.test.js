@@ -4,7 +4,7 @@ describe("Test For Batch Profile API", () => {
   const options = {
     method: "POST",
     body: JSON.stringify({
-      ids: ["ens,sujiyan.eth", "ens,vitalik.eth", "basenames,tony.base.eth", "farcaster,dwr.eth", "lens,stani.lens"],
+      ids: ["ens,sujiyan.eth", "ens,vitalik.eth", "tony.base.eth", "farcaster,dwr.eth", "lens,stani.lens"],
     }),
   };
   it("It should response 200 for batch profile api", async () => {
