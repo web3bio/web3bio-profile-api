@@ -523,6 +523,21 @@ export default function Home() {
               </div>
             </a>
             <a
+              href="#batch-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Batch Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="label text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+            <a
               href="#ens-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
