@@ -7,8 +7,8 @@ describe("Test For Batch Profile API", () => {
       ids: [
         "ens,sujiyan.eth",
         "ens,vitalik.eth",
-        "basenames,tony.base.eth",
-        "farcaster,dwr.eth",
+        "tony.base.eth",
+        "dwr.eth.farcaster",
         "lens,stani.lens",
       ],
     }),
@@ -23,15 +23,15 @@ describe("Test For Batch Profile API", () => {
     const ids = [
       "ens,sujiyan.eth",
       "ens,vitalik.eth",
-      "basenames,tony.base.eth",
-      "farcaster,dwr.eth",
+      "tony.base.eth",
+      "dwr.eth.farcaster",
+      "farcaster,suji",
       "lens,stani.lens",
     ];
     const url = `/profile/batch?ids=${encodeURIComponent(ids)}`;
     const res = await queryClient(url);
     expect(res.status).toBe(200);
     const json = await res.json();
-    // console.log(json);
-    expect(json.length).toBe(5);
+    expect(json.length).toBe(6);
   });
 });

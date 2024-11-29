@@ -1,4 +1,4 @@
-import { formatText, isWeb3Address } from "@/utils/base";
+import { formatText, isWeb3Address, prettify } from "@/utils/base";
 import {
   IDENTITY_GRAPH_SERVER,
   generateProfileStruct,
@@ -10,6 +10,16 @@ import {
   ProfileAPIResponse,
   ProfileNSResponse,
 } from "@/utils/types";
+import { PlatformType } from "@/utils/platform";
+
+const SUPPORTED_PLATFORMS = [
+  PlatformType.ens,
+  PlatformType.ethereum,
+  PlatformType.farcaster,
+  PlatformType.lens,
+  PlatformType.basenames,
+];
+
 export async function fetchIdentityGraphBatch(
   ids: string[],
   ns: boolean,
@@ -61,3 +71,49 @@ export async function fetchIdentityGraphBatch(
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }
+
+export const filterIdsPOST = (ids: string[]) => {
+  const resolved = ids
+    .map((x) => {
+      if (
+        !x.includes(",") &&
+        (x.endsWith(".base") || x.endsWith(".base.eth"))
+      ) {
+        return `${PlatformType.basenames},${prettify(x)}`;
+      }
+      if (!x.includes(",") && x.endsWith(".farcaster")) {
+        return `${PlatformType.farcaster},${prettify(x)}`;
+      }
+      return x;
+    })
+    .filter(
+      (x) =>
+        !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType)
+    );
+  return resolved;
+};
+
+export const filterIds = (ids: string[]) => {
+  const resolved = ids.map((x, idx) => {
+    if (!x.includes(",") && (x.endsWith(".base") || x.endsWith(".base.eth"))) {
+      return {
+        platform: PlatformType.basenames,
+        handle: prettify(x),
+      };
+    }
+    if (x.endsWith(".farcaster")) {
+      return {
+        platform: PlatformType.farcaster,
+        handle: prettify(x),
+      };
+    }
+    if (SUPPORTED_PLATFORMS.includes(x as PlatformType)) {
+      return {
+        platform: prettify(x),
+        handle: ids[idx + 1],
+      };
+    }
+  });
+
+  return resolved.filter((x) => !!x).map((x) => `${x?.platform},${x?.handle}`);
+};

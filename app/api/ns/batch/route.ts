@@ -1,33 +1,21 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
-import { PlatformType } from "@/utils/platform";
-import { fetchIdentityGraphBatch } from "../../profile/batch/utils";
+import { NextRequest } from "next/server";
+import { fetchIdentityGraphBatch, filterIds, filterIdsPOST } from "../../profile/batch/utils";
 import { ErrorMessages } from "@/utils/types";
-
-const filterIds = (ids: string[]) =>
-  ids.filter((x: string) => {
-    return [
-      PlatformType.ens,
-      PlatformType.basenames,
-      PlatformType.ethereum,
-      PlatformType.lens,
-      PlatformType.farcaster,
-    ].includes(x.split(",")[0] as PlatformType);
-  });
 
 export async function POST(req: NextRequest) {
   const { ids } = await req.json();
   const headers = getUserHeaders(req);
-  if (!ids.length)
-    if (!ids?.length)
-      return errorHandle({
-        identity: null,
-        platform: "batch",
-        code: 404,
-        message: ErrorMessages.invalidIdentity,
-      });
+  if (!ids?.length)
+    return errorHandle({
+      identity: null,
+      platform: "batch",
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
   try {
-    const queryIds = filterIds(ids);
+
+    const queryIds = filterIdsPOST(ids);
     const json = (await fetchIdentityGraphBatch(
       queryIds,
       true,
@@ -64,11 +52,7 @@ export async function GET(req: NextRequest) {
         code: 404,
         message: ErrorMessages.invalidIdentity,
       });
-    const mergedIds = [];
-    for (let i = 0; i < ids.length; i += 2) {
-      mergedIds.push(`${ids[i]},${ids[i + 1]}`);
-    }
-    const queryIds = filterIds(mergedIds);
+    const queryIds = filterIds(ids);
     const json = (await fetchIdentityGraphBatch(
       queryIds,
       true,

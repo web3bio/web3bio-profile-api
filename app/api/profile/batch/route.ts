@@ -1,19 +1,11 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  respondWithCache,
+} from "@/utils/base";
 import { NextRequest } from "next/server";
-import { fetchIdentityGraphBatch } from "./utils";
-import { PlatformType } from "@/utils/platform";
+import { fetchIdentityGraphBatch, filterIds, filterIdsPOST } from "./utils";
 import { ErrorMessages } from "@/utils/types";
-
-const filterIds = (ids: string[]) =>
-  ids.filter((x: string) => {
-    return [
-      PlatformType.ens,
-      PlatformType.basenames,
-      PlatformType.ethereum,
-      PlatformType.lens,
-      PlatformType.farcaster,
-    ].includes(x.split(",")[0] as PlatformType);
-  });
 
 export async function POST(req: NextRequest) {
   const { ids } = await req.json();
@@ -26,7 +18,7 @@ export async function POST(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const queryIds = filterIds(ids);
+    const queryIds = filterIdsPOST(ids);
     const json = (await fetchIdentityGraphBatch(
       queryIds,
       false,
@@ -63,16 +55,13 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const mergedIds = [];
-    for (let i = 0; i < ids.length; i += 2) {
-      mergedIds.push(`${ids[i]},${ids[i + 1]}`);
-    }
-    const queryIds = filterIds(mergedIds);
+    const queryIds = filterIds(ids);
     const json = (await fetchIdentityGraphBatch(
       queryIds,
       false,
       headers
     )) as any;
+
     if (json.code) {
       return errorHandle({
         identity: JSON.stringify(ids),

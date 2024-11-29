@@ -52,8 +52,7 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
     ip = ip.split(",")[0].trim();
   }
   const header: AuthHeaders = {
-    // test for local dev
-    // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY,
+    authorization: process.env.GENERAL_IDENTITY_GRAPH_API_KEY,
     "x-client-ip": ip || "",
   };
   const isTrustedDomain =
@@ -62,7 +61,7 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
     : isTrustedDomain
-    ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
+    ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
     : "";
   if (apiKey?.length) {
     header.authorization = apiKey;
