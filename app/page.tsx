@@ -523,7 +523,7 @@ export default function Home() {
               </div>
             </a>
             <a
-              href="#batch-profile-api"
+              href="#batch-query"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
             >
@@ -775,26 +775,37 @@ export default function Home() {
         "identity": "vitalik.eth",
         "platform": "ens",
         "displayName": "vitalik.eth",
-        "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-        "description": null,
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati",
         "email": null,
         "location": null,
-        "header": null,
-        "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
+        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
         "links": {
             "website": {
                 "link": "https://vitalik.ca",
-                "handle": "vitalik.ca"
+                "handle": "vitalik.ca",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/vbuterin",
+                "handle": "vbuterin",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/VitalikButerin",
+                "handle": "VitalikButerin",
+                "sources": []
             }
-        }
+        },
         "social": {}
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vbuterin",
+        "identity": "vitalik.eth",
         "platform": "farcaster",
         "displayName": "Vitalik Buterin",
-        "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
+        "avatar": "https://i.imgur.com/IzJxuId.jpg",
         "description": "hullo",
         "email": null,
         "location": null,
@@ -802,35 +813,42 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "farcaster": {
-                "link": "https://warpcast.com/vbuterin",
-                "handle": "vbuterin"
+                "links": "https://warpcast.com/vitalik.eth",
+                "handle": "vitalik.eth",
+                "sources": [
+                    "ethereum"
+                ]
             }
         },
         "social": {
-             "uid": 5650,
-             "follower": 312547,
-             "following": 72
+            "uid": 5650,
+            "follower": 396461,
+            "following": 73
         }
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
         "identity": "vitalik.lens",
         "platform": "lens",
-        "displayName": "Vitalik Buterin",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
-        "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds",
+        "displayName": "vitalik.lens",
+        "avatar": "https://api.hey.xyz/avatar?id=100275",
+        "description": null,
         "email": null,
+        "location": null,
         "header": null,
         "contenthash": null,
         "links": {
             "lens": {
-                "link": "https://www.lensfrens.xyz/vitalik",
-                "handle": "vitalik"
+                "links": "https://www.lensfrens.xyz/vitalik",
+                "handle": "vitalik",
+                "sources": [
+                    "ethereum"
+                ]
             }
         },
         "social": {
             "uid": 100275,
-            "follower": 33500,
+            "follower": 42267,
             "following": 7
         }
     }
@@ -847,24 +865,24 @@ export default function Home() {
         "identity": "vitalik.eth",
         "platform": "ens",
         "displayName": "vitalik.eth",
-        "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-        "description": null
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati"
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vbuterin",
+        "identity": "vitalik.eth",
         "platform": "farcaster",
         "displayName": "Vitalik Buterin",
-        "avatar": "https://i.imgur.com/gF9Yaeg.jpg",
+        "avatar": "https://i.imgur.com/IzJxuId.jpg",
         "description": "hullo"
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
         "identity": "vitalik.lens",
         "platform": "lens",
-        "displayName": "Vitalik Buterin",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/d2762e3b5f2532c648feec96bf590923ea6c3783fee428cbb694936ce62962e0.jpg",
-        "description": "Ethereum  Fable of the Dragon Tyrant (not mine but it's important): https://www.youtube.com/watch?v=cZYNADOHhVY  Abolish daylight savings time and leap seconds"
+        "displayName": "vitalik.lens",
+        "avatar": "https://api.hey.xyz/avatar?id=100275",
+        "description": null
     }
 ]`}
               </code>
@@ -873,7 +891,7 @@ export default function Home() {
 
           <section
             className="pt-4 pb-4"
-            id="batch-profile-api"
+            id="batch-query"
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Batch Query</h2>
@@ -916,7 +934,7 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <strong>ids</strong> <span className="label">string</span>{" "}
+                <strong>ids</strong> <span className="label">string[]</span>{" "}
                 <br />
                 An array of strings where each string is formatted as{" "}
                 <span className="label">platform,identity</span>, encoded using{" "}
@@ -924,8 +942,19 @@ export default function Home() {
                 limited to a maximum of 30 items per query.
               </li>
             </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                {`[
+    "ens,vitalik.eth",
+    "lens,stani.lens",
+    "farcaster,dwr.eth",
+    "basenames,tony.base.eth",
+    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+]`}
+              </code>
+            </pre>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters Format
+              Examples
             </h3>
             <ul>
               <li>
@@ -933,25 +962,32 @@ export default function Home() {
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
                     JSON.stringify([
-                      "ens,sujiyan.eth",
-                      "ens,vitalik.eth",
-                      "tony.base.eth",
-                      "dwr.eth.farcaster",
-                      "farcaster,suji",
-                      "lens,stani.lens",
+                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
                     ]),
                   )}`}
                   target="_blank"
                 >
-                  ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045,
-                  ens,0x934b510d4c9103e6a87aef13b816fb080286d649
+                  ethereum,0xd8da...6045
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                    JSON.stringify([
+                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  ens,0x934b...d649
                 </a>
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "ens,vitalik.eth",
+                    JSON.stringify(["ens,vitalik.eth"]),
                   )}`}
                   target="_blank"
                 >
@@ -962,7 +998,11 @@ export default function Home() {
                 <span className="label">Farcaster</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,dwr.eth",
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
                   )}`}
                   target="_blank"
                 >
@@ -971,16 +1011,24 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
                   )}`}
                   target="_blank"
                 >
-                  farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2
+                  farcaster,0xd702...8ff2
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,#3",
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
                   )}`}
                   target="_blank"
                 >
@@ -991,7 +1039,11 @@ export default function Home() {
                 <span className="label">Lens</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,stani.lens",
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
                   )}`}
                   target="_blank"
                 >
@@ -1000,27 +1052,35 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
                   )}`}
                   target="_blank"
                 >
-                  lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff
+                  lens,0xd8da...6045
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,#1",
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
                   )}`}
                   target="_blank"
                 >
-                  lens,#1
+                  lens,#11874
                 </a>
               </li>
               <li>
                 <span className="label">Basenames</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "basenames,tony.base.eth",
+                    JSON.stringify(["basenames,tony.base.eth"]),
                   )}`}
                   target="_blank"
                 >
@@ -1033,8 +1093,17 @@ export default function Home() {
             </h3>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                <span
+                  className="text-gray"
+                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
+                >{`// ${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  JSON.stringify([
+                    "ens,vitalik.eth",
+                    "lens,stani.lens",
+                    "farcaster,dwr.eth",
+                    "basenames,tony.base.eth",
+                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                  ]),
                 )}`}</span>
                 <br />
                 {`[
@@ -1077,11 +1146,11 @@ export default function Home() {
         "identity": "stani.lens",
         "platform": "lens",
         "displayName": "Stani",
-        "avatar": "https://api.hey.xyz/avatar?id=5",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
         "description": "@Avara (@Aave @Lens @Family)",
         "email": null,
         "location": null,
-        "header": null,
+        "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
         "contenthash": null,
         "links": {
             "lens": {
@@ -1092,8 +1161,8 @@ export default function Home() {
         },
         "social": {
             "uid": 5,
-            "following": 1263,
-            "follower": 114891
+            "following": 1265,
+            "follower": 115084
         },
         "aliases": [
             "lens,#5",
@@ -1121,8 +1190,8 @@ export default function Home() {
         },
         "social": {
             "uid": 3,
-            "following": 3510,
-            "follower": 492198
+            "following": 3534,
+            "follower": 493153
         },
         "aliases": [
             "farcaster,#3",
@@ -1212,8 +1281,17 @@ export default function Home() {
 ]`}
                 <br />
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/batch?ids=${encodeURIComponent(
-                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                <span
+                  className="text-gray"
+                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
+                >{`// ${BASE_URL}/ns/batch?ids=${encodeURIComponent(
+                  JSON.stringify([
+                    "ens,vitalik.eth",
+                    "lens,stani.lens",
+                    "farcaster,dwr.eth",
+                    "basenames,tony.base.eth",
+                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                  ]),
                 )}`}</span>
                 <br />
                 {`[
@@ -1234,7 +1312,7 @@ export default function Home() {
         "identity": "stani.lens",
         "platform": "lens",
         "displayName": "Stani",
-        "avatar": "https://api.hey.xyz/avatar?id=5",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
         "description": "@Avara (@Aave @Lens @Family)",
         "aliases": [
             "lens,#5",
@@ -1397,7 +1475,18 @@ export default function Home() {
     "links": {
         "website": {
             "link": "https://vitalik.ca",
-            "handle": "vitalik.ca"
+            "handle": "vitalik.ca",
+            "sources": []
+        },
+        "github": {
+            "link": "https://github.com/vbuterin",
+            "handle": "vbuterin",
+            "sources": []
+        },
+        "twitter": {
+            "link": "https://x.com/VitalikButerin",
+            "handle": "VitalikButerin",
+            "sources": []
         }
     },
     "social": {}
@@ -1476,7 +1565,7 @@ export default function Home() {
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
                 An Ethereum address or a Farcaster username/fname or a Farcaster
-                FID (with fid:).
+                FID (with fid/).
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1514,12 +1603,12 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
-                <a href={`${BASE_URL}/profile/farcaster/fid:3`} target="_blank">
-                  /profile/farcaster/fid:3
+                <a href={`${BASE_URL}/profile/farcaster/fid/3`} target="_blank">
+                  /profile/farcaster/fid/3
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/fid:3`} target="_blank">
-                  /ns/farcaster/fid:3
+                <a href={`${BASE_URL}/ns/farcaster/fid/3`} target="_blank">
+                  /ns/farcaster/fid/3
                 </a>
               </li>
             </ul>
@@ -1529,29 +1618,32 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid:3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid/3`}</span>
                 <br />
                 {`{
-    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
+    "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
     "identity": "dwr.eth",
     "platform": "farcaster",
     "displayName": "Dan Romero",
-    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
+    "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
     "description": "Working on Farcaster and Warpcast.",
     "email": null,
-    "location": "Los Angeles, CA, USA",
+    "location": null,
     "header": null,
     "contenthash": null,
     "links": {
         "farcaster": {
             "link": "https://warpcast.com/dwr.eth",
-            "handle": "dwr.eth"
+            "handle": "dwr.eth",
+            "sources": [
+                "ethereum"
+            ]
         }
     },
     "social": {
         "uid": 3,
-        "follower": 385189,
-        "following": 3111
+        "follower": 493153,
+        "following": 3534
     }
 }`}
                 <br />
@@ -1560,7 +1652,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid:3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid/3`}</span>
                 <br />
                 {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
@@ -1670,26 +1762,25 @@ export default function Home() {
     "identity": "stani.lens",
     "platform": "lens",
     "displayName": "Stani",
-    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-    "description": "Building @LensProtocol & @AaveAave",
+    "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
     "email": null,
+    "description": "@Avara (@Aave @Lens @Family)",
     "location": null,
-    "header": "https://ik.imagekit.io/lens/media-snapshot/692020434413dd88dd96a93f9df08cfefd0a3b84abba5772c14a2f56ac01b0cd.jpg",
+    "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
     "contenthash": null,
     "links": {
         "lens": {
             "link": "https://www.lensfrens.xyz/stani",
-            "handle": "stani"
-        },
-        "website": {
-            "link": "https://lens.xyz",
-            "handle": "lens.xyz"
+            "handle": "stani",
+            "sources": [
+                "ethereum"
+            ]
         }
     },
     "social": {
         "uid": 5,
-        "follower": 92157,
-        "following": 1139
+        "follower": 115084,
+        "following": 1265
     }
 }`}
                 <br />
@@ -1704,7 +1795,7 @@ export default function Home() {
     "platform": "lens",
     "displayName": "Stani",
     "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-    "description": "Building @LensProtocol & @AaveAave"
+    "description": "@Avara (@Aave @Lens @Family)"
 }`}
               </code>
             </pre>
@@ -1821,29 +1912,20 @@ export default function Home() {
     "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
     "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
     "links": {
-        "url": {
-            "link": "https://gateway.pinata.cloud/ipfs/Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
-            "handle": "sandy.nft"
-        },
         "twitter": {
             "link": "https://x.com/Sandy_carter",
-            "handle": "Sandy_carter"
-        },
-        "discord": {
-            "link": "",
-            "handle": "SandyCarter#6286"
-        },
-        "lens": {
-            "link": "https://www.lensfrens.xyz/sandracarter",
-            "handle": "sandracarter.lens"
+            "handle": "Sandy_carter",
+            "sources": []
         },
         "telegram": {
             "link": "https://t.me/sandycarter",
-            "handle": "sandycarter"
+            "handle": "sandycarter",
+            "sources": []
         },
         "youtube": {
             "link": "https://www.youtube.com/@sandycarter3993",
-            "handle": "@sandycarter3993"
+            "handle": "@sandycarter3993",
+            "sources": []
         }
     },
     "social": {
@@ -2105,23 +2187,33 @@ export default function Home() {
     "links": {
         "twitter": {
             "link": "https://x.com/dotbitHQ",
-            "handle": "dotbitHQ"
+            "handle": "dotbitHQ",
+            "sources": []
         },
         "github": {
             "link": "https://github.com/dotbitHQ",
-            "handle": "dotbitHQ"
+            "handle": "dotbitHQ",
+            "sources": []
         },
         "discord": {
             "link": "https://discord.com/invite/did",
-            "handle": "did"
+            "handle": "did",
+            "sources": []
         },
         "website": {
             "link": "https://www.did.id/",
-            "handle": "www.did.id"
+            "handle": "www.did.id",
+            "sources": []
         },
         "nostr": {
-            "link": "https://snort.social/p/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
-            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag"
+            "link": "https://app.coracle.social/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
+            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
+            "sources": []
+        },
+        "opensea": {
+            "link": "https://opensea.io/collection/dotbit",
+            "handle": "dotbit",
+            "sources": []
         }
     },
     "social": {}
