@@ -529,7 +529,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Batch Profile API</div>
+                <div className="mr-2">Batch Query</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -876,8 +876,8 @@ export default function Home() {
             id="batch-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Batch Profile API</h2>
-            <p>Retrieve profiles or name service resolution from query ids </p>
+            <h2 className="text-bold h4">Batch Query</h2>
+            <p>Retrieve profiles for multiple identities using query IDs</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -892,7 +892,7 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  batch?ids= {"["}ids{"]"}
+                  batch?ids= {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -907,7 +907,7 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  batch?ids= {"["}ids{"]"}
+                  batch?ids= {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -918,11 +918,10 @@ export default function Home() {
               <li>
                 <strong>ids</strong> <span className="label">string</span>{" "}
                 <br />
-                An array of strings consisting of
-                <span className="label">platform,identity</span> split with{" "}
-                <span className="label">,</span> and with{" "}
-                <span className="label">encodeURIComponent</span> format,
-                maximum of 30 items can be queried at a time
+                An array of strings where each string is formatted as{" "}
+                <span className="label">platform,identity</span>, encoded using{" "}
+                <span className="label">encodeURIComponent</span>. The array is
+                limited to a maximum of 30 items per query.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -933,18 +932,26 @@ export default function Home() {
                 <span className="label">Ethereum</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                    JSON.stringify([
+                      "ens,sujiyan.eth",
+                      "ens,vitalik.eth",
+                      "tony.base.eth",
+                      "dwr.eth.farcaster",
+                      "farcaster,suji",
+                      "lens,stani.lens",
+                    ]),
                   )}`}
                   target="_blank"
                 >
-                  ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+                  ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045,
+                  ens,0x934b510d4c9103e6a87aef13b816fb080286d649
                 </a>
               </li>
               <li>
                 <span className="label">ENS</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "ens,vitalik.eth"
+                    "ens,vitalik.eth",
                   )}`}
                   target="_blank"
                 >
@@ -955,7 +962,7 @@ export default function Home() {
                 <span className="label">Farcaster</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,dwr.eth"
+                    "farcaster,dwr.eth",
                   )}`}
                   target="_blank"
                 >
@@ -964,7 +971,7 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                    "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
                   )}`}
                   target="_blank"
                 >
@@ -973,7 +980,7 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "farcaster,#3"
+                    "farcaster,#3",
                   )}`}
                   target="_blank"
                 >
@@ -984,7 +991,7 @@ export default function Home() {
                 <span className="label">Lens</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,stani.lens"
+                    "lens,stani.lens",
                   )}`}
                   target="_blank"
                 >
@@ -993,7 +1000,7 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+                    "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff",
                   )}`}
                   target="_blank"
                 >
@@ -1002,7 +1009,7 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "lens,#1"
+                    "lens,#1",
                   )}`}
                   target="_blank"
                 >
@@ -1013,55 +1020,13 @@ export default function Home() {
                 <span className="label">Basenames</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "basenames,tony.base.eth"
+                    "basenames,tony.base.eth",
                   )}`}
                   target="_blank"
                 >
                   basenames,tony.base.eth
                 </a>
               </li>
-              {/* <li>
-                <span className="label">SNS</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "sns,bonfida.sol"
-                  )}`}
-                  target="_blank"
-                >
-                  sns,bonfida.sol
-                </a>
-              </li>
-              <li>
-                <span className="label">Solana</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "solana,24ywRTze3X2fUez6mkC9WCaKPVdMF6ykgzLq7wavjvap"
-                  )}`}
-                  target="_blank"
-                >
-                  solana,24ywRTze3X2fUez6mkC9WCaKPVdMF6ykgzLq7wavjvap
-                </a>
-              </li>
-              <li>
-                <span className="label">Clusters</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "clusters,suji/sujieth"
-                  )}`}
-                  target="_blank"
-                >
-                  clusters,suji/sujieth
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                    "clusters,sujieth"
-                  )}`}
-                  target="_blank"
-                >
-                  clusters,sujieth
-                </a>
-              </li> */}
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
@@ -1069,7 +1034,7 @@ export default function Home() {
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">{`// ${BASE_URL}/profile/batch?ids=${encodeURIComponent(
-                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
                 )}`}</span>
                 <br />
                 {`[
@@ -1248,7 +1213,7 @@ export default function Home() {
                 <br />
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/batch?ids=${encodeURIComponent(
-                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                  "ens,vitalik.eth,lens,stani.lens,farcaster,dwr.eth,basenames,tony.base.eth,ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
                 )}`}</span>
                 <br />
                 {`[

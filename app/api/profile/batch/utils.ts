@@ -23,7 +23,7 @@ const SUPPORTED_PLATFORMS = [
 export async function fetchIdentityGraphBatch(
   ids: string[],
   ns: boolean,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ): Promise<
   ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
 > {
@@ -59,7 +59,7 @@ export async function fetchIdentityGraphBatch(
                   ? formatText(item.identity)
                   : item.identity,
               },
-              ns
+              ns,
             )),
             aliases: item.aliases,
           });
@@ -72,7 +72,7 @@ export async function fetchIdentityGraphBatch(
   }
 }
 
-export const filterIdsPOST = (ids: string[]) => {
+export const filterIds = (ids: string[]) => {
   const resolved = ids
     .map((x) => {
       if (
@@ -88,32 +88,7 @@ export const filterIdsPOST = (ids: string[]) => {
     })
     .filter(
       (x) =>
-        !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType)
+        !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType),
     );
   return resolved;
-};
-
-export const filterIds = (ids: string[]) => {
-  const resolved = ids.map((x, idx) => {
-    if (!x.includes(",") && (x.endsWith(".base") || x.endsWith(".base.eth"))) {
-      return {
-        platform: PlatformType.basenames,
-        handle: prettify(x),
-      };
-    }
-    if (x.endsWith(".farcaster")) {
-      return {
-        platform: PlatformType.farcaster,
-        handle: prettify(x),
-      };
-    }
-    if (SUPPORTED_PLATFORMS.includes(x as PlatformType)) {
-      return {
-        platform: prettify(x),
-        handle: ids[idx + 1],
-      };
-    }
-  });
-
-  return resolved.filter((x) => !!x).map((x) => `${x?.platform},${x?.handle}`);
 };
