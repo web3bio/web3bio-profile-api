@@ -665,6 +665,10 @@ export default function Home() {
               format:
               <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
             </p>
+            <p>
+              The Profile API without API keys includes rate limiting mechanisms
+              to ensure fair usage and prevent abuse.
+            </p>
           </section>
 
           <section
