@@ -37,7 +37,7 @@ export const resolveSNSHandle = async (
 ) => {
   const response = await queryIdentityGraph(
     handle,
-    PlatformType.sns,
+    regexSolana.test(handle) ? PlatformType.solana : PlatformType.sns,
     GET_PROFILES(ns),
     headers
   );

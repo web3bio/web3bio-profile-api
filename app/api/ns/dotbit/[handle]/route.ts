@@ -20,7 +20,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const json = await resolveDotbitHandle(handle, headers, true);
+    const json = (await resolveDotbitHandle(handle, headers, true)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.dotbit,
+        code: json.code || 500,
+        message: json.message || ErrorMessages.unknownError,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

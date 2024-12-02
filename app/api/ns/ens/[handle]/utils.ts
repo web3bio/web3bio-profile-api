@@ -1,7 +1,7 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { resolveENSResponse } from "@/app/api/profile/ens/[handle]/utils";
-import { AuthHeaders } from "@/utils/types";
+import { AuthHeaders, ErrorMessages } from "@/utils/types";
 
 export const resolveENSRespondNS = async (
   handle: string,
@@ -11,8 +11,13 @@ export const resolveENSRespondNS = async (
   try {
     const profile = await resolveENSResponse(handle, headers, _platform, true);
     let json = {};
-    if ((profile as any).message) {
-      json = profile;
+    if ((profile as any).code) {
+      return errorHandle({
+        identity: handle,
+        platform: _platform || PlatformType.ens,
+        code: profile.code,
+        message: profile.message || ErrorMessages.unknownError,
+      });
     } else {
       json = {
         address: profile.address,
@@ -24,11 +29,11 @@ export const resolveENSRespondNS = async (
       };
     }
 
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(json), headers);
   } catch (e: any) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.ens,
+      platform: _platform || PlatformType.ens,
       code: e.cause || 500,
       message: e.message,
     });

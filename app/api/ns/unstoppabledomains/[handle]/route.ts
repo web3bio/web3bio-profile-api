@@ -20,7 +20,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const json = await resolveUDHandle(handle, headers, true);
+    const json = (await resolveUDHandle(handle, headers, true)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.unstoppableDomains,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

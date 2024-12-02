@@ -28,6 +28,7 @@ import {
 import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
+import { processJson } from "../../graph/utils";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -184,7 +185,11 @@ export async function generateProfileStruct(
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName,
-    avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
+    avatar: data.avatar
+      ? await resolveEipAssetURL(data.avatar, data.identity)
+      : data.platform === PlatformType.lens && data?.social?.uid
+      ? `https://api.hey.xyz/avatar?id=${Number(data.social.uid)}`
+      : null,
     description: data.description || null,
   };
 
@@ -214,7 +219,6 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
-  PlatformType.unstoppableDomains,
 ];
 
 function sortProfilesByPlatform(
@@ -222,12 +226,10 @@ function sortProfilesByPlatform(
   targetPlatform: PlatformType,
   handle: string
 ): ProfileAPIResponse[] {
-  const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
-    ? [
-        targetPlatform,
-        ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
-      ]
-    : DEFAULT_PLATFORM_ORDER;
+  const order = [
+    targetPlatform,
+    ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
+  ];
 
   const sortedResponses = responses.reduce(
     (acc, response) => {
@@ -285,8 +287,10 @@ export const resolveWithIdentityGraph = async ({
       message: response.errors ? response.errors : ErrorMessages.notFound,
       code: response.errors ? 500 : 404,
     };
+  const resolvedResponse = await processJson(response)
+
   const profilesArray = primaryDomainResolvedRequestArray(
-    response,
+    resolvedResponse,
     handle,
     platform
   )
@@ -401,7 +405,7 @@ export const resolveUniversalHandle = async (
       message: res.message,
     });
   } else {
-    return respondWithCache(JSON.stringify(res));
+    return respondWithCache(JSON.stringify(res), headers);
   }
 };
 

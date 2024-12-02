@@ -17,12 +17,20 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveSNSHandleNS(inputName, headers);
+    const json = (await resolveSNSHandleNS(inputName, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: inputName,
+        platform: PlatformType.solana,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
       identity: inputName,
-      platform: PlatformType.sns,
+      platform: PlatformType.solana,
       code: e.cause || 500,
       message: e.message,
     });

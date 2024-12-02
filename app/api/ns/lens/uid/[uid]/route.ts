@@ -20,10 +20,18 @@ export async function GET(req: NextRequest) {
 
   try {
     const json = await resolveLensHandleNS(`#${uid}`, headers);
+    if (json.code) {
+      return errorHandle({
+        identity: `#${uid}`,
+        platform: PlatformType.lens,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
-      identity: uid,
+      identity: `#${uid}`,
       platform: PlatformType.lens,
       code: e.cause || 500,
       message: e.message,

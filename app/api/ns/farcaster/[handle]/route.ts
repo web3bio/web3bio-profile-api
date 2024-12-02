@@ -37,7 +37,15 @@ export async function GET(req: NextRequest) {
   const queryInput = prettify(handle);
 
   try {
-    const json = await resolveFarcasterHandleNS(queryInput, headers);
+    const json = (await resolveFarcasterHandleNS(queryInput, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: queryInput,
+        platform: PlatformType.farcaster,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

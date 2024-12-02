@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       ns: true,
       headers: {
         ...headers,
-        authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        authorization: process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY || "",
       },
     })) as any;
     if (profiles.message) {

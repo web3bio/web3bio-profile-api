@@ -7,7 +7,7 @@ export const resolveLensHandleNS = async (
   headers: AuthHeaders
 ) => {
   const profile = (await resolveLensHandle(handle, headers, true)) as any;
-  if (profile.message) {
+  if (profile?.code || profile?.message) {
     return profile;
   }
   return {

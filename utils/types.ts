@@ -1,8 +1,8 @@
 import { PlatformType } from "./platform";
 
 export interface AuthHeaders {
-  authorization: string;
   ["x-client-ip"]: string;
+  authorization?: string;
 }
 
 export interface ParamsType {
@@ -21,7 +21,7 @@ export interface errorHandleProps {
   identity: string | null;
   code: number;
   message: ErrorMessages | string;
-  platform: PlatformType | null;
+  platform: PlatformType | string;
   headers?: HeadersInit;
 }
 

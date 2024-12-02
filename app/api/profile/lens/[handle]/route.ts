@@ -7,7 +7,15 @@ import { resolveLensHandle } from "./utils";
 
 const resolveLensRespond = async (handle: string, headers: AuthHeaders) => {
   try {
-    const json = await resolveLensHandle(handle, headers);
+    const json = (await resolveLensHandle(handle, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.lens,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

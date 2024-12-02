@@ -1,49 +1,26 @@
-import { getUserHeaders, respondWithCache } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
-import { fetchIdentityGraphBatch } from "./utils";
-import { PlatformType } from "@/utils/platform";
-
-const filterIds = (ids: string[]) =>
-  ids.filter((x: string) => {
-    return [
-      PlatformType.ens,
-      PlatformType.basenames,
-      PlatformType.ethereum,
-      PlatformType.lens,
-      PlatformType.farcaster,
-    ].includes(x.split(",")[0] as PlatformType);
-  });
+import { errorHandle, getUserHeaders } from "@/utils/base";
+import { NextRequest } from "next/server";
+import { ErrorMessages } from "@/utils/types";
+import { handleRequest } from "./utils";
 
 export async function POST(req: NextRequest) {
   const { ids } = await req.json();
   const headers = getUserHeaders(req);
-  if (!ids.length) return NextResponse.json([]);
-  try {
-    const queryIds = filterIds(ids);
-    const json = await fetchIdentityGraphBatch(queryIds, false, headers);
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return NextResponse.json({
-      error: e.message,
-    });
-  }
+  return handleRequest(ids, headers, false);
 }
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const headers = getUserHeaders(req);
   try {
-    const ids = searchParams.get("ids")?.split(",") || [];
-    const mergedIds = [];
-    for (let i = 0; i < ids.length; i += 2) {
-      mergedIds.push(`${ids[i]},${ids[i + 1]}`);
-    }
-    const queryIds = filterIds(mergedIds);
-    const json = await fetchIdentityGraphBatch(queryIds, false, headers);
-    return respondWithCache(JSON.stringify(json));
+    const ids = JSON.parse(searchParams.get("ids") || "");
+    return handleRequest(ids, headers, false);
   } catch (e: any) {
-    return NextResponse.json({
-      error: e.message,
+    return errorHandle({
+      identity: searchParams.get("ids"),
+      platform: "batch",
+      code: 404,
+      message: e.message || ErrorMessages.invalidIdentity,
     });
   }
 }

@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     return errorHandle({
       identity: inputName,
       code: 404,
-      platform: null,
+      platform: platform || "universal",
       message: ErrorMessages.invalidIdentity,
     });
   }

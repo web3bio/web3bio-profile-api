@@ -18,7 +18,15 @@ export async function GET(req: NextRequest) {
     });
 
   try {
-    const json = await resolveLensHandle(`#${uid}`, headers);
+    const json = (await resolveLensHandle(`#${uid}`, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: `#${uid}`,
+        platform: PlatformType.lens,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

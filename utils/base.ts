@@ -18,7 +18,7 @@ import {
   regexCluster,
   regexNext,
 } from "./regexp";
-import { errorHandleProps } from "./types";
+import { AuthHeaders, errorHandleProps } from "./types";
 import { NextRequest, NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
@@ -28,11 +28,7 @@ export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 
-export const PLATFORMS_TO_EXCLUDE = [
-  PlatformType.dotbit,
-  PlatformType.sns,
-  PlatformType.solana,
-];
+export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
 
 const web3AddressRegexes = [
   regexEth,
@@ -42,47 +38,50 @@ const web3AddressRegexes = [
   regexNext,
 ];
 
-export function isWeb3Address(address: string): boolean {
-  return web3AddressRegexes.some((regex) => regex.test(address));
-}
+export const isWeb3Address = (address: string): boolean =>
+  web3AddressRegexes.some((regex) => regex.test(address));
 
-export function getUserHeaders(req: NextRequest) {
+export const getUserHeaders = (req: NextRequest): AuthHeaders => {
   let ip = req.headers?.get("x-forwarded-for") || req?.ip;
 
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[0].trim();
   }
+  const header: AuthHeaders = {
+    "x-client-ip": ip || "",
+  };
 
+  if (process.env.GENERAL_IDENTITY_GRAPH_API_KEY) {
+    header.authorization = process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
+  }
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
-
-  const apiKey = req.headers?.get("authorization")
-    ? req.headers.get("authorization")
+  const apiKey = req.headers?.get("x-api-key")
+    ? req.headers.get("x-api-key")
     : isTrustedDomain
-    ? process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY
-    : "";
+      ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
+      : "";
+  if (apiKey?.length) {
+    header.authorization = apiKey;
+  }
+  return header;
+};
 
-  return {
-    "x-client-ip": ip || "",
-    // authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
-    authorization: apiKey || "",
-  };
-}
-
-export function isSameAddress(
-  address?: string | undefined,
-  otherAddress?: string | undefined
-): boolean {
+export const isSameAddress = (
+  address?: string,
+  otherAddress?: string,
+): boolean => {
   if (!address || !otherAddress) return false;
   return address.toLowerCase() === otherAddress.toLowerCase();
-}
+};
+
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
     {
       address: isValidAddress ? props.identity : null,
-      identity: !isValidAddress ? props.identity : null,
+      identity: isValidAddress ? null : props.identity,
       platform: props.platform,
       error: props.message,
     },
@@ -92,19 +91,17 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    }
+    },
   );
 };
-export const respondWithCache = (
-  json: string,
-  headers?: { [index: string]: string }
-) => {
+
+export const respondWithCache = (json: string, headers?: AuthHeaders) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
+      ...headers,
       "Content-Type": "application/json",
       "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
-      ...headers,
     },
   });
 };
@@ -118,16 +115,13 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars
+      string.length - chars,
     )}`;
   } else {
-    if (string.length > len) {
-      return `${string.substring(0, chars + 1)}...${string.substring(
-        string.length - (chars + 1)
-      )}`;
-    }
+    return `${string.substring(0, chars + 1)}...${string.substring(
+      string.length - (chars + 1),
+    )}`;
   }
-  return string;
 };
 
 export const isValidEthereumAddress = (address: string) => {
@@ -138,22 +132,18 @@ export const isValidEthereumAddress = (address: string) => {
 
 export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   if (!platform) return false;
-  if (
-    [
-      PlatformType.ens,
-      PlatformType.basenames,
-      PlatformType.ethereum,
-      PlatformType.farcaster,
-      PlatformType.lens,
-      PlatformType.unstoppableDomains,
-      PlatformType.nextid,
-      PlatformType.dotbit,
-      PlatformType.solana,
-      PlatformType.sns,
-    ].includes(platform)
-  )
-    return true;
-  return false;
+  return [
+    PlatformType.ens,
+    PlatformType.basenames,
+    PlatformType.ethereum,
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.unstoppableDomains,
+    PlatformType.nextid,
+    PlatformType.dotbit,
+    PlatformType.solana,
+    PlatformType.sns,
+  ].includes(platform);
 };
 
 const platformMap = new Map([
@@ -185,14 +175,13 @@ export const handleSearchPlatform = (term: string) => {
 
 export const prettify = (input: string) => {
   if (!input) return "";
-  switch (!!input) {
-    case input.endsWith(".farcaster") || input.endsWith(".fcast.id"):
-      return input.replace(".farcaster", "").replace(".fcast.id", "");
-    case input.endsWith(".base.eth") || input.endsWith(".base"):
-      return input.split(".")[0] + ".base.eth";
-    default:
-      return input;
+  if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
+    return input.replace(".farcaster", "").replace(".fcast.id", "");
   }
+  if (input.endsWith(".base.eth") || input.endsWith(".base")) {
+    return input.split(".")[0] + ".base.eth";
+  }
+  return input;
 };
 
 export const uglify = (input: string, platform: PlatformType) => {
@@ -202,8 +191,8 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input.endsWith(".base")
         ? `${input}.eth`
         : input.endsWith(".base.eth")
-        ? input
-        : `${input}.base.eth`;
+          ? input
+          : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:
