@@ -1,4 +1,10 @@
-import { formatText, isWeb3Address, prettify } from "@/utils/base";
+import {
+  errorHandle,
+  formatText,
+  isWeb3Address,
+  prettify,
+  respondWithCache,
+} from "@/utils/base";
 import {
   IDENTITY_GRAPH_SERVER,
   generateProfileStruct,
@@ -20,10 +26,44 @@ const SUPPORTED_PLATFORMS = [
   PlatformType.basenames,
 ];
 
+export async function handleRequest(
+  ids: string[],
+  headers: AuthHeaders,
+  ns: boolean
+) {
+  if (!ids?.length)
+    return errorHandle({
+      identity: null,
+      platform: "batch",
+      code: 404,
+      message: ErrorMessages.invalidIdentity,
+    });
+  try {
+    const queryIds = filterIds(ids);
+    const json = (await fetchIdentityGraphBatch(queryIds, ns, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: JSON.stringify(ids),
+        platform: "batch",
+        code: json.code,
+        message: json.msg,
+      });
+    }
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: JSON.stringify(ids),
+      platform: "batch",
+      code: e.cause || 500,
+      message: ErrorMessages.notFound,
+    });
+  }
+}
+
 export async function fetchIdentityGraphBatch(
   ids: string[],
   ns: boolean,
-  headers: AuthHeaders,
+  headers: AuthHeaders
 ): Promise<
   ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
 > {
@@ -59,7 +99,7 @@ export async function fetchIdentityGraphBatch(
                   ? formatText(item.identity)
                   : item.identity,
               },
-              ns,
+              ns
             )),
             aliases: item.aliases,
           });
@@ -72,7 +112,7 @@ export async function fetchIdentityGraphBatch(
   }
 }
 
-export const filterIds = (ids: string[]) => {
+export function filterIds(ids: string[]) {
   const resolved = ids
     .map((x) => {
       if (
@@ -88,7 +128,7 @@ export const filterIds = (ids: string[]) => {
     })
     .filter(
       (x) =>
-        !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType),
+        !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType)
     );
   return resolved;
-};
+}
