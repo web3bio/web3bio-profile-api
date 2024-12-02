@@ -4,45 +4,40 @@ import { handleSearchPlatform, isValidEthereumAddress } from "./utils/base";
 
 async function verifyAuth(token: string) {
   try {
-    const verified = await jwtVerify(
+    const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(process.env.JWT_KEY)
+      new TextEncoder().encode(process.env.JWT_KEY),
     );
-    return verified.payload;
+    return payload;
   } catch (err) {
     throw new Error("Invalid API Token");
   }
 }
 
 const getIdentityPlatform = (req: NextRequest) => {
-  let identity,
-    platform = null;
-  const { searchParams } = req.nextUrl;
-  const pathname = req.nextUrl.pathname;
+  const { searchParams, pathname } = req.nextUrl;
+  let identity = null;
+  let platform = null;
 
   if (pathname.startsWith("/graph")) {
     identity = searchParams.get("identity");
     platform = searchParams.get("platform");
-  }
-  if (pathname.startsWith("/domains")) {
+  } else if (pathname.startsWith("/domains")) {
     identity = searchParams.get("name");
     platform = "domains";
-  }
-  if (pathname.includes("/batch")) {
+  } else if (pathname.includes("/batch")) {
     identity = JSON.stringify(searchParams.get("ids"));
     platform = "batch";
+  } else {
+    const pathArr = pathname.split("/");
+    platform =
+      pathArr.length === 4
+        ? pathArr[2]
+        : handleSearchPlatform(pathArr[pathArr.length - 1]);
+    identity = pathArr[pathArr.length - 1];
   }
-  const pathArr = pathname.split("/");
-  platform =
-    pathArr.length === 4
-      ? pathname.split("/")[2]
-      : handleSearchPlatform(pathArr[pathArr.length - 1]);
-  identity = pathArr[pathArr.length - 1];
 
-  return {
-    identity,
-    platform,
-  };
+  return { identity, platform };
 };
 
 export const config = {
@@ -61,9 +56,8 @@ export async function middleware(req: NextRequest) {
   }
 
   const verifiedToken = await verifyAuth(
-    userToken.includes("Bearer") ? userToken.split("Bearer ")[0] : userToken
+    userToken.replace("Bearer ", ""),
   ).catch((err) => {
-    // todo: do some log
     console.error(err.message);
   });
 
@@ -77,7 +71,7 @@ export async function middleware(req: NextRequest) {
         platform,
         error: "Invalid API Token",
       },
-      { status: 403 }
+      { status: 403 },
     );
   }
 }

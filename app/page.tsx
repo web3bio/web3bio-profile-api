@@ -641,6 +641,32 @@ export default function Home() {
             </p>
           </section>
 
+          <section className="pt-4 pb-4" id="authentication">
+            <h2 className="text-bold h4">Authentication</h2>
+            <p>
+              All REST API endpoints require use of an API Key - these can be
+              obtained by contacting Web3.bio via{" "}
+              <a
+                href="https://x.com/web3bio"
+                target="_blank"
+                className="text-underline"
+              >
+                Twitter (X)
+              </a>{" "}
+              or{" "}
+              <a
+                href="https://t.me/web3dotbio"
+                target="_blank"
+                className="text-underline"
+              >
+                Telegram group
+              </a>
+              . Include the API key in the request header using the following
+              format:
+              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
+            </p>
+          </section>
+
           <section
             className="pt-4 pb-4"
             id="universal-profile-api"

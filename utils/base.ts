@@ -38,11 +38,10 @@ const web3AddressRegexes = [
   regexNext,
 ];
 
-export function isWeb3Address(address: string): boolean {
-  return web3AddressRegexes.some((regex) => regex.test(address));
-}
+export const isWeb3Address = (address: string): boolean =>
+  web3AddressRegexes.some((regex) => regex.test(address));
 
-export function getUserHeaders(req: NextRequest): AuthHeaders {
+export const getUserHeaders = (req: NextRequest): AuthHeaders => {
   let ip = req.headers?.get("x-forwarded-for") || req?.ip;
 
   if (ip && ip.includes(",")) {
@@ -61,21 +60,22 @@ export function getUserHeaders(req: NextRequest): AuthHeaders {
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
     : isTrustedDomain
-    ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
-    : "";
+      ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
+      : "";
   if (apiKey?.length) {
     header.authorization = apiKey;
   }
   return header;
-}
+};
 
-export function isSameAddress(
-  address?: string | undefined,
-  otherAddress?: string | undefined
-): boolean {
+export const isSameAddress = (
+  address?: string,
+  otherAddress?: string,
+): boolean => {
   if (!address || !otherAddress) return false;
   return address.toLowerCase() === otherAddress.toLowerCase();
-}
+};
+
 export const errorHandle = (props: errorHandleProps) => {
   const isValidAddress = isValidEthereumAddress(props.identity || "");
   return NextResponse.json(
@@ -91,9 +91,10 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    }
+    },
   );
 };
+
 export const respondWithCache = (json: string, headers?: AuthHeaders) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
@@ -114,16 +115,13 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars
+      string.length - chars,
     )}`;
   } else {
-    if (string.length > len) {
-      return `${string.substring(0, chars + 1)}...${string.substring(
-        string.length - (chars + 1)
-      )}`;
-    }
+    return `${string.substring(0, chars + 1)}...${string.substring(
+      string.length - (chars + 1),
+    )}`;
   }
-  return string;
 };
 
 export const isValidEthereumAddress = (address: string) => {
@@ -134,22 +132,18 @@ export const isValidEthereumAddress = (address: string) => {
 
 export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   if (!platform) return false;
-  if (
-    [
-      PlatformType.ens,
-      PlatformType.basenames,
-      PlatformType.ethereum,
-      PlatformType.farcaster,
-      PlatformType.lens,
-      PlatformType.unstoppableDomains,
-      PlatformType.nextid,
-      PlatformType.dotbit,
-      PlatformType.solana,
-      PlatformType.sns,
-    ].includes(platform)
-  )
-    return true;
-  return false;
+  return [
+    PlatformType.ens,
+    PlatformType.basenames,
+    PlatformType.ethereum,
+    PlatformType.farcaster,
+    PlatformType.lens,
+    PlatformType.unstoppableDomains,
+    PlatformType.nextid,
+    PlatformType.dotbit,
+    PlatformType.solana,
+    PlatformType.sns,
+  ].includes(platform);
 };
 
 const platformMap = new Map([
@@ -181,14 +175,13 @@ export const handleSearchPlatform = (term: string) => {
 
 export const prettify = (input: string) => {
   if (!input) return "";
-  switch (!!input) {
-    case input.endsWith(".farcaster") || input.endsWith(".fcast.id"):
-      return input.replace(".farcaster", "").replace(".fcast.id", "");
-    case input.endsWith(".base.eth") || input.endsWith(".base"):
-      return input.split(".")[0] + ".base.eth";
-    default:
-      return input;
+  if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
+    return input.replace(".farcaster", "").replace(".fcast.id", "");
   }
+  if (input.endsWith(".base.eth") || input.endsWith(".base")) {
+    return input.split(".")[0] + ".base.eth";
+  }
+  return input;
 };
 
 export const uglify = (input: string, platform: PlatformType) => {
@@ -198,8 +191,8 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input.endsWith(".base")
         ? `${input}.eth`
         : input.endsWith(".base.eth")
-        ? input
-        : `${input}.base.eth`;
+          ? input
+          : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:
