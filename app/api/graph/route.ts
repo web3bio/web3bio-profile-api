@@ -22,12 +22,16 @@ export async function POST(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
-    if (json.code) {
+    if (json.code || json.errors) {
       return errorHandle({
         identity: body?.identity,
         platform: body?.platform || "graph",
         code: json.code,
-        message: json.msg || ErrorMessages.notFound,
+        message: json.msg
+          ? json.msg
+          : json.errors
+          ? json.stringify(json.errors)
+          : ErrorMessages.notFound,
       });
     }
     const result = await processJson(json);
