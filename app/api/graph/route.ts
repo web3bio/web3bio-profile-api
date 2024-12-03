@@ -66,12 +66,16 @@ export async function GET(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
-    if (rawJson.code) {
+    if (rawJson.code || rawJson.errors) {
       return errorHandle({
         identity: identity,
         platform: platform || "graph",
         code: rawJson.code,
-        message: rawJson.msg || ErrorMessages.notFound,
+        message: rawJson.msg
+          ? rawJson.msg
+          : rawJson.errors
+          ? rawJson.stringify(rawJson.errors)
+          : ErrorMessages.notFound,
       });
     }
     const result = await processJson(rawJson);
