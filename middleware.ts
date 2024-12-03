@@ -54,7 +54,7 @@ export async function middleware(req: NextRequest) {
   if (!userToken) {
     return NextResponse.next();
   }
-
+  console.log("API Token: ", userToken);
   const verifiedToken = await verifyAuth(
     userToken.replace("Bearer ", "")
   ).catch((err) => {
