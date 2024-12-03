@@ -29,7 +29,7 @@ export const resolveENSRespondNS = async (
       };
     }
 
-    return respondWithCache(JSON.stringify(json), headers);
+    return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
       identity: handle,

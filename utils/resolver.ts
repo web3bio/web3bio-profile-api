@@ -1,4 +1,4 @@
-import { ARWEAVE_ASSET_PREFIX, BASE_URL, SIMPLEHASH_URL } from "./base";
+import { ARWEAVE_ASSET_PREFIX, SIMPLEHASH_URL } from "./base";
 import { _fetcher } from "./fetcher";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
