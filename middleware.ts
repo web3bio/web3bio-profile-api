@@ -6,7 +6,7 @@ async function verifyAuth(token: string) {
   try {
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(process.env.JWT_KEY),
+      new TextEncoder().encode(process.env.JWT_KEY)
     );
     return payload;
   } catch (err) {
@@ -50,13 +50,13 @@ export const config = {
 };
 
 export async function middleware(req: NextRequest) {
-  const userToken = req.headers.get("x-api-key");
+  const userToken = req.headers.get("authorization");
   if (!userToken) {
     return NextResponse.next();
   }
 
   const verifiedToken = await verifyAuth(
-    userToken.replace("Bearer ", ""),
+    userToken.replace("Bearer ", "")
   ).catch((err) => {
     console.error(err.message);
   });
@@ -71,7 +71,7 @@ export async function middleware(req: NextRequest) {
         platform,
         error: "Invalid API Token",
       },
-      { status: 403 },
+      { status: 403 }
     );
   }
 }
