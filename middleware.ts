@@ -54,7 +54,19 @@ export async function middleware(req: NextRequest) {
   if (!userToken) {
     return NextResponse.next();
   }
-  console.log("API Token: ", userToken);
+  const customHeaders = {
+    "X-Client-IP": req.headers.get("x-client-ip") || "anonymous",
+    "X-API-KEY": req.headers.get("x-api-key") || "",
+  };
+
+  console.log(
+    JSON.stringify({
+      message: "Incoming request",
+      url: req.url,
+      headers: customHeaders,
+      timestamp: new Date().toISOString(),
+    }),
+  );
   const verifiedToken = await verifyAuth(
     userToken.replace("Bearer ", ""),
   ).catch((err) => {
