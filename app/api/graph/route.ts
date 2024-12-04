@@ -6,26 +6,26 @@ import { NextRequest } from "next/server";
 import { processJson } from "./utils";
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
+  const { identity, platform } = await req.json();
   const headers = getUserHeaders(req);
-  if (!body?.identity || !body?.platform)
+  if (!identity || !platform)
     return errorHandle({
-      identity: body?.identity,
-      platform: body?.platform || "graph",
+      identity: identity,
+      platform: platform || "graph",
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
   try {
     const json = await queryIdentityGraph(
-      body.identity,
-      body.platform,
+      identity,
+      platform,
       GET_PROFILES(false),
       headers
     );
     if (json.code || json.errors) {
       return errorHandle({
-        identity: body?.identity,
-        platform: body?.platform || "graph",
+        identity: identity,
+        platform: platform || "graph",
         code: json.code,
         message: json.msg
           ? json.msg
@@ -39,8 +39,8 @@ export async function POST(req: NextRequest) {
     return respondWithCache(JSON.stringify(result));
   } catch (e: any) {
     return errorHandle({
-      identity: body?.identity,
-      platform: body?.platform,
+      identity: identity,
+      platform: platform,
       code: e.cause || 500,
       message: e.message || ErrorMessages.notFound,
     });
