@@ -55,8 +55,8 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
     header.authorization = process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
   }
   const isTrustedDomain =
-    req.headers.get("host")?.includes("web3.bio") ||
-    req.headers.get("origin")?.includes("web3.bio");
+    req.headers.get("host")?.includes("web3bio") ||
+    req.headers.get("origin")?.includes("web3bio");
 
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
