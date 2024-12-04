@@ -95,7 +95,8 @@ export const errorHandle = (props: errorHandleProps) => {
   );
 };
 
-export const respondWithCache = (json: string) => {
+export const respondWithCache = (json: string, headers?: AuthHeaders) => {
+  console.log('input token: ',headers?.authorization)
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
