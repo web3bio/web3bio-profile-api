@@ -12,7 +12,6 @@ import { regexSolana, regexBtc } from "@/utils/regexp";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const headers = getUserHeaders(req);
-  console.log(headers, "profile api user header");
   const handle = searchParams.get("handle") || "";
   const inputName = [regexSolana, regexBtc].some((x) => x.test(handle))
     ? handle
