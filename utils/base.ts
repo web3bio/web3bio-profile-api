@@ -65,7 +65,7 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
     : "";
 
   if (req.headers?.get("x-api-key") || isTrustedDomain) {
-    console.log(`origin: | ${req.headers.get("origin")} | , key:| ${apiKey} |`);
+    console.log(`origin: | ${req.headers.get("origin")} | , key:| ${req.headers?.get('x-api-key')} |`);
   }
 
   if (apiKey?.length) {
