@@ -54,23 +54,19 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
   if (process.env.GENERAL_IDENTITY_GRAPH_API_KEY) {
     header.authorization = process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
   }
-  const isTrustedDomain =
-    req.headers.get("origin")?.includes("web3bio") ||
-    req.headers.get("referer")?.includes("web3bio");
-  const userToken = req.headers?.get("x-api-key");
+
+  const isTrustedDomain = req.headers.get("origin")?.includes("web3.bio");
+  const userToken = req.headers?.get("x-api-key") || "";
+
   const apiKey =
-    userToken && userToken!.length > 0
+    userToken.length > 0
       ? userToken
       : isTrustedDomain
       ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
       : "";
 
-  if (userToken || isTrustedDomain) {
-    console.log(
-      `user origin: | ${req.headers.get("origin")} | , user key:| ${req.headers?.get(
-        "x-api-key"
-      )} |`
-    );
+  if (userToken.length > 0 || isTrustedDomain) {
+    console.log(`API Token: ${apiKey}`);
   }
 
   if (apiKey?.length) {
