@@ -51,7 +51,6 @@ export const config = {
 
 export async function middleware(req: NextRequest) {
   const userToken = req.headers.get("x-api-key");
-  console.log("user token: ", userToken);
   if (!userToken) {
     return NextResponse.next();
   }

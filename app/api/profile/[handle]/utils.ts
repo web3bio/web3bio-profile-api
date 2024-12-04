@@ -405,7 +405,7 @@ export const resolveUniversalHandle = async (
       message: res.message,
     });
   } else {
-    return respondWithCache(JSON.stringify(res), headers);
+    return respondWithCache(JSON.stringify(res));
   }
 };
 

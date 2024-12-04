@@ -57,11 +57,17 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
   const isTrustedDomain =
     req.headers.get("host")?.includes("web3.bio") ||
     req.headers.get("origin")?.includes("web3.bio");
+
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
     : isTrustedDomain
     ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
     : "";
+
+  if (req.headers?.get("x-api-key") || isTrustedDomain) {
+    console.log(`origin: | ${req.headers.get("origin")} | , key:| ${apiKey} |`);
+  }
+
   if (apiKey?.length) {
     header.authorization = apiKey;
   }
@@ -95,8 +101,7 @@ export const errorHandle = (props: errorHandleProps) => {
   );
 };
 
-export const respondWithCache = (json: string, headers?: AuthHeaders) => {
-  console.log('input token: ',headers?.authorization)
+export const respondWithCache = (json: string) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
