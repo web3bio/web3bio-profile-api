@@ -22,12 +22,16 @@ export async function POST(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
-    if (json.code) {
+    if (json.code || json.errors) {
       return errorHandle({
         identity: body?.identity,
         platform: body?.platform || "graph",
         code: json.code,
-        message: json.msg || ErrorMessages.notFound,
+        message: json.msg
+          ? json.msg
+          : json.errors
+          ? json.stringify(json.errors)
+          : ErrorMessages.notFound,
       });
     }
     const result = await processJson(json);
@@ -62,12 +66,16 @@ export async function GET(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
-    if (rawJson.code) {
+    if (rawJson.code || rawJson.errors) {
       return errorHandle({
         identity: identity,
         platform: platform || "graph",
         code: rawJson.code,
-        message: rawJson.msg || ErrorMessages.notFound,
+        message: rawJson.msg
+          ? rawJson.msg
+          : rawJson.errors
+          ? rawJson.stringify(rawJson.errors)
+          : ErrorMessages.notFound,
       });
     }
     const result = await processJson(rawJson);

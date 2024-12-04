@@ -60,8 +60,8 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
   const apiKey = req.headers?.get("x-api-key")
     ? req.headers.get("x-api-key")
     : isTrustedDomain
-      ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
-      : "";
+    ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
+    : "";
   if (apiKey?.length) {
     header.authorization = apiKey;
   }
@@ -70,7 +70,7 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
 
 export const isSameAddress = (
   address?: string,
-  otherAddress?: string,
+  otherAddress?: string
 ): boolean => {
   if (!address || !otherAddress) return false;
   return address.toLowerCase() === otherAddress.toLowerCase();
@@ -91,15 +91,14 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    },
+    }
   );
 };
 
-export const respondWithCache = (json: string, headers?: AuthHeaders) => {
+export const respondWithCache = (json: string) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
-      ...headers,
       "Content-Type": "application/json",
       "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
     },
@@ -115,11 +114,11 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars,
+      string.length - chars
     )}`;
   } else {
     return `${string.substring(0, chars + 1)}...${string.substring(
-      string.length - (chars + 1),
+      string.length - (chars + 1)
     )}`;
   }
 };
@@ -191,8 +190,8 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input.endsWith(".base")
         ? `${input}.eth`
         : input.endsWith(".base.eth")
-          ? input
-          : `${input}.base.eth`;
+        ? input
+        : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
     default:
