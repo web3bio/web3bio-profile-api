@@ -8,8 +8,8 @@ async function verifyAuth(token: string) {
       new TextEncoder().encode(process.env.JWT_KEY)
     );
     return payload;
-  } catch (err) {
-    throw new Error("Invalid API Token");
+  } catch {
+    return null;
   }
 }
 
@@ -28,11 +28,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  const verifiedToken = await verifyAuth(
-    userToken.replace("Bearer ", "")
-  ).catch((err) => {
-    console.error(err.message);
-  });
+  const verifiedToken = await verifyAuth(userToken.replace("Bearer ", ""));
 
   if (!verifiedToken) {
     return NextResponse.json(
