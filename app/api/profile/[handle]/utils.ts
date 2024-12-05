@@ -287,7 +287,7 @@ export const resolveWithIdentityGraph = async ({
       message: response.errors ? response.errors : ErrorMessages.notFound,
       code: response.errors ? 500 : 404,
     };
-  const resolvedResponse = await processJson(response)
+  const resolvedResponse = await processJson(response);
 
   const profilesArray = primaryDomainResolvedRequestArray(
     resolvedResponse,
