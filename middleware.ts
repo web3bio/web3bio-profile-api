@@ -22,10 +22,38 @@ export const config = {
   ],
 };
 
+const WEB3BIO_KEY = process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY || "";
+const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
+
+function initHeaders(req: NextRequest) {
+  // set x-client-ip
+  const userHeaders = new Headers(req.headers);
+  let ip = userHeaders?.get("x-forwarded-for") || req?.ip;
+
+  if (ip && ip.includes(",")) {
+    ip = ip.split(",")[0].trim();
+  }
+  if (ip && ip.length > 0) {
+    userHeaders.set("x-client-ip", ip);
+  }
+  return userHeaders;
+}
+
 export async function middleware(req: NextRequest) {
-  const userToken = req.headers.get("x-api-key");
+  const userHeaders = initHeaders(req);
+  const isTrusted = userHeaders.get("origin")?.endsWith("web3.bio");
+  const userToken = userHeaders.get("x-api-key");
+
   if (!userToken) {
-    return NextResponse.next();
+    userHeaders.set("x-api-key", isTrusted ? WEB3BIO_KEY : GENERAL_KEY);
+    if (isTrusted) {
+      console.log("API Token: ", WEB3BIO_KEY);
+    }
+    return NextResponse.next({
+      request: {
+        headers: userHeaders,
+      },
+    });
   }
 
   const verifiedToken = await verifyAuth(userToken.replace("Bearer ", ""));
@@ -40,5 +68,12 @@ export async function middleware(req: NextRequest) {
       },
       { status: 403 }
     );
+  } else {
+    console.log("API Token: ", userToken);
+    return NextResponse.next({
+      request: {
+        headers: userHeaders,
+      },
+    });
   }
 }
