@@ -1,6 +1,5 @@
 import { jwtVerify } from "jose";
 import { type NextRequest, NextResponse } from "next/server";
-import { handleSearchPlatform, isValidEthereumAddress } from "./utils/base";
 
 async function verifyAuth(token: string) {
   try {
@@ -13,32 +12,6 @@ async function verifyAuth(token: string) {
     throw new Error("Invalid API Token");
   }
 }
-
-const getIdentityPlatform = (req: NextRequest) => {
-  const { searchParams, pathname } = req.nextUrl;
-  let identity = null;
-  let platform = null;
-
-  if (pathname.startsWith("/graph")) {
-    identity = searchParams.get("identity");
-    platform = searchParams.get("platform");
-  } else if (pathname.startsWith("/domains")) {
-    identity = searchParams.get("name");
-    platform = "domains";
-  } else if (pathname.includes("/batch")) {
-    identity = JSON.stringify(searchParams.get("ids"));
-    platform = "batch";
-  } else {
-    const pathArr = pathname.split("/");
-    platform =
-      pathArr.length === 4
-        ? pathArr[2]
-        : handleSearchPlatform(pathArr[pathArr.length - 1]);
-    identity = pathArr[pathArr.length - 1];
-  }
-
-  return { identity, platform };
-};
 
 export const config = {
   matcher: [
@@ -62,13 +35,11 @@ export async function middleware(req: NextRequest) {
   });
 
   if (!verifiedToken) {
-    const { identity, platform } = getIdentityPlatform(req);
-
     return NextResponse.json(
       {
-        address: identity && isValidEthereumAddress(identity) ? identity : null,
-        identity,
-        platform,
+        address: null,
+        identity: null,
+        platform: null,
         error: "Invalid API Token",
       },
       { status: 403 }
