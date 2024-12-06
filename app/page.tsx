@@ -940,7 +940,9 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  batch?ids= {"{"}ids{"}"}
+                  batch
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -955,7 +957,9 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  batch?ids= {"{"}ids{"}"}
+                  batch
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -990,7 +994,7 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
@@ -1002,7 +1006,7 @@ export default function Home() {
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
@@ -1016,7 +1020,7 @@ export default function Home() {
               <li>
                 <span className="label">ENS</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify(["ens,vitalik.eth"]),
                   )}`}
                   target="_blank"
@@ -1027,7 +1031,7 @@ export default function Home() {
               <li>
                 <span className="label">Farcaster</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1040,7 +1044,7 @@ export default function Home() {
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1053,7 +1057,7 @@ export default function Home() {
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1068,7 +1072,7 @@ export default function Home() {
               <li>
                 <span className="label">Lens</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1081,7 +1085,7 @@ export default function Home() {
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1094,7 +1098,7 @@ export default function Home() {
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -1109,7 +1113,7 @@ export default function Home() {
               <li>
                 <span className="label">Basenames</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify(["basenames,tony.base.eth"]),
                   )}`}
                   target="_blank"
@@ -1126,7 +1130,7 @@ export default function Home() {
                 <span
                   className="text-gray"
                   style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/profile/batch?ids=${encodeURIComponent(
+                >{`// ${BASE_URL}/profile/batch/${encodeURIComponent(
                   JSON.stringify([
                     "ens,vitalik.eth",
                     "lens,stani.lens",
@@ -1314,7 +1318,7 @@ export default function Home() {
                 <span
                   className="text-gray"
                   style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/ns/batch?ids=${encodeURIComponent(
+                >{`// ${BASE_URL}/ns/batch/${encodeURIComponent(
                   JSON.stringify([
                     "ens,vitalik.eth",
                     "lens,stani.lens",
