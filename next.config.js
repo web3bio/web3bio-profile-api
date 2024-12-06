@@ -17,7 +17,7 @@ const nextConfig = {
         source: "/api",
         destination: "/",
         permanent: true,
-      }
+      },
     ];
   },
   async headers() {
@@ -30,6 +30,10 @@ const nextConfig = {
           {
             key: "Access-Control-Allow-Methods",
             value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+          },
+          {
+            key: "Access-Control-Allow-Headers",
+            value: "Access-Control-Allow-Headers",
           },
         ],
       },
