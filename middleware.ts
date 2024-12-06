@@ -40,6 +40,29 @@ function initHeaders(req: NextRequest) {
   return userHeaders;
 }
 
+function logWithInfo(req: NextRequest, token: string) {
+  const { pathname, search } = req.nextUrl;
+  const message: {
+    key: string;
+    params?: string;
+  } = {
+    key: token,
+  };
+  if (["/graph", "/domains"].includes(pathname)) {
+    message.params = search.replace("?", "");
+  }
+  if (pathname.includes("/batch")) {
+    const decodedStr = decodeURIComponent(search.replace("?ids=", ""));
+    try {
+      message.params = JSON.parse(decodedStr);
+    } catch {
+      message.params = decodedStr;
+    }
+  }
+
+  return console.log(JSON.stringify(message));
+}
+
 export async function middleware(req: NextRequest) {
   const userHeaders = initHeaders(req);
   const isTrusted = userHeaders.get("origin")?.endsWith("web3.bio");
@@ -49,7 +72,7 @@ export async function middleware(req: NextRequest) {
     // request from *.web3.bio set x-api-key as WEB3BIO_KEY or GENERAL_KEY
     userHeaders.set("x-api-key", isTrusted ? WEB3BIO_KEY : GENERAL_KEY);
     if (isTrusted) {
-      console.log("API Token: ", WEB3BIO_KEY);
+      logWithInfo(req, WEB3BIO_KEY);
     }
     return NextResponse.next({
       request: {
@@ -71,7 +94,7 @@ export async function middleware(req: NextRequest) {
       { status: 403 }
     );
   } else {
-    console.log("API Token: ", userToken);
+    logWithInfo(req, userToken);
     return NextResponse.next({
       request: {
         headers: userHeaders,
