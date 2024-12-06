@@ -1,7 +1,6 @@
 import { PlatformType } from "./platform";
 
 export interface AuthHeaders {
-  ["x-client-ip"]: string;
   authorization?: string;
 }
 

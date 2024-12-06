@@ -1,6 +1,5 @@
 import { jwtVerify } from "jose";
 import { type NextRequest, NextResponse } from "next/server";
-import { handleSearchPlatform, isValidEthereumAddress } from "./utils/base";
 
 async function verifyAuth(token: string) {
   try {
@@ -9,36 +8,10 @@ async function verifyAuth(token: string) {
       new TextEncoder().encode(process.env.JWT_KEY)
     );
     return payload;
-  } catch (err) {
-    throw new Error("Invalid API Token");
+  } catch {
+    return null;
   }
 }
-
-const getIdentityPlatform = (req: NextRequest) => {
-  const { searchParams, pathname } = req.nextUrl;
-  let identity = null;
-  let platform = null;
-
-  if (pathname.startsWith("/graph")) {
-    identity = searchParams.get("identity");
-    platform = searchParams.get("platform");
-  } else if (pathname.startsWith("/domains")) {
-    identity = searchParams.get("name");
-    platform = "domains";
-  } else if (pathname.includes("/batch")) {
-    identity = JSON.stringify(searchParams.get("ids"));
-    platform = "batch";
-  } else {
-    const pathArr = pathname.split("/");
-    platform =
-      pathArr.length === 4
-        ? pathArr[2]
-        : handleSearchPlatform(pathArr[pathArr.length - 1]);
-    identity = pathArr[pathArr.length - 1];
-  }
-
-  return { identity, platform };
-};
 
 export const config = {
   matcher: [
@@ -49,29 +22,60 @@ export const config = {
   ],
 };
 
+const WEB3BIO_KEY = process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY || "";
+const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
+
+function initHeaders(req: NextRequest) {
+  // init x-client-ip
+  const userHeaders = new Headers(req.headers);
+  let ip = userHeaders?.get("x-forwarded-for") || req?.ip;
+
+  if (ip && ip.includes(",")) {
+    // resolve ipv6 to ipv4
+    ip = ip.split(",")[0].trim();
+  }
+  if (ip && ip.length > 0) {
+    userHeaders.set("x-client-ip", ip);
+  }
+  return userHeaders;
+}
+
 export async function middleware(req: NextRequest) {
-  const userToken = req.headers.get("x-api-key");
+  const userHeaders = initHeaders(req);
+  const isTrusted = userHeaders.get("origin")?.endsWith("web3.bio");
+  const userToken = userHeaders.get("x-api-key");
+
   if (!userToken) {
-    return NextResponse.next();
+    // request from *.web3.bio set x-api-key as WEB3BIO_KEY or GENERAL_KEY
+    userHeaders.set("x-api-key", isTrusted ? WEB3BIO_KEY : GENERAL_KEY);
+    if (isTrusted) {
+      console.log("API Token: ", WEB3BIO_KEY);
+    }
+    return NextResponse.next({
+      request: {
+        headers: userHeaders,
+      },
+    });
   }
 
-  const verifiedToken = await verifyAuth(
-    userToken.replace("Bearer ", "")
-  ).catch((err) => {
-    console.error(err.message);
-  });
+  const verifiedToken = await verifyAuth(userToken.replace("Bearer ", ""));
 
   if (!verifiedToken) {
-    const { identity, platform } = getIdentityPlatform(req);
-
     return NextResponse.json(
       {
-        address: identity && isValidEthereumAddress(identity) ? identity : null,
-        identity,
-        platform,
+        address: null,
+        identity: null,
+        platform: null,
         error: "Invalid API Token",
       },
       { status: 403 }
     );
+  } else {
+    console.log("API Token: ", userToken);
+    return NextResponse.next({
+      request: {
+        headers: userHeaders,
+      },
+    });
   }
 }

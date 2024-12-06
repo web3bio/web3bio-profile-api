@@ -42,37 +42,14 @@ export const isWeb3Address = (address: string): boolean =>
   web3AddressRegexes.some((regex) => regex.test(address));
 
 export const getUserHeaders = (req: NextRequest): AuthHeaders => {
-  let ip = req.headers?.get("x-forwarded-for") || req?.ip;
+  const userToken = req.headers?.get("x-api-key");
 
-  if (ip && ip.includes(",")) {
-    ip = ip.split(",")[0].trim();
+  if (userToken && userToken?.length > 0) {
+    return {
+      authorization: userToken,
+    };
   }
-  const header: AuthHeaders = {
-    "x-client-ip": ip || "",
-  };
-
-  if (process.env.GENERAL_IDENTITY_GRAPH_API_KEY) {
-    header.authorization = process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
-  }
-
-  const isTrustedDomain = req.headers.get("origin")?.endsWith("web3.bio");
-  const userToken = req.headers?.get("x-api-key") || "";
-
-  const apiKey =
-    userToken.length > 0
-      ? userToken
-      : isTrustedDomain
-      ? process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY
-      : "";
-
-  if (userToken.length > 0 || isTrustedDomain) {
-    console.log(`API Token: ${apiKey}`);
-  }
-
-  if (apiKey?.length) {
-    header.authorization = apiKey;
-  }
-  return header;
+  return {};
 };
 
 export const isSameAddress = (
