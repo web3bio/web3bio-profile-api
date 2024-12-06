@@ -33,7 +33,7 @@ const nextConfig = {
           },
           {
             key: "Access-Control-Allow-Headers",
-            value: "Access-Control-Allow-Headers",
+            value: "Content-Type, X-Api-Key",
           },
         ],
       },
