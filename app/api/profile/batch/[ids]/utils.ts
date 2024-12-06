@@ -5,10 +5,7 @@ import {
   prettify,
   respondWithCache,
 } from "@/utils/base";
-import {
-  IDENTITY_GRAPH_SERVER,
-  generateProfileStruct,
-} from "../[handle]/utils";
+
 import { BATCH_GET_PROFILES } from "@/utils/query";
 import {
   AuthHeaders,
@@ -17,6 +14,7 @@ import {
   ProfileNSResponse,
 } from "@/utils/types";
 import { PlatformType } from "@/utils/platform";
+import { IDENTITY_GRAPH_SERVER, generateProfileStruct } from "../../[handle]/utils";
 
 const SUPPORTED_PLATFORMS = [
   PlatformType.ens,

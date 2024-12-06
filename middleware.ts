@@ -52,7 +52,8 @@ function logWithInfo(req: NextRequest, token: string) {
     message.params = search.replace("?", "");
   }
   if (pathname.includes("/batch")) {
-    const decodedStr = decodeURIComponent(search.replace("?ids=", ""));
+    const pathArr = pathname.split("/");
+    const decodedStr = decodeURIComponent(pathArr[pathArr.length - 1]);
     try {
       message.params = JSON.parse(decodedStr);
     } catch {

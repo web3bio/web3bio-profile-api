@@ -1,7 +1,7 @@
 import { errorHandle, getUserHeaders } from "@/utils/base";
 import { NextRequest } from "next/server";
 import { ErrorMessages } from "@/utils/types";
-import { handleRequest } from "../../profile/batch/utils";
+import { handleRequest } from "@/app/api/profile/batch/[ids]/utils";
 
 // export async function POST(req: NextRequest) {
 //   const { ids } = await req.json();
