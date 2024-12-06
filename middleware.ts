@@ -46,7 +46,7 @@ function logWithInfo(req: NextRequest, token: string) {
     key: string;
     params?: string;
   } = {
-    key: token,
+    key: token?.replace("Bearer ", ""),
   };
   if (["/graph", "/domains"].includes(pathname)) {
     message.params = search.replace("?", "");
