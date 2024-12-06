@@ -942,7 +942,7 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   batch
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  {"["}ids{"]"}
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -959,7 +959,7 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   batch
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  {"["}ids{"]"}
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
