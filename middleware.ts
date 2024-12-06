@@ -51,16 +51,6 @@ function logWithInfo(req: NextRequest, token: string) {
   if (["/graph", "/domains"].includes(pathname)) {
     message.params = search.replace("?", "");
   }
-  if (pathname.includes("/batch")) {
-    const pathArr = pathname.split("/");
-    const decodedStr = decodeURIComponent(pathArr[pathArr.length - 1]);
-    try {
-      message.params = JSON.parse(decodedStr);
-    } catch {
-      message.params = decodedStr;
-    }
-  }
-
   return console.log(JSON.stringify(message));
 }
 
