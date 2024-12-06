@@ -30,7 +30,7 @@ describe("Test For Batch Query", () => {
   // });
 
   it("It should response 200 for Batch Query GET", async () => {
-    const url = `/profile/batch?ids=${encodeURIComponent(JSON.stringify(getIds))}`;
+    const url = `/profile/batch/${encodeURIComponent(JSON.stringify(getIds))}`;
     const res = await queryClient(url);
     expect(res.status).toBe(200);
     const json = await res.json();
