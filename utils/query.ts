@@ -1,4 +1,4 @@
-import { NEXTID_GRAPHQL_ENDPOINT } from "@/app/api/profile/[handle]/utils";
+import { IDENTITY_GRAPH_SERVER } from "@/app/api/profile/[handle]/utils";
 import {
   PLATFORMS_TO_EXCLUDE,
   formatText,
@@ -6,7 +6,11 @@ import {
   isSameAddress,
 } from "./base";
 import { PlatformType } from "./platform";
-import { IdentityRecord, IdentityGraphQueryResponse } from "./types";
+import {
+  IdentityRecord,
+  IdentityGraphQueryResponse,
+  AuthHeaders,
+} from "./types";
 
 const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary) return true;
@@ -153,6 +157,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.ens,
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
+        PlatformType.dotbit,
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =
@@ -227,13 +232,14 @@ export const BATCH_GET_PROFILES = `
 export async function queryIdentityGraph(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
-  query: string
+  query: string,
+  headers: AuthHeaders
 ): Promise<any> {
   try {
-    const response = await fetch(NEXTID_GRAPHQL_ENDPOINT, {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
-        Authorization: process.env.NEXT_PUBLIC_IDENTITY_GRAPH_API_KEY || "",
+        ...headers,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
@@ -244,6 +250,7 @@ export async function queryIdentityGraph(
         },
       }),
     });
+
     return await response.json();
   } catch (e) {
     return { errors: e };

@@ -18,6 +18,7 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import {
+  AuthHeaders,
   ErrorMessages,
   IdentityGraphEdge,
   ProfileAPIResponse,
@@ -27,9 +28,10 @@ import {
 import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
+import { processJson } from "../../graph/utils";
 
-export const NEXTID_GRAPHQL_ENDPOINT =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "https://graph.web3.bio/graphql";
+export const IDENTITY_GRAPH_SERVER =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 
 function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
   const platform = data.platform;
@@ -182,8 +184,12 @@ export async function generateProfileStruct(
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || data.identity,
-    avatar: (await resolveEipAssetURL(data.avatar, data.identity)) || null,
+    displayName: data.displayName,
+    avatar: data.avatar
+      ? await resolveEipAssetURL(data.avatar, data.identity)
+      : data.platform === PlatformType.lens && data?.social?.uid
+      ? `https://api.hey.xyz/avatar?id=${Number(data.social.uid)}`
+      : null,
     description: data.description || null,
   };
 
@@ -213,7 +219,6 @@ const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
-  PlatformType.unstoppableDomains,
 ];
 
 function sortProfilesByPlatform(
@@ -221,12 +226,10 @@ function sortProfilesByPlatform(
   targetPlatform: PlatformType,
   handle: string
 ): ProfileAPIResponse[] {
-  const order = DEFAULT_PLATFORM_ORDER.includes(targetPlatform)
-    ? [
-        targetPlatform,
-        ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
-      ]
-    : DEFAULT_PLATFORM_ORDER;
+  const order = [
+    targetPlatform,
+    ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
+  ];
 
   const sortedResponses = responses.reduce(
     (acc, response) => {
@@ -255,17 +258,28 @@ export const resolveWithIdentityGraph = async ({
   platform,
   handle,
   ns,
+  headers,
 }: {
   platform: PlatformType;
   handle: string;
   ns?: boolean;
+  headers: AuthHeaders;
 }) => {
   const response = await queryIdentityGraph(
     handle,
     platform,
-    GET_PROFILES(false)
+    GET_PROFILES(false),
+    headers
   );
 
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform,
+      message: response.msg,
+      code: response.code || 500,
+    };
+  }
   if (!response?.data?.identity || response?.errors)
     return {
       identity: handle,
@@ -273,8 +287,10 @@ export const resolveWithIdentityGraph = async ({
       message: response.errors ? response.errors : ErrorMessages.notFound,
       code: response.errors ? 500 : 404,
     };
+  const resolvedResponse = await processJson(response);
+
   const profilesArray = primaryDomainResolvedRequestArray(
-    response,
+    resolvedResponse,
     handle,
     platform
   )
@@ -351,6 +367,7 @@ export const resolveWithIdentityGraph = async ({
 export const resolveUniversalHandle = async (
   handle: string,
   platform: PlatformType,
+  headers: AuthHeaders,
   ns?: boolean
 ) => {
   const handleToQuery = prettify(handle);
@@ -377,6 +394,7 @@ export const resolveUniversalHandle = async (
     platform,
     handle: handleToQuery,
     ns,
+    headers,
   })) as any;
 
   if (res.message) {

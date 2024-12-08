@@ -1,5 +1,6 @@
 import {
   errorHandle,
+  getUserHeaders,
   isValidEthereumAddress,
   respondWithCache,
   uglify,
@@ -13,6 +14,7 @@ import { resolveENSResponse } from "../../ens/[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
+  const headers = getUserHeaders(req);
   const inputName = isValidEthereumAddress(handle)
     ? handle
     : uglify(handle, PlatformType.basenames);
@@ -24,7 +26,19 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveENSResponse(inputName, PlatformType.basenames);
+    const json = await resolveENSResponse(
+      inputName,
+      headers,
+      PlatformType.basenames
+    );
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.basenames,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

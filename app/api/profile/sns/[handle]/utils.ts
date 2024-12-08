@@ -2,7 +2,7 @@ import { PlatformType } from "@/utils/platform";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { ErrorMessages, LinksItem } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
 import { formatText } from "@/utils/base";
 import { regexSolana } from "@/utils/regexp";
 import { resolveVerifiedLink } from "../../[handle]/utils";
@@ -30,12 +30,28 @@ export const recordsShouldFetch = [
   "CNAME",
 ];
 
-export const resolveSNSHandle = async (handle: string, ns?: boolean) => {
+export const resolveSNSHandle = async (
+  handle: string,
+  headers: AuthHeaders,
+  ns?: boolean
+) => {
   const response = await queryIdentityGraph(
     handle,
-    PlatformType.sns,
-    GET_PROFILES(ns)
+    regexSolana.test(handle) ? PlatformType.solana : PlatformType.sns,
+    GET_PROFILES(ns),
+    headers
   );
+
+  if (response.msg) {
+    return {
+      identity: handle,
+      platform: regexSolana.test(handle)
+        ? PlatformType.solana
+        : PlatformType.sns,
+      message: response.msg,
+      code: response.code,
+    };
+  }
 
   const profile = response?.data?.identity?.profile;
   if (!profile) {

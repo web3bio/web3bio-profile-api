@@ -1,4 +1,9 @@
-import { errorHandle, prettify, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  prettify,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -7,6 +12,7 @@ import { resolveFarcasterHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
+  const headers = getUserHeaders(req);
   const handle = searchParams.get("handle") || "";
   const resolvedHandle = regexSolana.test(handle)
     ? handle
@@ -29,7 +35,15 @@ export async function GET(req: NextRequest) {
   const queryInput = prettify(resolvedHandle);
 
   try {
-    const json = await resolveFarcasterHandle(queryInput);
+    const json = await resolveFarcasterHandle(queryInput, headers);
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.farcaster,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

@@ -1,13 +1,21 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
+import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveLensHandle } from "./utils";
 
-const resolveLensRespond = async (handle: string) => {
+const resolveLensRespond = async (handle: string, headers: AuthHeaders) => {
   try {
-    const json = await resolveLensHandle(handle);
+    const json = (await resolveLensHandle(handle, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.lens,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
@@ -23,7 +31,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle");
   const lowercaseName = inputName?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (
     ![regexLens.test(lowercaseName), regexEth.test(lowercaseName)].some(
       (x) => !!x
@@ -35,7 +43,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveLensRespond(lowercaseName);
+  return resolveLensRespond(lowercaseName, headers);
 }
 
 export const runtime = "edge";

@@ -1,7 +1,4 @@
-import {
-  errorHandle,
-  respondWithCache,
-} from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLens } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -12,7 +9,7 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (!regexLens.test(handle) && !regexEth.test(handle)) {
     return errorHandle({
       identity: handle,
@@ -23,7 +20,16 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const json = await resolveLensHandleNS(handle);
+    const json = (await resolveLensHandleNS(handle, headers)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.lens,
+        code: json.code,
+        message: json.message,
+      });
+    }
+
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

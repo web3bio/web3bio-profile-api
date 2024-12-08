@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -8,6 +8,7 @@ import { resolveENSResponse } from "../../ens/[handle]/utils";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
+  const headers = getUserHeaders(req);
   if (!regexEns.test(handle) && !regexEth.test(handle))
     return errorHandle({
       identity: handle,
@@ -16,7 +17,15 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveENSResponse(handle);
+    const json = await resolveENSResponse(handle, headers);
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.ethereum,
+        code: json.code,
+        message: json.message,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({

@@ -1,4 +1,4 @@
-import { errorHandle, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
@@ -9,7 +9,7 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
-
+  const headers = getUserHeaders(req);
   if (!regexDotbit.test(handle) && !regexEth.test(handle)) {
     return errorHandle({
       identity: handle,
@@ -20,7 +20,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const json = await resolveDotbitHandle(handle, true);
+    const json = (await resolveDotbitHandle(handle, headers, true)) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: PlatformType.dotbit,
+        code: json.code || 500,
+        message: json.message || ErrorMessages.unknownError,
+      });
+    }
     return respondWithCache(JSON.stringify(json));
   } catch (e: any) {
     return errorHandle({
