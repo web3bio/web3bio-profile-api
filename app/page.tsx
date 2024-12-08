@@ -87,7 +87,8 @@ export default function Home() {
               >
                 Ethereum (ENS)
               </span>
-              , <span className="text-underline">Farcaster</span>,{" "}
+              , <span className="text-underline">Basenames</span>,{" "}
+              <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Unstoppable Domains</span>,{" "}
               <span
@@ -95,9 +96,9 @@ export default function Home() {
                 title="Solana and Solana Name Service (Bonfida)"
               >
                 Solana (SNS)
-              </span>
-              , and <span className="text-underline">.bit</span> into their
-              applications. These APIs are already integrated into{" "}
+              </span>{" "}
+              and more into their applications. These APIs are already
+              integrated into{" "}
               <a
                 href="https://web3.bio"
                 target="_blank"
@@ -2329,6 +2330,29 @@ export default function Home() {
               .
             </p>
             <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
+              November Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added{" "}
+                <a href="#batch-query">
+                  <code>Batch Query</code>
+                </a>{" "}
+                support to the Profile API.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
+              October Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added
+                Basenames query support to the Profile API.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
               March Update
             </h3>
@@ -2361,7 +2385,7 @@ export default function Home() {
               <li>
                 <span className="label label-primary">Feature</span> Added{" "}
                 <code>ns</code> basic profile resolution query support to the
-                Profile APIs.
+                Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
@@ -2371,7 +2395,7 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added
-                Unstoppable Domains query support to the Profile APIs.
+                Unstoppable Domains query support to the Profile API.
               </li>
               <li>
                 <span className="label label-primary">Update</span> Added
@@ -2395,7 +2419,7 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added .bit
-                query support to the Profile APIs.
+                query support to the Profile API.
               </li>
               <li>
                 <span className="label label-primary">Update</span> Added ENS
@@ -2421,7 +2445,7 @@ export default function Home() {
               <li>
                 <span className="label label-primary">Feature</span> Added
                 Ethereum Name Service (ENS), Lens, and Farcaster support to the
-                Profile APIs.
+                Profile API.
               </li>
             </ul>
           </section>
