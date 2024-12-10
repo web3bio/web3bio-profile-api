@@ -44,15 +44,15 @@ export async function GET(req: NextRequest) {
         if (avatarURL) {
           return NextResponse.redirect(avatarURL);
         } else {
-          return respondWithSVG(name, 240);
+          return respondWithSVG(encodeURIComponent(name), 240);
         }
       } catch (e) {
-        return respondWithSVG(name, 240);
+        return respondWithSVG(encodeURIComponent(name), 240);
       }
     }
   }
 
-  return respondWithSVG(name, 240);
+  return respondWithSVG(encodeURIComponent(name), 240);
 }
 
 export const runtime = "edge";

@@ -7,6 +7,6 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const name = searchParams.get("handle") || "";
   const size = searchParams.get("size") || 240;
-  return await respondWithSVG(name, Number(size));
+  return await respondWithSVG(encodeURIComponent(name), Number(size));
 }
 export const runtime = "edge";
