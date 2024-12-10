@@ -172,9 +172,20 @@ export const respondWithSVG = async (name: string, size: number) => {
     square: true,
   };
   const ReactDOMServer = (await import("react-dom/server")).default;
-  const svg = ReactDOMServer.renderToString(<AvatarMarble {...avatarProps} name={encodeURIComponent(avatarProps.name)} />);
-
-  return new Response(svg, {
+  const svg = ReactDOMServer.renderToString(
+    <AvatarMarble
+      {...avatarProps}
+      name={encodeURIComponent(avatarProps.name)}
+    />
+  );
+  const encoded = (() => {
+    try {
+      return new TextEncoder().encode(svg);
+    } catch {
+      return svg;
+    }
+  })();
+  return new Response(encoded, {
     headers: {
       "Content-Type": "image/svg+xml",
       "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
