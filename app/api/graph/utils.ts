@@ -1,5 +1,5 @@
 import { PlatformType } from "@/utils/platform";
-import { resolveEipAssetURL } from "@/utils/resolver";
+import { getLensDefaultAvatar, resolveEipAssetURL } from "@/utils/resolver";
 import { IdentityRecord, ProfileRecord } from "@/utils/types";
 
 const processAvatar = async (profile: ProfileRecord) => {
@@ -19,9 +19,7 @@ const processAvatar = async (profile: ProfileRecord) => {
     !_profile.avatar &&
     _profile?.social?.uid
   ) {
-    _profile.avatar = `https://api.hey.xyz/avatar?id=${Number(
-      _profile.social.uid
-    )}`;
+    _profile.avatar = await getLensDefaultAvatar(Number(_profile.social.uid));
   }
 
   return _profile;

@@ -178,14 +178,14 @@ export const respondWithSVG = async (name: string, size: number) => {
       name={encodeURIComponent(avatarProps.name)}
     />
   );
-  const encoded = (() => {
-    try {
-      return new TextEncoder().encode(svg);
-    } catch {
-      return svg;
-    }
-  })();
-  return new Response(encoded, {
+  // const encoded = (() => {
+  //   try {
+  //     return new TextEncoder().encode(svg);
+  //   } catch {
+  //     return svg;
+  //   }
+  // })();
+  return new Response(svg, {
     headers: {
       "Content-Type": "image/svg+xml",
       "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",

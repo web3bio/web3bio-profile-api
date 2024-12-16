@@ -1,4 +1,5 @@
 import {
+  getLensDefaultAvatar,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
@@ -68,7 +69,7 @@ export const resolveLensHandle = async (
   const avatarUri = profile.avatar
     ? await resolveEipAssetURL(profile?.avatar)
     : profile?.social?.uid
-    ? `https://api.hey.xyz/avatar?id=${Number(profile?.social?.uid)}`
+    ? await getLensDefaultAvatar(Number(profile?.social?.uid))
     : null;
   const resJSON = {
     address: profile.address,
