@@ -175,7 +175,7 @@ export const respondWithSVG = async (name: string, size: number) => {
   const svg = ReactDOMServer.renderToString(
     <AvatarMarble
       {...avatarProps}
-      name={encodeURIComponent(avatarProps.name)}
+      // name={encodeURIComponent(avatarProps.name)}
     />
   );
   // const encoded = (() => {
