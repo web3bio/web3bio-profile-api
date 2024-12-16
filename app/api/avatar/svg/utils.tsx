@@ -78,6 +78,26 @@ const AvatarMarble = (props: any) => {
             ")"
           }
         />
+        <path
+          filter={`url(#filter_${maskID})`}
+          d="M22.216 24L0 46.75l14.108 38.129L78 86l-3.081-59.276-22.378 4.005 12.972 20.186-23.35 27.395L22.215 24z"
+          fill={"rgba(255, 255, 255, .25"}
+          transform={
+            "translate(" +
+            properties[3].translateX +
+            " " +
+            properties[3].translateY +
+            ") rotate(" +
+            properties[3].rotate +
+            " " +
+            SIZE / 2 +
+            " " +
+            SIZE / 2 +
+            ") scale(" +
+            properties[3].scale +
+            ")"
+          }
+        />
       </g>
       <defs>
         <filter
@@ -156,7 +176,7 @@ export const respondWithSVG = async (name: string, size: number) => {
     <AvatarMarble
       {...avatarProps}
       name={encodeURIComponent(avatarProps.name)}
-    />
+    />,
   );
   const encoded = (() => {
     try {
