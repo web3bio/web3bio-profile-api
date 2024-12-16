@@ -176,7 +176,7 @@ export const respondWithSVG = async (name: string, size: number) => {
     <AvatarMarble
       {...avatarProps}
       name={encodeURIComponent(avatarProps.name)}
-    />
+    />,
   );
   const encoded = (() => {
     try {
