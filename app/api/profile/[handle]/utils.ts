@@ -13,6 +13,7 @@ import {
   queryIdentityGraph,
 } from "@/utils/query";
 import {
+  getLensDefaultAvatar,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
@@ -188,7 +189,7 @@ export async function generateProfileStruct(
     avatar: data.avatar
       ? await resolveEipAssetURL(data.avatar, data.identity)
       : data.platform === PlatformType.lens && data?.social?.uid
-      ? `https://api.hey.xyz/avatar?id=${Number(data.social.uid)}`
+      ? await getLensDefaultAvatar(Number(data.social.uid))
       : null,
     description: data.description || null,
   };

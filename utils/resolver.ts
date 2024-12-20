@@ -105,3 +105,15 @@ export const resolveEipAssetURL = async (
 
   return resolveMediaURL(source, identity);
 };
+
+export const getLensDefaultAvatar = async (tokenId: number) => {
+  try {
+    const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/polygon/0xdb46d1dc155634fbc732f92e853b10b288ad5a1d/${tokenId}`;
+    const res = await fetch(fetchURL)
+      .then((res) => res.json())
+      .catch((e) => null);
+    return res?.previews?.image_medium_url || res?.image_url;
+  } catch (e) {
+    return null;
+  }
+};
