@@ -259,20 +259,13 @@ export const resolveWithIdentityGraph = async ({
   platform,
   handle,
   ns,
-  headers,
+  response,
 }: {
   platform: PlatformType;
   handle: string;
   ns?: boolean;
-  headers: AuthHeaders;
+  response: any;
 }) => {
-  const response = await queryIdentityGraph(
-    handle,
-    platform,
-    GET_PROFILES(false),
-    headers
-  );
-
   if (response.msg) {
     return {
       identity: handle,
@@ -289,7 +282,6 @@ export const resolveWithIdentityGraph = async ({
       code: response.errors ? 500 : 404,
     };
   const resolvedResponse = await processJson(response);
-
   const profilesArray = primaryDomainResolvedRequestArray(
     resolvedResponse,
     handle,
@@ -306,6 +298,7 @@ export const resolveWithIdentityGraph = async ({
       return pre;
     }, new Array())
     .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+
   let responsesToSort = [];
 
   for (let i = 0; i < profilesArray.length; i++) {
@@ -391,11 +384,17 @@ export const resolveUniversalHandle = async (
       code: 404,
       message: ErrorMessages.invalidAddr,
     });
+  const response = await queryIdentityGraph(
+    handleToQuery,
+    platform,
+    GET_PROFILES(false),
+    headers
+  );
   const res = (await resolveWithIdentityGraph({
     platform,
     handle: handleToQuery,
     ns,
-    headers,
+    response,
   })) as any;
 
   if (res.message) {

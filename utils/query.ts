@@ -198,6 +198,86 @@ export const primaryDomainResolvedRequestArray = (
   ];
 };
 
+export const BATCH_GET_UNIVERSAL = `
+  query BATCH_GET_UNIVERSAL($ids: [String!]!) {
+  identitiesWithGraph(ids: $ids) {
+    id
+    aliases
+    identity
+    platform
+    isPrimary
+    resolvedAddress {
+      network
+      address
+    }
+    ownerAddress {
+      network
+      address
+    }
+    profile {
+      identity
+      platform
+      address
+      displayName
+      avatar
+      description
+      contenthash
+      texts
+      addresses {
+        network
+        address
+      }
+      social {
+        uid
+        follower
+        following
+      }
+    }
+    identityGraph {
+      graphId
+      vertices {
+        identity
+        platform
+        isPrimary
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+          contenthash
+          texts
+          addresses {
+            network
+            address
+          }
+          social {
+            uid
+            follower
+            following
+          }
+        }
+      }
+      edges {
+        source
+        target
+        dataSource
+        edgeType
+      }
+    }
+  }
+}
+`;
+
 export const BATCH_GET_PROFILES = `
   query BATCH_GET_PROFILES($ids: [String!]!) {
   identities(ids: $ids) {

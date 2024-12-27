@@ -6,7 +6,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 
-import { BATCH_GET_PROFILES } from "@/utils/query";
+import { BATCH_GET_PROFILES, BATCH_GET_UNIVERSAL } from "@/utils/query";
 import {
   AuthHeaders,
   ErrorMessages,
@@ -14,7 +14,11 @@ import {
   ProfileNSResponse,
 } from "@/utils/types";
 import { PlatformType } from "@/utils/platform";
-import { IDENTITY_GRAPH_SERVER, generateProfileStruct } from "../../[handle]/utils";
+import {
+  IDENTITY_GRAPH_SERVER,
+  generateProfileStruct,
+  resolveWithIdentityGraph,
+} from "../../[handle]/utils";
 
 const SUPPORTED_PLATFORMS = [
   PlatformType.ens,
@@ -55,6 +59,52 @@ export async function handleRequest(
       code: e.cause || 500,
       message: ErrorMessages.notFound,
     });
+  }
+}
+
+export async function fetchUniversalBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders
+) {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: BATCH_GET_UNIVERSAL,
+        variables: {
+          ids: ids,
+        },
+      }),
+    });
+
+    const json = await response.json();
+    if (!json || json?.code) return json;
+
+    const res = [];
+    for (let i = 0; i < json.data.identitiesWithGraph?.length; i++) {
+      const item = json.data.identitiesWithGraph[i];
+      const platform = item.id.split(",")[0];
+      const handle = item.id.split(",")[1];
+      res.push({
+        id: item.id,
+        aliases: item.aliases,
+        profiles: await resolveWithIdentityGraph({
+          platform,
+          handle,
+          ns,
+          response: { data: { identity: { ...item } } },
+        }),
+      });
+    }
+
+    return res;
+  } catch (e: any) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }
 
