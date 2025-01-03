@@ -70,9 +70,14 @@ export const resolveENSResponse = async (
     res.data.identity.identityGraph?.edges
   );
   return {
-    address: profile.address.toLowerCase(),
+    address: isValidEthereumAddress(profile.identity)
+      ? profile.identity.toLowerCase()
+      : profile.address?.toLowerCase(),
     identity: profile.identity,
-    platform: _platform || PlatformType.ens,
+    platform:
+      _platform || isValidEthereumAddress(profile.identity)
+        ? PlatformType.ethereum
+        : PlatformType.ens,
     displayName: profile.displayName || handle,
     avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description,
