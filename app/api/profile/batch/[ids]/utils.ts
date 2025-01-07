@@ -26,7 +26,6 @@ const SUPPORTED_PLATFORMS = [
   PlatformType.farcaster,
   PlatformType.lens,
   PlatformType.basenames,
-  PlatformType.twitter
 ];
 
 export async function handleRequest(
@@ -161,7 +160,7 @@ export async function fetchIdentityGraphBatch(
   }
 }
 
-export function filterIds(ids: string[]) {
+export function filterIds(ids: string[], includesTwitter?: boolean) {
   const resolved = ids
     .map((x) => {
       if (
@@ -173,11 +172,17 @@ export function filterIds(ids: string[]) {
       if (!x.includes(",") && x.endsWith(".farcaster")) {
         return `${PlatformType.farcaster},${prettify(x)}`;
       }
+      if (!x.includes(",") && x.endsWith(".twitter")) {
+        return `${PlatformType.twitter},${prettify(x)}`;
+      }
       return x;
     })
-    .filter(
-      (x) =>
+    .filter((x) => {
+      if (includesTwitter && x.split(",")[0] === PlatformType.twitter)
+        return true;
+      return (
         !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType)
-    );
+      );
+    });
   return resolved;
 }

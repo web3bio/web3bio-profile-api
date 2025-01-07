@@ -151,6 +151,7 @@ export const primaryDomainResolvedRequestArray = (
         }));
       return [...resolved];
     }
+
     if (
       [
         PlatformType.ethereum,
@@ -158,6 +159,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
         PlatformType.dotbit,
+        PlatformType.twitter
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =
@@ -167,6 +169,7 @@ export const primaryDomainResolvedRequestArray = (
               x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
+              if(resolvedRecord.platform === PlatformType.twitter) return true
               const sourceAddr =
                 resolvedRecord.platform === PlatformType.ethereum
                   ? resolvedRecord.identity
@@ -183,7 +186,8 @@ export const primaryDomainResolvedRequestArray = (
             ...x.profile,
             isPrimary: x.isPrimary,
           })) || [];
-      return resolvedRecord.platform === PlatformType.ethereum
+      
+      return [PlatformType.ethereum, PlatformType.twitter].includes(resolvedRecord.platform)
         ? [...vertices]
         : [...vertices, defaultReturn];
     }

@@ -15,7 +15,7 @@ export const handleUniversalBatchRequest = async (
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const queryIds = filterIds(ids);
+    const queryIds = filterIds(ids, true);
     const json = (await fetchUniversalBatch(queryIds, ns, headers)) as any;
 
     if (json.code) {
