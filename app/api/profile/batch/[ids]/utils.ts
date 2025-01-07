@@ -6,7 +6,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 
-import { BATCH_GET_PROFILES, BATCH_GET_UNIVERSAL } from "@/utils/query";
+import { BATCH_GET_UNIVERSAL } from "@/utils/query";
 import {
   AuthHeaders,
   ErrorMessages,
@@ -26,6 +26,7 @@ const SUPPORTED_PLATFORMS = [
   PlatformType.farcaster,
   PlatformType.lens,
   PlatformType.basenames,
+  PlatformType.twitter
 ];
 
 export async function handleRequest(
@@ -84,7 +85,6 @@ export async function fetchUniversalBatch(
 
     const json = await response.json();
     if (!json || json?.code) return json;
-
     const res = [];
     for (let i = 0; i < json.data.identitiesWithGraph?.length; i++) {
       const item = json.data.identitiesWithGraph[i];
@@ -123,7 +123,7 @@ export async function fetchIdentityGraphBatch(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: BATCH_GET_PROFILES,
+        query: BATCH_GET_UNIVERSAL,
         variables: {
           ids: ids,
         },
@@ -133,9 +133,9 @@ export async function fetchIdentityGraphBatch(
     const json = await response.json();
     if (json.code) return json;
     let res = [] as any;
-    if (json?.data?.identities?.length > 0) {
-      for (let i = 0; i < json.data.identities.length; i++) {
-        const item = json.data.identities[i];
+    if (json?.data?.identitiesWithGraph?.length > 0) {
+      for (let i = 0; i < json.data.identitiesWithGraph.length; i++) {
+        const item = json.data.identitiesWithGraph[i];
         if (item) {
           res.push({
             ...(await generateProfileStruct(
@@ -147,7 +147,8 @@ export async function fetchIdentityGraphBatch(
                   ? formatText(item.identity)
                   : item.identity,
               },
-              ns
+              ns,
+              item.identityGraph?.edges
             )),
             aliases: item.aliases,
           });

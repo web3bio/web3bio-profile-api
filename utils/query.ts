@@ -278,37 +278,6 @@ export const BATCH_GET_UNIVERSAL = `
 }
 `;
 
-export const BATCH_GET_PROFILES = `
-  query BATCH_GET_PROFILES($ids: [String!]!) {
-  identities(ids: $ids) {
-    identity
-    platform
-    aliases
-    profile {
-      uid
-      identity
-      platform
-      network
-      address
-      displayName
-      avatar
-      description
-      contenthash
-      texts
-      addresses {
-        network
-        address
-      }
-      social {
-        uid
-        following
-        follower
-      }
-    }
-  }
-}
-`;
-
 export async function queryIdentityGraph(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
