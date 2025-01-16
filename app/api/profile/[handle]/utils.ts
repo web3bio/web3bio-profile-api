@@ -62,7 +62,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     case PlatformType.farcaster:
       const resolvedHandle = resolveHandle(identity);
       res[PlatformType.farcaster] = {
-        links: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
+        link: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
         handle: resolvedHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.farcaster},${resolvedHandle}`,
@@ -88,7 +88,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     case PlatformType.lens:
       const pureHandle = identity.replace(".lens", "");
       res[PlatformType.lens] = {
-        links: getSocialMediaLink(pureHandle!, PlatformType.lens),
+        link: getSocialMediaLink(pureHandle!, PlatformType.lens),
         handle: pureHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.lens},${pureHandle}.lens`,
