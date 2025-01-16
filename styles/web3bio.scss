@@ -36,18 +36,18 @@
 @import "spectre/utilities";
 
 // Variables
-$pride-color-1: #FBF4EC !default;
-$pride-color-2: #ECD7C8 !default;
-$pride-color-3: #EEA4BC !default;
-$pride-color-4: #BE88C4 !default;
-$pride-color-5: #9186E7 !default;
-$pride-color-6: #92C9F9 !default;
-$pride-color-7: #C7F8FF !default;
+$pride-color-1: #fbf4ec !default;
+$pride-color-2: #ecd7c8 !default;
+$pride-color-3: #eea4bc !default;
+$pride-color-4: #be88c4 !default;
+$pride-color-5: #9186e7 !default;
+$pride-color-6: #92c9f9 !default;
+$pride-color-7: #c7f8ff !default;
 
 /*! Web3bio.css | MIT License */
 body {
   background: $light-color;
-  font-size: .75rem;
+  font-size: 0.75rem;
   line-height: 1.75;
   overflow-x: hidden;
 }
@@ -55,7 +55,7 @@ body {
 .web3bio-container {
   min-height: 75vh;
   overflow-x: hidden;
-  padding: .5rem;
+  padding: 0.5rem;
   scroll-behavior: smooth;
   width: 100vw;
 }
@@ -77,32 +77,32 @@ body {
 .web3bio-logo {
   align-items: center;
   background: $dark-color;
-  border-radius: .8rem;
-  box-shadow: 0 .2rem .4rem rgba(0, 0, 0, .1);
+  border-radius: 0.8rem;
+  box-shadow: 0 0.2rem 0.4rem rgba(0, 0, 0, 0.1);
   color: $dark-color;
   cursor: pointer;
   display: flex;
   height: 3rem;
-  padding: .4rem;
+  padding: 0.4rem;
   position: relative;
   text-align: left;
-  transition: all .3s ease;
+  transition: all 0.3s ease;
   user-select: none;
   width: 3rem;
   z-index: 1;
 
   &:focus,
   &:hover {
-    box-shadow: 0 .3rem .6rem rgba(0, 0, 0, .2);
+    box-shadow: 0 0.3rem 0.6rem rgba(0, 0, 0, 0.2);
     color: $dark-color;
     text-decoration: none;
   }
 
   h1 {
-    font-size: .8rem;
+    font-size: 0.8rem;
     font-weight: 900;
-    letter-spacing: -.05rem;
-    line-height: .8rem;
+    letter-spacing: -0.05rem;
+    line-height: 0.8rem;
     margin: 0;
   }
 }
@@ -130,28 +130,30 @@ body {
   width: 100%;
 
   @media screen and (max-width: $size-md) {
-    transform: scale(.75);
+    transform: scale(0.75);
   }
 }
 
 .profile-card {
   background: $light-color;
-  border: .05rem solid rgba($dark-color, .075);
-  border-radius: .8rem;
-  box-shadow: 0 .1rem .2rem rgba($dark-color, .04), 0 0 2rem rgba($dark-color, .05);
+  border: 0.05rem solid rgba($dark-color, 0.075);
+  border-radius: 0.8rem;
+  box-shadow:
+    0 0.1rem 0.2rem rgba($dark-color, 0.04),
+    0 0 2rem rgba($dark-color, 0.05);
   display: flex;
   flex: 1 0;
   flex-direction: column;
   left: 50%;
   padding: 1rem;
   position: absolute;
-  top: .5rem;
-  transition: transform .15s ease;
+  top: 0.5rem;
+  transition: transform 0.15s ease;
   width: 20rem;
   z-index: 1;
 
   &:nth-child(1) {
-    transform: translateX(-110%) scale(.95) rotate(-3deg);
+    transform: translateX(-110%) scale(0.95) rotate(-3deg);
 
     &:focus,
     &:hover {
@@ -160,7 +162,7 @@ body {
   }
 
   &:nth-child(2) {
-    transform: translateX(-60%) scale(.95) rotate(6deg);
+    transform: translateX(-60%) scale(0.95) rotate(6deg);
 
     &:focus,
     &:hover {
@@ -169,7 +171,7 @@ body {
   }
 
   &:nth-child(3) {
-    transform: translateX(-10%) scale(.95) rotate(-3deg);
+    transform: translateX(-10%) scale(0.95) rotate(-3deg);
 
     &:focus,
     &:hover {
@@ -178,7 +180,7 @@ body {
   }
 
   &:nth-child(4) {
-    transform: translateX(40%) scale(.95) rotate(6deg);
+    transform: translateX(40%) scale(0.95) rotate(6deg);
 
     &:focus,
     &:hover {
@@ -191,7 +193,7 @@ body {
 
     .avatar {
       background: $gray-color;
-      box-shadow: inset 0 0 0 .2rem rgba($light-color, .1);
+      box-shadow: inset 0 0 0 0.2rem rgba($light-color, 0.1);
       height: 2.4rem;
       width: 2.4rem;
     }
@@ -199,7 +201,7 @@ body {
 
   .card-content {
     flex: 1;
-    padding: .5rem 0;
+    padding: 0.5rem 0;
     width: 100%;
   }
 
@@ -211,12 +213,12 @@ body {
 
   .card-identity {
     color: $gray-color;
-    font-size: .65rem;
-    margin-bottom: .5rem;
+    font-size: 0.65rem;
+    margin-bottom: 0.5rem;
   }
 
   .card-description {
-    font-size: .7rem;
+    font-size: 0.7rem;
     min-height: 1.25rem;
   }
 
@@ -225,72 +227,76 @@ body {
     color: $gray-color-dark;
     display: flex;
     flex-wrap: wrap;
-    margin-bottom: .5rem;
-    font-size: .6rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.6rem;
     line-height: 1rem;
-    gap: .2rem;
-  
+    gap: 0.2rem;
+
     .platform-badge {
+      cursor: pointer;
+      color: rgba($dark-color, 0.9);
       align-items: center;
-      background: rgba(#5298FF, .15);
-      border: .05rem solid transparent;
-      box-shadow: inset 0 0 .1rem rgba($dark-color, .1);
-      border-radius: .8rem;
+      background-color: var(--badge-bg-color, rgba($dark-color, 0.05));
+      border: 0.05rem solid transparent;
+      border-color: var(--badge-bg-color, transparent);
+      border-radius: 0.35rem;
+      box-shadow: 0 0.05rem 0.1rem
+        var(--badge-bg-color, rgba($dark-color, 0.05));
       display: flex;
-      height: 1.5rem;
-      padding: .15rem;
+      gap: 0.1rem;
+      height: 1.4rem;
+      max-width: 100%;
+      padding: 0.25rem;
       text-decoration: none;
-      transition: all .2s ease;
-    
+      transition: all 0.2s ease;
+
       &:focus,
       &:hover {
-        box-shadow: inset 0 0 .1rem rgba($dark-color, .15), 0 0 .6rem rgba($dark-color, .1);
+        box-shadow:
+          inset 0 0 0.1rem rgba($dark-color, 0.15),
+          0 0 0.6rem rgba($dark-color, 0.1);
       }
-  
+
       &.active {
-        box-shadow: inset 0 0 .05rem rgba($dark-color, .25);
+        box-shadow: inset 0 0 0.05rem rgba($dark-color, 0.25);
       }
-  
+
       &.ens {
-        background: lighten(#5298FF, 30%);
-        border-color: lighten(#5298FF, 20%);
-  
+        background: lighten(#5298ff, 30%);
+        border-color: lighten(#5298ff, 20%);
+
         .platform-badge-icon {
-          color: #5298FF;
+          color: #5298ff;
         }
       }
-  
+
       &.lens {
         background: lighten(#6bc674, 35%);
         border-color: lighten(#6bc674, 25%);
-  
+
         .platform-badge-icon {
           color: #6bc674;
         }
       }
-  
+
       &.farcaster {
-        background: lighten(#8465CB, 35%);
-        border-color: lighten(#8465CB, 25%);
-  
+        background: lighten(#8465cb, 35%);
+        border-color: lighten(#8465cb, 25%);
+
         .platform-badge-icon {
-          color: #8465CB;
+          color: #8465cb;
         }
       }
 
       .platform-badge-icon {
         align-items: center;
-        border-radius: .7rem;
+        border-radius: 0.7rem;
         display: flex;
-        flex: 0 0 1.2rem;
-        height: 1.3rem;
+        flex: 0 0 0.9rem;
+        height: 0.9rem;
         justify-content: center;
-        padding: .15rem;
-        width: 1.3rem;
-      }
-      
-      .platform-badge-name {
-        padding: 0 .3rem 0 .1rem;
+        padding: 0.05rem;
+        width: 0.9rem;
       }
     }
   }
@@ -309,23 +315,23 @@ body {
   z-index: 9999;
 
   .toast {
-    animation: slide-down .25s ease 1;
+    animation: slide-down 0.25s ease 1;
     max-width: $size-xs;
   }
 }
 
 .web3bio-placeholder {
-  background: rgba(darken($primary-color, 10%), .01);
-  box-shadow: inset 0 0 4rem rgba($dark-color, .2);
+  background: rgba(darken($primary-color, 10%), 0.01);
+  box-shadow: inset 0 0 4rem rgba($dark-color, 0.2);
   backdrop-filter: blur(2rem) saturate(120%) brightness(100%);
 }
 
 //- Web3.bio Footer
 .web3bio-footer {
-  color: rgba($dark-color, .5);
-  font-size: .7rem;
+  color: rgba($dark-color, 0.5);
+  font-size: 0.7rem;
   font-weight: 500;
-  padding: .5rem;
+  padding: 0.5rem;
   position: sticky;
   z-index: 99;
   top: 90vh;
@@ -333,7 +339,16 @@ body {
 
 //- Pride
 .text-pride {
-  background-image: linear-gradient(70deg, $pride-color-1 10%, $pride-color-2 25%, $pride-color-3 36%, $pride-color-4 50%, $pride-color-5 63%, $pride-color-6 75%, $pride-color-7 90%);
+  background-image: linear-gradient(
+    70deg,
+    $pride-color-1 10%,
+    $pride-color-2 25%,
+    $pride-color-3 36%,
+    $pride-color-4 50%,
+    $pride-color-5 63%,
+    $pride-color-6 75%,
+    $pride-color-7 90%
+  );
   background-clip: text;
   text-fill-color: transparent;
   -webkit-background-clip: text;
@@ -341,13 +356,33 @@ body {
 }
 
 .bg-pride {
-  background: linear-gradient(70deg, $pride-color-1 -10%, $pride-color-2 5%, $pride-color-3 36%, $pride-color-4 50%, $pride-color-5 63%, $pride-color-6 95%, $pride-color-7 110%);
+  background: linear-gradient(
+    70deg,
+    $pride-color-1 -10%,
+    $pride-color-2 5%,
+    $pride-color-3 36%,
+    $pride-color-4 50%,
+    $pride-color-5 63%,
+    $pride-color-6 95%,
+    $pride-color-7 110%
+  );
 }
 
 .border-pride {
-  border: .05rem solid transparent;
-  background: linear-gradient(white, white) padding-box,
-    linear-gradient(70deg, $pride-color-1 -10%, $pride-color-2 5%, $pride-color-3 36%, $pride-color-4 50%, $pride-color-5 63%, $pride-color-6 95%, $pride-color-7 110%) border-box;
+  border: 0.05rem solid transparent;
+  background:
+    linear-gradient(white, white) padding-box,
+    linear-gradient(
+        70deg,
+        $pride-color-1 -10%,
+        $pride-color-2 5%,
+        $pride-color-3 36%,
+        $pride-color-4 50%,
+        $pride-color-5 63%,
+        $pride-color-6 95%,
+        $pride-color-7 110%
+      )
+      border-box;
 }
 
 .img-placeholder {
@@ -355,32 +390,32 @@ body {
   display: flex;
   flex: 0 0;
   justify-content: center;
-  opacity: .75;
-  padding: .25rem;
+  opacity: 0.75;
+  padding: 0.25rem;
   position: relative;
 
   &[data-initial]::before {
     color: $light-color;
     content: attr(data-initial);
-    font-size: .5em;
+    font-size: 0.5em;
     font-weight: 700;
-    line-height: .5em;
-    text-shadow: 0 .1rem .4rem rgba($dark-color, .2);
+    line-height: 0.5em;
+    text-shadow: 0 0.1rem 0.4rem rgba($dark-color, 0.2);
     text-transform: uppercase;
     z-index: $zindex-0;
   }
 }
 
 .tooltip-copy {
-  background: rgba($dark-color, .85);
-  border-radius: .3rem;
+  background: rgba($dark-color, 0.85);
+  border-radius: 0.3rem;
   bottom: 100%;
   color: $light-color;
   display: block;
-  font-size: .6rem;
-  line-height: .6rem;
+  font-size: 0.6rem;
+  line-height: 0.6rem;
   left: 50%;
-  padding: .25rem .3rem;
+  padding: 0.25rem 0.3rem;
   pointer-events: none;
   position: absolute;
   transform: translate(-50%, 0);
