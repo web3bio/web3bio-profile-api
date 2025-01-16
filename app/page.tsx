@@ -645,8 +645,9 @@ export default function Home() {
           <section className="pt-4 pb-4" id="authentication">
             <h2 className="text-bold h4">Authentication</h2>
             <p>
-              All REST API endpoints require use of an API Key - these can be
-              obtained by contacting Web3.bio via{" "}
+              The Profile API is free, but usage without API keys includes rate
+              limiting mechanisms to ensure fair usage and prevent abuse. If you
+              need an API Key, you can obtain one by contacting Web3.bio via{" "}
               <a
                 href="https://x.com/web3bio"
                 target="_blank"
@@ -662,13 +663,12 @@ export default function Home() {
               >
                 Telegram group
               </a>
-              . Include the API key in the request header using the following
-              format:
-              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
+              .
             </p>
             <p>
-              The Profile API without API keys includes rate limiting mechanisms
-              to ensure fair usage and prevent abuse.
+              Please include the API key in the request header using the
+              following format:
+              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
             </p>
           </section>
 
@@ -844,7 +844,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "farcaster": {
-                "links": "https://warpcast.com/vitalik.eth",
+                "link": "https://warpcast.com/vitalik.eth",
                 "handle": "vitalik.eth",
                 "sources": [
                     "ethereum"
@@ -870,7 +870,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "lens": {
-                "links": "https://www.lensfrens.xyz/vitalik",
+                "link": "https://www.lensfrens.xyz/vitalik",
                 "handle": "vitalik",
                 "sources": [
                     "ethereum"
@@ -1189,7 +1189,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "lens": {
-                "links": "https://www.lensfrens.xyz/stani",
+                "link": "https://www.lensfrens.xyz/stani",
                 "handle": "stani",
                 "sources": []
             }
@@ -1218,7 +1218,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "farcaster": {
-                "links": "https://warpcast.com/dwr.eth",
+                "link": "https://warpcast.com/dwr.eth",
                 "handle": "dwr.eth",
                 "sources": []
             }

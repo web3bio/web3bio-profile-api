@@ -1,7 +1,8 @@
 {
   "name": "web3-profile-api",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.1.1",
+  "description": "Web3 Identity Resolver · Web3 DID Resolver · Web3 Domain Name Service Resolver",
+  "license": "MIT",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
