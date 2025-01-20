@@ -1,5 +1,5 @@
 export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
-  regexLens = /^[a-z0-9-]+\.lens$/i,
+  regexLens = /^.+\.lens$/i,
   regexDotbit = /^.+\.bit$/i,
   regexEth = /^0x[a-fA-F0-9]{40}$/i,
   regexBtc = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
