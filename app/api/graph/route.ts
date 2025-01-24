@@ -66,6 +66,7 @@ export async function GET(req: NextRequest) {
       GET_PROFILES(false),
       headers
     );
+
     if (rawJson.code || rawJson.errors) {
       return errorHandle({
         identity: identity,
@@ -74,7 +75,7 @@ export async function GET(req: NextRequest) {
         message: rawJson.msg
           ? rawJson.msg
           : rawJson.errors
-          ? rawJson.stringify(rawJson.errors)
+          ? JSON.stringify(rawJson.errors)
           : ErrorMessages.notFound,
       });
     }
