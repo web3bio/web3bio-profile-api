@@ -5,7 +5,7 @@ export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
   regexBtc = /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$/,
   regexSns = /^.+\.sol$/i,
   regexSolana = /^[1-9A-HJ-NP-Za-km-z]{32,44}$/,
-  regexTwitter = /^[A-Za-z0-9_]{1,15}$/i,
+  regexTwitter = /^[A-Za-z0-9_]{1,15}(?:|\.twitter)$/i,
   regexFarcaster = /^[A-Za-z0-9_-]{1,61}(?:|\.eth)(?:|\.farcaster)$/i,
   regexUnstoppableDomains =
     /^.+\.(crypto|888|nft|blockchain|bitcoin|dao|x|klever|hi|zil|kresus|polygon|wallet|binanceus|anime|go|manga|eth)$/i,

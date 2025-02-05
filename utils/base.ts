@@ -119,6 +119,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
     PlatformType.ens,
     PlatformType.basenames,
     PlatformType.ethereum,
+    PlatformType.twitter,
     PlatformType.farcaster,
     PlatformType.lens,
     PlatformType.unstoppableDomains,
@@ -158,6 +159,7 @@ export const handleSearchPlatform = (term: string) => {
 
 export const prettify = (input: string) => {
   if (!input) return "";
+  if (input.endsWith(".twitter")) return input.replace(".twitter", "");
   if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
     return input.replace(".farcaster", "").replace(".fcast.id", "");
   }

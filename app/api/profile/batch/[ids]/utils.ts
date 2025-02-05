@@ -6,7 +6,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 
-import { BATCH_GET_PROFILES } from "@/utils/query";
+import { BATCH_GET_UNIVERSAL } from "@/utils/query";
 import {
   AuthHeaders,
   ErrorMessages,
@@ -14,7 +14,11 @@ import {
   ProfileNSResponse,
 } from "@/utils/types";
 import { PlatformType } from "@/utils/platform";
-import { IDENTITY_GRAPH_SERVER, generateProfileStruct } from "../../[handle]/utils";
+import {
+  IDENTITY_GRAPH_SERVER,
+  generateProfileStruct,
+  resolveWithIdentityGraph,
+} from "../../[handle]/utils";
 
 const SUPPORTED_PLATFORMS = [
   PlatformType.ens,
@@ -58,6 +62,51 @@ export async function handleRequest(
   }
 }
 
+export async function fetchUniversalBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders
+) {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: BATCH_GET_UNIVERSAL,
+        variables: {
+          ids: ids,
+        },
+      }),
+    });
+
+    const json = await response.json();
+    if (!json || json?.code) return json;
+    const res = [];
+    for (let i = 0; i < json.data.identitiesWithGraph?.length; i++) {
+      const item = json.data.identitiesWithGraph[i];
+      const platform = item.id.split(",")[0];
+      const handle = item.id.split(",")[1];
+      res.push({
+        id: item.id,
+        aliases: item.aliases,
+        profiles: await resolveWithIdentityGraph({
+          platform,
+          handle,
+          ns,
+          response: { data: { identity: { ...item } } },
+        }),
+      });
+    }
+
+    return res;
+  } catch (e: any) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
+  }
+}
+
 export async function fetchIdentityGraphBatch(
   ids: string[],
   ns: boolean,
@@ -73,7 +122,7 @@ export async function fetchIdentityGraphBatch(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: BATCH_GET_PROFILES,
+        query: BATCH_GET_UNIVERSAL,
         variables: {
           ids: ids,
         },
@@ -83,9 +132,9 @@ export async function fetchIdentityGraphBatch(
     const json = await response.json();
     if (json.code) return json;
     let res = [] as any;
-    if (json?.data?.identities?.length > 0) {
-      for (let i = 0; i < json.data.identities.length; i++) {
-        const item = json.data.identities[i];
+    if (json?.data?.identitiesWithGraph?.length > 0) {
+      for (let i = 0; i < json.data.identitiesWithGraph.length; i++) {
+        const item = json.data.identitiesWithGraph[i];
         if (item) {
           res.push({
             ...(await generateProfileStruct(
@@ -97,7 +146,8 @@ export async function fetchIdentityGraphBatch(
                   ? formatText(item.identity)
                   : item.identity,
               },
-              ns
+              ns,
+              item.identityGraph?.edges
             )),
             aliases: item.aliases,
           });
@@ -110,7 +160,7 @@ export async function fetchIdentityGraphBatch(
   }
 }
 
-export function filterIds(ids: string[]) {
+export function filterIds(ids: string[], includesTwitter?: boolean) {
   const resolved = ids
     .map((x) => {
       if (
@@ -122,11 +172,17 @@ export function filterIds(ids: string[]) {
       if (!x.includes(",") && x.endsWith(".farcaster")) {
         return `${PlatformType.farcaster},${prettify(x)}`;
       }
+      if (!x.includes(",") && x.endsWith(".twitter")) {
+        return `${PlatformType.twitter},${prettify(x)}`;
+      }
       return x;
     })
-    .filter(
-      (x) =>
+    .filter((x) => {
+      if (includesTwitter && x.split(",")[0] === PlatformType.twitter)
+        return true;
+      return (
         !!x && SUPPORTED_PLATFORMS.includes(x.split(",")[0] as PlatformType)
-    );
+      );
+    });
   return resolved;
 }

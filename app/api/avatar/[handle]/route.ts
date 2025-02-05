@@ -7,22 +7,26 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 import { respondWithSVG } from "../svg/utils";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
+import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const name = searchParams.get("handle") || "";
+  const handle = searchParams.get("handle") || "";
   const headers = getUserHeaders(req);
-  const platform = handleSearchPlatform(name);
+  const platform = handleSearchPlatform(handle);
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
+    const response = await queryIdentityGraph(
+      handle,
+      platform,
+      GET_PROFILES(false),
+      headers
+    );
     const profiles = (await resolveWithIdentityGraph({
       platform,
-      handle: name,
+      handle,
       ns: true,
-      headers: {
-        ...headers,
-        authorization: process.env.WEB3BIO_IDENTITY_GRAPH_API_KEY || "",
-      },
+      response,
     })) as any;
     if (profiles.message) {
       return NextResponse.json(profiles);
@@ -33,7 +37,7 @@ export async function GET(req: NextRequest) {
         new URL(rawAvatarUrl);
         avatarURL = rawAvatarUrl;
       } catch (e) {
-        return respondWithSVG(name, 240);
+        return respondWithSVG(handle, 240);
       }
       if (rawAvatarUrl?.includes(".webp")) {
         avatarURL = `${BASE_URL}/avatar/process?url=${encodeURIComponent(
@@ -44,15 +48,15 @@ export async function GET(req: NextRequest) {
         if (avatarURL) {
           return NextResponse.redirect(avatarURL);
         } else {
-          return respondWithSVG(name, 240);
+          return respondWithSVG(handle, 240);
         }
       } catch (e) {
-        return respondWithSVG(name, 240);
+        return respondWithSVG(handle, 240);
       }
     }
   }
 
-  return respondWithSVG(name, 240);
+  return respondWithSVG(handle, 240);
 }
 
 export const runtime = "edge";

@@ -151,6 +151,7 @@ export const primaryDomainResolvedRequestArray = (
         }));
       return [...resolved];
     }
+
     if (
       [
         PlatformType.ethereum,
@@ -158,6 +159,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
         PlatformType.dotbit,
+        PlatformType.twitter
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =
@@ -167,6 +169,7 @@ export const primaryDomainResolvedRequestArray = (
               x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
+              if(resolvedRecord.platform === PlatformType.twitter) return true
               const sourceAddr =
                 resolvedRecord.platform === PlatformType.ethereum
                   ? resolvedRecord.identity
@@ -183,7 +186,8 @@ export const primaryDomainResolvedRequestArray = (
             ...x.profile,
             isPrimary: x.isPrimary,
           })) || [];
-      return resolvedRecord.platform === PlatformType.ethereum
+      
+      return [PlatformType.ethereum, PlatformType.twitter].includes(resolvedRecord.platform)
         ? [...vertices]
         : [...vertices, defaultReturn];
     }
@@ -198,17 +202,25 @@ export const primaryDomainResolvedRequestArray = (
   ];
 };
 
-export const BATCH_GET_PROFILES = `
-  query BATCH_GET_PROFILES($ids: [String!]!) {
-  identities(ids: $ids) {
+export const BATCH_GET_UNIVERSAL = `
+  query BATCH_GET_UNIVERSAL($ids: [String!]!) {
+  identitiesWithGraph(ids: $ids) {
+    id
+    aliases
     identity
     platform
-    aliases
+    isPrimary
+    resolvedAddress {
+      network
+      address
+    }
+    ownerAddress {
+      network
+      address
+    }
     profile {
-      uid
       identity
       platform
-      network
       address
       displayName
       avatar
@@ -221,8 +233,49 @@ export const BATCH_GET_PROFILES = `
       }
       social {
         uid
-        following
         follower
+        following
+      }
+    }
+    identityGraph {
+      graphId
+      vertices {
+        identity
+        platform
+        isPrimary
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+          contenthash
+          texts
+          addresses {
+            network
+            address
+          }
+          social {
+            uid
+            follower
+            following
+          }
+        }
+      }
+      edges {
+        source
+        target
+        dataSource
+        edgeType
       }
     }
   }
