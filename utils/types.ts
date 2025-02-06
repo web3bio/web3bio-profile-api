@@ -72,6 +72,8 @@ export interface IdentityGraphQueryResponse {
 export interface IdentityGraphEdge {
   source: string;
   target: string;
+  dataSource: string;
+  edgeType: string;
 }
 export interface IdentityRecord {
   id: string;
