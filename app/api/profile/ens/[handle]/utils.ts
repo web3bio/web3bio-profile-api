@@ -6,7 +6,12 @@ import {
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { regexEns } from "@/utils/regexp";
-import { AuthHeaders, ErrorMessages, IdentityGraphEdge } from "@/utils/types";
+import {
+  AuthHeaders,
+  ErrorMessages,
+  IdentityGraphEdge,
+  LinksItem,
+} from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "../../[handle]/utils";
 
@@ -14,7 +19,7 @@ export const resolveENSResponse = async (
   handle: string,
   headers: AuthHeaders,
   _platform?: PlatformType,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   let identity,
     platform = "";
@@ -32,7 +37,7 @@ export const resolveENSResponse = async (
     identity,
     platform as PlatformType,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
 
   if (res.msg) {
@@ -65,9 +70,9 @@ export const resolveENSResponse = async (
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
   }
-  const linksObj = await getLinks(
+  const linksObj: Record<string, LinksItem> = await getLinks(
     profile.texts,
-    res.data.identity.identityGraph?.edges
+    res.data.identity.identityGraph?.edges,
   );
   return {
     address: isValidEthereumAddress(profile.identity)
@@ -84,7 +89,7 @@ export const resolveENSResponse = async (
     email: profile.texts?.email,
     location: profile.texts?.location,
     header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner
+      profile.texts?.header || profile.texts?.banner,
     ),
     contenthash: profile.contenthash,
     links: linksObj,
@@ -99,7 +104,7 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
   let res = {} as any;
   keys.forEach((i) => {
     key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-      PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+      PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
     );
     if (key) {
       res[key] = {

@@ -1,4 +1,5 @@
 import { PlatformType } from "./platform";
+import { SourceType } from "./source";
 
 export interface AuthHeaders {
   authorization?: string;
@@ -13,7 +14,7 @@ export interface ParamsType {
 export type LinksItem = {
   link: string | null;
   handle: string | null;
-  sources: PlatformType[];
+  sources: SourceType[];
 };
 
 export interface errorHandleProps {
@@ -72,6 +73,8 @@ export interface IdentityGraphQueryResponse {
 export interface IdentityGraphEdge {
   source: string;
   target: string;
+  dataSource: string;
+  edgeType: string;
 }
 export interface IdentityRecord {
   id: string;
