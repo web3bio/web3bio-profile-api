@@ -178,6 +178,12 @@ export const uglify = (input: string, platform: PlatformType) => {
         : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
+    case PlatformType.linea:
+      return input.endsWith(".linea")
+        ? `${input}.eth`
+        : input.endsWith(".linea.eth")
+        ? input
+        : `${input}.linea.eth`;
     default:
       return input;
   }

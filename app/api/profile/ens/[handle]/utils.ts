@@ -19,7 +19,7 @@ export const resolveENSResponse = async (
   handle: string,
   headers: AuthHeaders,
   _platform?: PlatformType,
-  ns?: boolean,
+  ns?: boolean
 ) => {
   let identity,
     platform = "";
@@ -37,7 +37,7 @@ export const resolveENSResponse = async (
     identity,
     platform as PlatformType,
     GET_PROFILES(ns),
-    headers,
+    headers
   );
 
   if (res.msg) {
@@ -72,7 +72,7 @@ export const resolveENSResponse = async (
   }
   const linksObj: Record<string, LinksItem> = await getLinks(
     profile.texts,
-    res.data.identity.identityGraph?.edges,
+    res.data.identity.identityGraph?.edges
   );
   return {
     address: isValidEthereumAddress(profile.identity)
@@ -80,16 +80,17 @@ export const resolveENSResponse = async (
       : profile.address?.toLowerCase(),
     identity: profile.identity,
     platform:
-      _platform || isValidEthereumAddress(profile.identity)
+      _platform ||
+      (isValidEthereumAddress(profile.identity)
         ? PlatformType.ethereum
-        : PlatformType.ens,
+        : PlatformType.ens),
     displayName: profile.displayName || handle,
     avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description,
     email: profile.texts?.email,
     location: profile.texts?.location,
     header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner,
+      profile.texts?.header || profile.texts?.banner
     ),
     contenthash: profile.contenthash,
     links: linksObj,
@@ -104,7 +105,7 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
   let res = {} as any;
   keys.forEach((i) => {
     key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-      PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
+      PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
     );
     if (key) {
       res[key] = {
