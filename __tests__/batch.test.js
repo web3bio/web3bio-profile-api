@@ -16,6 +16,8 @@ describe("Test For Batch Query", () => {
     "dwr.eth.farcaster",
     "farcaster,suji",
     "lens,stani.lens",
+    "linea,0xthor.linea.eth",
+    "184.linea",
   ];
 
   // it("It should response 200 for Batch Query POST", async () => {
@@ -32,6 +34,7 @@ describe("Test For Batch Query", () => {
   it("It should response 200 for Batch Query GET", async () => {
     const url = `/profile/batch/${encodeURIComponent(JSON.stringify(getIds))}`;
     const res = await queryClient(url);
+    console.log(url);
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.length).toBe(getIds.length);
