@@ -7,7 +7,7 @@ import {
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const resolveLensHandle = async (
   handle: string,

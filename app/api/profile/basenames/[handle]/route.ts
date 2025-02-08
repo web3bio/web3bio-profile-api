@@ -8,8 +8,8 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexBasenames, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
+import { resolveEtherResponse } from "@/utils/utils";
 import { NextRequest } from "next/server";
-import { resolveENSResponse } from "../../ens/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const json = await resolveENSResponse(
+    const json = await resolveEtherResponse(
       inputName,
       headers,
       PlatformType.basenames

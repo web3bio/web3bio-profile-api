@@ -6,7 +6,7 @@ import {
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const resolveDotbitHandle = async (
   handle: string,

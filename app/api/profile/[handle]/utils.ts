@@ -7,7 +7,6 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { SourceType } from "@/utils/source";
 import {
   GET_PROFILES,
   primaryDomainResolvedRequestArray,
@@ -31,6 +30,7 @@ import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
 import { processJson } from "../../graph/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -411,19 +411,4 @@ export const resolveUniversalHandle = async (
   }
 };
 
-export const resolveVerifiedLink = (
-  key: string,
-  edges?: IdentityGraphEdge[]
-) => {
-  const res = [] as SourceType[];
 
-  if (!edges?.length) return res;
-
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.dataSource.split(",")[0];
-      if (!res.includes(source as SourceType)) res.push(source as SourceType);
-    });
-  return res;
-};

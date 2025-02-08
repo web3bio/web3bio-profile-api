@@ -5,7 +5,7 @@ import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
 import { formatText } from "@/utils/base";
 import { regexSolana } from "@/utils/regexp";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 

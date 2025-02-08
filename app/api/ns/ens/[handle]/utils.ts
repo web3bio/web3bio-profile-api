@@ -1,7 +1,7 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { resolveENSResponse } from "@/app/api/profile/ens/[handle]/utils";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { resolveEtherResponse } from "@/utils/utils";
 
 export const resolveENSRespondNS = async (
   handle: string,
@@ -9,7 +9,7 @@ export const resolveENSRespondNS = async (
   _platform?: PlatformType
 ) => {
   try {
-    const profile = await resolveENSResponse(handle, headers, _platform, true);
+    const profile = await resolveEtherResponse(handle, headers, _platform, true);
     let json = {};
     if ((profile as any).code) {
       return errorHandle({

@@ -10,12 +10,11 @@ import {
   AuthHeaders,
   ErrorMessages,
   IdentityGraphEdge,
-  LinksItem,
 } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { SourceType } from "./source";
 
-export const resolveENSResponse = async (
+export const resolveEtherResponse = async (
   handle: string,
   headers: AuthHeaders,
   _platform?: PlatformType,
@@ -28,6 +27,7 @@ export const resolveENSResponse = async (
     identity = handle.toLowerCase();
     platform = _platform || PlatformType.ethereum;
   } else {
+    console.log(handle,'kkk')
     if (!regexEns.test(handle))
       throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
     identity = handle;
@@ -70,10 +70,6 @@ export const resolveENSResponse = async (
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
   }
-  const linksObj: Record<string, LinksItem> = await getLinks(
-    profile.texts,
-    res.data.identity.identityGraph?.edges
-  );
   return {
     address: isValidEthereumAddress(profile.identity)
       ? profile.identity.toLowerCase()
@@ -93,7 +89,10 @@ export const resolveENSResponse = async (
       profile.texts?.header || profile.texts?.banner
     ),
     contenthash: profile.contenthash,
-    links: linksObj,
+    links: await getLinks(
+      profile.texts,
+      res.data.identity.identityGraph?.edges
+    ),
     social: {},
   };
 };
@@ -115,5 +114,23 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
       };
     }
   });
+  return res;
+};
+
+
+export const resolveVerifiedLink = (
+  key: string,
+  edges?: IdentityGraphEdge[]
+) => {
+  const res = [] as SourceType[];
+
+  if (!edges?.length) return res;
+
+  edges
+    .filter((x) => x.target === key)
+    .forEach((x) => {
+      const source = x.dataSource.split(",")[0];
+      if (!res.includes(source as SourceType)) res.push(source as SourceType);
+    });
   return res;
 };
