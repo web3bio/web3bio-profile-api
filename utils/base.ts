@@ -17,6 +17,7 @@ import {
   regexGenome,
   regexCluster,
   regexNext,
+  regexLinea,
 } from "./regexp";
 import { AuthHeaders, errorHandleProps } from "./types";
 import { NextRequest, NextResponse } from "next/server";
@@ -118,6 +119,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
   return [
     PlatformType.ens,
     PlatformType.basenames,
+    PlatformType.linea,
     PlatformType.ethereum,
     PlatformType.farcaster,
     PlatformType.lens,
@@ -131,6 +133,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
 
 const platformMap = new Map([
   [regexBasenames, PlatformType.basenames],
+  [regexLinea, PlatformType.linea],
   [regexEns, PlatformType.ens],
   [regexEth, PlatformType.ethereum],
   [regexLens, PlatformType.lens],
@@ -164,6 +167,9 @@ export const prettify = (input: string) => {
   if (input.endsWith(".base.eth") || input.endsWith(".base")) {
     return input.split(".")[0] + ".base.eth";
   }
+  if (input.endsWith(".linea.eth") || input.endsWith(".linea")) {
+    return input.split(".")[0] + ".linea.eth";
+  }
   return input;
 };
 
@@ -178,6 +184,12 @@ export const uglify = (input: string, platform: PlatformType) => {
         : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
+    case PlatformType.linea:
+      return input.endsWith(".linea")
+        ? `${input}.eth`
+        : input.endsWith(".linea.eth")
+        ? input
+        : `${input}.linea.eth`;
     default:
       return input;
   }

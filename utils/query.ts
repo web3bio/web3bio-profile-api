@@ -13,7 +13,7 @@ import {
 } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
-  if (identity.isPrimary) return true;
+  if (identity.isPrimary && identity.platform !== PlatformType.linea) return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
     identity.platform
   );
@@ -158,6 +158,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
         PlatformType.dotbit,
+        PlatformType.linea
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =

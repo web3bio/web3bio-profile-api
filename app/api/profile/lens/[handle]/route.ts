@@ -1,6 +1,11 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexLens } from "@/utils/regexp";
+import { regexLens } from "@/utils/regexp";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveLensHandle } from "./utils";
@@ -29,21 +34,18 @@ const resolveLensRespond = async (handle: string, headers: AuthHeaders) => {
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle");
-  const lowercaseName = inputName?.toLowerCase() || "";
+  const handle = searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
   if (
-    ![regexLens.test(lowercaseName), regexEth.test(lowercaseName)].some(
-      (x) => !!x
-    )
+    ![regexLens.test(handle), !isValidEthereumAddress(handle)].some((x) => !!x)
   )
     return errorHandle({
-      identity: lowercaseName,
+      identity: handle,
       platform: PlatformType.lens,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveLensRespond(lowercaseName, headers);
+  return resolveLensRespond(handle, headers);
 }
 
 export const runtime = "edge";

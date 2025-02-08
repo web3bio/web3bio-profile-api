@@ -8,7 +8,7 @@ import {
   ProfileRecord,
 } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 const resolveFarcasterLinks = (
   profile: ProfileRecord,

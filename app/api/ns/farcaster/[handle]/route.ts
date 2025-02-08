@@ -1,11 +1,12 @@
 import {
   errorHandle,
   getUserHeaders,
+  isValidEthereumAddress,
   prettify,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexFarcaster, regexSolana } from "@/utils/regexp";
+import { regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveFarcasterHandleNS } from "./utils";
@@ -21,7 +22,7 @@ export async function GET(req: NextRequest) {
 
   if (
     ![
-      regexEth.test(resolvedHandle),
+      isValidEthereumAddress(resolvedHandle),
       regexSolana.test(resolvedHandle),
       regexFarcaster.test(resolvedHandle),
       /#\d+/.test(handle),

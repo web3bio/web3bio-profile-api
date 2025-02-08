@@ -54,4 +54,20 @@ describe("Test For Universal NS API", () => {
       ).length
     ).toBe(0);
   });
+  it("It should response 200 data for 184.linea.eth", async () => {
+    const res = await queryClient("/ns/184.linea");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.length > 0).toBeTruthy();
+    expect(json[0].identity).toBe("184.linea.eth");
+    expect(json[1].platform).toBe("ens");
+  });
+  it("It should response 200 data for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
+    const res = await queryClient(
+      "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.some((x) => x.platform === "linea")).toBe(false);
+  });
 });

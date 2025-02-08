@@ -7,7 +7,7 @@ import {
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const resolveLensHandle = async (
   handle: string,
@@ -37,7 +37,7 @@ export const resolveLensHandle = async (
   let linksObj = {
     [PlatformType.lens]: {
       link: getSocialMediaLink(pureHandle, PlatformType.lens),
-      handle: pureHandle,
+      handle: profile.identity,
       sources: resolveVerifiedLink(
         `${PlatformType.lens},${profile.identity}`,
         response.data.identity.identityGraph?.edges

@@ -14,7 +14,10 @@ import {
   ProfileNSResponse,
 } from "@/utils/types";
 import { PlatformType } from "@/utils/platform";
-import { IDENTITY_GRAPH_SERVER, generateProfileStruct } from "../../[handle]/utils";
+import {
+  IDENTITY_GRAPH_SERVER,
+  generateProfileStruct,
+} from "../../[handle]/utils";
 
 const SUPPORTED_PLATFORMS = [
   PlatformType.ens,
@@ -22,6 +25,7 @@ const SUPPORTED_PLATFORMS = [
   PlatformType.farcaster,
   PlatformType.lens,
   PlatformType.basenames,
+  PlatformType.linea,
 ];
 
 export async function handleRequest(
@@ -118,6 +122,12 @@ export function filterIds(ids: string[]) {
         (x.endsWith(".base") || x.endsWith(".base.eth"))
       ) {
         return `${PlatformType.basenames},${prettify(x)}`;
+      }
+      if (
+        !x.includes(",") &&
+        (x.endsWith(".linea") || x.endsWith(".linea.eth"))
+      ) {
+        return `${PlatformType.linea},${prettify(x)}`;
       }
       if (!x.includes(",") && x.endsWith(".farcaster")) {
         return `${PlatformType.farcaster},${prettify(x)}`;

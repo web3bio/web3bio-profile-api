@@ -16,6 +16,8 @@ describe("Test For Batch Query", () => {
     "dwr.eth.farcaster",
     "farcaster,suji",
     "lens,stani.lens",
+    "linea,0xthor.linea.eth",
+    "184.linea",
   ];
 
   // it("It should response 200 for Batch Query POST", async () => {
