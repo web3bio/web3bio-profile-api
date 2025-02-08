@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveEtherRespond(handle, headers, PlatformType.basenames, true);
+  return resolveEtherRespond(handle, PlatformType.basenames, headers, true);
 }
 
 export const runtime = "edge";

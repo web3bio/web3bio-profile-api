@@ -4,20 +4,20 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, Links } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "@/utils/utils";
 
 export const resolveDotbitHandle = async (
   handle: string,
   headers: AuthHeaders,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.dotbit,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
   if (response.msg) {
     return {
@@ -41,24 +41,25 @@ export const resolveDotbitHandle = async (
   };
 
   if (ns) return nsObj;
-  const linksObj: Record<string, LinksItem> = {};
+  let linksObj: Partial<Links> = {};
 
   if (profile?.texts) {
-    const keys = Object.keys(profile.texts);
-    keys.forEach((x) => {
-      if (PLATFORM_DATA.has(x as PlatformType)) {
-        const item = profile.texts[x];
-        const handle = resolveHandle(item, x as PlatformType);
-        linksObj[x] = {
-          link: getSocialMediaLink(item, x as PlatformType)!,
+    Object.entries(profile.texts)
+      .filter(([key]) => PLATFORM_DATA.has(key as PlatformType))
+      .forEach(([key, value]) => {
+        const platformKey = key as PlatformType;
+        const platformValue = (value as string) || "";
+        const handle = resolveHandle(platformValue, platformKey);
+
+        linksObj[platformKey] = {
+          link: getSocialMediaLink(platformValue, platformKey)!,
           handle,
           sources: resolveVerifiedLink(
-            `${x},${handle}`,
-            response?.data?.identityGraph?.edges
+            `${key},${handle}`,
+            response?.data?.identityGraph?.edges,
           ),
         };
-      }
-    });
+      });
   }
 
   return {

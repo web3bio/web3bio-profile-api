@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
       }
       if (rawAvatarUrl?.includes(".webp")) {
         avatarURL = `${BASE_URL}/avatar/process?url=${encodeURIComponent(
-          rawAvatarUrl
+          rawAvatarUrl,
         )}`;
       }
       try {

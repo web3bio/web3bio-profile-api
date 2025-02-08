@@ -10,9 +10,8 @@ import { resolveUniversalHandle } from "./utils";
 import { regexSolana, regexBtc } from "@/utils/regexp";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
+  const handle = req.nextUrl.searchParams.get("handle") || "";
   const headers = getUserHeaders(req);
-  const handle = searchParams.get("handle") || "";
   const inputName = [regexSolana, regexBtc].some((x) => x.test(handle))
     ? handle
     : handle.toLowerCase();
@@ -26,7 +25,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return await resolveUniversalHandle(inputName, platform, headers, false);
+  return resolveUniversalHandle(inputName, platform, headers, false);
 }
 
 export const runtime = "edge";

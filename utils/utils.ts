@@ -10,7 +10,12 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { AuthHeaders, ErrorMessages, IdentityGraphEdge } from "@/utils/types";
+import {
+  AuthHeaders,
+  ErrorMessages,
+  IdentityGraphEdge,
+  Links,
+} from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 
@@ -18,7 +23,7 @@ export const resolveEtherResponse = async (
   handle: string,
   headers: AuthHeaders,
   platform: PlatformType,
-  ns: boolean
+  ns: boolean,
 ) => {
   let identity = "";
 
@@ -31,7 +36,7 @@ export const resolveEtherResponse = async (
     identity,
     platform as PlatformType,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
   if (res.msg) {
     return {
@@ -85,12 +90,12 @@ export const resolveEtherResponse = async (
         email: profile.texts?.email,
         location: profile.texts?.location,
         header: await resolveEipAssetURL(
-          profile.texts?.header || profile.texts?.banner
+          profile.texts?.header || profile.texts?.banner,
         ),
         contenthash: profile.contenthash,
         links: await getLinks(
           profile.texts,
-          res.data.identity.identityGraph?.edges
+          res.data.identity.identityGraph?.edges,
         ),
         social: {},
       };
@@ -98,18 +103,19 @@ export const resolveEtherResponse = async (
 
 const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
   if (!texts) return {};
-  const keys = Object.keys(texts);
-  let key = null;
-  let res = {} as any;
-  keys.forEach((i) => {
-    key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-      PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
-    );
-    if (key) {
-      res[key] = {
-        link: getSocialMediaLink(texts[i], key),
-        handle: resolveHandle(texts[i], key),
-        sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
+  const res: Partial<Links> = {};
+
+  Object.entries(texts).forEach(([textKey, textValue]) => {
+    const platformKey = Array.from(PLATFORM_DATA.entries()).find(([_, data]) =>
+      data.ensText?.includes(textKey.toLowerCase()),
+    )?.[0];
+    const platformValue = textValue as string;
+
+    if (platformKey && platformValue) {
+      res[platformKey] = {
+        link: getSocialMediaLink(platformValue, platformKey),
+        handle: resolveHandle(platformValue, platformKey),
+        sources: resolveVerifiedLink(`${platformKey},${platformValue}`, edges),
       };
     }
   });
@@ -118,7 +124,7 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
 
 export const resolveVerifiedLink = (
   key: string,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ) => {
   const res = [] as SourceType[];
 
@@ -135,16 +141,16 @@ export const resolveVerifiedLink = (
 
 export const resolveEtherRespond = async (
   handle: string,
-  headers: AuthHeaders,
   platform: PlatformType,
-  ns: boolean
+  headers: AuthHeaders,
+  ns: boolean,
 ) => {
   try {
     const json = (await resolveEtherResponse(
       handle,
       headers,
       platform,
-      ns
+      ns,
     )) as any;
     if (json.code) {
       return errorHandle({

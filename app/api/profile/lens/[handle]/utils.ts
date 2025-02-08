@@ -5,20 +5,20 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, Links } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { resolveVerifiedLink } from "@/utils/utils";
 
 export const resolveLensHandle = async (
   handle: string,
   headers: AuthHeaders,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.lens,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
   if (response.msg) {
     return {
@@ -40,17 +40,17 @@ export const resolveLensHandle = async (
       handle: profile.identity,
       sources: resolveVerifiedLink(
         `${PlatformType.lens},${profile.identity}`,
-        response.data.identity.identityGraph?.edges
+        response.data.identity.identityGraph?.edges,
       ),
     },
-  } as any;
+  } as Partial<Links>;
   if (profile.texts) {
     const keys = Object.keys(profile.texts);
     keys.forEach((i) => {
       if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
         let key = null;
         key = Array.from(PLATFORM_DATA.keys()).find(
-          (k) => k === i.toLowerCase()
+          (k) => k === i.toLowerCase(),
         );
         if (key) {
           const resolvedHandle = resolveHandle(profile.texts[i]);
@@ -59,7 +59,7 @@ export const resolveLensHandle = async (
             handle: resolvedHandle,
             sources: resolveVerifiedLink(
               resolvedHandle || "",
-              response.data.identity.identityGraph?.edges
+              response.data.identity.identityGraph?.edges,
             ),
           };
         }
@@ -69,8 +69,8 @@ export const resolveLensHandle = async (
   const avatarUri = profile.avatar
     ? await resolveEipAssetURL(profile?.avatar)
     : profile?.social?.uid
-    ? await getLensDefaultAvatar(Number(profile?.social?.uid))
-    : null;
+      ? await getLensDefaultAvatar(Number(profile?.social?.uid))
+      : null;
   const resJSON = {
     address: profile.address,
     identity: profile.identity,
@@ -81,7 +81,7 @@ export const resolveLensHandle = async (
     description: profile.description,
     location: profile.texts?.location || null,
     header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner
+      profile.texts?.header || profile.texts?.banner,
     ),
     contenthash: null,
     links: linksObj,
