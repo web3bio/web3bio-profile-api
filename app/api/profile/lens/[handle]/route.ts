@@ -36,9 +36,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  if (
-    ![regexLens.test(handle), !isValidEthereumAddress(handle)].some((x) => !!x)
-  )
+  if (!regexLens.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.lens,

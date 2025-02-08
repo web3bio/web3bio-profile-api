@@ -55,7 +55,7 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
 
 export const isSameAddress = (
   address?: string,
-  otherAddress?: string
+  otherAddress?: string,
 ): boolean => {
   if (!address || !otherAddress) return false;
   return address.toLowerCase() === otherAddress.toLowerCase();
@@ -76,7 +76,7 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    }
+    },
   );
 };
 
@@ -99,11 +99,11 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars
+      string.length - chars,
     )}`;
   } else {
     return `${string.substring(0, chars + 1)}...${string.substring(
-      string.length - (chars + 1)
+      string.length - (chars + 1),
     )}`;
   }
 };
@@ -159,16 +159,13 @@ export const handleSearchPlatform = (term: string) => {
   return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
 };
 
-export const prettify = (input: string) => {
+export const prettify = (input: string): string => {
   if (!input) return "";
   if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
-    return input.replace(".farcaster", "").replace(".fcast.id", "");
+    return input.replace(/(\.farcaster|\.fcast\.id)$/, "");
   }
-  if (input.endsWith(".base.eth") || input.endsWith(".base")) {
-    return input.split(".")[0] + ".base.eth";
-  }
-  if (input.endsWith(".linea.eth") || input.endsWith(".linea")) {
-    return input.split(".")[0] + ".linea.eth";
+  if (input.endsWith(".base") || input.endsWith(".linea")) {
+    return input.split(".")[0] + "." + input.split(".").pop() + ".eth";
   }
   return input;
 };
@@ -177,19 +174,23 @@ export const uglify = (input: string, platform: PlatformType) => {
   if (!input) return "";
   switch (platform) {
     case PlatformType.basenames:
-      return input.endsWith(".base")
-        ? `${input}.eth`
-        : input.endsWith(".base.eth")
+      return input.endsWith(".base.eth")
         ? input
-        : `${input}.base.eth`;
+        : input.endsWith(".base")
+          ? `${input}.eth`
+          : `${input}.base.eth`;
     case PlatformType.farcaster:
-      return input.endsWith(".farcaster") ? input : `${input}.farcaster`;
-    case PlatformType.linea:
-      return input.endsWith(".linea")
-        ? `${input}.eth`
-        : input.endsWith(".linea.eth")
+      return input.endsWith(".farcaster") || input.endsWith(".fcast.id")
         ? input
-        : `${input}.linea.eth`;
+        : `${input}.farcaster`;
+    case PlatformType.lens:
+      return input.endsWith(".lens") ? input : `${input}.lens`;
+    case PlatformType.linea:
+      return input.endsWith(".linea.eth")
+        ? input
+        : input.endsWith(".linea")
+          ? `${input}.eth`
+          : `${input}.linea.eth`;
     default:
       return input;
   }
