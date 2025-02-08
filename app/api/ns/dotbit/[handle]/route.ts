@@ -1,7 +1,7 @@
 import { resolveDotbitHandle } from "@/app/api/profile/dotbit/[handle]/utils";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, isValidEthereumAddress, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexDotbit, regexEth } from "@/utils/regexp";
+import { regexDotbit } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
@@ -10,7 +10,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  if (!regexDotbit.test(handle) && !regexEth.test(handle)) {
+  if (!regexDotbit.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.dotbit,

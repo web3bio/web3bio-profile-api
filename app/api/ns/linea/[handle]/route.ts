@@ -7,24 +7,24 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexEth, regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
+import { resolveEtherRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
-import { resolveENSRespondNS } from "../../ens/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const headers = getUserHeaders(req);
   const inputName = searchParams.get("handle") || "";
-  const lowercaseName = isValidEthereumAddress(inputName)
+  const handle = isValidEthereumAddress(inputName)
     ? inputName
     : uglify(inputName?.toLowerCase(), PlatformType.linea);
-  if (!regexLinea.test(lowercaseName) && !regexEth.test(lowercaseName))
+  if (!regexLinea.test(handle) && !regexEth.test(handle))
     return errorHandle({
-      identity: lowercaseName,
+      identity: handle,
       platform: PlatformType.linea,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveENSRespondNS(lowercaseName, headers, PlatformType.linea);
+  return resolveEtherRespond(handle, headers, PlatformType.linea, true);
 }
 
 export const runtime = "edge";

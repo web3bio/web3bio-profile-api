@@ -1,40 +1,26 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexEns, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveEtherResponse } from "@/utils/utils";
+import { resolveEtherRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  if (!regexEns.test(handle) && !regexEth.test(handle))
+  if (!regexEns.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.ens,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  try {
-    const json = await resolveEtherResponse(handle, headers);
-    if (json.code) {
-      return errorHandle({
-        identity: handle,
-        platform: PlatformType.ens,
-        code: json.code,
-        message: json.message,
-      });
-    }
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.ens,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
+  return resolveEtherRespond(handle, headers, PlatformType.ens, false);
 }
 
 export const runtime = "edge";

@@ -1,37 +1,34 @@
-import { formatText, isValidEthereumAddress } from "@/utils/base";
+import {
+  errorHandle,
+  formatText,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { regexEns } from "@/utils/regexp";
-import {
-  AuthHeaders,
-  ErrorMessages,
-  IdentityGraphEdge,
-} from "@/utils/types";
+import { AuthHeaders, ErrorMessages, IdentityGraphEdge } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 
 export const resolveEtherResponse = async (
   handle: string,
   headers: AuthHeaders,
-  _platform?: PlatformType,
-  ns?: boolean
+  _platform: PlatformType,
+  ns: boolean
 ) => {
   let identity,
     platform = "";
 
   if (isValidEthereumAddress(handle)) {
     identity = handle.toLowerCase();
-    platform = _platform || PlatformType.ethereum;
+    platform = _platform;
   } else {
-    console.log(handle,'kkk')
-    if (!regexEns.test(handle))
-      throw new Error(ErrorMessages.invalidIdentity, { cause: 404 });
     identity = handle;
-    platform = _platform || PlatformType.ens;
+    platform = _platform;
   }
   const res = await queryIdentityGraph(
     identity,
@@ -39,62 +36,67 @@ export const resolveEtherResponse = async (
     GET_PROFILES(ns),
     headers
   );
-
   if (res.msg) {
     return {
       identity: handle,
-      platform: _platform || PlatformType.ethereum,
+      platform: _platform,
       message: res.msg,
       code: res.code,
     };
   }
 
   const profile = res?.data?.identity?.profile;
+  // ens empty resolved address
   if (!profile) {
     if (isValidEthereumAddress(handle)) {
-      return {
-        address: handle,
-        identity: handle,
-        platform: _platform || PlatformType.ethereum,
-        displayName: formatText(handle),
-        avatar: null,
-        description: null,
-        email: null,
-        location: null,
-        header: null,
-        contenthash: null,
-        links: {},
-        social: {},
-      };
+      if (_platform === PlatformType.ens) {
+        return {
+          address: handle,
+          identity: handle,
+          platform: PlatformType.ethereum,
+          displayName: formatText(handle),
+          avatar: null,
+          description: null,
+          email: null,
+          location: null,
+          header: null,
+          contenthash: null,
+          links: {},
+          social: {},
+        };
+      } else {
+        throw new Error(ErrorMessages.notFound, { cause: 404 });
+      }
     } else {
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
   }
-  return {
+  const nsResponse = {
     address: isValidEthereumAddress(profile.identity)
       ? profile.identity.toLowerCase()
       : profile.address?.toLowerCase(),
     identity: profile.identity,
-    platform:
-      _platform ||
-      (isValidEthereumAddress(profile.identity)
-        ? PlatformType.ethereum
-        : PlatformType.ens),
+    platform: _platform,
     displayName: profile.displayName || handle,
     avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description,
-    email: profile.texts?.email,
-    location: profile.texts?.location,
-    header: await resolveEipAssetURL(
-      profile.texts?.header || profile.texts?.banner
-    ),
-    contenthash: profile.contenthash,
-    links: await getLinks(
-      profile.texts,
-      res.data.identity.identityGraph?.edges
-    ),
-    social: {},
   };
+  return ns
+    ? nsResponse
+    : {
+        ...nsResponse,
+        email: profile.texts?.email,
+        location: profile.texts?.location,
+        header: await resolveEipAssetURL(
+          profile.texts?.header || profile.texts?.banner
+        ),
+        contenthash: profile.contenthash,
+        links: await getLinks(
+          profile.texts,
+          res.data.identity.identityGraph?.edges
+        ),
+        social: {},
+      };
 };
 
 const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
@@ -117,7 +119,6 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
   return res;
 };
 
-
 export const resolveVerifiedLink = (
   key: string,
   edges?: IdentityGraphEdge[]
@@ -133,4 +134,36 @@ export const resolveVerifiedLink = (
       if (!res.includes(source as SourceType)) res.push(source as SourceType);
     });
   return res;
+};
+
+export const resolveEtherRespond = async (
+  handle: string,
+  headers: AuthHeaders,
+  platform: PlatformType,
+  ns: boolean
+) => {
+  try {
+    const json = (await resolveEtherResponse(
+      handle,
+      headers,
+      platform,
+      ns
+    )) as any;
+    if (json.code) {
+      return errorHandle({
+        identity: handle,
+        platform: platform,
+        code: json.code,
+        message: json.message,
+      });
+    }
+    return respondWithCache(JSON.stringify(json));
+  } catch (e: any) {
+    return errorHandle({
+      identity: handle,
+      platform: platform,
+      code: e.cause || 500,
+      message: e.message,
+    });
+  }
 };
