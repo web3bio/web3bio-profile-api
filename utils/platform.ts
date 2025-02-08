@@ -1042,7 +1042,7 @@ export const PLATFORM_DATA: ReadonlyMap<
 ]);
 
 export const SocialPlatformMapping = (
-  platform: PlatformType,
+  platform: PlatformType
 ): Readonly<SocialPlatform> => {
   return (
     PLATFORM_DATA.get(platform) || { ...DEFAULT_PLATFORM, label: platform }

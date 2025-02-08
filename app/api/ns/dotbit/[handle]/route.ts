@@ -1,8 +1,8 @@
+import { resolveDotbitHandle } from "@/app/api/profile/dotbit/[handle]/utils";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit, regexEth } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveDotbitHandle } from "@/app/api/profile/dotbit/[handle]/utils";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";

@@ -90,7 +90,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
       const pureHandle = identity.replace(".lens", "");
       res[PlatformType.lens] = {
         link: getSocialMediaLink(pureHandle!, PlatformType.lens),
-        handle: pureHandle,
+        handle: identity,
         sources: resolveVerifiedLink(
           `${PlatformType.lens},${pureHandle}.lens`,
           edges
@@ -425,6 +425,5 @@ export const resolveVerifiedLink = (
       const source = x.dataSource.split(",")[0];
       if (!res.includes(source as SourceType)) res.push(source as SourceType);
     });
-
   return res;
 };

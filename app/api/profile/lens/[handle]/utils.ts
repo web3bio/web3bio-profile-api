@@ -37,7 +37,7 @@ export const resolveLensHandle = async (
   let linksObj = {
     [PlatformType.lens]: {
       link: getSocialMediaLink(pureHandle, PlatformType.lens),
-      handle: pureHandle,
+      handle: profile.identity,
       sources: resolveVerifiedLink(
         `${PlatformType.lens},${profile.identity}`,
         response.data.identity.identityGraph?.edges
