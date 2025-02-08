@@ -5,7 +5,7 @@ import {
   uglify,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexLinea } from "@/utils/regexp";
+import { regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveEtherRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   const handle = isValidEthereumAddress(inputName)
     ? inputName
     : uglify(inputName?.toLowerCase(), PlatformType.linea);
-  if (!regexLinea.test(handle) && !regexEth.test(handle))
+  if (!regexLinea.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.linea,

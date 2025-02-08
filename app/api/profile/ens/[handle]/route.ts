@@ -4,7 +4,7 @@ import {
   isValidEthereumAddress,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns, regexEth } from "@/utils/regexp";
+import { regexEns } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveEtherRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";

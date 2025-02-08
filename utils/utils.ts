@@ -17,18 +17,15 @@ import { SourceType } from "./source";
 export const resolveEtherResponse = async (
   handle: string,
   headers: AuthHeaders,
-  _platform: PlatformType,
+  platform: PlatformType,
   ns: boolean
 ) => {
-  let identity,
-    platform = "";
+  let identity = "";
 
   if (isValidEthereumAddress(handle)) {
     identity = handle.toLowerCase();
-    platform = _platform;
   } else {
     identity = handle;
-    platform = _platform;
   }
   const res = await queryIdentityGraph(
     identity,
@@ -39,7 +36,7 @@ export const resolveEtherResponse = async (
   if (res.msg) {
     return {
       identity: handle,
-      platform: _platform,
+      platform: platform,
       message: res.msg,
       code: res.code,
     };
@@ -49,7 +46,7 @@ export const resolveEtherResponse = async (
   // ens empty resolved address
   if (!profile) {
     if (isValidEthereumAddress(handle)) {
-      if (_platform === PlatformType.ens) {
+      if (platform === PlatformType.ens) {
         return {
           address: handle,
           identity: handle,
@@ -76,7 +73,7 @@ export const resolveEtherResponse = async (
       ? profile.identity.toLowerCase()
       : profile.address?.toLowerCase(),
     identity: profile.identity,
-    platform: _platform,
+    platform: platform,
     displayName: profile.displayName || handle,
     avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
     description: profile.description,
