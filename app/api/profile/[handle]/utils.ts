@@ -7,7 +7,6 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
-import { SourceType } from "@/utils/source";
 import {
   GET_PROFILES,
   primaryDomainResolvedRequestArray,
@@ -31,6 +30,7 @@ import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
 import { processJson } from "../../graph/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -49,7 +49,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
       let key = null;
       keys.forEach((i) => {
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
         );
         if (key && texts[i]) {
           res[key] = {
@@ -67,7 +67,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
         handle: resolvedHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.farcaster},${resolvedHandle}`,
-          edges,
+          edges
         ),
       };
       if (!data.description) break;
@@ -81,7 +81,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
           handle: resolveMatch,
           sources: resolveVerifiedLink(
             `${PlatformType.twitter},${resolveMatch}`,
-            edges,
+            edges
           ),
         };
       }
@@ -90,17 +90,17 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
       const pureHandle = identity.replace(".lens", "");
       res[PlatformType.lens] = {
         link: getSocialMediaLink(pureHandle!, PlatformType.lens),
-        handle: pureHandle,
+        handle: identity,
         sources: resolveVerifiedLink(
           `${PlatformType.lens},${pureHandle}.lens`,
-          edges,
+          edges
         ),
       };
       keys?.forEach((i) => {
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
           let key = null;
           key = Array.from(PLATFORM_DATA.keys()).find(
-            (k) => k === i.toLowerCase(),
+            (k) => k === i.toLowerCase()
           );
           if (key) {
             const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
@@ -180,7 +180,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
 export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
-  edges?: IdentityGraphEdge[],
+  edges?: IdentityGraphEdge[]
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
   const nsObj = {
     address: data.address,
@@ -190,8 +190,8 @@ export async function generateProfileStruct(
     avatar: data.avatar
       ? await resolveEipAssetURL(data.avatar, data.identity)
       : data.platform === PlatformType.lens && data?.social?.uid
-        ? await getLensDefaultAvatar(Number(data.social.uid))
-        : null,
+      ? await getLensDefaultAvatar(Number(data.social.uid))
+      : null,
     description: data.description || null,
   };
 
@@ -226,7 +226,7 @@ const DEFAULT_PLATFORM_ORDER = [
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[] | ProfileNSResponse[],
   targetPlatform: PlatformType,
-  handle: string,
+  handle: string
 ): ProfileAPIResponse[] {
   const order = [
     targetPlatform,
@@ -246,11 +246,11 @@ function sortProfilesByPlatform(
       i === 0
         ? [
             responses.find(
-              (x) => x.identity === handle && x.platform === targetPlatform,
+              (x) => x.identity === handle && x.platform === targetPlatform
             ),
           ]
-        : [],
-    ),
+        : []
+    )
   );
 
   return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
@@ -271,7 +271,7 @@ export const resolveWithIdentityGraph = async ({
     handle,
     platform,
     GET_PROFILES(false),
-    headers,
+    headers
   );
 
   if (response.msg) {
@@ -294,12 +294,12 @@ export const resolveWithIdentityGraph = async ({
   const profilesArray = primaryDomainResolvedRequestArray(
     resolvedResponse,
     handle,
-    platform,
+    platform
   )
     .reduce((pre, cur) => {
       if (
         !pre.some(
-          (i) => i.platform === cur.platform && i.identity === cur.identity,
+          (i) => i.platform === cur.platform && i.identity === cur.identity
         )
       ) {
         pre.push(cur);
@@ -313,7 +313,7 @@ export const resolveWithIdentityGraph = async ({
     const obj = await generateProfileStruct(
       profilesArray[i] as any,
       ns,
-      response.data.identity.identityGraph?.edges,
+      response.data.identity.identityGraph?.edges
     );
     responsesToSort.push(obj);
   }
@@ -339,7 +339,7 @@ export const resolveWithIdentityGraph = async ({
             location: null,
             header: null,
             links: {},
-          }) as ProfileAPIResponse,
+          }) as ProfileAPIResponse
     );
   }
 
@@ -348,7 +348,7 @@ export const resolveWithIdentityGraph = async ({
       cur &&
       !pre.find(
         (x: ProfileAPIResponse) =>
-          x.platform === cur.platform && x.identity === cur.identity,
+          x.platform === cur.platform && x.identity === cur.identity
       )
     ) {
       pre.push(cur as ProfileAPIResponse);
@@ -370,7 +370,7 @@ export const resolveUniversalHandle = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns?: boolean,
+  ns?: boolean
 ) => {
   const handleToQuery = prettify(handle);
 
@@ -411,20 +411,4 @@ export const resolveUniversalHandle = async (
   }
 };
 
-export const resolveVerifiedLink = (
-  key: string,
-  edges?: IdentityGraphEdge[],
-) => {
-  const res = [] as SourceType[];
 
-  if (!edges?.length) return res;
-
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.dataSource.split(",")[0];
-      if (!res.includes(source as SourceType)) res.push(source as SourceType);
-    });
-
-  return res;
-};

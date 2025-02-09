@@ -1,7 +1,12 @@
 import { resolveUDHandle } from "@/app/api/profile/unstoppabledomains/[handle]/utils";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexUnstoppableDomains } from "@/utils/regexp";
+import { regexUnstoppableDomains } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
@@ -10,7 +15,10 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  if (!regexUnstoppableDomains.test(handle) && !regexEth.test(handle)) {
+  if (
+    !regexUnstoppableDomains.test(handle) &&
+    !isValidEthereumAddress(handle)
+  ) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.unstoppableDomains,

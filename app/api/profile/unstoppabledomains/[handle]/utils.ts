@@ -3,7 +3,7 @@ import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 const formatContenthash = (string: string) => {
   if (string) {

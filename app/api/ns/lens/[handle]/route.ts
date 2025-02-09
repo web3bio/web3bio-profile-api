@@ -1,6 +1,11 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+  respondWithCache,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEth, regexLens } from "@/utils/regexp";
+import { regexLens } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveLensHandleNS } from "./utils";
@@ -10,7 +15,7 @@ export const runtime = "edge";
 export async function GET(req: NextRequest) {
   const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  if (!regexLens.test(handle) && !regexEth.test(handle)) {
+  if (!regexLens.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
       identity: handle,
       platform: PlatformType.lens,

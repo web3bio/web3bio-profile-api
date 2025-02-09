@@ -1,23 +1,27 @@
-import { errorHandle, getUserHeaders } from "@/utils/base";
+import {
+  errorHandle,
+  getUserHeaders,
+  isValidEthereumAddress,
+} from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { regexEns, regexEth } from "@/utils/regexp";
+import { regexEns } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
+import { resolveEtherRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
-import { resolveENSRespondNS } from "../../ens/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const inputName = searchParams.get("handle") || "";
+  const handle = searchParams.get("handle")?.toLowerCase() || "";
   const headers = getUserHeaders(req);
-  const lowercaseName = inputName?.toLowerCase();
-  if (!regexEns.test(lowercaseName) && !regexEth.test(lowercaseName))
+
+  if (!regexEns.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
-      identity: lowercaseName,
+      identity: handle,
       platform: PlatformType.ethereum,
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveENSRespondNS(lowercaseName, headers);
+  return resolveEtherRespond(handle, PlatformType.ens, headers, true);
 }
 
 export const runtime = "edge";
