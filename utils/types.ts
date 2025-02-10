@@ -11,6 +11,8 @@ export interface ParamsType {
   };
 }
 
+export type Links = Record<PlatformType, LinksItem>;
+
 export type LinksItem = {
   link: string | null;
   handle: string | null;
@@ -50,7 +52,7 @@ export interface ProfileAPIResponse extends ProfileNSResponse {
   header: string | null;
   location: string | null;
   error?: string;
-  links: Record<PlatformType, LinksItem> | {};
+  links: Links | {};
   social: SocialRecord | {};
 }
 

@@ -6,13 +6,14 @@ import {
   ErrorMessages,
   IdentityGraphEdge,
   ProfileRecord,
+  Links,
 } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 const resolveFarcasterLinks = (
   profile: ProfileRecord,
-  edges: IdentityGraphEdge[]
+  edges: IdentityGraphEdge[],
 ) => {
   const linksObj = {
     [PlatformType.farcaster]: {
@@ -20,10 +21,10 @@ const resolveFarcasterLinks = (
       handle: profile.identity,
       sources: resolveVerifiedLink(
         `${PlatformType.farcaster},${profile.identity}`,
-        edges
+        edges,
       ),
     },
-  } as any;
+  } as Partial<Links>;
   const twitterMatch = profile.description?.match(regexTwitterLink);
   if (twitterMatch) {
     const matched = twitterMatch[1];
@@ -33,7 +34,7 @@ const resolveFarcasterLinks = (
       handle: resolveMatch,
       sources: resolveVerifiedLink(
         `${PlatformType.twitter},${resolveMatch}`,
-        edges
+        edges,
       ),
     };
   }
@@ -43,13 +44,13 @@ const resolveFarcasterLinks = (
 export const resolveFarcasterHandle = async (
   handle: string,
   headers: AuthHeaders,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   const response = await queryIdentityGraph(
     handle,
     PlatformType.farcaster,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
 
   if (response.msg) {
@@ -64,7 +65,7 @@ export const resolveFarcasterHandle = async (
   if (!profile) throw new Error(ErrorMessages.notFound, { cause: 404 });
   const links = resolveFarcasterLinks(
     profile,
-    response.data.identity.identityGraph?.edges
+    response.data.identity.identityGraph?.edges,
   );
 
   return {
