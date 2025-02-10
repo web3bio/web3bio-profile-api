@@ -2,10 +2,10 @@ import { PlatformType } from "@/utils/platform";
 import { resolveIPFS_URL } from "@/utils/ipfs";
 import { getSocialMediaLink, resolveHandle } from "@/utils/resolver";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
-import { AuthHeaders, ErrorMessages, LinksItem } from "@/utils/types";
+import { AuthHeaders, ErrorMessages, Links } from "@/utils/types";
 import { formatText } from "@/utils/base";
 import { regexSolana } from "@/utils/regexp";
-import { resolveVerifiedLink } from "../../[handle]/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
 
@@ -33,13 +33,13 @@ export const recordsShouldFetch = [
 export const resolveSNSHandle = async (
   handle: string,
   headers: AuthHeaders,
-  ns?: boolean
+  ns?: boolean,
 ) => {
   const response = await queryIdentityGraph(
     handle,
     regexSolana.test(handle) ? PlatformType.solana : PlatformType.sns,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
 
   if (response.msg) {
@@ -80,20 +80,20 @@ export const resolveSNSHandle = async (
     }
   }
 
-  const linksObj: Record<string, LinksItem> = {};
+  const linksObj: Partial<Links> = {};
   if (profile.texts) {
     recordsShouldFetch.forEach((x) => {
       const handle = resolveHandle(profile?.texts[x]);
       if (handle) {
         const type = ["CNAME", PlatformType.url].includes(x)
           ? PlatformType.website
-          : x;
+          : (x as PlatformType);
         linksObj[type] = {
           link: getSocialMediaLink(handle, type)!,
           handle: handle,
           sources: resolveVerifiedLink(
             `${type},${handle}`,
-            response?.data?.identity?.identityGraph?.edges
+            response?.data?.identity?.identityGraph?.edges,
           ),
         };
       }

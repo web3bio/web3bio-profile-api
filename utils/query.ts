@@ -13,7 +13,8 @@ import {
 } from "./types";
 
 const directPass = (identity: IdentityRecord) => {
-  if (identity.isPrimary) return true;
+  if (identity.isPrimary && identity.platform !== PlatformType.linea)
+    return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
     identity.platform
   );
@@ -159,7 +160,8 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.basenames,
         PlatformType.unstoppableDomains,
         PlatformType.dotbit,
-        PlatformType.twitter
+        PlatformType.twitter,
+        PlatformType.linea,
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =
@@ -169,7 +171,7 @@ export const primaryDomainResolvedRequestArray = (
               x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
-              if(resolvedRecord.platform === PlatformType.twitter) return true
+              if (resolvedRecord.platform === PlatformType.twitter) return true;
               const sourceAddr =
                 resolvedRecord.platform === PlatformType.ethereum
                   ? resolvedRecord.identity
@@ -186,8 +188,10 @@ export const primaryDomainResolvedRequestArray = (
             ...x.profile,
             isPrimary: x.isPrimary,
           })) || [];
-      
-      return [PlatformType.ethereum, PlatformType.twitter].includes(resolvedRecord.platform)
+
+      return [PlatformType.ethereum, PlatformType.twitter].includes(
+        resolvedRecord.platform
+      )
         ? [...vertices]
         : [...vertices, defaultReturn];
     }

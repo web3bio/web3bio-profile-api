@@ -26,6 +26,7 @@ const SUPPORTED_PLATFORMS = [
   PlatformType.farcaster,
   PlatformType.lens,
   PlatformType.basenames,
+  PlatformType.linea,
 ];
 
 export async function handleRequest(
@@ -168,6 +169,12 @@ export function filterIds(ids: string[], includesTwitter?: boolean) {
         (x.endsWith(".base") || x.endsWith(".base.eth"))
       ) {
         return `${PlatformType.basenames},${prettify(x)}`;
+      }
+      if (
+        !x.includes(",") &&
+        (x.endsWith(".linea") || x.endsWith(".linea.eth"))
+      ) {
+        return `${PlatformType.linea},${prettify(x)}`;
       }
       if (!x.includes(",") && x.endsWith(".farcaster")) {
         return `${PlatformType.farcaster},${prettify(x)}`;

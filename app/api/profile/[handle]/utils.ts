@@ -30,6 +30,7 @@ import { regexTwitterLink } from "@/utils/regexp";
 import { UDSocialAccountsList } from "../unstoppabledomains/[handle]/utils";
 import { recordsShouldFetch } from "../sns/[handle]/utils";
 import { processJson } from "../../graph/utils";
+import { resolveVerifiedLink } from "@/utils/utils";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -62,7 +63,7 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     case PlatformType.farcaster:
       const resolvedHandle = resolveHandle(identity);
       res[PlatformType.farcaster] = {
-        links: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
+        link: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
         handle: resolvedHandle,
         sources: resolveVerifiedLink(
           `${PlatformType.farcaster},${resolvedHandle}`,
@@ -88,8 +89,8 @@ function generateSocialLinks(data: ProfileRecord, edges?: IdentityGraphEdge[]) {
     case PlatformType.lens:
       const pureHandle = identity.replace(".lens", "");
       res[PlatformType.lens] = {
-        links: getSocialMediaLink(pureHandle!, PlatformType.lens),
-        handle: pureHandle,
+        link: getSocialMediaLink(pureHandle!, PlatformType.lens),
+        handle: identity,
         sources: resolveVerifiedLink(
           `${PlatformType.lens},${pureHandle}.lens`,
           edges
@@ -409,19 +410,4 @@ export const resolveUniversalHandle = async (
   }
 };
 
-export const resolveVerifiedLink = (
-  key: PlatformType | string,
-  edges?: IdentityGraphEdge[]
-) => {
-  const res = [] as PlatformType[];
-  if (!edges?.length) return res;
 
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.source.split(",")[0];
-      if (!res.includes(source as PlatformType))
-        res.push(source as PlatformType);
-    });
-  return res;
-};

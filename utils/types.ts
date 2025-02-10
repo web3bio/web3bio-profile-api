@@ -1,4 +1,5 @@
 import { PlatformType } from "./platform";
+import { SourceType } from "./source";
 
 export interface AuthHeaders {
   authorization?: string;
@@ -10,10 +11,12 @@ export interface ParamsType {
   };
 }
 
+export type Links = Record<PlatformType, LinksItem>;
+
 export type LinksItem = {
   link: string | null;
   handle: string | null;
-  sources: PlatformType[];
+  sources: SourceType[];
 };
 
 export interface errorHandleProps {
@@ -49,7 +52,7 @@ export interface ProfileAPIResponse extends ProfileNSResponse {
   header: string | null;
   location: string | null;
   error?: string;
-  links: Record<PlatformType, LinksItem> | {};
+  links: Links | {};
   social: SocialRecord | {};
 }
 
@@ -72,6 +75,8 @@ export interface IdentityGraphQueryResponse {
 export interface IdentityGraphEdge {
   source: string;
   target: string;
+  dataSource: string;
+  edgeType: string;
 }
 export interface IdentityRecord {
   id: string;
