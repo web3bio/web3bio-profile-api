@@ -16,9 +16,9 @@ import {
 import { PlatformType } from "@/utils/platform";
 import {
   IDENTITY_GRAPH_SERVER,
-  generateProfileStruct,
   resolveWithIdentityGraph,
 } from "../../[handle]/utils";
+import { generateProfileStruct } from "@/utils/utils";
 
 const SUPPORTED_PLATFORMS = [
   PlatformType.ens,
@@ -42,7 +42,7 @@ export async function handleRequest(
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const queryIds = filterIds(ids);
+    const queryIds = filterIds(ids, true);
     const json = (await fetchIdentityGraphBatch(queryIds, ns, headers)) as any;
     if (json.code) {
       return errorHandle({
@@ -185,6 +185,7 @@ export function filterIds(ids: string[], includesTwitter?: boolean) {
       return x;
     })
     .filter((x) => {
+      console.log(x, "kkk");
       if (includesTwitter && x.split(",")[0] === PlatformType.twitter)
         return true;
       return (

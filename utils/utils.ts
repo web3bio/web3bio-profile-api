@@ -5,6 +5,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import {
+  getLensDefaultAvatar,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
@@ -14,10 +15,15 @@ import {
   AuthHeaders,
   ErrorMessages,
   IdentityGraphEdge,
-  Links,
+  ProfileAPIResponse,
+  ProfileNSResponse,
+  ProfileRecord,
 } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
+import { regexTwitterLink } from "@/utils/regexp";
+import { recordsShouldFetch } from "@/app/api/profile/sns/[handle]/utils";
+import { UDSocialAccountsList } from "@/app/api/profile/unstoppabledomains/[handle]/utils";
 
 export const resolveIdentityResponse = async (
   handle: string,
@@ -77,73 +83,50 @@ export const resolveIdentityResponse = async (
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
   }
-  const nsResponse = {
-    address: isValidEthereumAddress(profile.identity)
-      ? profile.identity.toLowerCase()
-      : [PlatformType.sns, PlatformType.solana].includes(profile.platform)
-      ? profile.address
-      : profile.address?.toLowerCase(),
-    identity: profile.identity,
-    platform: platform,
-    displayName: profile.displayName || handle,
-    avatar: await resolveEipAssetURL(profile.avatar, profile.identity),
-    description: profile.description,
-  };
-  return ns
-    ? nsResponse
-    : {
-        ...nsResponse,
-        email: profile.texts?.email,
-        location: profile.texts?.location,
-        header: await resolveEipAssetURL(
-          profile.texts?.header || profile.texts?.banner
-        ),
-        contenthash: profile.contenthash,
-        links: await getLinks(
-          profile.texts,
-          res.data.identity.identityGraph?.edges
-        ),
-        social: {},
-      };
+  return await generateProfileStruct(
+    profile,
+    ns,
+    res.data.identity?.identityGraph?.edges
+  );
 };
 
-const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
-  if (!texts) return {};
-  const res: Partial<Links> = {};
-
-  Object.entries(texts).forEach(([textKey, textValue]) => {
-    const platformKey = Array.from(PLATFORM_DATA.entries()).find(([_, data]) =>
-      data.ensText?.includes(textKey.toLowerCase())
-    )?.[0];
-    const platformValue = textValue as string;
-
-    if (platformKey && platformValue) {
-      res[platformKey] = {
-        link: getSocialMediaLink(platformValue, platformKey),
-        handle: resolveHandle(platformValue, platformKey),
-        sources: resolveVerifiedLink(`${platformKey},${platformValue}`, edges),
-      };
-    }
-  });
-  return res;
-};
-
-export const resolveVerifiedLink = (
-  key: string,
+export async function generateProfileStruct(
+  data: ProfileRecord,
+  ns?: boolean,
   edges?: IdentityGraphEdge[]
-) => {
-  const res = [] as SourceType[];
+): Promise<ProfileAPIResponse | ProfileNSResponse> {
+  const nsObj = {
+    address: data.address,
+    identity: data.identity,
+    platform: data.platform,
+    displayName: data.displayName,
+    avatar: data.avatar
+      ? await resolveEipAssetURL(data.avatar, data.identity)
+      : data.platform === PlatformType.lens && data?.social?.uid
+      ? await getLensDefaultAvatar(Number(data.social.uid))
+      : null,
+    description: data.description || null,
+  };
 
-  if (!edges?.length) return res;
-
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.dataSource.split(",")[0];
-      if (!res.includes(source as SourceType)) res.push(source as SourceType);
-    });
-  return res;
-};
+  return ns
+    ? nsObj
+    : {
+        ...nsObj,
+        email: data.texts?.email || null,
+        location: data.texts?.location || null,
+        header: (await resolveEipAssetURL(data.texts?.header)) || null,
+        contenthash: data.contenthash || null,
+        links: generateSocialLinks(data, edges) || {},
+        social: data.social
+          ? {
+              ...data.social,
+              uid: isNaN(data.social.uid)
+                ? data.social.uid
+                : Number(data.social.uid),
+            }
+          : {},
+      };
+}
 
 export const resolveIdentityRespond = async (
   handle: string,
@@ -175,4 +158,166 @@ export const resolveIdentityRespond = async (
       message: e.message,
     });
   }
+};
+
+export const generateSocialLinks = (
+  data: ProfileRecord,
+  edges?: IdentityGraphEdge[]
+) => {
+  const platform = data.platform;
+  const texts = data.texts;
+  const keys = texts ? Object.keys(texts) : [];
+  const identity = data.identity;
+  const res = {} as any;
+  switch (platform) {
+    case PlatformType.basenames:
+    case PlatformType.ethereum:
+    case PlatformType.linea:
+    case PlatformType.ens:
+      if (!texts) return {};
+      let key = null;
+      keys.forEach((i) => {
+        key = Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+        );
+        if (key && texts[i]) {
+          res[key] = {
+            link: getSocialMediaLink(texts[i], key),
+            handle: resolveHandle(texts[i], key),
+            sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
+          };
+        }
+      });
+      break;
+    case PlatformType.farcaster:
+      const resolvedHandle = resolveHandle(identity);
+      res[PlatformType.farcaster] = {
+        link: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
+        handle: resolvedHandle,
+        sources: resolveVerifiedLink(
+          `${PlatformType.farcaster},${resolvedHandle}`,
+          edges
+        ),
+      };
+      if (!data.description) break;
+      const twitterMatch = data.description?.match(regexTwitterLink);
+      if (twitterMatch) {
+        const matched = twitterMatch[1];
+        const resolveMatch =
+          resolveHandle(matched, PlatformType.farcaster) || "";
+        res[PlatformType.twitter] = {
+          link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
+          handle: resolveMatch,
+          sources: resolveVerifiedLink(
+            `${PlatformType.twitter},${resolveMatch}`,
+            edges
+          ),
+        };
+      }
+      break;
+    case PlatformType.lens:
+      const pureHandle = identity.replace(".lens", "");
+      res[PlatformType.lens] = {
+        link: getSocialMediaLink(pureHandle!, PlatformType.lens),
+        handle: identity,
+        sources: resolveVerifiedLink(
+          `${PlatformType.lens},${pureHandle}.lens`,
+          edges
+        ),
+      };
+      keys?.forEach((i) => {
+        if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
+          let key = null;
+          key = Array.from(PLATFORM_DATA.keys()).find(
+            (k) => k === i.toLowerCase()
+          );
+          if (key) {
+            const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
+            res[key] = {
+              link: getSocialMediaLink(texts[i], i),
+              handle: resolvedHandle,
+              sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
+            };
+          }
+        }
+      });
+      break;
+    case PlatformType.solana:
+    case PlatformType.sns:
+      recordsShouldFetch.forEach((x) => {
+        const handle = resolveHandle(texts?.[x]);
+        if (handle) {
+          const type = ["CNAME", PlatformType.url].includes(x)
+            ? PlatformType.website
+            : x;
+          res[type] = {
+            link: getSocialMediaLink(handle, type)!,
+            handle: handle,
+            sources: resolveVerifiedLink(`${type},${handle}`, edges),
+          };
+        }
+      });
+      break;
+    case PlatformType.unstoppableDomains:
+      UDSocialAccountsList.forEach((x) => {
+        const item = texts?.[x];
+        if (item && PLATFORM_DATA.has(x)) {
+          const resolvedHandle = resolveHandle(item, x);
+          res[x] = {
+            link: getSocialMediaLink(resolvedHandle, x),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
+          };
+        }
+      });
+      break;
+    case PlatformType.sns:
+    case PlatformType.solana:
+      recordsShouldFetch.forEach((x) => {
+        const handle = resolveHandle(texts[x]);
+        if (handle) {
+          const type = ["CNAME", PlatformType.url].includes(x)
+            ? PlatformType.website
+            : x;
+          res[type] = {
+            link: getSocialMediaLink(handle, type)!,
+            handle: handle,
+            sources: resolveVerifiedLink(`${type},${handle}`, edges),
+          };
+        }
+      });
+      break;
+    case PlatformType.dotbit:
+      keys.forEach((x) => {
+        if (PLATFORM_DATA.has(x as PlatformType)) {
+          const item = texts[x];
+          const handle = resolveHandle(item, x as PlatformType);
+          res[x] = {
+            link: getSocialMediaLink(item, x as PlatformType)!,
+            handle,
+            sources: resolveVerifiedLink(`${x},${handle}`, edges),
+          };
+        }
+      });
+    default:
+      break;
+  }
+
+  return res;
+};
+export const resolveVerifiedLink = (
+  key: string,
+  edges?: IdentityGraphEdge[]
+) => {
+  const res = [] as SourceType[];
+
+  if (!edges?.length) return res;
+
+  edges
+    .filter((x) => x.target === key)
+    .forEach((x) => {
+      const source = x.dataSource.split(",")[0];
+      if (!res.includes(source as SourceType)) res.push(source as SourceType);
+    });
+  return res;
 };
