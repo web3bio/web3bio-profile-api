@@ -7,7 +7,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveEtherRespond } from "@/utils/utils";
+import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveEtherRespond(handle, PlatformType.linea, headers, false);
+  return resolveIdentityRespond(handle, PlatformType.linea, headers, false);
 }
 
 export const runtime = "edge";

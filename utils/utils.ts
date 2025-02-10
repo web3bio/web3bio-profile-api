@@ -19,11 +19,11 @@ import {
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 
-export const resolveEtherResponse = async (
+export const resolveIdentityResponse = async (
   handle: string,
   headers: AuthHeaders,
   platform: PlatformType,
-  ns: boolean,
+  ns: boolean
 ) => {
   let identity = "";
 
@@ -36,7 +36,7 @@ export const resolveEtherResponse = async (
     identity,
     platform as PlatformType,
     GET_PROFILES(ns),
-    headers,
+    headers
   );
   if (res.msg) {
     return {
@@ -50,25 +50,29 @@ export const resolveEtherResponse = async (
   const profile = res?.data?.identity?.profile;
   // ens empty resolved address
   if (!profile) {
-    if (isValidEthereumAddress(handle)) {
-      if (platform === PlatformType.ens) {
-        return {
-          address: handle,
-          identity: handle,
-          platform: PlatformType.ethereum,
-          displayName: formatText(handle),
-          avatar: null,
-          description: null,
-          email: null,
-          location: null,
-          header: null,
-          contenthash: null,
-          links: {},
-          social: {},
-        };
-      } else {
-        throw new Error(ErrorMessages.notFound, { cause: 404 });
-      }
+    if (isValidEthereumAddress(handle) || platform === PlatformType.sns) {
+      const nsResponse = {
+        address: handle,
+        identity: handle,
+        platform:
+          platform === PlatformType.ens
+            ? PlatformType.ethereum
+            : PlatformType.solana,
+        displayName: formatText(handle),
+        avatar: null,
+      };
+      return ns
+        ? nsResponse
+        : {
+            ...nsResponse,
+            description: null,
+            email: null,
+            location: null,
+            header: null,
+            contenthash: null,
+            links: {},
+            social: {},
+          };
     } else {
       throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
     }
@@ -76,6 +80,8 @@ export const resolveEtherResponse = async (
   const nsResponse = {
     address: isValidEthereumAddress(profile.identity)
       ? profile.identity.toLowerCase()
+      : [PlatformType.sns, PlatformType.solana].includes(profile.platform)
+      ? profile.address
       : profile.address?.toLowerCase(),
     identity: profile.identity,
     platform: platform,
@@ -90,12 +96,12 @@ export const resolveEtherResponse = async (
         email: profile.texts?.email,
         location: profile.texts?.location,
         header: await resolveEipAssetURL(
-          profile.texts?.header || profile.texts?.banner,
+          profile.texts?.header || profile.texts?.banner
         ),
         contenthash: profile.contenthash,
         links: await getLinks(
           profile.texts,
-          res.data.identity.identityGraph?.edges,
+          res.data.identity.identityGraph?.edges
         ),
         social: {},
       };
@@ -107,7 +113,7 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
 
   Object.entries(texts).forEach(([textKey, textValue]) => {
     const platformKey = Array.from(PLATFORM_DATA.entries()).find(([_, data]) =>
-      data.ensText?.includes(textKey.toLowerCase()),
+      data.ensText?.includes(textKey.toLowerCase())
     )?.[0];
     const platformValue = textValue as string;
 
@@ -124,7 +130,7 @@ const getLinks = async (texts: any, edges: IdentityGraphEdge[]) => {
 
 export const resolveVerifiedLink = (
   key: string,
-  edges?: IdentityGraphEdge[],
+  edges?: IdentityGraphEdge[]
 ) => {
   const res = [] as SourceType[];
 
@@ -139,18 +145,18 @@ export const resolveVerifiedLink = (
   return res;
 };
 
-export const resolveEtherRespond = async (
+export const resolveIdentityRespond = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns: boolean,
+  ns: boolean
 ) => {
   try {
-    const json = (await resolveEtherResponse(
+    const json = (await resolveIdentityResponse(
       handle,
       headers,
       platform,
-      ns,
+      ns
     )) as any;
     if (json.code) {
       return errorHandle({

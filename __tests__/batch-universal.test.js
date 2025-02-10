@@ -8,6 +8,7 @@ describe("Test For Profile Batch Universal Query", () => {
     "dwr.eth.farcaster",
     "suji_yan.twitter",
     "twitter,billyshife888",
+    "184.linea"
   ];
 
   it("It should response 200 for Batch Query GET", async () => {
@@ -22,5 +23,6 @@ describe("Test For Profile Batch Universal Query", () => {
     expect(json[3].id).toBe("farcaster,dwr.eth");
     expect(json[4].id).toBe("twitter,suji_yan");
     expect(json[5].id).toBe("twitter,billyshife888");
+    expect(json[6].id).toBe("linea,184.linea.eth");
   });
 });
