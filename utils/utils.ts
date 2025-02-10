@@ -56,8 +56,11 @@ export const resolveIdentityResponse = async (
   const profile = res?.data?.identity?.profile;
   // ens empty resolved address
   if (!profile) {
-    if (isValidEthereumAddress(handle) || platform === PlatformType.sns) {
-      const nsResponse = {
+    let nsResponse = null;
+    if ([PlatformType.sns, PlatformType.ens].includes(platform)) {
+      if (platform === PlatformType.ens && !isValidEthereumAddress(handle))
+        throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+      nsResponse = {
         address: handle,
         identity: handle,
         platform:
