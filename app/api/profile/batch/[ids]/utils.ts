@@ -185,7 +185,6 @@ export function filterIds(ids: string[], includesTwitter?: boolean) {
       return x;
     })
     .filter((x) => {
-      console.log(x, "kkk");
       if (includesTwitter && x.split(",")[0] === PlatformType.twitter)
         return true;
       return (

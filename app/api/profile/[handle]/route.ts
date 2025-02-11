@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
     ? handle
     : handle.toLowerCase();
   const platform = handleSearchPlatform(inputName);
-
+  
   if (!inputName || !platform || !shouldPlatformFetch(platform)) {
     return errorHandle({
       identity: inputName,

@@ -22,8 +22,39 @@ import {
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 import { regexTwitterLink } from "@/utils/regexp";
-import { recordsShouldFetch } from "@/app/api/profile/sns/[handle]/utils";
-import { UDSocialAccountsList } from "@/app/api/profile/unstoppabledomains/[handle]/utils";
+
+const UD_ACCOUNTS_LIST = [
+  PlatformType.twitter,
+  PlatformType.discord,
+  PlatformType.reddit,
+  PlatformType.lens,
+  PlatformType.telegram,
+  PlatformType.youtube,
+  PlatformType.website,
+  PlatformType.url,
+];
+const SNS_RECORDS_LIST = [
+  PlatformType.twitter,
+  PlatformType.telegram,
+  PlatformType.reddit,
+  PlatformType.url,
+  PlatformType.github,
+  PlatformType.discord,
+  "CNAME",
+];
+
+const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
+
+export const resolveContentIPNS = async (handle: string) => {
+  const res = await fetch(SnsSDKProxyEndpoint + "domain-data/" + handle)
+    .then((res) => res.json())
+    .catch(() => null);
+  if (!res || res?.s === "error") return "";
+  const ipnsMatch = Buffer.from(res?.result, "base64")
+    .toString("utf-8")
+    .match(/ipns=(k51[a-zA-Z0-9]{59})/);
+  return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
+};
 
 export const resolveIdentityResponse = async (
   handle: string,
@@ -83,7 +114,7 @@ export const resolveIdentityResponse = async (
             social: {},
           };
     } else {
-      throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+      throw new Error(ErrorMessages.notFound, { cause: 404 });
     }
   }
   return await generateProfileStruct(
@@ -110,7 +141,7 @@ export async function generateProfileStruct(
       : null,
     description: data.description || null,
   };
-
+  const { links, contenthash } = await generateSocialLinks(data, edges);
   return ns
     ? nsObj
     : {
@@ -118,12 +149,12 @@ export async function generateProfileStruct(
         email: data.texts?.email || null,
         location: data.texts?.location || null,
         header: (await resolveEipAssetURL(data.texts?.header)) || null,
-        contenthash: data.contenthash || null,
-        links: generateSocialLinks(data, edges) || {},
+        contenthash: contenthash || null,
+        links: links || {},
         social: data.social
           ? {
               ...data.social,
-              uid: isNaN(data.social.uid)
+              uid: isNaN(Number(data.social.uid))
                 ? data.social.uid
                 : Number(data.social.uid),
             }
@@ -163,7 +194,7 @@ export const resolveIdentityRespond = async (
   }
 };
 
-export const generateSocialLinks = (
+export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[]
 ) => {
@@ -171,30 +202,33 @@ export const generateSocialLinks = (
   const texts = data.texts;
   const keys = texts ? Object.keys(texts) : [];
   const identity = data.identity;
-  const res = {} as any;
+  let links = {} as any;
+  let contenthash = null;
   switch (platform) {
     case PlatformType.basenames:
     case PlatformType.ethereum:
     case PlatformType.linea:
     case PlatformType.ens:
-      if (!texts) return {};
+      if (!texts) break;
       let key = null;
       keys.forEach((i) => {
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
         );
         if (key && texts[i]) {
-          res[key] = {
+          links[key] = {
             link: getSocialMediaLink(texts[i], key),
             handle: resolveHandle(texts[i], key),
             sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
           };
         }
       });
+      contenthash = data.contenthash;
       break;
     case PlatformType.farcaster:
+      contenthash = data.contenthash;
       const resolvedHandle = resolveHandle(identity);
-      res[PlatformType.farcaster] = {
+      links[PlatformType.farcaster] = {
         link: getSocialMediaLink(resolvedHandle!, PlatformType.farcaster),
         handle: resolvedHandle,
         sources: resolveVerifiedLink(
@@ -208,7 +242,7 @@ export const generateSocialLinks = (
         const matched = twitterMatch[1];
         const resolveMatch =
           resolveHandle(matched, PlatformType.farcaster) || "";
-        res[PlatformType.twitter] = {
+        links[PlatformType.twitter] = {
           link: getSocialMediaLink(resolveMatch, PlatformType.twitter),
           handle: resolveMatch,
           sources: resolveVerifiedLink(
@@ -219,8 +253,9 @@ export const generateSocialLinks = (
       }
       break;
     case PlatformType.lens:
+      contenthash = data.contenthash;
       const pureHandle = identity.replace(".lens", "");
-      res[PlatformType.lens] = {
+      links[PlatformType.lens] = {
         link: getSocialMediaLink(pureHandle!, PlatformType.lens),
         handle: identity,
         sources: resolveVerifiedLink(
@@ -236,7 +271,7 @@ export const generateSocialLinks = (
           );
           if (key) {
             const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
-            res[key] = {
+            links[key] = {
               link: getSocialMediaLink(texts[i], i),
               handle: resolvedHandle,
               sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
@@ -247,13 +282,17 @@ export const generateSocialLinks = (
       break;
     case PlatformType.solana:
     case PlatformType.sns:
-      recordsShouldFetch.forEach((x) => {
+      contenthash =
+        data.texts?.["IPNS"] ||
+        data.texts?.["IPFS"] ||
+        (await resolveContentIPNS(data.identity));
+      SNS_RECORDS_LIST.forEach((x) => {
         const handle = resolveHandle(texts?.[x]);
         if (handle) {
           const type = ["CNAME", PlatformType.url].includes(x)
             ? PlatformType.website
             : x;
-          res[type] = {
+          links[type] = {
             link: getSocialMediaLink(handle, type)!,
             handle: handle,
             sources: resolveVerifiedLink(`${type},${handle}`, edges),
@@ -262,11 +301,12 @@ export const generateSocialLinks = (
       });
       break;
     case PlatformType.unstoppableDomains:
-      UDSocialAccountsList.forEach((x) => {
+      contenthash = data.contenthash;
+      UD_ACCOUNTS_LIST.forEach((x) => {
         const item = texts?.[x];
         if (item && PLATFORM_DATA.has(x)) {
           const resolvedHandle = resolveHandle(item, x);
-          res[x] = {
+          links[x] = {
             link: getSocialMediaLink(resolvedHandle, x),
             handle: resolvedHandle,
             sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
@@ -274,28 +314,13 @@ export const generateSocialLinks = (
         }
       });
       break;
-    case PlatformType.sns:
-    case PlatformType.solana:
-      recordsShouldFetch.forEach((x) => {
-        const handle = resolveHandle(texts[x]);
-        if (handle) {
-          const type = ["CNAME", PlatformType.url].includes(x)
-            ? PlatformType.website
-            : x;
-          res[type] = {
-            link: getSocialMediaLink(handle, type)!,
-            handle: handle,
-            sources: resolveVerifiedLink(`${type},${handle}`, edges),
-          };
-        }
-      });
-      break;
     case PlatformType.dotbit:
+      contenthash = data.contenthash;
       keys.forEach((x) => {
         if (PLATFORM_DATA.has(x as PlatformType)) {
           const item = texts[x];
           const handle = resolveHandle(item, x as PlatformType);
-          res[x] = {
+          links[x] = {
             link: getSocialMediaLink(item, x as PlatformType)!,
             handle,
             sources: resolveVerifiedLink(`${x},${handle}`, edges),
@@ -306,7 +331,7 @@ export const generateSocialLinks = (
       break;
   }
 
-  return res;
+  return { links, contenthash };
 };
 export const resolveVerifiedLink = (
   key: string,

@@ -115,7 +115,7 @@ export const primaryDomainResolvedRequestArray = (
           isPrimary: resolvedRecord.isPrimary,
         }
       : {
-          address: resolvedRecord.identity,
+          address: resolvedRecord.resolvedAddress?.[0]?.address || null,
           identity: resolvedRecord.identity,
           platform: resolvedRecord.platform,
           displayName: formatText(resolvedRecord.identity),
@@ -189,9 +189,7 @@ export const primaryDomainResolvedRequestArray = (
             isPrimary: x.isPrimary,
           })) || [];
 
-      return [PlatformType.ethereum, PlatformType.twitter].includes(
-        resolvedRecord.platform
-      )
+      return [PlatformType.ethereum].includes(resolvedRecord.platform)
         ? [...vertices]
         : [...vertices, defaultReturn];
     }
