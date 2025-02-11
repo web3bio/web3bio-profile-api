@@ -153,10 +153,9 @@ export async function generateProfileStruct(
         links: links || {},
         social: data.social
           ? {
-              ...data.social,
-              uid: isNaN(Number(data.social.uid))
-                ? data.social.uid
-                : Number(data.social.uid),
+              uid: data.social.uid ? Number(data.social.uid) : null,
+              follower: Number(data.social.follower),
+              following: Number(data.social.following),
             }
           : {},
       };
