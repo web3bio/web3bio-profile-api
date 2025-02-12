@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/base";
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity Resolver";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Basenames, Farcaster, Lens Protocol, Unstoppable Domains, and Solana Name Service into their applications.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), BaseNames, Farcaster, Lens Protocol, Unstoppable Domains, Linea, and Solana Name Service into their applications.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -87,10 +87,11 @@ export default function Home() {
               >
                 Ethereum (ENS)
               </span>
-              , <span className="text-underline">Basenames</span>,{" "}
+              , <span className="text-underline">BaseNames</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Lens Protocol</span>,{" "}
               <span className="text-underline">Unstoppable Domains</span>,{" "}
+              <span className="text-underline">Linea</span>,{" "}
               <span
                 className="text-underline"
                 title="Solana and Solana Name Service (Bonfida)"
@@ -553,6 +554,21 @@ export default function Home() {
                 </div>
               </div>
             </a>
+            <a
+              href="#basenames-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">BaseNames Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="label text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
 
             <a
               href="#farcaster-profile-api"
@@ -626,6 +642,22 @@ export default function Home() {
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">.bit Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="label text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#linea-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Linea Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="label text-small">
@@ -999,7 +1031,7 @@ export default function Home() {
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1011,7 +1043,7 @@ export default function Home() {
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1022,7 +1054,7 @@ export default function Home() {
                 <span className="label">ENS</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify(["ens,vitalik.eth"]),
+                    JSON.stringify(["ens,vitalik.eth"])
                   )}`}
                   target="_blank"
                 >
@@ -1037,7 +1069,7 @@ export default function Home() {
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "farcaster,#966",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1050,7 +1082,7 @@ export default function Home() {
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "farcaster,#966",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1063,7 +1095,7 @@ export default function Home() {
                       "farcaster,dwr.eth",
                       "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "farcaster,#966",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1078,7 +1110,7 @@ export default function Home() {
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "lens,#11874",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1091,7 +1123,7 @@ export default function Home() {
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "lens,#11874",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1104,7 +1136,7 @@ export default function Home() {
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
                       "lens,#11874",
-                    ]),
+                    ])
                   )}`}
                   target="_blank"
                 >
@@ -1112,10 +1144,10 @@ export default function Home() {
                 </a>
               </li>
               <li>
-                <span className="label">Basenames</span>{" "}
+                <span className="label">BaseNames</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify(["basenames,tony.base.eth"]),
+                    JSON.stringify(["basenames,tony.base.eth"])
                   )}`}
                   target="_blank"
                 >
@@ -1138,7 +1170,7 @@ export default function Home() {
                     "farcaster,dwr.eth",
                     "basenames,tony.base.eth",
                     "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ]),
+                  ])
                 )}`}</span>
                 <br />
                 {`[
@@ -1326,7 +1358,7 @@ export default function Home() {
                     "farcaster,dwr.eth",
                     "basenames,tony.base.eth",
                     "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ]),
+                  ])
                 )}`}</span>
                 <br />
                 {`[
@@ -1543,6 +1575,164 @@ export default function Home() {
     "displayName": "vitalik.eth",
     "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
     "description": null
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pb-4"
+            id="basenames-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">BaseNames Profile API</h2>
+            <p>Retrieve an BaseNames profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  basenames
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  basenames
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or an BaseNames domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}
+                  target="_blank"
+                >
+                  profile/basenames/0x041b...44c4
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}
+                  target="_blank"
+                >
+                  /ns/basenames/0x041b...44c4
+                </a>
+              </li>
+              <li>
+                <span className="label">BaseNames</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/basenames/tony.base`}
+                  target="_blank"
+                >
+                  /profile/basenames/tony.base
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/basenames/tony.base`} target="_blank">
+                  /ns/baesname/tony.base
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/basenames/tony.base`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+    "identity": "tony.base.eth",
+    "platform": "basenames",
+    "displayName": "tony.base.eth",
+    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+    "description": "mfer building on base",
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {
+      "website": {
+        "link": "https://mint.club",
+        "handle": "mint.club",
+        "sources": []
+      },
+      "github": {
+        "link": "https://github.com/tonymfer",
+        "handle": "tonymfer",
+        "sources": []
+      },
+      "twitter": {
+        "link": "https://x.com/tonmfer",
+        "handle": "tonmfer",
+        "sources": []
+      },
+      "farcaster": {
+        "link": "https://warpcast.com/to",
+        "handle": "to",
+        "sources": []
+      }
+    },
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/basenames/tony.base`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+    "identity": "tony.base.eth",
+    "platform": "basenames",
+    "displayName": "tony.base.eth",
+    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+    "description": "mfer building on base"
 }`}
               </code>
             </pre>
@@ -2272,6 +2462,166 @@ export default function Home() {
           </section>
 
           <section
+            className="pb-4"
+            id="linea-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Linea Profile API</h2>
+            <p>Retrieve an Linea profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or an Linea domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}
+                  target="_blank"
+                >
+                  profile/linea/0xc28d...020d
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}
+                  target="_blank"
+                >
+                  /ns/linea/0xc28d...020d
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/0xthor.linea`}
+                  target="_blank"
+                >
+                  /profile/linea/0xthor.linea
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/linea/0xthor.linea`} target="_blank">
+                  /ns/linea/0xthor.linea
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/0xthor.linea`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea",
+    "identity": "0xthor.linea.eth",
+    "platform": "linea",
+    "displayName": "0xthor.linea.eth",
+    "avatar": null,
+    "description": null,
+    "email": "thorjr88@gmail.com",
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {
+        "github": {
+            "link": "https://github.com/thorjr0",
+            "handle": "thorjr0",
+            "sources": [
+                "talentprotocol"
+            ]
+        },
+        "discord": {
+            "link": "",
+            "handle": "thorjr0",
+            "sources": []
+        },
+        "twitter": {
+            "link": "https://x.com/thorirahman",
+            "handle": "thorirahman",
+            "sources": []
+        },
+        "telegram": {
+            "link": "https://t.me/thorjr0",
+            "handle": "thorjr0",
+            "sources": []
+        }
+    },
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/0xthor.linea`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea",
+    "identity": "0xthor.linea.eth",
+    "platform": "linea",
+    "displayName": "0xthor.linea.eth",
+    "avatar": null,
+    "description": null,
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
             className="pt-4 pb-4"
             id="errors"
             style={{ marginTop: "4rem" }}
@@ -2349,7 +2699,7 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added
-                Basenames query support to the Profile API.
+                BaseNames query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
