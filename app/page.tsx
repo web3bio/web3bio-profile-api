@@ -3,9 +3,9 @@ import Script from "next/script";
 import { BASE_URL } from "../utils/base";
 
 export async function generateMetadata() {
-  const title = "Web3.bio Profile API - Web3 Identity Resolver";
+  const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), BaseNames, Farcaster, Lens Protocol, Unstoppable Domains, Linea, and Solana Name Service into their applications.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), BaseNames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -44,6 +44,7 @@ export async function generateMetadata() {
       "DID",
       "DID Search Engine",
       "DID Explorer",
+      "Ethereum Identity Kit",
       "Web3 Domain Search",
       "Web3 Domain Explorer",
       "Web3 Domain WHOIS",
@@ -74,8 +75,8 @@ export default function Home() {
             <strong className="text-bold">Web3.bio Profile API</strong>
           </h1>
           <h2 className="h6 text-gray mb-4 pb-4">
-            Web3 Identity Resolver · Web3 DID Resolver · Web3 Domain Name
-            Service Resolver
+            Multi-Chain Identity & Domain Resolver API for Ethereum, ENS
+            Ecosystem, Farcaster, Lens, and Solana.
           </h2>
           <section className="mt-4 pt-4 pb-4">
             <p>
@@ -89,17 +90,16 @@ export default function Home() {
               </span>
               , <span className="text-underline">BaseNames</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
-              <span className="text-underline">Lens Protocol</span>,{" "}
-              <span className="text-underline">Unstoppable Domains</span>,{" "}
-              <span className="text-underline">Linea</span>,{" "}
+              <span className="text-underline">Lens</span>,{" "}
+              <span className="text-underline">Linea Name Service</span>,{" "}
               <span
                 className="text-underline"
                 title="Solana and Solana Name Service (Bonfida)"
               >
                 Solana (SNS)
-              </span>{" "}
-              and more into their applications. These APIs are already
-              integrated into{" "}
+              </span>
+              , <span className="text-underline">Unstoppable Domains</span>, and
+              more into their apps. These APIs are already integrated into{" "}
               <a
                 href="https://web3.bio"
                 target="_blank"
@@ -519,26 +519,12 @@ export default function Home() {
                 <div className="mr-2">Universal Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
             </a>
-            <a
-              href="#batch-query"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Batch Query</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
+
             <a
               href="#ens-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
@@ -549,7 +535,7 @@ export default function Home() {
                 <div className="mr-2">ENS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -564,87 +550,7 @@ export default function Home() {
                 <div className="mr-2">BaseNames Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#farcaster-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Farcaster Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#lens-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Lens Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#unstoppabledomains-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Unstoppable Domains Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#solana-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Solana Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#dotbit-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">.bit Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -660,7 +566,103 @@ export default function Home() {
                 <div className="mr-2">Linea Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#farcaster-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Farcaster Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#lens-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Lens Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#unstoppabledomains-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Unstoppable Domains Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#solana-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Solana/SNS Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            {/* <a
+              href="#dotbit-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">.bit Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a> */}
+            <div className="pt-1 pb-1"></div>
+            <a
+              href="#batch-query"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Batch Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -861,7 +863,11 @@ export default function Home() {
                 "sources": []
             }
         },
-        "social": {}
+        "social": {
+            "uid": null,
+            "follower": 4449,
+            "following": 10
+        }
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -879,7 +885,7 @@ export default function Home() {
                 "link": "https://warpcast.com/vitalik.eth",
                 "handle": "vitalik.eth",
                 "sources": [
-                    "ethereum"
+                    "farcaster"
                 ]
             }
         },
@@ -905,7 +911,7 @@ export default function Home() {
                 "link": "https://www.lensfrens.xyz/vitalik",
                 "handle": "vitalik",
                 "sources": [
-                    "ethereum"
+                    "lens"
                 ]
             }
         },
@@ -946,484 +952,6 @@ export default function Home() {
         "displayName": "vitalik.lens",
         "avatar": "https://api.hey.xyz/avatar?id=100275",
         "description": null
-    }
-]`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="batch-query"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Batch Query</h2>
-            <p>Retrieve profiles for multiple identities using query IDs</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  batch
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}ids{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  batch
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}ids{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>ids</strong> <span className="label">string[]</span>{" "}
-                <br />
-                An array of strings where each string is formatted as{" "}
-                <span className="label">platform,identity</span>, encoded using{" "}
-                <span className="label">encodeURIComponent</span>. The array is
-                limited to a maximum of 30 items per query.
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                {`[
-    "ens,vitalik.eth",
-    "lens,stani.lens",
-    "farcaster,dwr.eth",
-    "basenames,tony.base.eth",
-    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-]`}
-              </code>
-            </pre>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  ethereum,0xd8da...6045
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  ens,0x934b...d649
-                </a>
-              </li>
-              <li>
-                <span className="label">ENS</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify(["ens,vitalik.eth"])
-                  )}`}
-                  target="_blank"
-                >
-                  ens,vitalik.eth
-                </a>
-              </li>
-              <li>
-                <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "farcaster,dwr.eth",
-                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "farcaster,#966",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  farcaster,dwr.eth
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "farcaster,dwr.eth",
-                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "farcaster,#966",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  farcaster,0xd702...8ff2
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "farcaster,dwr.eth",
-                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "farcaster,#966",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  farcaster,#3
-                </a>
-              </li>
-              <li>
-                <span className="label">Lens</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "lens,stani.lens",
-                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  lens,stani.lens
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "lens,stani.lens",
-                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  lens,0xd8da...6045
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "lens,stani.lens",
-                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
-                    ])
-                  )}`}
-                  target="_blank"
-                >
-                  lens,#11874
-                </a>
-              </li>
-              <li>
-                <span className="label">BaseNames</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify(["basenames,tony.base.eth"])
-                  )}`}
-                  target="_blank"
-                >
-                  basenames,tony.base.eth
-                </a>
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Responses
-            </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span
-                  className="text-gray"
-                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/profile/batch/${encodeURIComponent(
-                  JSON.stringify([
-                    "ens,vitalik.eth",
-                    "lens,stani.lens",
-                    "farcaster,dwr.eth",
-                    "basenames,tony.base.eth",
-                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ])
-                )}`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati",
-        "email": null,
-        "location": null,
-        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
-        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
-        "links": {
-            "website": {
-                "link": "https://vitalik.ca",
-                "handle": "vitalik.ca",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/vbuterin",
-                "handle": "vbuterin",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/VitalikButerin",
-                "handle": "VitalikButerin",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "ens,vitalik.eth",
-            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-        ]
-    },
-    {
-        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-        "identity": "stani.lens",
-        "platform": "lens",
-        "displayName": "Stani",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-        "description": "@Avara (@Aave @Lens @Family)",
-        "email": null,
-        "location": null,
-        "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
-        "contenthash": null,
-        "links": {
-            "lens": {
-                "link": "https://www.lensfrens.xyz/stani",
-                "handle": "stani",
-                "sources": []
-            }
-        },
-        "social": {
-            "uid": 5,
-            "following": 1265,
-            "follower": 115084
-        },
-        "aliases": [
-            "lens,#5",
-            "lens,stani.lens",
-            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
-        ]
-    },
-    {
-        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-        "identity": "dwr.eth",
-        "platform": "farcaster",
-        "displayName": "Dan Romero",
-        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-        "description": "Working on Farcaster and Warpcast.",
-        "email": null,
-        "location": null,
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "farcaster": {
-                "link": "https://warpcast.com/dwr.eth",
-                "handle": "dwr.eth",
-                "sources": []
-            }
-        },
-        "social": {
-            "uid": 3,
-            "following": 3534,
-            "follower": 493153
-        },
-        "aliases": [
-            "farcaster,#3",
-            "farcaster,dwr",
-            "farcaster,dwr.eth",
-            "farcaster,danromero.eth",
-            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
-        ]
-    },
-    {
-        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-        "identity": "tony.base.eth",
-        "platform": "basenames",
-        "displayName": "tony.base.eth",
-        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-        "description": "mfer building on base",
-        "email": null,
-        "location": null,
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "website": {
-                "link": "https://mint.club",
-                "handle": "mint.club",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/tonymfer",
-                "handle": "tonymfer",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/tonmfer",
-                "handle": "tonmfer",
-                "sources": []
-            },
-            "farcaster": {
-                "link": "https://warpcast.com/to",
-                "handle": "to",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "basenames,tony.base.eth",
-            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
-        ]
-    },
-    {
-        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-        "identity": "sujiyan.eth",
-        "platform": "ens",
-        "displayName": "sujiyan.eth",
-        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
-        "description": null,
-        "email": "suji.yan@dimension.im",
-        "location": null,
-        "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
-        "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
-        "links": {
-            "website": {
-                "link": "https://mask.io",
-                "handle": "mask.io",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/tedko",
-                "handle": "tedko",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/suji_yan",
-                "handle": "suji_yan",
-                "sources": []
-            },
-            "instagram": {
-                "link": "https://www.instagram.com/suji_yan_",
-                "handle": "suji_yan_",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
-        ]
-    }
-]`}
-                <br />
-                <br />
-                <span
-                  className="text-gray"
-                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/ns/batch/${encodeURIComponent(
-                  JSON.stringify([
-                    "ens,vitalik.eth",
-                    "lens,stani.lens",
-                    "farcaster,dwr.eth",
-                    "basenames,tony.base.eth",
-                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ])
-                )}`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati",
-        "aliases": [
-            "ens,vitalik.eth",
-            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-        ]
-    },
-    {
-        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-        "identity": "stani.lens",
-        "platform": "lens",
-        "displayName": "Stani",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-        "description": "@Avara (@Aave @Lens @Family)",
-        "aliases": [
-            "lens,#5",
-            "lens,stani.lens",
-            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
-        ]
-    },
-    {
-        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-        "identity": "dwr.eth",
-        "platform": "farcaster",
-        "displayName": "Dan Romero",
-        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-        "description": "Working on Farcaster and Warpcast.",
-        "aliases": [
-            "farcaster,#3",
-            "farcaster,dwr",
-            "farcaster,dwr.eth",
-            "farcaster,danromero.eth",
-            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
-        ]
-    },
-    {
-        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-        "identity": "tony.base.eth",
-        "platform": "basenames",
-        "displayName": "tony.base.eth",
-        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-        "description": "mfer building on base",
-        "aliases": [
-            "basenames,tony.base.eth",
-            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
-        ]
-    },
-    {
-        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-        "identity": "sujiyan.eth",
-        "platform": "ens",
-        "displayName": "sujiyan.eth",
-        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
-        "description": null,
-        "aliases": [
-            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
-        ]
     }
 ]`}
               </code>
@@ -1631,7 +1159,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or an BaseNames domain.
+                An Ethereum address or a BaseNames domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1657,14 +1185,17 @@ export default function Home() {
               <li>
                 <span className="label">BaseNames</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/basenames/tony.base`}
+                  href={`${BASE_URL}/profile/basenames/tony.base.eth`}
                   target="_blank"
                 >
-                  /profile/basenames/tony.base
+                  /profile/basenames/tony.base.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/basenames/tony.base`} target="_blank">
-                  /ns/baesname/tony.base
+                <a
+                  href={`${BASE_URL}/ns/basenames/tony.base.eth`}
+                  target="_blank"
+                >
+                  /ns/baesname/tony.base.eth
                 </a>
               </li>
             </ul>
@@ -1678,7 +1209,7 @@ export default function Home() {
                 </span>
                 <br />
                 <span className="text-gray">
-                  {`// ${BASE_URL}/profile/basenames/tony.base`}{" "}
+                  {`// ${BASE_URL}/profile/basenames/tony.base.eth`}{" "}
                 </span>
                 <br />
                 {`{
@@ -1723,7 +1254,7 @@ export default function Home() {
                 </span>
                 <br />
                 <span className="text-gray">
-                  {`// ${BASE_URL}/ns/basenames/tony.base`}{" "}
+                  {`// ${BASE_URL}/ns/basenames/tony.base.eth`}{" "}
                 </span>
                 <br />
                 {`{
@@ -1733,6 +1264,143 @@ export default function Home() {
     "displayName": "tony.base.eth",
     "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
     "description": "mfer building on base"
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pb-4"
+            id="linea-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Linea Profile API</h2>
+            <p>Retrieve an Linea profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Linea domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}
+                  target="_blank"
+                >
+                  profile/linea/0xa4d4...0e47
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}
+                  target="_blank"
+                >
+                  /ns/linea/0xa4d4...0e47
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/name.linea.eth`}
+                  target="_blank"
+                >
+                  /profile/linea/name.linea.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/linea/name.linea.eth`} target="_blank">
+                  /ns/linea/name.linea.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/name.linea.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+    "identity": "name.linea.eth",
+    "platform": "linea",
+    "displayName": "name.linea.eth",
+    "avatar": null,
+    "description": null,
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {},
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/name.linea.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+    "identity": "name.linea.eth",
+    "platform": "linea",
+    "displayName": "name.linea.eth",
+    "avatar": null,
+    "description": null
 }`}
               </code>
             </pre>
@@ -1861,7 +1529,7 @@ export default function Home() {
             "link": "https://warpcast.com/dwr.eth",
             "handle": "dwr.eth",
             "sources": [
-                "ethereum"
+                "farcaster"
             ]
         }
     },
@@ -1998,7 +1666,7 @@ export default function Home() {
             "link": "https://www.lensfrens.xyz/stani",
             "handle": "stani",
             "sources": [
-                "ethereum"
+                "lens"
             ]
         }
     },
@@ -2462,12 +2130,12 @@ export default function Home() {
           </section>
 
           <section
-            className="pb-4"
-            id="linea-profile-api"
-            style={{ paddingTop: "4rem" }}
+            className="pt-4 pb-4"
+            id="batch-query"
+            style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Linea Profile API</h2>
-            <p>Retrieve an Linea profile or name service resolution</p>
+            <h2 className="text-bold h4">Batch Query</h2>
+            <p>Retrieve profiles for multiple identities using query IDs</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2482,9 +2150,9 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   profile
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  linea
+                  batch
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -2499,9 +2167,9 @@ export default function Home() {
                   <span className="ml-1 mr-1 text-gray">/</span>
                   ns
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  linea
+                  batch
                   <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
+                  {"{"}ids{"}"}
                 </div>
               </div>
             </div>
@@ -2510,11 +2178,25 @@ export default function Home() {
             </h3>
             <ul>
               <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
+                <strong>ids</strong> <span className="label">string[]</span>{" "}
                 <br />
-                An Ethereum address or an Linea domain.
+                An array of strings where each string is formatted as{" "}
+                <span className="label">platform,identity</span>, encoded using{" "}
+                <span className="label">encodeURIComponent</span>. The array is
+                limited to a maximum of 30 items per query.
               </li>
             </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                {`[
+    "ens,vitalik.eth",
+    "lens,stani.lens",
+    "farcaster,dwr.eth",
+    "basenames,tony.base.eth",
+    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+]`}
+              </code>
+            </pre>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Examples
             </h3>
@@ -2522,30 +2204,131 @@ export default function Home() {
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                    ]),
+                  )}`}
                   target="_blank"
                 >
-                  profile/linea/0xc28d...020d
+                  ethereum,0xd8da...6045
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
-                  href={`${BASE_URL}/ns/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                    ]),
+                  )}`}
                   target="_blank"
                 >
-                  /ns/linea/0xc28d...020d
+                  ens,0x934b...d649
                 </a>
               </li>
               <li>
-                <span className="label">Linea</span>{" "}
+                <span className="label">ENS</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/linea/0xthor.linea`}
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify(["ens,vitalik.eth"]),
+                  )}`}
                   target="_blank"
                 >
-                  /profile/linea/0xthor.linea
+                  ens,vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,dwr.eth
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/linea/0xthor.linea`} target="_blank">
-                  /ns/linea/0xthor.linea
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,0xd702...8ff2
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "farcaster,dwr.eth",
+                      "farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "farcaster,#966",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  farcaster,#3
+                </a>
+              </li>
+              <li>
+                <span className="label">Lens</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  lens,stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  lens,0xd8da...6045
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify([
+                      "lens,stani.lens",
+                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                      "lens,#11874",
+                    ]),
+                  )}`}
+                  target="_blank"
+                >
+                  lens,#11874
+                </a>
+              </li>
+              <li>
+                <span className="label">BaseNames</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify(["basenames,tony.base.eth"]),
+                  )}`}
+                  target="_blank"
+                >
+                  basenames,tony.base.eth
                 </a>
               </li>
             </ul>
@@ -2554,69 +2337,272 @@ export default function Home() {
             </h3>
             <pre className="code" data-lang="JSON">
               <code>
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}{" "}
-                </span>
+                <span
+                  className="text-gray"
+                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
+                >{`// ${BASE_URL}/profile/batch/${encodeURIComponent(
+                  JSON.stringify([
+                    "ens,vitalik.eth",
+                    "lens,stani.lens",
+                    "farcaster,dwr.eth",
+                    "basenames,tony.base.eth",
+                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                  ]),
+                )}`}</span>
                 <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/linea/0xthor.linea`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea",
-    "identity": "0xthor.linea.eth",
-    "platform": "linea",
-    "displayName": "0xthor.linea.eth",
-    "avatar": null,
-    "description": null,
-    "email": "thorjr88@gmail.com",
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {
-        "github": {
-            "link": "https://github.com/thorjr0",
-            "handle": "thorjr0",
-            "sources": [
-                "talentprotocol"
-            ]
+                {`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ens",
+        "displayName": "vitalik.eth",
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati",
+        "email": null,
+        "location": null,
+        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
+        "links": {
+            "website": {
+                "link": "https://vitalik.ca",
+                "handle": "vitalik.ca",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/vbuterin",
+                "handle": "vbuterin",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/VitalikButerin",
+                "handle": "VitalikButerin",
+                "sources": []
+            }
         },
-        "discord": {
-            "link": "",
-            "handle": "thorjr0",
-            "sources": []
-        },
-        "twitter": {
-            "link": "https://x.com/thorirahman",
-            "handle": "thorirahman",
-            "sources": []
-        },
-        "telegram": {
-            "link": "https://t.me/thorjr0",
-            "handle": "thorjr0",
-            "sources": []
-        }
+        "social": {},
+        "aliases": [
+            "ens,vitalik.eth",
+            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+        ]
     },
-    "social": {}
-}`}
+    {
+        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+        "identity": "stani.lens",
+        "platform": "lens",
+        "displayName": "Stani",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+        "description": "@Avara (@Aave @Lens @Family)",
+        "email": null,
+        "location": null,
+        "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
+        "contenthash": null,
+        "links": {
+            "lens": {
+                "link": "https://www.lensfrens.xyz/stani",
+                "handle": "stani",
+                "sources": []
+            }
+        },
+        "social": {
+            "uid": 5,
+            "following": 1265,
+            "follower": 115084
+        },
+        "aliases": [
+            "lens,#5",
+            "lens,stani.lens",
+            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+        ]
+    },
+    {
+        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+        "identity": "dwr.eth",
+        "platform": "farcaster",
+        "displayName": "Dan Romero",
+        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+        "description": "Working on Farcaster and Warpcast.",
+        "email": null,
+        "location": null,
+        "header": null,
+        "contenthash": null,
+        "links": {
+            "farcaster": {
+                "link": "https://warpcast.com/dwr.eth",
+                "handle": "dwr.eth",
+                "sources": []
+            }
+        },
+        "social": {
+            "uid": 3,
+            "following": 3534,
+            "follower": 493153
+        },
+        "aliases": [
+            "farcaster,#3",
+            "farcaster,dwr",
+            "farcaster,dwr.eth",
+            "farcaster,danromero.eth",
+            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+        ]
+    },
+    {
+        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+        "identity": "tony.base.eth",
+        "platform": "basenames",
+        "displayName": "tony.base.eth",
+        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+        "description": "mfer building on base",
+        "email": null,
+        "location": null,
+        "header": null,
+        "contenthash": null,
+        "links": {
+            "website": {
+                "link": "https://mint.club",
+                "handle": "mint.club",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/tonymfer",
+                "handle": "tonymfer",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/tonmfer",
+                "handle": "tonmfer",
+                "sources": []
+            },
+            "farcaster": {
+                "link": "https://warpcast.com/to",
+                "handle": "to",
+                "sources": []
+            }
+        },
+        "social": {},
+        "aliases": [
+            "basenames,tony.base.eth",
+            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+        ]
+    },
+    {
+        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+        "identity": "sujiyan.eth",
+        "platform": "ens",
+        "displayName": "sujiyan.eth",
+        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+        "description": null,
+        "email": "suji.yan@dimension.im",
+        "location": null,
+        "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
+        "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
+        "links": {
+            "website": {
+                "link": "https://mask.io",
+                "handle": "mask.io",
+                "sources": []
+            },
+            "github": {
+                "link": "https://github.com/tedko",
+                "handle": "tedko",
+                "sources": []
+            },
+            "twitter": {
+                "link": "https://x.com/suji_yan",
+                "handle": "suji_yan",
+                "sources": []
+            },
+            "instagram": {
+                "link": "https://www.instagram.com/suji_yan_",
+                "handle": "suji_yan_",
+                "sources": []
+            }
+        },
+        "social": {},
+        "aliases": [
+            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+        ]
+    }
+]`}
                 <br />
                 <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/linea/0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea`}{" "}
-                </span>
+                <span
+                  className="text-gray"
+                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
+                >{`// ${BASE_URL}/ns/batch/${encodeURIComponent(
+                  JSON.stringify([
+                    "ens,vitalik.eth",
+                    "lens,stani.lens",
+                    "farcaster,dwr.eth",
+                    "basenames,tony.base.eth",
+                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                  ]),
+                )}`}</span>
                 <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/linea/0xthor.linea`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0x2e3b4ee7ca47ce12bdfa7bea215910947f53d9ea",
-    "identity": "0xthor.linea.eth",
-    "platform": "linea",
-    "displayName": "0xthor.linea.eth",
-    "avatar": null,
-    "description": null,
-}`}
+                {`[
+    {
+        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+        "identity": "vitalik.eth",
+        "platform": "ens",
+        "displayName": "vitalik.eth",
+        "avatar": "https://euc.li/vitalik.eth",
+        "description": "mi pinxe lo crino tcati",
+        "aliases": [
+            "ens,vitalik.eth",
+            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+        ]
+    },
+    {
+        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+        "identity": "stani.lens",
+        "platform": "lens",
+        "displayName": "Stani",
+        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+        "description": "@Avara (@Aave @Lens @Family)",
+        "aliases": [
+            "lens,#5",
+            "lens,stani.lens",
+            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+        ]
+    },
+    {
+        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+        "identity": "dwr.eth",
+        "platform": "farcaster",
+        "displayName": "Dan Romero",
+        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+        "description": "Working on Farcaster and Warpcast.",
+        "aliases": [
+            "farcaster,#3",
+            "farcaster,dwr",
+            "farcaster,dwr.eth",
+            "farcaster,danromero.eth",
+            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+        ]
+    },
+    {
+        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+        "identity": "tony.base.eth",
+        "platform": "basenames",
+        "displayName": "tony.base.eth",
+        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+        "description": "mfer building on base",
+        "aliases": [
+            "basenames,tony.base.eth",
+            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+        ]
+    },
+    {
+        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+        "identity": "sujiyan.eth",
+        "platform": "ens",
+        "displayName": "sujiyan.eth",
+        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+        "description": null,
+        "aliases": [
+            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+        ]
+    }
+]`}
               </code>
             </pre>
           </section>
