@@ -756,9 +756,9 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), a Basenames name, a Linea name
-                or an Unstoppable Domains domain.
+                An Ethereum address, an ENS domain, a Basenames domain, a Linea
+                Name Service domain, a Farcaster username (ends with
+                .farcaster), a Lens handle or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
