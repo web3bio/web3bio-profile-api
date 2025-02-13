@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/base";
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), BaseNames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, BaseNames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -86,7 +86,7 @@ export default function Home() {
                 className="text-underline"
                 title="Ethereum and Ethereum Name Service (ENS)"
               >
-                Ethereum (ENS)
+                Ethereum / ENS
               </span>
               , <span className="text-underline">BaseNames</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
@@ -96,7 +96,7 @@ export default function Home() {
                 className="text-underline"
                 title="Solana and Solana Name Service (Bonfida)"
               >
-                Solana (SNS)
+                Solana / SNS
               </span>
               , <span className="text-underline">Unstoppable Domains</span>, and
               more into their apps. These APIs are already integrated into{" "}
@@ -532,7 +532,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">ENS Profile API</div>
+                <div className="mr-2">Ethereum / ENS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -627,7 +627,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Solana/SNS Profile API</div>
+                <div className="mr-2">Solana / SNS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -651,7 +651,7 @@ export default function Home() {
                 </div>
               </div>
             </a> */}
-            <div className="pt-1 pb-1"></div>
+
             <a
               href="#batch-query"
               className="s-rounded d-flex mt-4 mb-4 p-1"
@@ -963,8 +963,8 @@ export default function Home() {
             id="ens-profile-api"
             style={{ paddingTop: "4rem" }}
           >
-            <h2 className="text-bold h4">ENS Profile API</h2>
-            <p>Retrieve an ENS profile or name service resolution</p>
+            <h2 className="text-bold h4">Ethereum / ENS Profile API</h2>
+            <p>Retrieve an Ethereum / ENS profile or name service resolution</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1275,7 +1275,7 @@ export default function Home() {
             style={{ paddingTop: "4rem" }}
           >
             <h2 className="text-bold h4">Linea Profile API</h2>
-            <p>Retrieve an Linea profile or name service resolution</p>
+            <p>Retrieve a Linea profile or name service resolution</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1850,9 +1850,10 @@ export default function Home() {
             id="solana-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Solana (SNS) Profile API</h2>
+            <h2 className="text-bold h4">Solana / SNS Profile API</h2>
             <p>
-              Retrieve a Solana Name Service profile or name service resolution
+              Retrieve a Solana / Solana Name Service (SNS) profile or name
+              service resolution
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -2665,6 +2666,16 @@ export default function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
+              February Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added Linea
+                Name Service query support to the Profile API.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
               November Update
