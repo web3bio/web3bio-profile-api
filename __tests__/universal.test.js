@@ -155,7 +155,6 @@ describe("Test For Universal Profile API", () => {
   it("It should response 200 for suji_yan.twitter", async () => {
     const res = await queryClient("/profile/suji_yan.twitter");
     const json = await res.json();
-    expect(json[0].platform).toBe("twitter");
-    expect(json[0].identity).toBe("suji_yan");
+    expect(json[0].platform).toBe("ens");
   });
 });
