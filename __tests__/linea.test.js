@@ -21,11 +21,12 @@ describe("Test For Linea Profile API", () => {
   });
   it("It should response 200 for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
     const res = await queryClient(
-      "/profile/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      "/profile/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d"
     );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("184.linea.eth");
+    expect(json.links.website.handle).toBe("184.eth.limo");
   });
   it("It should response 200 for tacoz.linea.eth", async () => {
     const res = await queryClient("/profile/linea/tacoz.linea");

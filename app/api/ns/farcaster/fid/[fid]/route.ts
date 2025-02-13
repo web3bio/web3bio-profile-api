@@ -1,13 +1,13 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
+import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
-import { resolveFarcasterHandleNS } from "../../[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
-  const fid = searchParams.get("fid")?.toLowerCase() || "";
+  const fid = searchParams.get("fid") || "";
   const headers = getUserHeaders(req);
   if (!regexUID.test(fid))
     return errorHandle({
@@ -16,26 +16,12 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-
-  try {
-    const json = (await resolveFarcasterHandleNS(`#${fid}`, headers)) as any;
-    if (json.code) {
-      return errorHandle({
-        identity: `#${fid}`,
-        platform: PlatformType.farcaster,
-        code: json.code,
-        message: json.message,
-      });
-    }
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return errorHandle({
-      identity: `#${fid}`,
-      platform: PlatformType.farcaster,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
+  return resolveIdentityRespond(
+    `#${fid}`,
+    PlatformType.farcaster,
+    headers,
+    true
+  );
 }
 
 export const runtime = "edge";

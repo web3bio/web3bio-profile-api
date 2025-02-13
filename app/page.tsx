@@ -3,9 +3,9 @@ import Script from "next/script";
 import { BASE_URL } from "../utils/base";
 
 export async function generateMetadata() {
-  const title = "Web3.bio Profile API - Web3 Identity Resolver";
+  const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum (ENS), Basenames, Farcaster, Lens Protocol, Unstoppable Domains, and Solana Name Service into their applications.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -44,6 +44,7 @@ export async function generateMetadata() {
       "DID",
       "DID Search Engine",
       "DID Explorer",
+      "Ethereum Identity Kit",
       "Web3 Domain Search",
       "Web3 Domain Explorer",
       "Web3 Domain WHOIS",
@@ -74,8 +75,8 @@ export default function Home() {
             <strong className="text-bold">Web3.bio Profile API</strong>
           </h1>
           <h2 className="h6 text-gray mb-4 pb-4">
-            Web3 Identity Resolver · Web3 DID Resolver · Web3 Domain Name
-            Service Resolver
+            Multi-Chain Identity & Domain Resolver API for Ethereum, ENS
+            Ecosystem, Farcaster, Lens, and Solana.
           </h2>
           <section className="mt-4 pt-4 pb-4">
             <p>
@@ -85,20 +86,20 @@ export default function Home() {
                 className="text-underline"
                 title="Ethereum and Ethereum Name Service (ENS)"
               >
-                Ethereum (ENS)
+                Ethereum / ENS
               </span>
               , <span className="text-underline">Basenames</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
-              <span className="text-underline">Lens Protocol</span>,{" "}
-              <span className="text-underline">Unstoppable Domains</span>,{" "}
+              <span className="text-underline">Lens</span>,{" "}
+              <span className="text-underline">Linea Name Service</span>,{" "}
               <span
                 className="text-underline"
                 title="Solana and Solana Name Service (Bonfida)"
               >
-                Solana (SNS)
-              </span>{" "}
-              and more into their applications. These APIs are already
-              integrated into{" "}
+                Solana / SNS
+              </span>
+              , <span className="text-underline">Unstoppable Domains</span>, and
+              more into their apps. These APIs are already integrated into{" "}
               <a
                 href="https://web3.bio"
                 target="_blank"
@@ -518,26 +519,12 @@ export default function Home() {
                 <div className="mr-2">Universal Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
             </a>
-            <a
-              href="#batch-query"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Batch Query</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
+
             <a
               href="#ens-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
@@ -545,10 +532,41 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">ENS Profile API</div>
+                <div className="mr-2">Ethereum / ENS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+            <a
+              href="#basenames-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Basenames Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#linea-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Linea Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -564,7 +582,7 @@ export default function Home() {
                 <div className="mr-2">Farcaster Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -580,7 +598,7 @@ export default function Home() {
                 <div className="mr-2">Lens Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -596,7 +614,7 @@ export default function Home() {
                 <div className="mr-2">Unstoppable Domains Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -609,16 +627,16 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Solana Profile API</div>
+                <div className="mr-2">Solana / SNS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
             </a>
 
-            <a
+            {/* <a
               href="#dotbit-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -628,7 +646,23 @@ export default function Home() {
                 <div className="mr-2">.bit Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="label text-small">
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a> */}
+
+            <a
+              href="#batch-query"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Batch Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
                   <span className="hide-sm">Endpoints</span> &rarr;
                 </div>
               </div>
@@ -722,9 +756,9 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), or an Unstoppable Domains
-                domain.
+                An Ethereum address, an ENS domain, a Basenames domain, a Linea
+                Name Service domain, a Farcaster username (ends with
+                .farcaster), a Lens handle or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -755,6 +789,26 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a href={`${BASE_URL}/ns/vitalik.eth`} target="_blank">
                   /ns/vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a href={`${BASE_URL}/profile/tony.base.eth`} target="_blank">
+                  /profile/tony.base.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/tony.base.eth`} target="_blank">
+                  /ns/tony.base.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea</span>{" "}
+                <a href={`${BASE_URL}/profile/name.linea.eth`} target="_blank">
+                  /profile/name.linea.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/name.linea.eth`} target="_blank">
+                  /ns/name.linea.eth
                 </a>
               </li>
               <li>
@@ -829,7 +883,11 @@ export default function Home() {
                 "sources": []
             }
         },
-        "social": {}
+        "social": {
+            "uid": null,
+            "follower": 4449,
+            "following": 10
+        }
     },
     {
         "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
@@ -847,7 +905,7 @@ export default function Home() {
                 "link": "https://warpcast.com/vitalik.eth",
                 "handle": "vitalik.eth",
                 "sources": [
-                    "ethereum"
+                    "farcaster"
                 ]
             }
         },
@@ -873,7 +931,7 @@ export default function Home() {
                 "link": "https://www.lensfrens.xyz/vitalik",
                 "handle": "vitalik",
                 "sources": [
-                    "ethereum"
+                    "lens"
                 ]
             }
         },
@@ -916,6 +974,1178 @@ export default function Home() {
         "description": null
     }
 ]`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pb-4"
+            id="ens-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Ethereum / ENS Profile API</h2>
+            <p>Retrieve an Ethereum / ENS profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or an ENS domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  target="_blank"
+                >
+                  profile/ens/0xd8da...6045
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  target="_blank"
+                >
+                  /ns/ens/0xd8da...6045
+                </a>
+              </li>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a href={`${BASE_URL}/profile/ens/vitalik.eth`} target="_blank">
+                  /profile/ens/vitalik.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/ens/vitalik.eth`} target="_blank">
+                  /ns/ens/vitalik.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/ens/vitalik.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    "identity": "vitalik.eth",
+    "platform": "ens",
+    "displayName": "vitalik.eth",
+    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+    "description": null,
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
+    "links": {
+        "website": {
+            "link": "https://vitalik.ca",
+            "handle": "vitalik.ca",
+            "sources": []
+        },
+        "github": {
+            "link": "https://github.com/vbuterin",
+            "handle": "vbuterin",
+            "sources": []
+        },
+        "twitter": {
+            "link": "https://x.com/VitalikButerin",
+            "handle": "VitalikButerin",
+            "sources": []
+        }
+    },
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/ens/vitalik.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+    "identity": "vitalik.eth",
+    "platform": "ens",
+    "displayName": "vitalik.eth",
+    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+    "description": null
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pb-4"
+            id="basenames-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Basenames Profile API</h2>
+            <p>Retrieve a Basenames profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  basenames
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  basenames
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Basenames domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}
+                  target="_blank"
+                >
+                  profile/basenames/0x041b...44c4
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}
+                  target="_blank"
+                >
+                  /ns/basenames/0x041b...44c4
+                </a>
+              </li>
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/basenames/tony.base.eth`}
+                  target="_blank"
+                >
+                  /profile/basenames/tony.base.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/basenames/tony.base.eth`}
+                  target="_blank"
+                >
+                  /ns/basenames/tony.base.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/basenames/tony.base.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+    "identity": "tony.base.eth",
+    "platform": "basenames",
+    "displayName": "tony.base.eth",
+    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+    "description": "mfer building on base",
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {
+      "website": {
+        "link": "https://mint.club",
+        "handle": "mint.club",
+        "sources": []
+      },
+      "github": {
+        "link": "https://github.com/tonymfer",
+        "handle": "tonymfer",
+        "sources": []
+      },
+      "twitter": {
+        "link": "https://x.com/tonmfer",
+        "handle": "tonmfer",
+        "sources": []
+      },
+      "farcaster": {
+        "link": "https://warpcast.com/to",
+        "handle": "to",
+        "sources": []
+      }
+    },
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/basenames/tony.base.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+    "identity": "tony.base.eth",
+    "platform": "basenames",
+    "displayName": "tony.base.eth",
+    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+    "description": "mfer building on base"
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pb-4"
+            id="linea-profile-api"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Linea Profile API</h2>
+            <p>Retrieve a Linea profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  linea
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Linea domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}
+                  target="_blank"
+                >
+                  profile/linea/0xa4d4...0e47
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}
+                  target="_blank"
+                >
+                  /ns/linea/0xa4d4...0e47
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/linea/name.linea.eth`}
+                  target="_blank"
+                >
+                  /profile/linea/name.linea.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/linea/name.linea.eth`} target="_blank">
+                  /ns/linea/name.linea.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/profile/linea/name.linea.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+    "identity": "name.linea.eth",
+    "platform": "linea",
+    "displayName": "name.linea.eth",
+    "avatar": null,
+    "description": null,
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {},
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
+                </span>
+                <br />
+                <span className="text-gray">
+                  {`// ${BASE_URL}/ns/linea/name.linea.eth`}{" "}
+                </span>
+                <br />
+                {`{
+    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+    "identity": "name.linea.eth",
+    "platform": "linea",
+    "displayName": "name.linea.eth",
+    "avatar": null,
+    "description": null
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="farcaster-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Farcaster Profile API</h2>
+            <p>Retrieve a Farcaster profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  farcaster
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  farcaster
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Farcaster username/fname or a Farcaster
+                FID (with fid/).
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  target="_blank"
+                >
+                  /profile/farcaster/0x8fc5...a2ea
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  target="_blank"
+                >
+                  /ns/farcaster/0x8fc5...a2ea
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/farcaster/dwr.eth`}
+                  target="_blank"
+                >
+                  /profile/farcaster/dwr.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/farcaster/dwr.eth`} target="_blank">
+                  /ns/farcaster/dwr.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a href={`${BASE_URL}/profile/farcaster/fid/3`} target="_blank">
+                  /profile/farcaster/fid/3
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/farcaster/fid/3`} target="_blank">
+                  /ns/farcaster/fid/3
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid/3`}</span>
+                <br />
+                {`{
+    "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+    "identity": "dwr.eth",
+    "platform": "farcaster",
+    "displayName": "Dan Romero",
+    "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+    "description": "Working on Farcaster and Warpcast.",
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {
+        "farcaster": {
+            "link": "https://warpcast.com/dwr.eth",
+            "handle": "dwr.eth",
+            "sources": [
+                "farcaster"
+            ]
+        }
+    },
+    "social": {
+        "uid": 3,
+        "follower": 493153,
+        "following": 3534
+    }
+}`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid/3`}</span>
+                <br />
+                {`{
+    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
+    "identity": "dwr.eth",
+    "platform": "farcaster",
+    "displayName": "Dan Romero",
+    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
+    "description": "Working on Farcaster and Warpcast."
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="lens-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Lens Profile API</h2>
+            <p>Retrieve a Lens profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  lens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  lens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum/Polygon address or a Lens handle.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum / Polygon</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  target="_blank"
+                >
+                  /profile/lens/0x7241...9dff
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  target="_blank"
+                >
+                  /ns/lens/0x7241...9dff
+                </a>
+              </li>
+              <li>
+                <span className="label">Lens</span>{" "}
+                <a href={`${BASE_URL}/profile/lens/stani.lens`} target="_blank">
+                  /profile/lens/stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/lens/stani.lens`} target="_blank">
+                  /ns/lens/stani.lens
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
+                <br />
+                {`{
+    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+    "identity": "stani.lens",
+    "platform": "lens",
+    "displayName": "Stani",
+    "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+    "email": null,
+    "description": "@Avara (@Aave @Lens @Family)",
+    "location": null,
+    "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
+    "contenthash": null,
+    "links": {
+        "lens": {
+            "link": "https://www.lensfrens.xyz/stani",
+            "handle": "stani",
+            "sources": [
+                "lens"
+            ]
+        }
+    },
+    "social": {
+        "uid": 5,
+        "follower": 115084,
+        "following": 1265
+    }
+}`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
+                <br />
+                {`{
+    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+    "identity": "stani.lens",
+    "platform": "lens",
+    "displayName": "Stani",
+    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
+    "description": "@Avara (@Aave @Lens @Family)"
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="unstoppabledomains-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
+            <p>
+              Retrieve an Unstoppable Domains profile or name service resolution
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  unstoppabledomains
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  unstoppabledomains
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or an Unstoppable Domains domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
+                  target="_blank"
+                >
+                  /profile/unstoppabledomains/0x94ef...ab23
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
+                  target="_blank"
+                >
+                  /ns/unstoppabledomains/0x94ef...ab23
+                </a>
+              </li>
+              <li>
+                <span className="label">Unstoppable Domains</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/unstoppabledomains/sandy.nft`}
+                  target="_blank"
+                >
+                  /profile/unstoppabledomains/sandy.nft
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/unstoppabledomains/sandy.nft`}
+                  target="_blank"
+                >
+                  /ns/unstoppabledomains/sandy.nft
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/sandy.nft`}</span>
+                <br />
+                {`{
+    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+    "identity": "sandy.nft",
+    "platform": "unstoppabledomains",
+    "displayName": "Pink Mamba",
+    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
+    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
+    "email": null,
+    "location": "Metaverse",
+    "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
+    "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
+    "links": {
+        "twitter": {
+            "link": "https://x.com/Sandy_carter",
+            "handle": "Sandy_carter",
+            "sources": []
+        },
+        "telegram": {
+            "link": "https://t.me/sandycarter",
+            "handle": "sandycarter",
+            "sources": []
+        },
+        "youtube": {
+            "link": "https://www.youtube.com/@sandycarter3993",
+            "handle": "@sandycarter3993",
+            "sources": []
+        }
+    },
+    "social": {
+        "uid": "sandy.nft",
+        "follower": 137,
+        "following": 0
+    }
+}`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/sandy.nft`}</span>
+                <br />
+                {`{
+    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+    "identity": "sandy.nft",
+    "platform": "unstoppabledomains",
+    "displayName": "Pink Mamba",
+    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
+    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="solana-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Solana / SNS Profile API</h2>
+            <p>
+              Retrieve a Solana / Solana Name Service (SNS) profile or name
+              service resolution
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  solana
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  solana
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />A Solana address or a Solana Name Service domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Solana</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
+                  target="_blank"
+                >
+                  /profile/solana/HKKp49qGWXd6...
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
+                  target="_blank"
+                >
+                  /ns/solana/HKKp49qGWXd6...
+                </a>
+              </li>
+              <li>
+                <span className="label">Solana Name Service</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/solana/bonfida.sol`}
+                  target="_blank"
+                >
+                  /profile/solana/bonfida.sol
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/solana/bonfida.sol`} target="_blank">
+                  /ns/solana/bonfida.sol
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/solana/bonfida.sol`}</span>
+                <br />
+                {`{
+    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+    "identity": "bonfida.sol",
+    "platform": "sns",
+    "displayName": "bonfida.sol",
+    "avatar": null,
+    "description": null,
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": null,
+    "links": {},
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/solana/bonfida.sol`}</span>
+                <br />
+                {`{
+    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+    "identity": "bonfida.sol",
+    "platform": "sns",
+    "displayName": "bonfida.sol",
+    "avatar": null,
+    "description": null,
+}`}
+              </code>
+            </pre>
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="dotbit-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">.bit Profile API</h2>
+            <p>Retrieve a .bit profile or name service resolution</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  dotbit
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  dotbit
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a .bit username.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
+                  target="_blank"
+                >
+                  /profile/dotbit/0xfa8f...7f1d
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
+                  target="_blank"
+                >
+                  /ns/dotbit/0xfa8f...7f1d
+                </a>
+              </li>
+              <li>
+                <span className="label">.bit</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/dotbit/bestcase.bit`}
+                  target="_blank"
+                >
+                  /profile/dotbit/bestcase.bit
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/dotbit/bestcase.bit`} target="_blank">
+                  /ns/dotbit/bestcase.bit
+                </a>
+              </li>
+            </ul>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/bestcase.bit`}</span>
+                <br />
+                {`{
+    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+    "identity": "bestcase.bit",
+    "platform": "dotbit",
+    "displayName": "bestcase.bit",
+    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
+    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world.",
+    "email": null,
+    "location": null,
+    "header": null,
+    "contenthash": "ipns://libp2p.io",
+    "links": {
+        "twitter": {
+            "link": "https://x.com/dotbitHQ",
+            "handle": "dotbitHQ",
+            "sources": []
+        },
+        "github": {
+            "link": "https://github.com/dotbitHQ",
+            "handle": "dotbitHQ",
+            "sources": []
+        },
+        "discord": {
+            "link": "https://discord.com/invite/did",
+            "handle": "did",
+            "sources": []
+        },
+        "website": {
+            "link": "https://www.did.id/",
+            "handle": "www.did.id",
+            "sources": []
+        },
+        "nostr": {
+            "link": "https://app.coracle.social/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
+            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
+            "sources": []
+        },
+        "opensea": {
+            "link": "https://opensea.io/collection/dotbit",
+            "handle": "dotbit",
+            "sources": []
+        }
+    },
+    "social": {}
+}`}
+                <br />
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/bestcase.bit`}</span>
+                <br />
+                {`{
+    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
+    "identity": "bestcase.bit",
+    "platform": "dotbit",
+    "displayName": "bestcase.bit",
+    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
+    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world."
+}`}
               </code>
             </pre>
           </section>
@@ -1399,879 +2629,6 @@ export default function Home() {
           </section>
 
           <section
-            className="pb-4"
-            id="ens-profile-api"
-            style={{ paddingTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">ENS Profile API</h2>
-            <p>Retrieve an ENS profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or an ENS domain.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
-                  target="_blank"
-                >
-                  profile/ens/0xd8da...6045
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
-                  target="_blank"
-                >
-                  /ns/ens/0xd8da...6045
-                </a>
-              </li>
-              <li>
-                <span className="label">ENS</span>{" "}
-                <a href={`${BASE_URL}/profile/ens/vitalik.eth`} target="_blank">
-                  /profile/ens/vitalik.eth
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/ens/vitalik.eth`} target="_blank">
-                  /ns/ens/vitalik.eth
-                </a>
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Responses
-            </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/ens/vitalik.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-    "identity": "vitalik.eth",
-    "platform": "ens",
-    "displayName": "vitalik.eth",
-    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-    "description": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
-    "links": {
-        "website": {
-            "link": "https://vitalik.ca",
-            "handle": "vitalik.ca",
-            "sources": []
-        },
-        "github": {
-            "link": "https://github.com/vbuterin",
-            "handle": "vbuterin",
-            "sources": []
-        },
-        "twitter": {
-            "link": "https://x.com/VitalikButerin",
-            "handle": "VitalikButerin",
-            "sources": []
-        }
-    },
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/ens/vitalik.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-    "identity": "vitalik.eth",
-    "platform": "ens",
-    "displayName": "vitalik.eth",
-    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-    "description": null
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="farcaster-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Farcaster Profile API</h2>
-            <p>Retrieve a Farcaster profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  farcaster
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  farcaster
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or a Farcaster username/fname or a Farcaster
-                FID (with fid/).
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
-                  target="_blank"
-                >
-                  /profile/farcaster/0x8fc5...a2ea
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
-                  target="_blank"
-                >
-                  /ns/farcaster/0x8fc5...a2ea
-                </a>
-              </li>
-              <li>
-                <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/farcaster/dwr.eth`}
-                  target="_blank"
-                >
-                  /profile/farcaster/dwr.eth
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/dwr.eth`} target="_blank">
-                  /ns/farcaster/dwr.eth
-                </a>
-              </li>
-              <li>
-                <span className="label">Farcaster</span>{" "}
-                <a href={`${BASE_URL}/profile/farcaster/fid/3`} target="_blank">
-                  /profile/farcaster/fid/3
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/fid/3`} target="_blank">
-                  /ns/farcaster/fid/3
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid/3`}</span>
-                <br />
-                {`{
-    "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-    "identity": "dwr.eth",
-    "platform": "farcaster",
-    "displayName": "Dan Romero",
-    "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-    "description": "Working on Farcaster and Warpcast.",
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {
-        "farcaster": {
-            "link": "https://warpcast.com/dwr.eth",
-            "handle": "dwr.eth",
-            "sources": [
-                "ethereum"
-            ]
-        }
-    },
-    "social": {
-        "uid": 3,
-        "follower": 493153,
-        "following": 3534
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid/3`}</span>
-                <br />
-                {`{
-    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
-    "identity": "dwr.eth",
-    "platform": "farcaster",
-    "displayName": "Dan Romero",
-    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
-    "description": "Working on Farcaster and Warpcast."
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="lens-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Lens Profile API</h2>
-            <p>Retrieve a Lens profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  lens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  lens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum/Polygon address or a Lens handle.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum / Polygon</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
-                  target="_blank"
-                >
-                  /profile/lens/0x7241...9dff
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
-                  target="_blank"
-                >
-                  /ns/lens/0x7241...9dff
-                </a>
-              </li>
-              <li>
-                <span className="label">Lens</span>{" "}
-                <a href={`${BASE_URL}/profile/lens/stani.lens`} target="_blank">
-                  /profile/lens/stani.lens
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/lens/stani.lens`} target="_blank">
-                  /ns/lens/stani.lens
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
-                <br />
-                {`{
-    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-    "identity": "stani.lens",
-    "platform": "lens",
-    "displayName": "Stani",
-    "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-    "email": null,
-    "description": "@Avara (@Aave @Lens @Family)",
-    "location": null,
-    "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
-    "contenthash": null,
-    "links": {
-        "lens": {
-            "link": "https://www.lensfrens.xyz/stani",
-            "handle": "stani",
-            "sources": [
-                "ethereum"
-            ]
-        }
-    },
-    "social": {
-        "uid": 5,
-        "follower": 115084,
-        "following": 1265
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
-                <br />
-                {`{
-    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-    "identity": "stani.lens",
-    "platform": "lens",
-    "displayName": "Stani",
-    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-    "description": "@Avara (@Aave @Lens @Family)"
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="unstoppabledomains-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
-            <p>
-              Retrieve an Unstoppable Domains profile or name service resolution
-            </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  unstoppabledomains
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  unstoppabledomains
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or an Unstoppable Domains domain.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/0x94ef...ab23
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
-                  target="_blank"
-                >
-                  /ns/unstoppabledomains/0x94ef...ab23
-                </a>
-              </li>
-              <li>
-                <span className="label">Unstoppable Domains</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/unstoppabledomains/sandy.nft`}
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/sandy.nft
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/unstoppabledomains/sandy.nft`}
-                  target="_blank"
-                >
-                  /ns/unstoppabledomains/sandy.nft
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/sandy.nft`}</span>
-                <br />
-                {`{
-    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-    "identity": "sandy.nft",
-    "platform": "unstoppabledomains",
-    "displayName": "Pink Mamba",
-    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
-    "email": null,
-    "location": "Metaverse",
-    "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
-    "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
-    "links": {
-        "twitter": {
-            "link": "https://x.com/Sandy_carter",
-            "handle": "Sandy_carter",
-            "sources": []
-        },
-        "telegram": {
-            "link": "https://t.me/sandycarter",
-            "handle": "sandycarter",
-            "sources": []
-        },
-        "youtube": {
-            "link": "https://www.youtube.com/@sandycarter3993",
-            "handle": "@sandycarter3993",
-            "sources": []
-        }
-    },
-    "social": {
-        "uid": "sandy.nft",
-        "follower": 137,
-        "following": 0
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/sandy.nft`}</span>
-                <br />
-                {`{
-    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-    "identity": "sandy.nft",
-    "platform": "unstoppabledomains",
-    "displayName": "Pink Mamba",
-    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="solana-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Solana (SNS) Profile API</h2>
-            <p>
-              Retrieve a Solana Name Service profile or name service resolution
-            </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  solana
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  solana
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />A Solana address or a Solana Name Service domain.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Solana</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
-                  target="_blank"
-                >
-                  /profile/solana/HKKp49qGWXd6...
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}
-                  target="_blank"
-                >
-                  /ns/solana/HKKp49qGWXd6...
-                </a>
-              </li>
-              <li>
-                <span className="label">Solana Name Service</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/solana/bonfida.sol`}
-                  target="_blank"
-                >
-                  /profile/solana/bonfida.sol
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/solana/bonfida.sol`} target="_blank">
-                  /ns/solana/bonfida.sol
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/solana/bonfida.sol`}</span>
-                <br />
-                {`{
-    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
-    "identity": "bonfida.sol",
-    "platform": "sns",
-    "displayName": "bonfida.sol",
-    "avatar": null,
-    "description": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {},
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/solana/bonfida.sol`}</span>
-                <br />
-                {`{
-    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
-    "identity": "bonfida.sol",
-    "platform": "sns",
-    "displayName": "bonfida.sol",
-    "avatar": null,
-    "description": null,
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="dotbit-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">.bit Profile API</h2>
-            <p>Retrieve a .bit profile or name service resolution</p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  dotbit
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  dotbit
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or a .bit username.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
-                  target="_blank"
-                >
-                  /profile/dotbit/0xfa8f...7f1d
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}
-                  target="_blank"
-                >
-                  /ns/dotbit/0xfa8f...7f1d
-                </a>
-              </li>
-              <li>
-                <span className="label">.bit</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/dotbit/bestcase.bit`}
-                  target="_blank"
-                >
-                  /profile/dotbit/bestcase.bit
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/dotbit/bestcase.bit`} target="_blank">
-                  /ns/dotbit/bestcase.bit
-                </a>
-              </li>
-            </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/dotbit/bestcase.bit`}</span>
-                <br />
-                {`{
-    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
-    "identity": "bestcase.bit",
-    "platform": "dotbit",
-    "displayName": "bestcase.bit",
-    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
-    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world.",
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": "ipns://libp2p.io",
-    "links": {
-        "twitter": {
-            "link": "https://x.com/dotbitHQ",
-            "handle": "dotbitHQ",
-            "sources": []
-        },
-        "github": {
-            "link": "https://github.com/dotbitHQ",
-            "handle": "dotbitHQ",
-            "sources": []
-        },
-        "discord": {
-            "link": "https://discord.com/invite/did",
-            "handle": "did",
-            "sources": []
-        },
-        "website": {
-            "link": "https://www.did.id/",
-            "handle": "www.did.id",
-            "sources": []
-        },
-        "nostr": {
-            "link": "https://app.coracle.social/npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
-            "handle": "npub1y0epuwrv23vcue2g5ft8armwdsjfd4dy6frzwmw72y847d3v2ahq7vh2ag",
-            "sources": []
-        },
-        "opensea": {
-            "link": "https://opensea.io/collection/dotbit",
-            "handle": "dotbit",
-            "sources": []
-        }
-    },
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/0xfa8fa9cf58eaff86aa208366a14d69de87867f1d`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/dotbit/bestcase.bit`}</span>
-                <br />
-                {`{
-    "address": "0xfa8fa9cf58eaff86aa208366a14d69de87867f1d",
-    "identity": "bestcase.bit",
-    "platform": "dotbit",
-    "displayName": "bestcase.bit",
-    "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
-    "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world."
-}`}
-              </code>
-            </pre>
-          </section>
-
-          <section
             className="pt-4 pb-4"
             id="errors"
             style={{ marginTop: "4rem" }}
@@ -2329,6 +2686,16 @@ export default function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
+              February Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added Linea
+                Name Service query support to the Profile API.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
               November Update
