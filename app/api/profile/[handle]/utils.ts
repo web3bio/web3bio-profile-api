@@ -224,8 +224,8 @@ export const resolveUniversalHandle = async (
 
 export const resolveUniversalParams = (handle: string) => {
   let platform = "" as PlatformType,
-    identity = "";
-  if (!handle)
+    identity = handle;
+  if (!handle || ![0, 1].includes(handle?.split(",")?.length - 1))
     return {
       identity,
       platform,
