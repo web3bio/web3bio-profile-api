@@ -2,6 +2,7 @@ import {
   PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
+  handleSearchPlatform,
   isValidEthereumAddress,
   prettify,
   respondWithCache,
@@ -21,6 +22,7 @@ import {
 
 import { processJson } from "../../graph/utils";
 import { generateProfileStruct } from "@/utils/utils";
+import { regexBtc, regexSolana } from "@/utils/regexp";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -218,4 +220,28 @@ export const resolveUniversalHandle = async (
   } else {
     return respondWithCache(JSON.stringify(res));
   }
+};
+
+export const resolveUniversalParams = (handle: string)=> {
+  if (!handle)
+    return {
+      identity: "",
+      platform: "" as PlatformType,
+    };
+  let platform = "" as PlatformType,
+    identity = "";
+  if (handle.includes(",")) {
+    platform = handle.split(",")[0] as PlatformType;
+    identity = handle.split(",")[1];
+  } else {
+    identity = handle;
+    platform = handleSearchPlatform(identity);
+  }
+  identity = [regexSolana, regexBtc].some((x) => x.test(identity))
+    ? identity
+    : identity.toLowerCase();
+  return {
+    identity,
+    platform,
+  };
 };
