@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/base";
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, BaseNames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -88,7 +88,7 @@ export default function Home() {
               >
                 Ethereum / ENS
               </span>
-              , <span className="text-underline">BaseNames</span>,{" "}
+              , <span className="text-underline">Basenames</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Lens</span>,{" "}
               <span className="text-underline">Linea Name Service</span>,{" "}
@@ -547,7 +547,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">BaseNames Profile API</div>
+                <div className="mr-2">Basenames Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -757,8 +757,8 @@ export default function Home() {
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
                 An Ethereum address, an ENS domain, a Lens handle, a Farcaster
-                username (ends with .farcaster), or an Unstoppable Domains
-                domain.
+                username (ends with .farcaster), a Basenames name, a Linea name
+                or an Unstoppable Domains domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -789,6 +789,26 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a href={`${BASE_URL}/ns/vitalik.eth`} target="_blank">
                   /ns/vitalik.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a href={`${BASE_URL}/profile/tony.base.eth`} target="_blank">
+                  /profile/tony.base.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/tony.base.eth`} target="_blank">
+                  /ns/tony.base.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea</span>{" "}
+                <a href={`${BASE_URL}/profile/name.linea.eth`} target="_blank">
+                  /profile/name.linea.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/name.linea.eth`} target="_blank">
+                  /ns/name.linea.eth
                 </a>
               </li>
               <li>
@@ -1113,8 +1133,8 @@ export default function Home() {
             id="basenames-profile-api"
             style={{ paddingTop: "4rem" }}
           >
-            <h2 className="text-bold h4">BaseNames Profile API</h2>
-            <p>Retrieve an BaseNames profile or name service resolution</p>
+            <h2 className="text-bold h4">Basenames Profile API</h2>
+            <p>Retrieve a Basenames profile or name service resolution</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1159,7 +1179,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a BaseNames domain.
+                An Ethereum address or a Basenames domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1183,7 +1203,7 @@ export default function Home() {
                 </a>
               </li>
               <li>
-                <span className="label">BaseNames</span>{" "}
+                <span className="label">Basenames</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/basenames/tony.base.eth`}
                   target="_blank"
@@ -1195,7 +1215,7 @@ export default function Home() {
                   href={`${BASE_URL}/ns/basenames/tony.base.eth`}
                   target="_blank"
                 >
-                  /ns/baesname/tony.base.eth
+                  /ns/basenames/tony.base.eth
                 </a>
               </li>
             </ul>
@@ -2322,7 +2342,7 @@ export default function Home() {
                 </a>
               </li>
               <li>
-                <span className="label">BaseNames</span>{" "}
+                <span className="label">Basenames</span>{" "}
                 <a
                   href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify(["basenames,tony.base.eth"]),
@@ -2696,7 +2716,7 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added
-                BaseNames query support to the Profile API.
+                Basenames query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
