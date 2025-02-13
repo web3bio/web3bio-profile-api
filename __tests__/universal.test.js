@@ -153,7 +153,7 @@ describe("Test For Universal Profile API", () => {
     expect(json.some((x) => x.platform === "ens")).toBe(true);
   });
   it("It should response 200 for suji_yan.twitter", async () => {
-    const res = await queryClient("/profile/suji_yan.twitter");
+    const res = await queryClient("/profile/twitter,suji_yan");
     const json = await res.json();
     expect(json[0].platform).toBe("ens");
   });

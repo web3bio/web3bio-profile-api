@@ -70,4 +70,20 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(false);
   });
+  it("It should response 200 data for linea,184.liena", async () => {
+    const res = await queryClient(
+      "/ns/linea,184.linea"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.some((x) => x.platform === "linea")).toBe(true);
+  });
+  it("It should response 200 data for solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y", async () => {
+    const res = await queryClient(
+      "/ns/solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.some((x) => x.platform === "linea")).toBe(false);
+  });
 });
