@@ -1,9 +1,9 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
+import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
-import { resolveSNSHandle } from "../../sns/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -16,25 +16,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  try {
-    const json = (await resolveSNSHandle(handle, headers)) as any;
-    if (json.code) {
-      return errorHandle({
-        identity: handle,
-        platform: PlatformType.solana,
-        code: json.code,
-        message: json.message,
-      });
-    }
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.sns,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
+  return resolveIdentityRespond(handle, PlatformType.sns, headers, false);
 }
 
 export const runtime = "edge";

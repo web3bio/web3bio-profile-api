@@ -7,7 +7,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexBasenames } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveEtherRespond } from "@/utils/utils";
+import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
 
-  return resolveEtherRespond(handle, PlatformType.basenames, headers, false);
+  return resolveIdentityRespond(handle, PlatformType.basenames, headers, false);
 }
 
 export const runtime = "edge";

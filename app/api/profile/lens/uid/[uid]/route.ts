@@ -1,9 +1,9 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveLensHandle } from "../../[handle]/utils";
+import { resolveIdentityRespond } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -16,26 +16,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-
-  try {
-    const json = (await resolveLensHandle(`#${uid}`, headers)) as any;
-    if (json.code) {
-      return errorHandle({
-        identity: `#${uid}`,
-        platform: PlatformType.lens,
-        code: json.code,
-        message: json.message,
-      });
-    }
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
-    return errorHandle({
-      identity: uid,
-      platform: PlatformType.lens,
-      code: e.cause || 500,
-      message: e.message,
-    });
-  }
+  return resolveIdentityRespond(`#${uid}`, PlatformType.lens, headers, false);
 }
 
 export const runtime = "edge";

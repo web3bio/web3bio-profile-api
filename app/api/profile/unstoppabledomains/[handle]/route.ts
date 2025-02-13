@@ -7,7 +7,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexUnstoppableDomains } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveUDRespond } from "./utils";
+import { resolveIdentityRespond } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -20,7 +20,12 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveUDRespond(handle, headers);
+  return resolveIdentityRespond(
+    handle,
+    PlatformType.unstoppableDomains,
+    headers,
+    false
+  );
 }
 
 export const runtime = "edge";
