@@ -129,9 +129,9 @@ export async function fetchIdentityGraphBatch(
           res.push({
             ...(await generateProfileStruct(
               item.profile || {
-                platform: item.platform,
-                address: item.identity,
+                address: isWeb3Address(item.identity) ? item.identity : null,
                 identity: item.identity,
+                platform: item.platform,
                 displayName: isWeb3Address(item.identity)
                   ? formatText(item.identity)
                   : item.identity,

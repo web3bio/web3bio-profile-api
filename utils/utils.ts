@@ -3,6 +3,7 @@ import {
   formatText,
   handleSearchPlatform,
   isValidEthereumAddress,
+  isWeb3Address,
   prettify,
   respondWithCache,
   shouldPlatformFetch,
@@ -96,7 +97,7 @@ export const resolveIdentityResponse = async (
       if (platform === PlatformType.ens && !isValidEthereumAddress(handle))
         throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
       nsResponse = {
-        address: handle,
+        address: isWeb3Address(handle) ? handle : null,
         identity: handle,
         platform:
           platform === PlatformType.ens
