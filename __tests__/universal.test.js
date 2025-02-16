@@ -157,4 +157,20 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].platform).toBe("ens");
   });
+  it("It should response 200 for nextid,0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50", async () => {
+    const res = await queryClient(
+      "/profile/nextid,0x028f936e528de34fc95179780751ec21256825ce604950580978a8961c5af03e50"
+    );
+    const json = await res.json();
+    expect(json[0].platform).toBe("ens");
+    expect(json[0].identity).toBe("sujiyan.eth");
+  });
+  it("It should response 200 for 0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid", async () => {
+    const res = await queryClient(
+      "/profile/0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid"
+    );
+    const json = await res.json();
+    expect(json[0].platform).toBe("ens");
+    expect(json.some((x) => x.platform === "nextid")).toBe(false);
+  });
 });
