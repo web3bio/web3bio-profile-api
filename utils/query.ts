@@ -162,6 +162,7 @@ export const primaryDomainResolvedRequestArray = (
         PlatformType.dotbit,
         PlatformType.twitter,
         PlatformType.linea,
+        PlatformType.nextid,
       ].includes(resolvedRecord.platform)
     ) {
       const vertices =
@@ -171,7 +172,12 @@ export const primaryDomainResolvedRequestArray = (
               x.isPrimary ||
               [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
             ) {
-              if (resolvedRecord.platform === PlatformType.twitter) return true;
+              if (
+                [PlatformType.twitter, PlatformType.nextid].includes(
+                  resolvedRecord.platform
+                )
+              )
+                return true;
               const sourceAddr =
                 resolvedRecord.platform === PlatformType.ethereum
                   ? resolvedRecord.identity
@@ -189,9 +195,11 @@ export const primaryDomainResolvedRequestArray = (
             isPrimary: x.isPrimary,
           })) || [];
 
-      return [PlatformType.ethereum, PlatformType.twitter].includes(
-        resolvedRecord.platform
-      )
+      return [
+        PlatformType.ethereum,
+        PlatformType.twitter,
+        PlatformType.nextid,
+      ].includes(resolvedRecord.platform)
         ? [...vertices]
         : [...vertices, defaultReturn];
     }
