@@ -55,7 +55,7 @@ export const getUserHeaders = (req: NextRequest): AuthHeaders => {
 
 export const isSameAddress = (
   address?: string,
-  otherAddress?: string
+  otherAddress?: string,
 ): boolean => {
   if (!address || !otherAddress) return false;
   return address.toLowerCase() === otherAddress.toLowerCase();
@@ -76,7 +76,7 @@ export const errorHandle = (props: errorHandleProps) => {
         "Cache-Control": "no-store",
         ...props.headers,
       },
-    }
+    },
   );
 };
 
@@ -99,11 +99,11 @@ export const formatText = (string: string, length?: number) => {
   }
   if (string.startsWith("0x")) {
     return `${string.substring(0, chars + 2)}...${string.substring(
-      string.length - chars
+      string.length - chars,
     )}`;
   } else {
     return `${string.substring(0, chars + 1)}...${string.substring(
-      string.length - (chars + 1)
+      string.length - (chars + 1),
     )}`;
   }
 };
@@ -153,6 +153,7 @@ const platformMap = new Map([
 ]);
 
 export const handleSearchPlatform = (term: string) => {
+  if (term.endsWith(".farcaster.eth")) return PlatformType.farcaster;
   for (const [regex, platformType] of platformMap) {
     if (regex.test(term)) {
       return platformType;
@@ -165,8 +166,12 @@ export const prettify = (input: string): string => {
   if (!input) return "";
   if (input.endsWith(".twitter")) return input.replace(".twitter", "");
   if (input.endsWith(".nextid")) return input.replace(".nextid", "");
-  if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
-    return input.replace(/(\.farcaster|\.fcast\.id)$/, "");
+  if (
+    input.endsWith(".farcaster") ||
+    input.endsWith(".fcast.id") ||
+    input.endsWith(".farcaster.eth")
+  ) {
+    return input.replace(/(\.farcaster|\.fcast\.id|\.farcaster\.eth)$/, "");
   }
   if (input.endsWith(".base") || input.endsWith(".linea")) {
     return input.split(".")[0] + "." + input.split(".").pop() + ".eth";
@@ -181,10 +186,12 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input.endsWith(".base.eth")
         ? input
         : input.endsWith(".base")
-        ? `${input}.eth`
-        : `${input}.base.eth`;
+          ? `${input}.eth`
+          : `${input}.base.eth`;
     case PlatformType.farcaster:
-      return input.endsWith(".farcaster") || input.endsWith(".fcast.id")
+      return input.endsWith(".farcaster") ||
+        input.endsWith(".fcast.id") ||
+        input.endsWith(".farcaster.eth")
         ? input
         : `${input}.farcaster`;
     case PlatformType.lens:
@@ -193,8 +200,8 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input.endsWith(".linea.eth")
         ? input
         : input.endsWith(".linea")
-        ? `${input}.eth`
-        : `${input}.linea.eth`;
+          ? `${input}.eth`
+          : `${input}.linea.eth`;
     default:
       return input;
   }
