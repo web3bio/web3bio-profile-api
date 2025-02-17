@@ -26,6 +26,7 @@ export const GET_PROFILES = (single?: boolean) => `
         identity
         platform
         isPrimary
+        expiredAt
         resolvedAddress {
           network
           address
@@ -60,6 +61,7 @@ export const GET_PROFILES = (single?: boolean) => `
             identity
             platform
             isPrimary
+            expiredAt
             resolvedAddress {
               network
               address

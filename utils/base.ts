@@ -153,6 +153,7 @@ const platformMap = new Map([
 ]);
 
 export const handleSearchPlatform = (term: string) => {
+  if (term.endsWith(".farcaster.eth")) return PlatformType.farcaster;
   for (const [regex, platformType] of platformMap) {
     if (regex.test(term)) {
       return platformType;
@@ -165,8 +166,12 @@ export const prettify = (input: string): string => {
   if (!input) return "";
   if (input.endsWith(".twitter")) return input.replace(".twitter", "");
   if (input.endsWith(".nextid")) return input.replace(".nextid", "");
-  if (input.endsWith(".farcaster") || input.endsWith(".fcast.id")) {
-    return input.replace(/(\.farcaster|\.fcast\.id)$/, "");
+  if (
+    input.endsWith(".farcaster") ||
+    input.endsWith(".fcast.id") ||
+    input.endsWith(".farcaster.eth")
+  ) {
+    return input.replace(/(\.farcaster|\.fcast\.id|\.farcaster\.eth)$/, "");
   }
   if (input.endsWith(".base") || input.endsWith(".linea")) {
     return input.split(".")[0] + "." + input.split(".").pop() + ".eth";
