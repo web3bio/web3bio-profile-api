@@ -55,16 +55,17 @@ export const getSocialMediaLink = (
   type: PlatformType | string,
 ): string | null => {
   if (!url) return null;
-  return url.startsWith("https")
-    ? url.toLowerCase()
-    : resolveSocialMediaLink(url, type);
+  const normalizedUrl = url.toLowerCase().replace(/\?$/, "");
+  return normalizedUrl.startsWith("http")
+    ? normalizedUrl
+    : resolveSocialMediaLink(normalizedUrl, type);
 };
 
 function resolveSocialMediaLink(
   name: string,
   type: PlatformType | string,
 ): string {
-  if (!Object.prototype.hasOwnProperty.call(PlatformType, type)) {
+  if (!(type in PlatformType)) {
     return `https://web3.bio/?s=${name}`;
   }
 
