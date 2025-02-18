@@ -28,20 +28,13 @@ export const resolveHandle = (
   if (platform === PlatformType.website) {
     return handle
       .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-      .replace(/\/+$/g, "");
+      .replace(/\/+$/g, "")
+      .toLowerCase();
   }
 
   if (platform === PlatformType.youtube) {
     const match = handle.match(/@(.*?)(?=[\/]|$)/);
     return match ? match[0] : "";
-  }
-
-  if (
-    platform &&
-    [PlatformType.lens, PlatformType.hey].includes(platform) &&
-    handle.endsWith(".lens")
-  ) {
-    handle = handle.slice(0, -5);
   }
 
   if (regexDomain.test(handle)) {
@@ -50,10 +43,11 @@ export const resolveHandle = (
       handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
     )
       .replace(/@/g, "")
-      .split("?")[0];
+      .split("?")[0]
+      .toLowerCase();
   }
 
-  return handle.replace(/@/g, "");
+  return handle.replace(/@/g, "").toLowerCase();
 };
 
 export const getSocialMediaLink = (
@@ -61,7 +55,9 @@ export const getSocialMediaLink = (
   type: PlatformType | string,
 ): string | null => {
   if (!url) return null;
-  return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
+  return url.startsWith("https")
+    ? url.toLowerCase()
+    : resolveSocialMediaLink(url, type);
 };
 
 function resolveSocialMediaLink(
@@ -74,13 +70,18 @@ function resolveSocialMediaLink(
 
   switch (type) {
     case PlatformType.url:
-      return name;
+      return name.toLowerCase();
     case PlatformType.website:
       return `https://${name}`;
     case PlatformType.discord:
       return name.includes("https://")
         ? SocialPlatformMapping(type).urlPrefix + name
         : "";
+    case PlatformType.lens:
+      return (
+        SocialPlatformMapping(PlatformType.lens).urlPrefix +
+        name.replace(/\.lens$/, "")
+      );
     default:
       const prefix = SocialPlatformMapping(type as PlatformType).urlPrefix;
       return prefix ? prefix + name : "";

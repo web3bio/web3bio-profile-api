@@ -13,12 +13,12 @@ describe("Test For Batch Query", () => {
     "ens,sujiyan.eth",
     "ens,vitalik.eth",
     "tony.base.eth",
-    "dwr.farcaster.eth",
+    "dwr.eth.farcaster",
     "suji.fcast.id",
     "lens,stani.lens",
     "linea,0xthor.linea.eth",
     "184.linea",
-    "suji_yan.twitter"
+    "suji_yan.twitter",
   ];
 
   // it("It should response 200 for Batch Query POST", async () => {

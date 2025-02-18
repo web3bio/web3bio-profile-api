@@ -5,48 +5,6 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { processJson } from "./utils";
 
-// export async function POST(req: NextRequest) {
-//   const { identity, platform } = await req.json();
-//   const headers = getUserHeaders(req);
-//   if (!identity || !platform)
-//     return errorHandle({
-//       identity: identity,
-//       platform: platform || "graph",
-//       code: 404,
-//       message: ErrorMessages.invalidIdentity,
-//     });
-//   try {
-//     const json = await queryIdentityGraph(
-//       identity,
-//       platform,
-//       GET_PROFILES(false),
-//       headers
-//     );
-//     if (json.code || json.errors) {
-//       return errorHandle({
-//         identity: identity,
-//         platform: platform || "graph",
-//         code: json.code,
-//         message: json.msg
-//           ? json.msg
-//           : json.errors
-//           ? json.stringify(json.errors)
-//           : ErrorMessages.notFound,
-//       });
-//     }
-//     const result = await processJson(json);
-
-//     return respondWithCache(JSON.stringify(result));
-//   } catch (e: any) {
-//     return errorHandle({
-//       identity: identity,
-//       platform: platform,
-//       code: e.cause || 500,
-//       message: e.message || ErrorMessages.notFound,
-//     });
-//   }
-// }
-
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const identity = searchParams.get("identity");
@@ -64,7 +22,7 @@ export async function GET(req: NextRequest) {
       identity,
       platform,
       GET_PROFILES(false),
-      headers
+      headers,
     );
 
     if (rawJson.code || rawJson.errors) {
@@ -75,8 +33,8 @@ export async function GET(req: NextRequest) {
         message: rawJson.msg
           ? rawJson.msg
           : rawJson.errors
-          ? JSON.stringify(rawJson.errors)
-          : ErrorMessages.notFound,
+            ? JSON.stringify(rawJson.errors)
+            : ErrorMessages.notFound,
       });
     }
     const result = await processJson(rawJson);
