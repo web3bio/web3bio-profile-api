@@ -68,6 +68,7 @@ export enum PlatformType {
   zerion = "zerion",
   aave = "aave",
   rainbow = "rainbow",
+  bluesky = "bluesky",
   nostr = "nostr",
   poap = "poap",
   uniswap = "uniswap",
@@ -90,6 +91,7 @@ export enum PlatformType {
   snapshot = "snapshot",
   coingecko = "coingecko",
   gitcoin = "gitcoin",
+  humanpassport = "humanpassport",
   talent = "talentprotocol",
   doge = "doge",
   bsc = "bsc",
@@ -161,7 +163,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-farcaster.svg",
       label: "Farcaster",
       description:
-        "Farcaster social identity (Fname handle and .fcast.id domain)",
+        "Farcaster social identity (Fname handle and .farcaster.eth domain)",
       urlPrefix: "https://warpcast.com/",
       ensText: ["farcaster", "xyz.farcaster"],
       registerlink:
@@ -285,9 +287,10 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.linea,
     {
-      color: "#61DFFF",
+      color: "#591FE6",
       icon: "icons/icon-linea.svg",
       label: "Linea Name Service",
+      description: "Linea Name Service (.linea.eth domains) based on ENS",
       urlPrefix: "https://names.linea.build/",
       registerlink: "https://names.linea.build/{name}/register",
       system: PlatformSystem.web3,
@@ -554,9 +557,20 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.rainbow,
     {
-      color: "000",
+      color: "#000000",
       icon: "icons/icon-rainbow.svg",
       label: "Rainbow",
+      system: PlatformSystem.web3,
+    },
+  ],
+  [
+    PlatformType.bluesky,
+    {
+      color: "#0085ff",
+      icon: "icons/icon-bluesky.svg",
+      label: "Bluesky",
+      urlPrefix: "https://bsky.app/",
+      ensText: ["app.bsky", "bluesky"],
       system: PlatformSystem.web3,
     },
   ],
@@ -780,9 +794,19 @@ export const PLATFORM_DATA: ReadonlyMap<
     PlatformType.gitcoin,
     {
       color: "#4A47D3",
-      icon: "icons/icon-gitcoinpassport.svg",
+      icon: "icons/icon-gitcoin.svg",
       label: "Gitcoin Passport",
       urlPrefix: "https://passport.gitcoin.co/",
+      system: PlatformSystem.web3,
+    },
+  ],
+  [
+    PlatformType.humanpassport,
+    {
+      color: "#006b57",
+      icon: "icons/icon-humanpassport.svg",
+      label: "Human Passport",
+      urlPrefix: "https://passport.human.tech/",
       system: PlatformSystem.web3,
     },
   ],

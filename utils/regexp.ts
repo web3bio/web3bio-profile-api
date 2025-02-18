@@ -2,7 +2,7 @@ export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
   regexBasenames = /^.+\.base(\.eth)?$/i,
   regexLinea = /^.+\.linea(\.eth)?$/i,
   regexFarcaster =
-    /^[A-Za-z0-9_-]{1,61}(?:(?:\.eth)?(?:\.farcaster|\.fcast\.id)?)?$/i,
+    /^[A-Za-z0-9_-]{1,61}(?:(?:\.eth)?(?:\.farcaster|\.fcast\.id|\.farcaster\.eth)?)?$/i,
   regexLens = /^.+\.lens$/i,
   regexCluster = /^[\w-]+\/[\w-]+$/,
   regexSpaceid = /^.+\.(bnb|arb)$/i,

@@ -7,7 +7,7 @@ import { regexDomain, regexEIP } from "./regexp";
 
 export const resolveMediaURL = (
   url: string,
-  identity?: string
+  identity?: string,
 ): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https://")) return url;
@@ -22,11 +22,13 @@ export const resolveMediaURL = (
 
 export const resolveHandle = (
   handle: string,
-  platform?: PlatformType
+  platform?: PlatformType,
 ): string | null => {
   if (!handle) return null;
   if (platform === PlatformType.website) {
-    return handle.replace(/^https?:\/\//i, "").replace(/\/$/g, "");
+    return handle
+      .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+      .replace(/\/+$/g, "");
   }
 
   if (platform === PlatformType.youtube) {
@@ -56,7 +58,7 @@ export const resolveHandle = (
 
 export const getSocialMediaLink = (
   url: string | null,
-  type: PlatformType | string
+  type: PlatformType | string,
 ): string | null => {
   if (!url) return null;
   return url.startsWith("https") ? url : resolveSocialMediaLink(url, type);
@@ -64,7 +66,7 @@ export const getSocialMediaLink = (
 
 function resolveSocialMediaLink(
   name: string,
-  type: PlatformType | string
+  type: PlatformType | string,
 ): string {
   if (!Object.prototype.hasOwnProperty.call(PlatformType, type)) {
     return `https://web3.bio/?s=${name}`;
@@ -87,7 +89,7 @@ function resolveSocialMediaLink(
 
 export const resolveEipAssetURL = async (
   source: string,
-  identity?: string
+  identity?: string,
 ): Promise<string | null> => {
   if (!source) return null;
   const match = source?.match(regexEIP);
