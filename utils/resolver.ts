@@ -80,7 +80,7 @@ function resolveSocialMediaLink(
     case PlatformType.lens:
       return (
         SocialPlatformMapping(PlatformType.lens).urlPrefix +
-        name.replace(".lens", "")
+        name.replace(/\.lens$/, "")
       );
     default:
       const prefix = SocialPlatformMapping(type as PlatformType).urlPrefix;
