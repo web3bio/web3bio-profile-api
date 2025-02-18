@@ -37,14 +37,6 @@ export const resolveHandle = (
     return match ? match[0] : "";
   }
 
-  if (
-    platform &&
-    [PlatformType.lens, PlatformType.hey].includes(platform) &&
-    handle.endsWith(".lens")
-  ) {
-    handle = handle.slice(0, -5);
-  }
-
   if (regexDomain.test(handle)) {
     const parts = handle.split("/");
     return (
