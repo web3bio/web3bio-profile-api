@@ -59,6 +59,7 @@ export enum PlatformType {
   hey = "hey",
   facebook = "facebook",
   threads = "threads",
+  whatsapp = "whatsapp",
   weibo = "weibo",
   youtube = "youtube",
   tiktok = "tiktok",
@@ -201,7 +202,8 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-lens.svg",
       label: "Lens",
       description: "Lens Protocol social identity (.lens handle)",
-      urlPrefix: "https://www.lensfrens.xyz/",
+      urlPrefix: "https://hey.xyz/u/",
+      ensText: ["lens"],
       registerlink: "https://www.lens.xyz/mint?name={name}",
       system: PlatformSystem.web2,
     },
@@ -456,7 +458,6 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-hey.svg",
       label: "Hey",
       urlPrefix: "https://hey.xyz/u/",
-      ensText: ["lens"],
       system: PlatformSystem.web3,
     },
   ],
@@ -467,6 +468,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-facebook.svg",
       label: "Facebook",
       urlPrefix: "https://www.facebook.com/",
+      ensText: ["com.facebook", "facebook"],
       dotbitText: ["profile.facebook"],
       system: PlatformSystem.web2,
     },
@@ -482,12 +484,24 @@ export const PLATFORM_DATA: ReadonlyMap<
     },
   ],
   [
+    PlatformType.whatsapp,
+    {
+      color: "#25d366",
+      icon: "icons/icon-whatsapp.svg",
+      label: "WhatsApp",
+      urlPrefix: "https://wa.me/",
+      ensText: ["com.whatsapp", "whatsapp"],
+      system: PlatformSystem.web2,
+    },
+  ],
+  [
     PlatformType.youtube,
     {
       color: "#FF0000",
       icon: "icons/icon-youtube.svg",
       label: "Youtube",
       urlPrefix: "https://www.youtube.com/",
+      ensText: ["com.youtube", "youtube"],
       dotbitText: ["profile.youtube"],
       system: PlatformSystem.web2,
     },
@@ -522,7 +536,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       label: "Medium",
       urlPrefix: "https://medium.com/",
       dotbitText: ["profile.medium"],
-      system: PlatformSystem.web3,
+      system: PlatformSystem.web2,
     },
   ],
   [
@@ -569,7 +583,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       color: "#0085ff",
       icon: "icons/icon-bluesky.svg",
       label: "Bluesky",
-      urlPrefix: "https://bsky.app/",
+      urlPrefix: "https://bsky.app/profile/",
       ensText: ["app.bsky", "bluesky"],
       system: PlatformSystem.web3,
     },
@@ -1066,7 +1080,7 @@ export const PLATFORM_DATA: ReadonlyMap<
 ]);
 
 export const SocialPlatformMapping = (
-  platform: PlatformType
+  platform: PlatformType,
 ): Readonly<SocialPlatform> => {
   return (
     PLATFORM_DATA.get(platform) || { ...DEFAULT_PLATFORM, label: platform }

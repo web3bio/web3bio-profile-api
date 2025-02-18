@@ -6,10 +6,10 @@ import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url as string);
-  const handle = searchParams.get("handle");
+  const { searchParams } = req.nextUrl;
+  const handle = searchParams.get("handle") || "";
   const headers = getUserHeaders(req);
-  if ((!regexSns.test(handle!) && !regexSolana.test(handle!)) || !handle)
+  if (!regexSns.test(handle) && !regexSolana.test(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.sns,
