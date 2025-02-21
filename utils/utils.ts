@@ -368,9 +368,7 @@ export const resolveUniversalParams = (ids: string[]) => {
       } else {
         res.push({
           platform: handleSearchPlatform(x),
-          identity: [regexSolana, regexBtc].some((i) => i.test(x))
-            ? x
-            : prettify(x).toLowerCase(),
+          identity: prettify(x),
         });
       }
     }
@@ -382,7 +380,9 @@ export const resolveUniversalParams = (ids: string[]) => {
         `${x.platform as PlatformType},${
           [PlatformType.twitter, PlatformType.farcaster].includes(x.platform) ||
           isValidEthereumAddress(x.identity)
-            ? x.identity.toLowerCase()
+            ? [regexBtc, regexSolana].some((i) => i.test(x.identity))
+              ? x.identity
+              : x.identity.toLowerCase()
             : uglify(x.identity, x.platform)
         }`
     );
