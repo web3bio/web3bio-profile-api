@@ -238,9 +238,9 @@ export const primaryDomainResolvedRequestArray = (
                 : resolvedAddress[0]?.address;
 
             return x.platform === PlatformType.farcaster
-              ? x.ownerAddress
-                  .map((i) => i.address)
-                  .some((i) => isSameAddress(i, sourceAddr))
+              ? x.ownerAddress?.find((i) =>
+                  isSameAddress(i.address, sourceAddr)
+                )
               : isSameAddress(x.resolvedAddress?.[0]?.address, sourceAddr);
           }
         })
