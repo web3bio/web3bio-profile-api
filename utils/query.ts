@@ -20,6 +20,65 @@ const directPass = (identity: IdentityRecord) => {
   );
 };
 
+export const GET_GRAPH_QUERY = `
+ query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
+        identity
+        platform
+        isPrimary
+        expiredAt
+        updatedAt
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+        }
+        identityGraph {
+          vertices {
+            identity
+            platform
+            isPrimary
+            expiredAt
+            updatedAt
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
+            profile {
+              identity
+              platform
+              address
+              displayName
+              avatar
+              description
+            }
+          }
+          edges {
+          source
+          target
+          dataSource
+          edgeType
+        }
+        }     
+      }
+  }
+`;
+
 export const GET_PROFILES = (single?: boolean) => `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
