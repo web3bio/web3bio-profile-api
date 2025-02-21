@@ -44,10 +44,6 @@ export const GET_PROFILES = (single?: boolean) => `
           description
           contenthash
           texts
-          addresses {
-            network
-            address
-          }
           social {
             uid
             follower
@@ -79,10 +75,6 @@ export const GET_PROFILES = (single?: boolean) => `
               description
               contenthash
               texts
-              addresses {
-                network
-                address
-              }
               social {
                 uid
                 follower
@@ -184,12 +176,11 @@ export const primaryDomainResolvedRequestArray = (
                 resolvedRecord.platform === PlatformType.ethereum
                   ? resolvedRecord.identity
                   : resolvedRecord.resolvedAddress[0]?.address;
-              return (
-                isSameAddress(x.profile?.address, sourceAddr) ||
-                x.profile?.addresses?.some((i) =>
-                  isSameAddress(i?.address, sourceAddr)
-                )
-              );
+              return x.platform === PlatformType.farcaster
+                ? x.ownerAddress
+                    .map((i) => i.address)
+                    .some((i) => isSameAddress(i, sourceAddr))
+                : isSameAddress(x.resolvedAddress?.[0]?.address, sourceAddr);
             }
           })
           .map((x) => ({
@@ -241,10 +232,6 @@ export const BATCH_GET_UNIVERSAL = `
       description
       contenthash
       texts
-      addresses {
-        network
-        address
-      }
       social {
         uid
         follower
@@ -274,10 +261,6 @@ export const BATCH_GET_UNIVERSAL = `
           description
           contenthash
           texts
-          addresses {
-            network
-            address
-          }
           social {
             uid
             follower
