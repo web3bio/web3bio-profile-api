@@ -11,7 +11,7 @@ describe("Test For Batch Query", () => {
 
   const getIds = [
     "ens,sujiyan.eth",
-    "ens,vitalik.eth",
+    "ens,0x2EC8EBB0a8eAa40e4Ce620CF9f84A96dF68D4669",
     "tony.base.eth",
     "dwr.eth.farcaster",
     "suji.fcast.id",

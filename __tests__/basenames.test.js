@@ -13,8 +13,8 @@ describe("Test For BaseNames Profile API", () => {
     const json = await res.json();
     expect(json.links.twitter.handle).toBe("tonmfer");
   });
-  it("It should response 200 for alexgrover.base.eth", async () => {
-    const res = await queryClient("/profile/basenames/alexgrover.base.eth");
+  it("It should response 200 for alexgrover", async () => {
+    const res = await queryClient("/profile/basenames/alexgrover");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0xd6507fc98605eab8775f851c25a5e09dc12ab7a7");

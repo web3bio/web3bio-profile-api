@@ -2,8 +2,6 @@ import {
   PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
-  handleSearchPlatform,
-  isValidEthereumAddress,
   prettify,
   respondWithCache,
 } from "@/utils/base";
@@ -18,11 +16,11 @@ import {
   ErrorMessages,
   ProfileAPIResponse,
   ProfileNSResponse,
+  ProfileRecord,
 } from "@/utils/types";
 
 import { processJson } from "../../graph/utils";
 import { generateProfileStruct } from "@/utils/utils";
-import { regexBtc, regexSolana } from "@/utils/regexp";
 
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
@@ -95,33 +93,29 @@ export const resolveWithIdentityGraph = async ({
       code: response.errors ? 500 : 404,
     };
   const resolvedResponse = await processJson(response);
+
   const profilesArray = primaryDomainResolvedRequestArray(
     resolvedResponse,
-    handle,
     platform
   )
-    .reduce((pre, cur) => {
-      if (
-        !pre.some(
-          (i) => i.platform === cur.platform && i.identity === cur.identity
+    .filter(
+      (item, index, self) =>
+        index ===
+        self.findIndex(
+          (i) => i.platform === item.platform && i.identity === item.identity
         )
-      ) {
-        pre.push(cur);
-      }
-      return pre;
-    }, new Array())
-    .sort((a, b) => (a.isPrimary === b.isPrimary ? 0 : a.isPrimary ? -1 : 1));
+    )
+    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
 
-  let responsesToSort = [];
-
-  for (let i = 0; i < profilesArray.length; i++) {
-    const obj = await generateProfileStruct(
-      profilesArray[i] as any,
-      ns,
-      response.data.identity.identityGraph?.edges
-    );
-    responsesToSort.push(obj);
-  }
+  const responsesToSort = await Promise.all(
+    profilesArray.map((_profile) =>
+      generateProfileStruct(
+        _profile as ProfileRecord,
+        ns,
+        response.data.identity.identityGraph?.edges
+      )
+    )
+  );
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
     : sortProfilesByPlatform(responsesToSort, platform, handle);
@@ -148,20 +142,15 @@ export const resolveWithIdentityGraph = async ({
     );
   }
 
-  const uniqRes = returnRes.reduce((pre, cur) => {
-    if (
-      cur &&
-      !pre.find(
-        (x: ProfileAPIResponse) =>
-          x.platform === cur.platform && x.identity === cur.identity
+  const uniqRes = returnRes.filter(
+    (item, index, self) =>
+      index ===
+      self.findIndex(
+        (x) => x.platform === item.platform && x.identity === item.identity
       )
-    ) {
-      pre.push(cur as ProfileAPIResponse);
-    }
-    return pre;
-  }, [] as ProfileAPIResponse[]);
+  ) as ProfileAPIResponse[];
 
-  return uniqRes.filter((x: ProfileAPIResponse) => !x?.error).length
+  return uniqRes.length && !uniqRes.every((x) => x?.error)
     ? uniqRes
     : {
         identity: handle,
@@ -178,25 +167,6 @@ export const resolveUniversalHandle = async (
   ns?: boolean
 ) => {
   const handleToQuery = prettify(handle);
-
-  if (!handleToQuery || !platform)
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.ens,
-      code: 404,
-      message: ErrorMessages.invalidIdentity,
-    });
-
-  if (
-    platform === PlatformType.ethereum &&
-    !isValidEthereumAddress(handleToQuery)
-  )
-    return errorHandle({
-      identity: handle,
-      platform: PlatformType.ethereum,
-      code: 404,
-      message: ErrorMessages.invalidAddr,
-    });
   const response = await queryIdentityGraph(
     handleToQuery,
     platform,
@@ -221,4 +191,3 @@ export const resolveUniversalHandle = async (
     return respondWithCache(JSON.stringify(res));
   }
 };
-
