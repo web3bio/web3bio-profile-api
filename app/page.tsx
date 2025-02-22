@@ -2204,7 +2204,9 @@ export default function Home() {
                 An array of strings where each string is formatted as{" "}
                 <span className="label">platform,identity</span>, encoded using{" "}
                 <span className="label">encodeURIComponent</span>. The array is
-                limited to a maximum of 30 items per query.
+                limited to a maximum of 30 items per query. <br />
+                Supported platforms include Ethereum, ENS, Basenames, Linea Name
+                Service, Farcaster and Lens.
               </li>
             </ul>
             <pre className="code" data-lang="JSON">
@@ -2215,6 +2217,7 @@ export default function Home() {
     "farcaster,dwr.eth",
     "basenames,tony.base.eth",
     "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+    "linea,name.linea.eth",
 ]`}
               </code>
             </pre>
@@ -2350,6 +2353,17 @@ export default function Home() {
                   target="_blank"
                 >
                   basenames,tony.base.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea Name Service</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
+                    JSON.stringify(["linea,name.linea.eth"]),
+                  )}`}
+                  target="_blank"
+                >
+                  linea,name.linea.eth
                 </a>
               </li>
             </ul>
