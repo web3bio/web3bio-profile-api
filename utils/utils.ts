@@ -321,11 +321,11 @@ export const generateSocialLinks = async (
       keys.forEach((x) => {
         if (PLATFORM_DATA.has(x as PlatformType)) {
           const item = texts[x];
-          const resolvdHandle = resolveHandle(item, x as PlatformType);
+          const resolvedHandle = resolveHandle(item, x as PlatformType);
           links[x] = {
             link: getSocialMediaLink(item, x as PlatformType)!,
             handle: resolvedHandle,
-            sources: resolveVerifiedLink(`${x},${resolvdHandle}`, edges),
+            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
           };
         }
       });
