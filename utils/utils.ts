@@ -219,11 +219,12 @@ export const generateSocialLinks = async (
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
         );
-        if (key && texts[i]) {
+        const resolvedHandle = resolveHandle(texts[i], key);
+        if (key && resolvedHandle) {
           links[key] = {
-            link: getSocialMediaLink(texts[i], key),
-            handle: resolveHandle(texts[i], key),
-            sources: resolveVerifiedLink(`${key},${texts[i]}`, edges),
+            link: getSocialMediaLink(resolvedHandle, key),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
           };
         }
       });
@@ -273,7 +274,7 @@ export const generateSocialLinks = async (
           if (key) {
             const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
             links[key] = {
-              link: getSocialMediaLink(texts[i], i),
+              link: getSocialMediaLink(resolvedHandle, i),
               handle: resolvedHandle,
               sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
             };
@@ -320,11 +321,11 @@ export const generateSocialLinks = async (
       keys.forEach((x) => {
         if (PLATFORM_DATA.has(x as PlatformType)) {
           const item = texts[x];
-          const handle = resolveHandle(item, x as PlatformType);
+          const resolvdHandle = resolveHandle(item, x as PlatformType);
           links[x] = {
             link: getSocialMediaLink(item, x as PlatformType)!,
-            handle,
-            sources: resolveVerifiedLink(`${x},${handle}`, edges),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(`${x},${resolvdHandle}`, edges),
           };
         }
       });
@@ -339,13 +340,11 @@ export const resolveVerifiedLink = (
   edges?: IdentityGraphEdge[]
 ) => {
   const res = [] as SourceType[];
-
   if (!edges?.length) return res;
-
   edges
     .filter((x) => x.target === key)
     .forEach((x) => {
-      const source = x.dataSource.split(",")[0];
+      const source = x.dataSource;
       if (!res.includes(source as SourceType)) res.push(source as SourceType);
     });
   return res;
