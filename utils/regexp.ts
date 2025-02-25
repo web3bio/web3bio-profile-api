@@ -21,5 +21,4 @@ export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
   regexEIP = /^eip155:(\d+)\/(erc1155|erc721):(.+)\/(.+)$/i,
   regexDomain = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/,
   regexTon = /^(EQ|UQ)[a-zA-Z0-9_-]{46}$/,
-  regexUID = /^\d{1,20}$/,
-  regexTwitterLink = /(\S*)(.|@)twitter/i;
+  regexUID = /^\d{1,20}$/;
