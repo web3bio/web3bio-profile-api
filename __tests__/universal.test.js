@@ -127,6 +127,9 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
+    expect(
+      json.find((x) => x.platform === "farcaster").links.twitter.handle
+    ).toBe("livid");
   });
   it("It should response 200 data for аррӏе.eth", async () => {
     const res = await queryClient("/profile/аррӏе.eth");
