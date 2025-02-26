@@ -7,8 +7,8 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("suji");
-    expect(json[0].platform).toBe("farcaster");
+    expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
+    expect(json[1].platform).toBe("farcaster");
   });
   it("It should response 200 data for lilgho.lens", async () => {
     const res = await queryClient("/profile/lilgho.lens");

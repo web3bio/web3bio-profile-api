@@ -246,13 +246,21 @@ export const primaryDomainResolvedRequestArray = (
         })
         .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
 
-    return [
-      PlatformType.ethereum,
-      PlatformType.twitter,
-      PlatformType.nextid,
-    ].includes(recordPlatform)
-      ? vertices
-      : [...vertices, defaultReturn];
+    if (
+      (recordPlatform === PlatformType.ethereum &&
+        !vertices.some((x) =>
+          isSameAddress(x.address, resolvedRecord.identity)
+        )) ||
+      ![
+        PlatformType.ethereum,
+        PlatformType.twitter,
+        PlatformType.nextid,
+      ].includes(recordPlatform)
+    ) {
+      return [...vertices, defaultReturn];
+    }
+
+    return vertices;
   }
 
   return [defaultReturn];
