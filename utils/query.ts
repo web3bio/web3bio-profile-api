@@ -170,9 +170,14 @@ export const primaryDomainResolvedRequestArray = (
     platform: recordPlatform,
     resolvedAddress,
     identityGraph,
+    profile,
   } = resolvedRecord;
-  const defaultReturn = resolvedRecord.profile
-    ? { ...resolvedRecord.profile, isPrimary: resolvedRecord.isPrimary }
+  const defaultReturn = profile
+    ? {
+        ...profile,
+        isPrimary: resolvedRecord.isPrimary,
+        displayName: profile.displayName || formatText(identity),
+      }
     : {
         address: resolvedAddress?.[0]?.address || null,
         identity,
@@ -245,7 +250,6 @@ export const primaryDomainResolvedRequestArray = (
           }
         })
         .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
-
     if (
       (recordPlatform === PlatformType.ethereum &&
         !vertices.some((x) =>
