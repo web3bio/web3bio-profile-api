@@ -7,9 +7,9 @@ describe("Test For Farcaster NS API", () => {
     const json = await res.json();
     expect(json.identity).toBe("suji");
   });
-  it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
+  it("It should response 200 for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     const res = await queryClient(
-      "/ns/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649"
+      "/ns/farcaster/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
     );
     expect(res.status).toBe(200);
     const json = await res.json();

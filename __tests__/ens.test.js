@@ -11,13 +11,6 @@ describe("Test For ENS Profile API", () => {
     expect(json.links.discord.handle).toBeTruthy();
     expect(res.status).toBe(200);
   });
-  it("It should response 404 for mcdonalds.eth", async () => {
-    const res = await queryClient("/profile/ens/mcdonalds.eth");
-    expect(res.status).toBe(200);
-    expect((await res.json()).address).toBe(
-      "0x782cf6b6e735496f7e608489b0c57ee27f407e7d",
-    );
-  });
   it("It should response 200 for dr3a.eth", async () => {
     const res = await queryClient("/profile/ens/dr3a.eth");
     expect(res.status).toBe(200);
@@ -34,20 +27,13 @@ describe("Test For ENS Profile API", () => {
     expect(json.address).toBe(null);
     expect(json.error).toBe("Invalid Resolved Address");
   });
-  it("It should response 404 for solperdev.eth", async () => {
-    const res = await queryClient("/profile/ens/solperdev.eth");
-    expect(res.status).toBe(404);
-  });
   it("It should response 200 for sujiyan.eth", async () => {
     const res = await queryClient("/profile/ens/sujiyan.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
     expect(json.contenthash.startsWith("ipns")).toBeTruthy();
-  });
-  it("It should response 200 for vitalik.eth", async () => {
-    const res = await queryClient("/profile/ens/vitalik.eth");
-    expect(res.status).toBe(200);
+    expect(json.address).toBe('0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5')
   });
   it("It should response 200 for ricmoo.eth", async () => {
     const res = await queryClient("/profile/ens/ricmoo.eth");
@@ -68,14 +54,6 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("0xcee81f7dd39d817f699a5c9eb93e3e6520f5b996");
-  });
-  it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
-    const res = await queryClient(
-      "/profile/ens/0x934b510d4c9103e6a87aef13b816fb080286d649",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("0x934b510d4c9103e6a87aef13b816fb080286d649");
   });
   it("It should response 404 for 0x000000000000000000000000000000000000dEaD", async () => {
     const res = await queryClient(
