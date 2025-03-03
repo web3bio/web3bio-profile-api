@@ -185,7 +185,6 @@ export const primaryDomainResolvedRequestArray = (
         displayName: formatText(identity),
         isPrimary: resolvedRecord.isPrimary,
       };
-
   if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
     return [defaultReturn];
   }
@@ -252,8 +251,8 @@ export const primaryDomainResolvedRequestArray = (
         .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
     if (
       (recordPlatform === PlatformType.ethereum &&
-        !vertices.some((x) =>
-          isSameAddress(x.address, resolvedRecord.identity)
+        !vertices.some(
+          (x) => x.isPrimary && x.platform === PlatformType.ens
         )) ||
       ![
         PlatformType.ethereum,

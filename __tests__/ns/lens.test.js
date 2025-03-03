@@ -20,7 +20,7 @@ describe("Test For Lens NS API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.identity).toBe("sujiyan.lens");
+    expect(json.identity).toBe("sujidaily.lens");
   });
   it("It should response 404 for 0xxxxxxxxxx", async () => {
     const res = await queryClient("/ns/lens/0xxxxxxxxxx");

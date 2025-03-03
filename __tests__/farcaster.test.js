@@ -9,9 +9,9 @@ describe("Test For Farcaster Profile API", () => {
     expect(json.links.twitter.handle).toBe("suji_yan");
     expect(json.links.twitter.sources.includes("farcaster")).toBeTruthy();
   });
-  it("It should response 200 for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
+  it("It should response 200 for 0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2", async () => {
     const res = await queryClient(
-      "/profile/farcaster/0x934b510d4c9103e6a87aef13b816fb080286d649"
+      "/profile/farcaster/0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2"
     );
     expect(res.status).toBe(200);
     const json = await res.json();
