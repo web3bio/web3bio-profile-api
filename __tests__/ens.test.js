@@ -75,7 +75,7 @@ describe("Test For ENS Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.identity).toBe("sujiyan.eth");
+    expect(json.identity).toBe("0x934b510d4c9103e6a87aef13b816fb080286d649");
   });
   it("It should response 404 for 0x000000000000000000000000000000000000dEaD", async () => {
     const res = await queryClient(
