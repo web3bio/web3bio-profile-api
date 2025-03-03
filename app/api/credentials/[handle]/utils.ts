@@ -6,8 +6,6 @@ import {
   CredentialRecord,
   CredentialsResponse,
 } from "@/utils/types";
-import { isEqualObject } from "@/utils/utils";
-import { NextResponse } from "next/server";
 
 const emptyReturn = {
   isHuman: null,
@@ -27,22 +25,13 @@ export const resolveCredentialsHandle = async (
     GET_CREDENTIALS_QUERY,
     headers
   );
-  const credentials = res?.data?.identity?.identityGraph?.vertices?.reduce(
-    (pre: CredentialRecord[], cur: { credentials: CredentialRecord[] }) => {
-      if (cur.credentials) {
-        cur.credentials.forEach((i) => {
-          pre.push(i);
-        });
-      }
-      return pre;
-    },
-    []
-  );
+  const credentials = res?.data?.identity?.credentials;
 
-  if (!credentials) return NextResponse.json(emptyReturn);
-  return respondWithCache(
-    JSON.stringify(resolveCredentialsStruct(credentials))
-  );
+  const json = !credentials?.length
+    ? emptyReturn
+    : resolveCredentialsStruct(credentials);
+
+  return respondWithCache(JSON.stringify(json));
 };
 
 const resolveCredentialsStruct = (data: CredentialRecord[]) => {
@@ -51,8 +40,7 @@ const resolveCredentialsStruct = (data: CredentialRecord[]) => {
     if (!pre[category]) {
       pre[category] = { value: false, sources: [] };
     }
-    if (!pre[category]?.sources.some((x: any) => isEqualObject(x, rest)))
-      pre[category].sources.push(rest);
+    pre[category].sources.push(rest);
     pre[category].value = pre[category].sources.length > 0;
     return pre;
   }, JSON.parse(JSON.stringify(emptyReturn)));
