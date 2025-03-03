@@ -38,25 +38,22 @@ export const resolveCredentialsHandle = async (
     },
     []
   );
-  if (!credentials) return NextResponse.json(emptyReturn);
 
+  if (!credentials) return NextResponse.json(emptyReturn);
   return respondWithCache(
     JSON.stringify(resolveCredentialsStruct(credentials))
   );
 };
 
 const resolveCredentialsStruct = (data: CredentialRecord[]) => {
-  return JSON.parse(JSON.stringify(data)).reduce(
-    (pre: CredentialsResponse, cur: CredentialRecord) => {
-      const { category, ...rest } = cur;
-      if (!pre[category]) {
-        pre[category] = { value: false, sources: [] };
-      }
-      if (!pre[category]?.sources.some((x: any) => isEqualObject(x, rest)))
-        pre[category].sources.push(rest);
-      pre[category].value = pre[category].sources.length > 0;
-      return pre;
-    },
-    emptyReturn as any
-  );
+  return data.reduce((pre: CredentialsResponse, cur: CredentialRecord) => {
+    const { category, ...rest } = cur;
+    if (!pre[category]) {
+      pre[category] = { value: false, sources: [] };
+    }
+    if (!pre[category]?.sources.some((x: any) => isEqualObject(x, rest)))
+      pre[category].sources.push(rest);
+    pre[category].value = pre[category].sources.length > 0;
+    return pre;
+  }, JSON.parse(JSON.stringify(emptyReturn)));
 };

@@ -15,4 +15,12 @@ describe("Test For Credentials API", () => {
     const json = await res.json();
     expect(json.isRisky.sources[0].value).toBe("hacker");
   });
+  it("It should response 200 for jchip300.eth", async () => {
+    const res = await queryClient(
+      "/credentials/jchip300.eth"
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.isHuman.value).toBe(true);
+  });
 });
