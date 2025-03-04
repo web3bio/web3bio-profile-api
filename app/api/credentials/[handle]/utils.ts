@@ -1,4 +1,4 @@
-import { prettify, respondWithCache } from "@/utils/base";
+import { respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { GET_CREDENTIALS_QUERY, queryIdentityGraph } from "@/utils/query";
 import {
@@ -7,41 +7,54 @@ import {
   CredentialsResponse,
 } from "@/utils/types";
 
-const emptyReturn = {
-  isHuman: null,
-  isRisky: null,
-  isSpam: null,
-};
-
 export const resolveCredentialsHandle = async (
   identity: string,
   platform: PlatformType,
   headers: AuthHeaders
 ) => {
-  const handleToQuery = prettify(identity);
   const res = await queryIdentityGraph(
-    handleToQuery,
+    identity,
     platform,
     GET_CREDENTIALS_QUERY,
     headers
   );
-  const credentials = res?.data?.identity?.credentials;
-
+  const credentials = res?.data?.identity?.identityGraph?.vertices?.filter(
+    (x: CredentialRecord) => x.credentials
+  );
   const json = !credentials?.length
-    ? emptyReturn
+    ? []
     : resolveCredentialsStruct(credentials);
 
   return respondWithCache(JSON.stringify(json));
 };
 
 const resolveCredentialsStruct = (data: CredentialRecord[]) => {
-  return data.reduce((pre: CredentialsResponse, cur: CredentialRecord) => {
-    const { category, ...rest } = cur;
-    if (!pre[category]) {
-      pre[category] = { value: false, sources: [] };
-    }
-    pre[category].sources.push(rest);
-    pre[category].value = pre[category].sources.length > 0;
-    return pre;
-  }, JSON.parse(JSON.stringify(emptyReturn)));
+  const result: CredentialsResponse[] = [];
+  data.forEach((x) => {
+    result.push({
+      id: x.id,
+      credentials: x.credentials.reduce(
+        (pre, cur) => {
+          const { category, ...rest } = cur;
+          if (!pre[category]) {
+            pre[category] = {
+              value: true,
+              sources: [{ ...rest }],
+            };
+          } else {
+            pre[category].sources.push({ ...rest });
+          }
+
+          return pre;
+        },
+        {
+          isHuman: null,
+          isRisky: null,
+          isSpam: null,
+        } as any
+      ),
+    });
+  });
+
+  return result;
 };
