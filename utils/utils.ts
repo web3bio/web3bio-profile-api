@@ -65,7 +65,7 @@ export const resolveIdentityResponse = async (
   handle: string,
   headers: AuthHeaders,
   platform: PlatformType,
-  ns: boolean
+  ns: boolean,
 ) => {
   let identity = "";
 
@@ -78,7 +78,7 @@ export const resolveIdentityResponse = async (
     identity,
     platform as PlatformType,
     GET_PROFILES(ns),
-    headers
+    headers,
   );
   if (res.msg) {
     return {
@@ -125,14 +125,14 @@ export const resolveIdentityResponse = async (
   return await generateProfileStruct(
     profile,
     ns,
-    res.data.identity?.identityGraph?.edges
+    res.data.identity?.identityGraph?.edges,
   );
 };
 
 export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
   const nsObj = {
     address: data.address,
@@ -142,8 +142,8 @@ export async function generateProfileStruct(
     avatar: data.avatar
       ? await resolveEipAssetURL(data.avatar, data.identity)
       : data.platform === PlatformType.lens && data?.social?.uid
-      ? await getLensDefaultAvatar(Number(data.social.uid))
-      : null,
+        ? await getLensDefaultAvatar(Number(data.social.uid))
+        : null,
     description: data.description || null,
   };
   const { links, contenthash } = await generateSocialLinks(data, edges);
@@ -170,14 +170,14 @@ export const resolveIdentityRespond = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns: boolean
+  ns: boolean,
 ) => {
   try {
     const json = (await resolveIdentityResponse(
       handle,
       headers,
       platform,
-      ns
+      ns,
     )) as any;
     if (json.code) {
       return errorHandle({
@@ -200,7 +200,7 @@ export const resolveIdentityRespond = async (
 
 export const generateSocialLinks = async (
   data: ProfileRecord,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ) => {
   const platform = data.platform;
   const texts = data.texts;
@@ -217,7 +217,7 @@ export const generateSocialLinks = async (
       let key = null;
       keys.forEach((i) => {
         key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase())
+          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
         );
         const resolvedHandle = resolveHandle(texts[i], key);
         if (key && resolvedHandle) {
@@ -237,7 +237,7 @@ export const generateSocialLinks = async (
         handle: identity,
         sources: resolveVerifiedLink(
           `${PlatformType.farcaster},${identity}`,
-          edges
+          edges,
         ),
       };
       if (texts?.twitter) {
@@ -247,7 +247,7 @@ export const generateSocialLinks = async (
           handle: resolvedHandle,
           sources: resolveVerifiedLink(
             `${PlatformType.twitter},${resolvedHandle}`,
-            edges
+            edges,
           ),
         };
       }
@@ -264,7 +264,7 @@ export const generateSocialLinks = async (
         if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
           let key = null;
           key = Array.from(PLATFORM_DATA.keys()).find(
-            (k) => k === i.toLowerCase()
+            (k) => k === i.toLowerCase(),
           );
           if (key) {
             const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
@@ -332,7 +332,7 @@ export const generateSocialLinks = async (
 };
 export const resolveVerifiedLink = (
   key: string,
-  edges?: IdentityGraphEdge[]
+  edges?: IdentityGraphEdge[],
 ) => {
   const res = [] as SourceType[];
   if (!edges?.length) return res;
@@ -372,12 +372,9 @@ export const resolveUniversalParams = (ids: string[]) => {
     .map(
       (x) =>
         `${x.platform as PlatformType},${
-          [PlatformType.twitter, PlatformType.farcaster].includes(x.platform) ||
-          isValidEthereumAddress(x.identity)
-            ? [regexBtc, regexSolana].some((i) => i.test(x.identity))
-              ? x.identity
-              : x.identity.toLowerCase()
-            : uglify(x.identity, x.platform)
-        }`
+          [regexBtc, regexSolana].some((i) => i.test(x.identity))
+            ? x.identity
+            : x.identity.toLowerCase()
+        }`,
     );
 };

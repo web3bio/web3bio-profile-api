@@ -20,6 +20,20 @@ const directPass = (identity: IdentityRecord) => {
   );
 };
 
+export const GET_CREDENTIALS_QUERY = `
+ query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      credentials{
+        category
+        type
+        value
+        platform
+        dataSource
+      }   
+    }
+  }
+`;
+
 export const GET_GRAPH_QUERY = `
  query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
@@ -185,7 +199,6 @@ export const primaryDomainResolvedRequestArray = (
         displayName: formatText(identity),
         isPrimary: resolvedRecord.isPrimary,
       };
-
   if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
     return [defaultReturn];
   }
@@ -252,8 +265,8 @@ export const primaryDomainResolvedRequestArray = (
         .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
     if (
       (recordPlatform === PlatformType.ethereum &&
-        !vertices.some((x) =>
-          isSameAddress(x.address, resolvedRecord.identity)
+        !vertices.some(
+          (x) => x.isPrimary && x.platform === PlatformType.ens
         )) ||
       ![
         PlatformType.ethereum,
