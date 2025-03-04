@@ -113,6 +113,7 @@ export interface ProfileRecord {
 }
 
 export interface CredentialRecordRaw {
+  category: "isHuman" | "isRisky" | "isSpam";
   value: string;
   type: string;
   platform: PlatformType;
@@ -120,14 +121,19 @@ export interface CredentialRecordRaw {
 }
 
 export interface CredentialRecord extends CredentialRecordRaw {
-  category: "isHuman" | "isRisky" | "isSpam";
+  id: string;
+  credentials: CredentialRecordRaw[];
 }
-type CredentialsResponseItem = {
+export interface CredentialsResponse {
+  id: string;
+  credentials: {
+    isHuman: CredentialsResponseItem | null;
+    isRisky: CredentialsResponseItem | null;
+    isSpam: CredentialsResponseItem | null;
+  };
+}
+
+interface CredentialsResponseItem {
   value: boolean;
   sources: CredentialRecordRaw[];
-};
-export interface CredentialsResponse {
-  isHuman: CredentialsResponseItem;
-  isRisky: CredentialsResponseItem;
-  isSpam: CredentialsResponseItem;
 }
