@@ -112,7 +112,22 @@ export interface ProfileRecord {
   aliases?: string[];
 }
 
-export const enum LensParamType {
-  domain = "domain",
-  address = "address",
+export interface CredentialRecordRaw {
+  value: string;
+  type: string;
+  platform: PlatformType;
+  dataSource: String;
+}
+
+export interface CredentialRecord extends CredentialRecordRaw {
+  category: "isHuman" | "isRisky" | "isSpam";
+}
+type CredentialsResponseItem = {
+  value: boolean;
+  sources: CredentialRecordRaw[];
+};
+export interface CredentialsResponse {
+  isHuman: CredentialsResponseItem;
+  isRisky: CredentialsResponseItem;
+  isSpam: CredentialsResponseItem;
 }
