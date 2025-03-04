@@ -23,13 +23,18 @@ const directPass = (identity: IdentityRecord) => {
 export const GET_CREDENTIALS_QUERY = `
  query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
-      credentials{
-        category
-        type
-        value
-        platform
-        dataSource
-      }   
+     	identityGraph{
+        vertices{
+          id
+          credentials{
+            category
+            type
+            value
+            platform
+            dataSource
+          }
+        }
+      }
     }
   }
 `;
