@@ -174,15 +174,29 @@ export const GET_PROFILES = (single?: boolean) => `
   }
 `;
 
-export const primaryDomainResolvedRequestArray = (
+const VALID_PLATFORMS = new Set([
+  PlatformType.ethereum,
+  PlatformType.ens,
+  PlatformType.basenames,
+  PlatformType.unstoppableDomains,
+  PlatformType.dotbit,
+  PlatformType.twitter,
+  PlatformType.linea,
+  PlatformType.nextid,
+]);
+
+const SOCIAL_PLATFORMS = new Set([PlatformType.farcaster, PlatformType.lens]);
+const INCLUSIVE_PLATFORMS = new Set([
+  PlatformType.twitter,
+  PlatformType.nextid,
+]);
+
+export const getResolvedProfileArray = (
   data: IdentityGraphQueryResponse,
   platform: PlatformType,
 ) => {
   const resolvedRecord = data?.data?.identity;
-
-  if (!resolvedRecord) {
-    return [];
-  }
+  if (!resolvedRecord) return [];
 
   const {
     identity,
@@ -190,103 +204,119 @@ export const primaryDomainResolvedRequestArray = (
     resolvedAddress,
     identityGraph,
     profile,
+    isPrimary,
+    ownerAddress,
   } = resolvedRecord;
+
+  const firstResolvedAddress = resolvedAddress?.[0]?.address;
+  const firstOwnerAddress = ownerAddress?.[0]?.address;
+
   const defaultReturn = profile
     ? {
         ...profile,
-        isPrimary: resolvedRecord.isPrimary,
+        isPrimary,
         displayName: profile.displayName || formatText(identity),
       }
     : {
-        address: resolvedAddress?.[0]?.address || null,
+        address: firstResolvedAddress || null,
         identity,
         platform: recordPlatform,
         displayName: formatText(identity),
-        isPrimary: resolvedRecord.isPrimary,
+        isPrimary,
       };
+
   if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
     return [defaultReturn];
   }
 
-  if (
-    directPass(resolvedRecord) &&
-    !(
-      recordPlatform === PlatformType.basenames &&
-      resolvedRecord.ownerAddress[0]?.address !== resolvedAddress[0]?.address
-    ) &&
-    identityGraph?.vertices?.length > 0
-  ) {
-    const resolved = identityGraph.vertices
-      .filter(
-        (x) =>
-          directPass(x) &&
-          (x.platform !== PlatformType.ens ||
-            x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address),
-      )
-      .map((x) => ({ ...x.profile, isPrimary: x.isPrimary }));
+  // Handle direct pass case
+  const isBadBasename =
+    recordPlatform === PlatformType.basenames &&
+    firstOwnerAddress !== firstResolvedAddress;
 
-    return resolved;
+  const vertices = identityGraph?.vertices;
+  if (!vertices?.length) {
+    return [defaultReturn];
   }
 
-  const validPlatforms = [
-    PlatformType.ethereum,
-    PlatformType.ens,
-    PlatformType.basenames,
-    PlatformType.unstoppableDomains,
-    PlatformType.dotbit,
-    PlatformType.twitter,
-    PlatformType.linea,
-    PlatformType.nextid,
-  ];
+  let results = [];
 
-  if (validPlatforms.includes(recordPlatform)) {
-    const vertices =
-      identityGraph?.vertices
-        .filter((x) => {
-          if (
-            x.isPrimary ||
-            [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
-          ) {
-            if (
-              [PlatformType.twitter, PlatformType.nextid].includes(
-                recordPlatform,
-              )
-            ) {
-              return true;
-            }
+  if (directPass(resolvedRecord) && !isBadBasename) {
+    results = vertices
+      .filter((vertex) => {
+        if (!directPass(vertex)) return false;
+        if (vertex.platform === PlatformType.ens) {
+          const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
+          const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
+          return vertexOwnerAddr === vertexResolvedAddr;
+        }
+        return true;
+      })
+      .map((vertex) => ({
+        ...vertex.profile,
+        isPrimary: vertex.isPrimary,
+      }));
+  } else if (VALID_PLATFORMS.has(recordPlatform)) {
+    // Get source address for comparison only once
+    const sourceAddr =
+      recordPlatform === PlatformType.ethereum
+        ? identity
+        : firstResolvedAddress;
 
-            const sourceAddr =
-              recordPlatform === PlatformType.ethereum
-                ? identity
-                : resolvedAddress[0]?.address;
+    // Filter vertices according to platform rules
+    results = vertices
+      .filter((vertex) => {
+        // Skip non-matching vertices quickly
+        if (!vertex.isPrimary && !SOCIAL_PLATFORMS.has(vertex.platform)) {
+          return false;
+        }
 
-            return x.platform === PlatformType.farcaster
-              ? x.ownerAddress?.find((i) =>
-                  isSameAddress(i.address, sourceAddr),
-                )
-              : isSameAddress(x.resolvedAddress?.[0]?.address, sourceAddr);
-          }
-        })
-        .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
+        // For inclusive platforms, include everything primary or social
+        if (INCLUSIVE_PLATFORMS.has(recordPlatform)) {
+          return true;
+        }
+
+        // Address comparison logic
+        if (vertex.platform === PlatformType.farcaster) {
+          return (
+            vertex.ownerAddress?.some((addr) =>
+              isSameAddress(addr.address, sourceAddr),
+            ) ?? false
+          );
+        }
+
+        return isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
+      })
+      .map((vertex) => ({
+        ...vertex.profile,
+        isPrimary: vertex.isPrimary,
+      }));
+
     if (
       (recordPlatform === PlatformType.ethereum &&
-        !vertices.some(
-          (x) => x.isPrimary && x.platform === PlatformType.ens,
-        )) ||
-      ![
-        PlatformType.ethereum,
-        PlatformType.twitter,
-        PlatformType.nextid,
-      ].includes(recordPlatform)
+        !results.some((x) => x.isPrimary && x.platform === PlatformType.ens)) ||
+      !(
+        INCLUSIVE_PLATFORMS.has(recordPlatform) ||
+        recordPlatform === PlatformType.ethereum
+      )
     ) {
-      return [...vertices, defaultReturn];
+      results = [...results, defaultReturn];
     }
-
-    return vertices;
+  } else {
+    results = [defaultReturn];
   }
 
-  return [defaultReturn];
+  return results
+    .filter(
+      (item, index, self) =>
+        index ===
+        self.findIndex(
+          (i) => i.platform === item.platform && i.identity === item.identity,
+        ),
+    )
+    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
 };
+
 export const BATCH_GET_UNIVERSAL = `
   query BATCH_GET_UNIVERSAL($ids: [String!]!) {
   identitiesWithGraph(ids: $ids) {

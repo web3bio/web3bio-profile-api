@@ -2,7 +2,7 @@ import {
   errorHandle,
   getUserHeaders,
   isValidEthereumAddress,
-  prettify,
+  uglify,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexLinea } from "@/utils/regexp";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const handle = isValidEthereumAddress(inputName)
     ? inputName
-    : prettify(inputName);
+    : uglify(inputName, PlatformType.linea);
 
   if (!regexLinea.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({

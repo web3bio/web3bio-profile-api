@@ -8,7 +8,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import {
   GET_PROFILES,
-  primaryDomainResolvedRequestArray,
+  getResolvedProfileArray,
   queryIdentityGraph,
 } from "@/utils/query";
 import {
@@ -36,7 +36,7 @@ const DEFAULT_PLATFORM_ORDER = [
 function sortProfilesByPlatform(
   responses: ProfileAPIResponse[] | ProfileNSResponse[],
   targetPlatform: PlatformType,
-  handle: string
+  handle: string,
 ): ProfileAPIResponse[] {
   const order = [
     targetPlatform,
@@ -56,11 +56,11 @@ function sortProfilesByPlatform(
       i === 0
         ? [
             responses.find(
-              (x) => x.identity === handle && x.platform === targetPlatform
+              (x) => x.identity === handle && x.platform === targetPlatform,
             ),
           ]
-        : []
-    )
+        : [],
+    ),
   );
 
   return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
@@ -94,28 +94,18 @@ export const resolveWithIdentityGraph = async ({
     };
   const resolvedResponse = await processJson(response);
 
-  const profilesArray = primaryDomainResolvedRequestArray(
-    resolvedResponse,
-    platform
-  )
-    .filter(
-      (item, index, self) =>
-        index ===
-        self.findIndex(
-          (i) => i.platform === item.platform && i.identity === item.identity
-        )
-    )
-    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+  const profilesArray = getResolvedProfileArray(resolvedResponse, platform);
 
   const responsesToSort = await Promise.all(
     profilesArray.map((_profile) =>
       generateProfileStruct(
         _profile as ProfileRecord,
         ns,
-        response.data.identity.identityGraph?.edges
-      )
-    )
+        response.data.identity.identityGraph?.edges,
+      ),
+    ),
   );
+
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
     : sortProfilesByPlatform(responsesToSort, platform, handle);
@@ -138,7 +128,7 @@ export const resolveWithIdentityGraph = async ({
             location: null,
             header: null,
             links: {},
-          }) as ProfileAPIResponse
+          }) as ProfileAPIResponse,
     );
   }
 
@@ -146,8 +136,8 @@ export const resolveWithIdentityGraph = async ({
     (item, index, self) =>
       index ===
       self.findIndex(
-        (x) => x.platform === item.platform && x.identity === item.identity
-      )
+        (x) => x.platform === item.platform && x.identity === item.identity,
+      ),
   ) as ProfileAPIResponse[];
 
   return uniqRes.length && !uniqRes.every((x) => x?.error)
@@ -164,18 +154,17 @@ export const resolveUniversalHandle = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns?: boolean
+  ns?: boolean,
 ) => {
-  const handleToQuery = prettify(handle);
   const response = await queryIdentityGraph(
-    handleToQuery,
+    handle,
     platform,
     GET_PROFILES(false),
-    headers
+    headers,
   );
   const res = (await resolveWithIdentityGraph({
     platform,
-    handle: handleToQuery,
+    handle: handle,
     ns,
     response,
   })) as any;
