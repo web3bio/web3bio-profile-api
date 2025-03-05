@@ -16,12 +16,12 @@ import {
   IDENTITY_GRAPH_SERVER,
   resolveWithIdentityGraph,
 } from "../../[handle]/utils";
-import { generateProfileStruct, resolveUniversalParams } from "@/utils/utils";
+import { generateProfileStruct, resolveIdentityBatch } from "@/utils/utils";
 
 export async function handleRequest(
   ids: string[],
   headers: AuthHeaders,
-  ns: boolean
+  ns: boolean,
 ) {
   if (!ids?.length)
     return errorHandle({
@@ -31,7 +31,7 @@ export async function handleRequest(
       message: ErrorMessages.invalidIdentity,
     });
   try {
-    const queryIds = resolveUniversalParams(ids);
+    const queryIds = resolveIdentityBatch(ids);
     const json = (await fetchIdentityGraphBatch(queryIds, ns, headers)) as any;
     if (json.code) {
       return errorHandle({
@@ -55,7 +55,7 @@ export async function handleRequest(
 export async function fetchUniversalBatch(
   ids: string[],
   ns: boolean,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ) {
   try {
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
@@ -100,7 +100,7 @@ export async function fetchUniversalBatch(
 export async function fetchIdentityGraphBatch(
   ids: string[],
   ns: boolean,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ): Promise<
   ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
 > {
@@ -137,7 +137,7 @@ export async function fetchIdentityGraphBatch(
                   : item.identity,
               },
               ns,
-              item.identityGraph?.edges
+              item.identityGraph?.edges,
             )),
             aliases: item.aliases,
           });

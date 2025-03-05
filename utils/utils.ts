@@ -345,33 +345,6 @@ export const resolveVerifiedLink = (
   return res;
 };
 
-export const resolveUniversalParams = (ids: string[]) => {
-  const res = new Array();
-  ids.forEach((x) => {
-    if (!x || ![0, 1].includes(x?.split(",")?.length - 1)) {
-      res.push({
-        platform: null,
-        identity: null,
-      });
-    } else {
-      if (x.includes(",")) {
-        res.push({
-          platform: x.split(",")[0],
-          identity: x.split(",")[1],
-        });
-      } else {
-        res.push({
-          platform: handleSearchPlatform(x),
-          identity: prettify(x),
-        });
-      }
-    }
-  });
-  return res
-    .filter((x) => shouldPlatformFetch(x.platform) && !!x.identity)
-    .map((x) => `${x.platform as PlatformType},${x.identity}`);
-};
-
 export const resolveIdentity = (input: string): string | null => {
   if (!input) return null;
 
