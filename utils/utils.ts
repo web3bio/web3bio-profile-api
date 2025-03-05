@@ -139,7 +139,7 @@ export async function generateProfileStruct(
     platform: data.platform,
     displayName: data.displayName,
     avatar: data.avatar
-      ? await resolveEipAssetURL(data.avatar, data.identity)
+      ? await resolveEipAssetURL(data.avatar)
       : data.platform === PlatformType.lens && data?.social?.uid
         ? await getLensDefaultAvatar(Number(data.social.uid))
         : null,
@@ -345,6 +345,7 @@ export const resolveVerifiedLink = (
   return res;
 };
 
+// Resolves and normalizes a user identity string into a standardized format.
 export const resolveIdentity = (input: string): string | null => {
   if (!input) return null;
 

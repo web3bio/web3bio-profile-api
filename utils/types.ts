@@ -61,11 +61,13 @@ interface SocialRecord {
   follower: number;
   following: number;
 }
+
 interface AddressRecord {
   address: string;
   network: string;
   __typename: "Address";
 }
+
 export interface IdentityGraphQueryResponse {
   data: {
     identity: IdentityRecord;
@@ -78,6 +80,7 @@ export interface IdentityGraphEdge {
   dataSource: string;
   edgeType: string;
 }
+
 export interface IdentityRecord {
   id: string;
   expiredAt: number;
@@ -96,10 +99,10 @@ export interface IdentityRecord {
 }
 
 export interface ProfileRecord {
-  // from web3bio IdentityGraph Service
+  // from Web3.bio Identity Graph
   uid: string;
   address: string;
-  avatar: string;
+  avatar: string | null;
   contenthash: string;
   description: string;
   displayName: string;

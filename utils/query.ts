@@ -16,7 +16,7 @@ const directPass = (identity: IdentityRecord) => {
   if (identity.isPrimary && identity.platform !== PlatformType.linea)
     return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
-    identity.platform
+    identity.platform,
   );
 };
 
@@ -93,7 +93,7 @@ export const GET_GRAPH_QUERY = `
           dataSource
           edgeType
         }
-        }     
+        }
       }
   }
 `;
@@ -160,7 +160,7 @@ export const GET_PROFILES = (single?: boolean) => `
               }
             }
           }
-            
+
           edges {
           source
           target
@@ -176,7 +176,7 @@ export const GET_PROFILES = (single?: boolean) => `
 
 export const primaryDomainResolvedRequestArray = (
   data: IdentityGraphQueryResponse,
-  platform: PlatformType
+  platform: PlatformType,
 ) => {
   const resolvedRecord = data?.data?.identity;
 
@@ -221,7 +221,7 @@ export const primaryDomainResolvedRequestArray = (
         (x) =>
           directPass(x) &&
           (x.platform !== PlatformType.ens ||
-            x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address)
+            x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address),
       )
       .map((x) => ({ ...x.profile, isPrimary: x.isPrimary }));
 
@@ -249,7 +249,7 @@ export const primaryDomainResolvedRequestArray = (
           ) {
             if (
               [PlatformType.twitter, PlatformType.nextid].includes(
-                recordPlatform
+                recordPlatform,
               )
             ) {
               return true;
@@ -262,7 +262,7 @@ export const primaryDomainResolvedRequestArray = (
 
             return x.platform === PlatformType.farcaster
               ? x.ownerAddress?.find((i) =>
-                  isSameAddress(i.address, sourceAddr)
+                  isSameAddress(i.address, sourceAddr),
                 )
               : isSameAddress(x.resolvedAddress?.[0]?.address, sourceAddr);
           }
@@ -271,7 +271,7 @@ export const primaryDomainResolvedRequestArray = (
     if (
       (recordPlatform === PlatformType.ethereum &&
         !vertices.some(
-          (x) => x.isPrimary && x.platform === PlatformType.ens
+          (x) => x.isPrimary && x.platform === PlatformType.ens,
         )) ||
       ![
         PlatformType.ethereum,
@@ -363,7 +363,7 @@ export async function queryIdentityGraph(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
   query: string,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ): Promise<any> {
   try {
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
