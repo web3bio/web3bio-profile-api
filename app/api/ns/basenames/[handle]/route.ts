@@ -2,7 +2,7 @@ import {
   errorHandle,
   getUserHeaders,
   isValidEthereumAddress,
-  uglify,
+  prettify,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexBasenames } from "@/utils/regexp";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const handle = isValidEthereumAddress(inputName)
     ? inputName
-    : uglify(inputName, PlatformType.basenames);
+    : prettify(inputName);
 
   if (!regexBasenames.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({

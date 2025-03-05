@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
       isValidEthereumAddress(resolvedHandle),
       regexSolana.test(resolvedHandle),
       regexFarcaster.test(resolvedHandle),
-      /#\d+/.test(handle),
     ].some((x) => !!x)
   )
     return errorHandle({

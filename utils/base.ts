@@ -182,12 +182,6 @@ export const prettify = (input: string): string => {
 export const uglify = (input: string, platform: PlatformType) => {
   if (!input) return "";
   switch (platform) {
-    case PlatformType.basenames:
-      return input.endsWith(".base.eth")
-        ? input
-        : input.endsWith(".base")
-          ? `${input}.eth`
-          : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ||
         input.endsWith(".fcast.id") ||
@@ -196,6 +190,12 @@ export const uglify = (input: string, platform: PlatformType) => {
         : `${input}.farcaster`;
     case PlatformType.lens:
       return input.endsWith(".lens") ? input : `${input}.lens`;
+    case PlatformType.basenames:
+      return input.endsWith(".base.eth")
+        ? input
+        : input.endsWith(".base")
+          ? `${input}.eth`
+          : `${input}.base.eth`;
     case PlatformType.linea:
       return input.endsWith(".linea.eth")
         ? input
