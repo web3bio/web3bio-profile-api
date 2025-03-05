@@ -356,6 +356,7 @@ export const resolveIdentity = (input: string): string | null => {
 
   if (parts.length === 2) {
     [platform, identity] = parts as [PlatformType, string];
+    identity = prettify(identity);
   } else if (parts.length === 1) {
     platform = handleSearchPlatform(input);
     identity = prettify(input);

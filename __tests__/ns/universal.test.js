@@ -7,7 +7,7 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(
       json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ens")?.address
+        json.find((x) => x.platform === "ens")?.address,
     );
   });
 
@@ -42,8 +42,8 @@ describe("Test For Universal NS API", () => {
     expect(
       json.filter(
         (x) =>
-          x.identity.endsWith(".eth") && x.platform === "unstoppabledomains"
-      ).length
+          x.identity.endsWith(".eth") && x.platform === "unstoppabledomains",
+      ).length,
     ).toBe(0);
   });
   it("It should response 200 data for 184.linea.eth", async () => {
@@ -56,23 +56,21 @@ describe("Test For Universal NS API", () => {
   });
   it("It should response 200 data for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
     const res = await queryClient(
-      "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d"
+      "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(false);
   });
-  it("It should response 200 data for linea,184.liena", async () => {
-    const res = await queryClient(
-      "/ns/linea,184.linea"
-    );
+  it("It should response 200 data for linea,184.linea", async () => {
+    const res = await queryClient("/ns/linea,184.linea");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(true);
   });
   it("It should response 200 data for solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y", async () => {
     const res = await queryClient(
-      "/ns/solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y"
+      "/ns/solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
