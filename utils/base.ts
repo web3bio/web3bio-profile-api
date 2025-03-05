@@ -42,8 +42,8 @@ const web3AddressRegexes = [
 export const isWeb3Address = (address: string): boolean =>
   web3AddressRegexes.some((regex) => regex.test(address));
 
-export const getUserHeaders = (req: NextRequest): AuthHeaders => {
-  const userToken = req.headers?.get("x-api-key");
+export const getUserHeaders = (headers: Headers): AuthHeaders => {
+  const userToken = headers?.get("x-api-key");
 
   if (userToken && userToken?.length > 0) {
     return {

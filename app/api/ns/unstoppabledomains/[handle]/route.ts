@@ -9,11 +9,11 @@ import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
-
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
-  const headers = getUserHeaders(req);
+  const headers = getUserHeaders(req.headers);
+  const { searchParams } = req.nextUrl;
+  const handle = searchParams.get("handle")?.toLowerCase() || "";
+
   if (
     !regexUnstoppableDomains.test(handle) &&
     !isValidEthereumAddress(handle)
@@ -29,6 +29,8 @@ export async function GET(req: NextRequest) {
     handle,
     PlatformType.unstoppableDomains,
     headers,
-    true
+    true,
   );
 }
+
+export const runtime = "edge";

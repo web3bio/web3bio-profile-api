@@ -6,10 +6,11 @@ import { NextRequest } from "next/server";
 import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as PlatformType;
-  const headers = getUserHeaders(req);
+
   if (!identity || !platform)
     return errorHandle({
       identity: identity,

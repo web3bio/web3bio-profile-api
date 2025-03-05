@@ -11,9 +11,10 @@ import { NextRequest } from "next/server";
 import { resolveIdentityRespond } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-  const headers = getUserHeaders(req);
   const handle = searchParams.get("handle") || "";
+
   const resolvedHandle = regexSolana.test(handle)
     ? handle
     : handle.toLowerCase();
@@ -37,7 +38,7 @@ export async function GET(req: NextRequest) {
     queryInput,
     PlatformType.farcaster,
     headers,
-    false
+    false,
   );
 }
 

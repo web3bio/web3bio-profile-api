@@ -6,9 +6,9 @@ import { resolveIdentityRespond } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const uid = searchParams.get("uid")?.toLowerCase() || "";
-  const headers = getUserHeaders(req);
 
   if (!regexUID.test(uid))
     return errorHandle({

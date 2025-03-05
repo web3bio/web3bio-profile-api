@@ -10,9 +10,9 @@ import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
   const platform = handleSearchPlatform(handle);
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       handle,
       platform,
       GET_PROFILES(false),
-      headers
+      headers,
     );
     const profiles = (await resolveWithIdentityGraph({
       platform,

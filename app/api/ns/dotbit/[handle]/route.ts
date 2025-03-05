@@ -12,8 +12,11 @@ import { NextRequest } from "next/server";
 export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
-  const handle = req.nextUrl.searchParams.get("handle")?.toLowerCase() || "";
-  const headers = getUserHeaders(req);
+  const headers = getUserHeaders(req.headers);
+  const { searchParams } = req.nextUrl;
+
+  const handle = searchParams.get("handle")?.toLowerCase() || "";
+
   if (!regexDotbit.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
       identity: handle,

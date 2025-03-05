@@ -3,15 +3,10 @@ import { NextRequest } from "next/server";
 import { ErrorMessages } from "@/utils/types";
 import { handleRequest } from "@/app/api/profile/batch/[ids]/utils";
 
-// export async function POST(req: NextRequest) {
-//   const { ids } = await req.json();
-//   const headers = getUserHeaders(req);
-//   return handleRequest(ids, headers, true);
-// }
-
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-  const headers = getUserHeaders(req);
+
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
     return handleRequest(ids, headers, true);

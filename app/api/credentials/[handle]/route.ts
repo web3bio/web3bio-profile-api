@@ -6,8 +6,8 @@ import { PlatformType } from "@/utils/platform";
 import { resolveCredentialsHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const handle = req.nextUrl.searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
   const id = resolveUniversalParams([handle])[0];
   if (!id) {
     return errorHandle({

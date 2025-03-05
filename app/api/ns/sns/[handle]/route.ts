@@ -6,9 +6,10 @@ import { NextRequest } from "next/server";
 import { resolveIdentityRespond } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
+
   if (!regexSns.test(handle) && !regexSolana.test(handle))
     return errorHandle({
       identity: handle,
@@ -16,6 +17,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+
   return resolveIdentityRespond(handle, PlatformType.sns, headers, true);
 }
 

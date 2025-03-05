@@ -7,7 +7,6 @@ import {
   prettify,
   respondWithCache,
   shouldPlatformFetch,
-  uglify,
 } from "@/utils/base";
 import {
   getLensDefaultAvatar,
@@ -26,7 +25,7 @@ import {
 } from "@/utils/types";
 import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
-import { regexBtc, regexSolana } from "@/utils/regexp";
+import { regexLowercaseExempt } from "@/utils/regexp";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -330,6 +329,7 @@ export const generateSocialLinks = async (
 
   return { links, contenthash };
 };
+
 export const resolveVerifiedLink = (
   key: string,
   edges?: IdentityGraphEdge[],
@@ -369,12 +369,43 @@ export const resolveUniversalParams = (ids: string[]) => {
   });
   return res
     .filter((x) => shouldPlatformFetch(x.platform) && !!x.identity)
-    .map(
-      (x) =>
-        `${x.platform as PlatformType},${
-          [regexBtc, regexSolana].some((i) => i.test(x.identity))
-            ? x.identity
-            : x.identity.toLowerCase()
-        }`,
-    );
+    .map((x) => `${x.platform as PlatformType},${x.identity}`);
+};
+
+export const resolveIdentity = (input: string): string | null => {
+  if (!input) return null;
+
+  const parts = input.split(",");
+
+  let platform: PlatformType;
+  let identity: string;
+
+  if (parts.length === 2) {
+    [platform, identity] = parts as [PlatformType, string];
+  } else if (parts.length === 1) {
+    platform = handleSearchPlatform(input);
+    identity = prettify(input);
+  } else {
+    return null;
+  }
+
+  if (!shouldPlatformFetch(platform) || !identity) return null;
+
+  const normalizedIdentity = regexLowercaseExempt.test(identity)
+    ? identity
+    : identity.toLowerCase();
+
+  return `${platform},${normalizedIdentity}`;
+};
+
+export const resolveIdentityBatch = (input: string[]): string[] => {
+  const results: string[] = [];
+
+  for (const id of input) {
+    const processed = resolveIdentity(id);
+    if (processed) {
+      results.push(processed);
+    }
+  }
+  return results;
 };

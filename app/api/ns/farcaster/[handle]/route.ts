@@ -10,11 +10,11 @@ import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { resolveIdentityRespond } from "@/utils/utils";
 
-export const runtime = "edge";
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
+
   const resolvedHandle = regexSolana.test(handle)
     ? handle
     : handle.toLowerCase();
@@ -39,6 +39,8 @@ export async function GET(req: NextRequest) {
     queryInput,
     PlatformType.farcaster,
     headers,
-    true
+    true,
   );
 }
+
+export const runtime = "edge";

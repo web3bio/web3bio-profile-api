@@ -10,9 +10,10 @@ import { NextRequest } from "next/server";
 import { resolveIdentityRespond } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
-  const headers = getUserHeaders(req);
+
   if (!regexLens.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
