@@ -11,7 +11,7 @@ import {
   ProfileAPIResponse,
   ProfileNSResponse,
 } from "./types";
-import { generateProfileStruct, resolveIdentityBatch } from "@/utils/utils";
+import { generateProfileStruct } from "@/utils/utils";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 
 export enum QueryType {
