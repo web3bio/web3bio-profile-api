@@ -3,7 +3,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
 
-  return resolveIdentityRespond(
+  return resolveIdentityHandle(
     `#${fid}`,
     PlatformType.farcaster,
     headers,

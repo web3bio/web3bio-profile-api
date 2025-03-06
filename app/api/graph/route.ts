@@ -20,9 +20,9 @@ export async function GET(req: NextRequest) {
     });
   try {
     let rawJson = await queryIdentityGraph(
+      GET_GRAPH_QUERY,
       identity,
       platform,
-      GET_GRAPH_QUERY,
       headers,
     );
 

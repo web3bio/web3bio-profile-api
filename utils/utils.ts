@@ -62,21 +62,14 @@ export const resolveContentIPNS = async (handle: string) => {
 
 export const resolveIdentityResponse = async (
   handle: string,
-  headers: AuthHeaders,
   platform: PlatformType,
+  headers: AuthHeaders,
   ns: boolean,
 ) => {
-  let identity = "";
-
-  if (isValidEthereumAddress(handle)) {
-    identity = handle.toLowerCase();
-  } else {
-    identity = handle;
-  }
   const res = await queryIdentityGraph(
-    identity,
+    GET_PROFILES,
+    handle,
     platform as PlatformType,
-    GET_PROFILES(ns),
     headers,
   );
   if (res.msg) {
@@ -165,28 +158,28 @@ export async function generateProfileStruct(
       };
 }
 
-export const resolveIdentityRespond = async (
+export const resolveIdentityHandle = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns: boolean,
+  ns: boolean = false,
 ) => {
   try {
-    const json = (await resolveIdentityResponse(
+    const response = await resolveIdentityResponse(
       handle,
-      headers,
       platform,
+      headers,
       ns,
-    )) as any;
-    if (json.code) {
+    );
+    if ("code" in response) {
       return errorHandle({
         identity: handle,
-        platform: platform,
-        code: json.code,
-        message: json.message,
+        platform,
+        code: response.code,
+        message: response.message,
       });
     }
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(response));
   } catch (e: any) {
     return errorHandle({
       identity: handle,

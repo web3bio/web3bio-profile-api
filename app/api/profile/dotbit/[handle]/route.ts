@@ -6,7 +6,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveIdentityRespond(handle, PlatformType.dotbit, headers, false);
+  return resolveIdentityHandle(handle, PlatformType.dotbit, headers, false);
 }
 
 export const runtime = "edge";

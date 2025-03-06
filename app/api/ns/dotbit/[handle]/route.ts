@@ -6,7 +6,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export const runtime = "edge";
@@ -26,5 +26,5 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return resolveIdentityRespond(handle, PlatformType.dotbit, headers, true);
+  return resolveIdentityHandle(handle, PlatformType.dotbit, headers, true);
 }

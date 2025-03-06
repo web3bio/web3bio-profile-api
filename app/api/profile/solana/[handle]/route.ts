@@ -2,7 +2,7 @@ import { errorHandle, getUserHeaders } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveIdentityRespond(handle, PlatformType.sns, headers, false);
+  return resolveIdentityHandle(handle, PlatformType.sns, headers, false);
 }
 
 export const runtime = "edge";

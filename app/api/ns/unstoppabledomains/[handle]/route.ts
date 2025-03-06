@@ -6,7 +6,7 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexUnstoppableDomains } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  return resolveIdentityRespond(
+  return resolveIdentityHandle(
     handle,
     PlatformType.unstoppableDomains,
     headers,

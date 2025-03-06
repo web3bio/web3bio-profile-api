@@ -6,10 +6,10 @@ import { AuthHeaders } from "./types";
 export const GET_CREDENTIALS_QUERY = `
  query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
-     	identityGraph{
-        vertices{
+     	identityGraph {
+        vertices {
           id
-          credentials{
+          credentials {
             category
             type
             value
@@ -71,89 +71,84 @@ export const GET_GRAPH_QUERY = `
             }
           }
           edges {
-          source
-          target
-          dataSource
-          edgeType
-        }
+            source
+            target
+            dataSource
+            edgeType
+          }
         }
       }
   }
 `;
 
-export const GET_PROFILES = (single?: boolean) => `
+export const GET_PROFILES = `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
-      identity(platform: $platform, identity: $identity) {
+    identity(platform: $platform, identity: $identity) {
+      identity
+      platform
+      isPrimary
+      expiredAt
+      resolvedAddress {
+        network
+        address
+      }
+      ownerAddress {
+        network
+        address
+      }
+      profile {
         identity
         platform
-        isPrimary
-        expiredAt
-        resolvedAddress {
-          network
-          address
+        address
+        displayName
+        avatar
+        description
+        contenthash
+        texts
+        social {
+          uid
+          follower
+          following
         }
-        ownerAddress {
-          network
-          address
-        }
-        profile {
+      }
+      identityGraph {
+        vertices {
           identity
           platform
-          address
-          displayName
-          avatar
-          description
-          contenthash
-          texts
-          social {
-            uid
-            follower
-            following
+          isPrimary
+          expiredAt
+          resolvedAddress {
+            network
+            address
           }
-        }
-        ${
-          !single
-            ? `identityGraph {
-          vertices {
+          ownerAddress {
+            network
+            address
+          }
+          profile {
             identity
             platform
-            isPrimary
-            expiredAt
-            resolvedAddress {
-              network
-              address
-            }
-            ownerAddress {
-              network
-              address
-            }
-            profile {
-              identity
-              platform
-              address
-              displayName
-              avatar
-              description
-              contenthash
-              texts
-              social {
-                uid
-                follower
-                following
-              }
+            address
+            displayName
+            avatar
+            description
+            contenthash
+            texts
+            social {
+              uid
+              follower
+              following
             }
           }
-
-          edges {
+        }
+        edges {
           source
           target
           dataSource
           edgeType
         }
-        }`
-            : ``
-        }
       }
+    }
   }
 `;
 
@@ -230,9 +225,9 @@ export const BATCH_GET_UNIVERSAL = `
 `;
 
 export async function queryIdentityGraph(
+  query: string,
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
-  query: string,
   headers: AuthHeaders,
 ): Promise<any> {
   try {

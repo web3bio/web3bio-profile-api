@@ -17,14 +17,14 @@ export async function GET(req: NextRequest) {
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
     const response = await queryIdentityGraph(
+      GET_PROFILES,
       handle,
       platform,
-      GET_PROFILES(false),
       headers,
     );
     const profiles = (await resolveWithIdentityGraph({
-      platform,
       handle,
+      platform,
       ns: true,
       response,
     })) as any;

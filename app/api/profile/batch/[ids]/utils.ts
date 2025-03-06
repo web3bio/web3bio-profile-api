@@ -83,8 +83,8 @@ export async function fetchUniversalBatch(
         id: item.id,
         aliases: item.aliases,
         profiles: await resolveWithIdentityGraph({
-          platform,
           handle,
+          platform,
           ns,
           response: { data: { identity: { ...item } } },
         }),
