@@ -171,7 +171,7 @@ export const getThemeColor = (
   const newSat = Math.max(0.15, s * 0.7);
   const newLight = Math.min(
     0.95,
-    l + 0.25 + (((hashCode >> 4) & 0xff) % 45) / 100,
+    l + 0.25 + (((hashCode >> 4) & 0xff) % 35) / 100,
   );
 
   const [r3, g3, b3] = hslToRgb(newHue, newSat, newLight);
