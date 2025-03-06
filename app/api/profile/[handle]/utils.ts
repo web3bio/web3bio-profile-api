@@ -23,14 +23,14 @@ import { processJson } from "../../graph/utils";
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
   PlatformType.basenames,
+  PlatformType.linea,
   PlatformType.ethereum,
   PlatformType.farcaster,
   PlatformType.lens,
 ];
 
 const directPass = (identity: IdentityRecord) => {
-  if (identity.isPrimary && identity.platform !== PlatformType.linea)
-    return true;
+  if (identity.isPrimary) return true;
   return [PlatformType.farcaster, PlatformType.lens].includes(
     identity.platform,
   );
@@ -188,10 +188,10 @@ const VALID_PLATFORMS = new Set([
   PlatformType.ethereum,
   PlatformType.ens,
   PlatformType.basenames,
+  PlatformType.linea,
   PlatformType.unstoppableDomains,
   PlatformType.dotbit,
   PlatformType.twitter,
-  PlatformType.linea,
   PlatformType.nextid,
 ]);
 

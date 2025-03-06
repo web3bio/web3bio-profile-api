@@ -60,7 +60,7 @@ describe("Test For Universal NS API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.some((x) => x.platform === "linea")).toBe(false);
+    expect(json.some((x) => x.platform === "linea")).toBe(true);
   });
   it("It should response 200 data for linea,184.linea", async () => {
     const res = await queryClient("/ns/linea,184.linea");

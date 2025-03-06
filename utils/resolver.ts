@@ -16,7 +16,7 @@ export const resolveMediaURL = (
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
     return resolveIPFS_URL(url) || url;
   return identity
-    ? `https://api.web3.bio/api/avatar/svg?hanlde=${encodeURIComponent(identity)}`
+    ? `https://api.web3.bio/api/avatar/svg?handle=${encodeURIComponent(identity)}`
     : url;
 };
 
