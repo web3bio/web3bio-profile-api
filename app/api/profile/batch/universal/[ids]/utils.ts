@@ -1,6 +1,6 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
-import { fetchUniversalBatch } from "../../[ids]/utils";
+import { fetchUniversalBatch } from "@/utils/query";
 import { resolveIdentityBatch } from "@/utils/utils";
 
 export const handleUniversalBatchRequest = async (

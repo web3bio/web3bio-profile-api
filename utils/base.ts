@@ -28,7 +28,8 @@ export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
-
+export const IDENTITY_GRAPH_SERVER =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
 
 const web3AddressRegexes = [

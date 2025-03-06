@@ -1,7 +1,18 @@
-import { IDENTITY_GRAPH_SERVER } from "@/app/api/profile/[handle]/utils";
-import { handleSearchPlatform } from "./base";
+import {
+  handleSearchPlatform,
+  IDENTITY_GRAPH_SERVER,
+  formatText,
+  isWeb3Address,
+} from "./base";
 import { PlatformType } from "./platform";
-import { AuthHeaders } from "./types";
+import {
+  AuthHeaders,
+  ErrorMessages,
+  ProfileAPIResponse,
+  ProfileNSResponse,
+} from "./types";
+import { generateProfileStruct, resolveIdentityBatch } from "@/utils/utils";
+import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
@@ -310,5 +321,103 @@ export async function queryIdentityGraph(
     return await response.json();
   } catch (e) {
     return { errors: e };
+  }
+}
+
+export async function fetchIdentityGraphBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders,
+): Promise<
+  ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
+> {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
+        variables: {
+          ids: ids,
+        },
+      }),
+    });
+
+    const json = await response.json();
+    if (json.code) return json;
+    let res = [] as any;
+    if (json?.data?.identitiesWithGraph?.length > 0) {
+      for (let i = 0; i < json.data.identitiesWithGraph.length; i++) {
+        const item = json.data.identitiesWithGraph[i];
+        if (item) {
+          res.push({
+            ...(await generateProfileStruct(
+              item.profile || {
+                address: isWeb3Address(item.identity) ? item.identity : null,
+                identity: item.identity,
+                platform: item.platform,
+                displayName: isWeb3Address(item.identity)
+                  ? formatText(item.identity)
+                  : item.identity,
+              },
+              ns,
+              item.identityGraph?.edges,
+            )),
+            aliases: item.aliases,
+          });
+        }
+      }
+    }
+    return res;
+  } catch (e: any) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
+  }
+}
+
+export async function fetchUniversalBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders,
+) {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
+        variables: {
+          ids: ids,
+        },
+      }),
+    });
+
+    const json = await response.json();
+    if (!json || json?.code) return json;
+    const res = [];
+    for (let i = 0; i < json.data.identitiesWithGraph?.length; i++) {
+      const item = json.data.identitiesWithGraph[i];
+      const platform = item.id.split(",")[0];
+      const handle = item.id.split(",")[1];
+      res.push({
+        id: item.id,
+        aliases: item.aliases,
+        profiles: await resolveWithIdentityGraph({
+          handle,
+          platform,
+          ns,
+          response: { data: { identity: { ...item } } },
+        }),
+      });
+    }
+
+    return res;
+  } catch (e: any) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }

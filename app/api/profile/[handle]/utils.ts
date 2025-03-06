@@ -20,9 +20,6 @@ import {
 import { generateProfileStruct } from "@/utils/utils";
 import { processJson } from "../../graph/utils";
 
-export const IDENTITY_GRAPH_SERVER =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
-
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
   PlatformType.basenames,
