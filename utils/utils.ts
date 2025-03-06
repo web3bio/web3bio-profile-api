@@ -369,16 +369,18 @@ export const generateSocialLinks = async (
 export const resolveVerifiedLink = (
   key: string,
   edges?: IdentityGraphEdge[],
-) => {
-  const res = [] as SourceType[];
-  if (!edges?.length) return res;
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.dataSource;
-      if (!res.includes(source as SourceType)) res.push(source as SourceType);
-    });
-  return res;
+): SourceType[] => {
+  if (!edges?.length) return [];
+
+  const sourceSet = new Set<SourceType>();
+  for (let i = 0; i < edges.length; i++) {
+    const edge = edges[i];
+    if (edge.target === key) {
+      sourceSet.add(edge.dataSource as SourceType); // O(1) operation
+    }
+  }
+
+  return Array.from(sourceSet);
 };
 
 // Resolves and normalizes a user identity string into a standardized format.

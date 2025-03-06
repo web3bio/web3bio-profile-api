@@ -1,26 +1,26 @@
+import { NextResponse } from "next/server";
 import { isAddress } from "viem";
 import { PlatformType } from "./platform";
 import {
+  regexBasenames,
+  regexBtc,
+  regexCluster,
+  regexCrossbell,
   regexDotbit,
   regexEns,
   regexEth,
+  regexFarcaster,
+  regexGenome,
   regexLens,
+  regexLinea,
+  regexNext,
+  regexSns,
+  regexSolana,
+  regexSpaceid,
   regexTwitter,
   regexUnstoppableDomains,
-  regexSpaceid,
-  regexFarcaster,
-  regexCrossbell,
-  regexSns,
-  regexBtc,
-  regexSolana,
-  regexBasenames,
-  regexGenome,
-  regexCluster,
-  regexNext,
-  regexLinea,
 } from "./regexp";
 import { AuthHeaders, errorHandleProps } from "./types";
-import { NextRequest, NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -61,20 +61,27 @@ export const isSameAddress = (
   return address.toLowerCase() === otherAddress.toLowerCase();
 };
 
-export const errorHandle = (props: errorHandleProps) => {
-  const isValidAddress = isValidEthereumAddress(props.identity || "");
+export const errorHandle = ({
+  identity = "",
+  platform,
+  message,
+  code = 500,
+  headers = {},
+}: errorHandleProps) => {
+  const isValidAddress = isValidEthereumAddress(identity || "");
+
   return NextResponse.json(
     {
-      address: isValidAddress ? props.identity : null,
-      identity: isValidAddress ? null : props.identity,
-      platform: props.platform,
-      error: props.message,
+      address: isValidAddress ? identity : null,
+      identity: isValidAddress ? null : identity || null,
+      platform,
+      error: message,
     },
     {
-      status: isNaN(props.code) ? 500 : props.code,
+      status: typeof code === "number" && !isNaN(code) ? code : 500,
       headers: {
         "Cache-Control": "no-store",
-        ...props.headers,
+        ...headers,
       },
     },
   );
