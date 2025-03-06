@@ -23,7 +23,7 @@ import {
   ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
-import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 import { regexLowercaseExempt } from "@/utils/regexp";
 
@@ -67,7 +67,7 @@ export const resolveIdentityResponse = async (
   ns: boolean,
 ) => {
   const res = await queryIdentityGraph(
-    GET_PROFILES,
+    ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
     handle,
     platform as PlatformType,
     headers,
@@ -82,7 +82,7 @@ export const resolveIdentityResponse = async (
   }
 
   const profile = res?.data?.identity?.profile;
-  // ens empty resolved address
+
   if (!profile) {
     let nsResponse = null;
     if ([PlatformType.sns, PlatformType.ens].includes(platform)) {

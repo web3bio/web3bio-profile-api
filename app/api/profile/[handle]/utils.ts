@@ -6,7 +6,7 @@ import {
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   AuthHeaders,
   ErrorMessages,
@@ -163,7 +163,7 @@ export const resolveUniversalHandle = async (
   ns: boolean = false,
 ) => {
   const response = await queryIdentityGraph(
-    GET_PROFILES,
+    ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
     handle,
     platform,
     headers,

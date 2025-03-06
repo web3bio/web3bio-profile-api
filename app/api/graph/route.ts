@@ -1,6 +1,6 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { GET_GRAPH_QUERY, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { processJson } from "./utils";
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
     });
   try {
     let rawJson = await queryIdentityGraph(
-      GET_GRAPH_QUERY,
+      QueryType.GET_GRAPH_QUERY,
       identity,
       platform,
       headers,

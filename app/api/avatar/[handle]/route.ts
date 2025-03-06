@@ -7,7 +7,7 @@ import {
 import { NextRequest, NextResponse } from "next/server";
 import { respondWithSVG } from "../svg/utils";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
-import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
   let avatarURL = "";
   if (shouldPlatformFetch(platform)) {
     const response = await queryIdentityGraph(
-      GET_PROFILES,
+      QueryType.GET_PROFILES,
       handle,
       platform,
       headers,

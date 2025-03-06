@@ -1,6 +1,6 @@
 import { respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { GET_CREDENTIALS_QUERY, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   AuthHeaders,
   CredentialRecord,
@@ -13,7 +13,7 @@ export const resolveCredentialsHandle = async (
   headers: AuthHeaders,
 ) => {
   const res = await queryIdentityGraph(
-    GET_CREDENTIALS_QUERY,
+    QueryType.GET_CREDENTIALS_QUERY,
     identity,
     platform,
     headers,
