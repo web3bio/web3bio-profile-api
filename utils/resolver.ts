@@ -5,19 +5,16 @@ import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 import { regexDomain, regexEIP } from "./regexp";
 
-export const resolveMediaURL = (
-  url: string,
-  identity?: string,
-): string | null => {
+export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https://")) return url;
   if (url.startsWith("ar://"))
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
     return resolveIPFS_URL(url) || url;
-  return identity
-    ? `https://api.web3.bio/api/avatar/svg?handle=${encodeURIComponent(identity)}`
-    : url;
+  return !id
+    ? url
+    : `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}`;
 };
 
 export const resolveHandle = (
