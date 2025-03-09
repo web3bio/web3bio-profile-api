@@ -3,13 +3,13 @@ import { queryClient } from "../utils/test-utils";
 describe("Test For Universal Profile API", () => {
   it("It should response 200 data for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     const res = await queryClient(
-      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
+      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
-    expect(json[0].displayName).toBe("0x7cbb...acf5");
-    expect(json[1].platform).toBe("farcaster");
+    expect(json[0].displayName).toBe("sujiyan.eth");
+    expect(json[1].platform).toBe("basenames");
   });
   it("It should response 200 data for lilgho.lens", async () => {
     const res = await queryClient("/profile/lilgho.lens");
@@ -21,7 +21,7 @@ describe("Test For Universal Profile API", () => {
   });
   it("It should response 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
     const res = await queryClient(
-      "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+      "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -35,7 +35,7 @@ describe("Test For Universal Profile API", () => {
   });
   it("It should response 200 data for 0x3ddfa8ec3052539b6c9549f12cea2c295cff5296", async () => {
     const res = await queryClient(
-      "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296"
+      "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -49,10 +49,10 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(
       json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ens")?.address
+        json.find((x) => x.platform === "ens")?.address,
     );
     expect(
-      json.find((x) => x.platform === "farcaster").social.follower
+      json.find((x) => x.platform === "farcaster").social.follower,
     ).toBeTruthy();
   });
   it("It should response 200 for mcdonalds.eth", async () => {
@@ -67,7 +67,7 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("stani.lens");
     expect(
-      json.find((x) => x.platform === "lens").social.following
+      json.find((x) => x.platform === "lens").social.following,
     ).toBeTruthy();
   });
   it("It should response 200 data for brantly.eth", async () => {
@@ -87,15 +87,15 @@ describe("Test For Universal Profile API", () => {
   });
   it("It should response 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(
-      "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649"
+      "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649",
     );
     expect(res.status).toBe(200);
-    const json = await res.json()
+    const json = await res.json();
     expect(json[0].platform).toBe("ethereum");
   });
   it("It should response 200 data for 0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c", async () => {
     const res = await queryClient(
-      "/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c"
+      "/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -107,7 +107,7 @@ describe("Test For Universal Profile API", () => {
   });
   it("It should response 200 data for 0x638b1350920333d23a7a7472c00aa5c38c278b90", async () => {
     const res = await queryClient(
-      "/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90"
+      "/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -125,7 +125,7 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
     expect(
-      json.find((x) => x.platform === "farcaster").links.twitter.handle
+      json.find((x) => x.platform === "farcaster").links.twitter.handle,
     ).toBe("livid");
   });
   it("It should response 200 data for аррӏе.eth", async () => {
@@ -155,11 +155,12 @@ describe("Test For Universal Profile API", () => {
   it("It should response 200 for suji_yan.twitter", async () => {
     const res = await queryClient("/profile/twitter,suji_yan");
     const json = await res.json();
-    expect(json[0].platform).toBe("basenames");
+    expect(json[0].platform).toBe("ens");
+    expect(json[0].identity).toBe("sujiyan.eth");
   });
   it("It should response 200 for 0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid", async () => {
     const res = await queryClient(
-      "/profile/0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid"
+      "/profile/0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid",
     );
     const json = await res.json();
     expect(json[0].platform).toBe("ens");

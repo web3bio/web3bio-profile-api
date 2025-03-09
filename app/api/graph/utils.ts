@@ -2,64 +2,88 @@ import { PlatformType } from "@/utils/platform";
 import { getLensDefaultAvatar, resolveEipAssetURL } from "@/utils/resolver";
 import { IdentityRecord, ProfileRecord } from "@/utils/types";
 
-const processAvatar = async (profile: ProfileRecord) => {
+const processProfileAvatar = async (
+  profile: ProfileRecord,
+): Promise<string | null> => {
   if (!profile) return null;
-  const _profile = JSON.parse(JSON.stringify(profile));
 
-  try {
-    _profile.avatar = await resolveEipAssetURL(
-      _profile?.avatar,
-      profile.identity
-    );
-  } catch {
-    _profile.avatar = null;
+  let avatarUrl = profile.avatar;
+
+  if (avatarUrl) {
+    try {
+      avatarUrl = await resolveEipAssetURL(avatarUrl);
+    } catch {
+      avatarUrl = null;
+    }
   }
+
   if (
-    _profile.platform === PlatformType.lens &&
-    !_profile.avatar &&
-    _profile?.social?.uid
+    !avatarUrl &&
+    profile.platform === PlatformType.lens &&
+    profile.social?.uid
   ) {
-    _profile.avatar = await getLensDefaultAvatar(Number(_profile.social.uid));
+    avatarUrl = await getLensDefaultAvatar(Number(profile.social.uid));
   }
 
-  return _profile;
+  return avatarUrl;
 };
 
 export const processJson = async (json: any) => {
-  const _json = JSON.parse(JSON.stringify(json));
+  const _json = structuredClone(json);
   const identity = _json?.data?.identity;
-  if (identity?.profile) {
-    identity.profile = await processAvatar(identity.profile);
+
+  if (!identity) return _json;
+
+  // Process main identity avatar in parallel with vertices
+  const promises = [];
+
+  if (identity.profile) {
+    promises.push(
+      processProfileAvatar(identity.profile).then((processedAvatar) => {
+        identity.profile.avatar = processedAvatar;
+      }),
+    );
   }
 
-  if (identity?.identityGraph?.vertices?.length > 0) {
-    if (
-      !identity?.identityGraph?.vertices?.some(
-        (x: IdentityRecord) =>
-          x.identity === identity.identity && x.platform === identity.platform
-      )
-    ) {
-      const _identity = JSON.parse(JSON.stringify(identity));
-      delete _identity.identityGraph;
-      identity?.identityGraph?.vertices.unshift(_identity);
+  const vertices: IdentityRecord[] = identity.identityGraph?.vertices;
+  if (vertices?.length > 0) {
+    const currentIdentityExists = vertices.some(
+      (x: IdentityRecord) =>
+        x.identity === identity.identity && x.platform === identity.platform,
+    );
+
+    if (!currentIdentityExists) {
+      const currentIdentity = { ...identity };
+      delete currentIdentity.identityGraph;
+      vertices.unshift(currentIdentity);
     } else {
-      const index = identity.identityGraph.vertices.findIndex(
+      const index = vertices.findIndex(
         (x: IdentityRecord) =>
-          x.platform === identity.platform && x.identity === identity.identity
+          x.platform === identity.platform && x.identity === identity.identity,
       );
-      if (index !== -1) {
-        const item = identity.identityGraph.vertices[index];
-        identity.identityGraph.vertices.splice(index, 1);
-        identity.identityGraph.vertices.unshift(item);
+
+      if (index > 0) {
+        const item = vertices[index];
+        vertices.copyWithin(1, 0, index);
+        vertices[0] = item;
       }
     }
 
-    for (let i = 0; i < identity.identityGraph.vertices.length; i++) {
-      const item = identity.identityGraph.vertices[i];
-      if (item?.profile) {
-        item.profile = await processAvatar(item.profile);
-      }
-    }
+    // Process all avatars in parallel
+    promises.push(
+      Promise.all(
+        vertices
+          .filter((item) => item?.profile)
+          .map(async (item) => {
+            const processedAvatar = await processProfileAvatar(item.profile);
+            if (processedAvatar) {
+              item.profile.avatar = processedAvatar;
+            }
+          }),
+      ),
+    );
   }
+  await Promise.all(promises);
+
   return _json;
 };

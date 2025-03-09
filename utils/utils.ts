@@ -7,7 +7,6 @@ import {
   prettify,
   respondWithCache,
   shouldPlatformFetch,
-  uglify,
 } from "@/utils/base";
 import {
   getLensDefaultAvatar,
@@ -24,9 +23,9 @@ import {
   ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
-import { GET_PROFILES, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
-import { regexBtc, regexSolana } from "@/utils/regexp";
+import { regexLowercaseExempt } from "@/utils/regexp";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -63,21 +62,14 @@ export const resolveContentIPNS = async (handle: string) => {
 
 export const resolveIdentityResponse = async (
   handle: string,
-  headers: AuthHeaders,
   platform: PlatformType,
+  headers: AuthHeaders,
   ns: boolean,
 ) => {
-  let identity = "";
-
-  if (isValidEthereumAddress(handle)) {
-    identity = handle.toLowerCase();
-  } else {
-    identity = handle;
-  }
   const res = await queryIdentityGraph(
-    identity,
+    ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
+    handle,
     platform as PlatformType,
-    GET_PROFILES(ns),
     headers,
   );
   if (res.msg) {
@@ -90,7 +82,7 @@ export const resolveIdentityResponse = async (
   }
 
   const profile = res?.data?.identity?.profile;
-  // ens empty resolved address
+
   if (!profile) {
     let nsResponse = null;
     if ([PlatformType.sns, PlatformType.ens].includes(platform)) {
@@ -134,60 +126,79 @@ export async function generateProfileStruct(
   ns?: boolean,
   edges?: IdentityGraphEdge[],
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
+  // Pre-fetch avatar asynchronously
+  const avatarPromise = data.avatar
+    ? resolveEipAssetURL(data.avatar)
+    : data.platform === PlatformType.lens && data?.social?.uid
+      ? getLensDefaultAvatar(Number(data.social.uid))
+      : Promise.resolve(null);
+
+  // Basic profile data used in both response types
   const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
     displayName: data.displayName,
-    avatar: data.avatar
-      ? await resolveEipAssetURL(data.avatar, data.identity)
-      : data.platform === PlatformType.lens && data?.social?.uid
-        ? await getLensDefaultAvatar(Number(data.social.uid))
-        : null,
+    avatar: null,
     description: data.description || null,
   };
-  const { links, contenthash } = await generateSocialLinks(data, edges);
-  return ns
-    ? nsObj
-    : {
-        ...nsObj,
-        email: data.texts?.email || null,
-        location: data.texts?.location || null,
-        header: (await resolveEipAssetURL(data.texts?.header)) || null,
-        contenthash: contenthash || null,
-        links: links || {},
-        social: data.social
-          ? {
-              uid: data.social.uid ? Number(data.social.uid) : null,
-              follower: Number(data.social.follower),
-              following: Number(data.social.following),
-            }
-          : {},
-      };
+
+  // Fetch social links and avatar concurrently
+  const [{ links, contenthash }, avatar] = await Promise.all([
+    generateSocialLinks(data, edges),
+    avatarPromise,
+  ]);
+
+  // Set resolved avatar
+  nsObj.avatar = avatar;
+
+  // Return minimal object if ns flag is true
+  if (ns) {
+    return nsObj;
+  }
+
+  // Return full profile for API response
+  return {
+    ...nsObj,
+    email: data.texts?.email || null,
+    location: data.texts?.location || null,
+    header: data.texts?.header
+      ? await resolveEipAssetURL(data.texts.header)
+      : null,
+    contenthash: contenthash || null,
+    links: links || {},
+    social: data.social
+      ? {
+          uid: data.social.uid ? Number(data.social.uid) : null,
+          follower: Number(data.social.follower),
+          following: Number(data.social.following),
+        }
+      : {},
+  };
 }
 
-export const resolveIdentityRespond = async (
+export const resolveIdentityHandle = async (
   handle: string,
   platform: PlatformType,
   headers: AuthHeaders,
-  ns: boolean,
+  ns: boolean = false,
 ) => {
   try {
-    const json = (await resolveIdentityResponse(
+    const response = await resolveIdentityResponse(
       handle,
-      headers,
       platform,
+      headers,
       ns,
-    )) as any;
-    if (json.code) {
+    );
+    if ("code" in response) {
       return errorHandle({
         identity: handle,
-        platform: platform,
-        code: json.code,
-        message: json.message,
+        platform,
+        code: response.code,
+        message: response.message,
       });
     }
-    return respondWithCache(JSON.stringify(json));
+    return respondWithCache(JSON.stringify(response));
   } catch (e: any) {
     return errorHandle({
       identity: handle,
@@ -202,36 +213,44 @@ export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
 ) => {
-  const platform = data.platform;
-  const texts = data.texts;
-  const keys = texts ? Object.keys(texts) : [];
-  const identity = data.identity;
-  let links = {} as any;
-  let contenthash = null;
+  const { platform, texts, identity, contenthash: originalContenthash } = data;
+  const links: Record<string, any> = {};
+  let contenthash = originalContenthash || null;
+
+  const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
+  if (!texts && !identityBasedPlatforms.includes(platform)) {
+    return { links, contenthash };
+  }
+
   switch (platform) {
     case PlatformType.basenames:
     case PlatformType.ethereum:
     case PlatformType.linea:
     case PlatformType.ens:
       if (!texts) break;
-      let key = null;
-      keys.forEach((i) => {
-        key = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(i.toLowerCase()),
+      // Process ENS text records
+      for (const textKey of Object.keys(texts)) {
+        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
         );
-        const resolvedHandle = resolveHandle(texts[i], key);
-        if (key && resolvedHandle) {
-          links[key] = {
-            link: getSocialMediaLink(resolvedHandle, key),
-            handle: resolvedHandle,
-            sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
-          };
+
+        if (platformKey) {
+          const resolvedHandle = resolveHandle(texts[textKey], platformKey);
+          if (resolvedHandle) {
+            links[platformKey] = {
+              link: getSocialMediaLink(resolvedHandle, platformKey),
+              handle: resolvedHandle,
+              sources: resolveVerifiedLink(
+                `${platformKey},${resolvedHandle}`,
+                edges,
+              ),
+            };
+          }
         }
-      });
-      contenthash = data.contenthash;
+      }
       break;
     case PlatformType.farcaster:
-      contenthash = data.contenthash;
+      // Add Farcaster link
       links[PlatformType.farcaster] = {
         link: getSocialMediaLink(identity, PlatformType.farcaster),
         handle: identity,
@@ -240,6 +259,7 @@ export const generateSocialLinks = async (
           edges,
         ),
       };
+      // Add Twitter link if available
       if (texts?.twitter) {
         const resolvedHandle = resolveHandle(texts.twitter);
         links[PlatformType.twitter] = {
@@ -253,128 +273,152 @@ export const generateSocialLinks = async (
       }
       break;
     case PlatformType.lens:
-      contenthash = data.contenthash;
+      // Add Lens link
       const pureHandle = identity.replace(".lens", "");
       links[PlatformType.lens] = {
         link: getSocialMediaLink(pureHandle, PlatformType.lens),
         handle: identity,
         sources: resolveVerifiedLink(`${PlatformType.lens},${identity}`, edges),
       };
-      keys?.forEach((i) => {
-        if (Array.from(PLATFORM_DATA.keys()).includes(i as PlatformType)) {
-          let key = null;
-          key = Array.from(PLATFORM_DATA.keys()).find(
-            (k) => k === i.toLowerCase(),
-          );
-          if (key) {
-            const resolvedHandle = resolveHandle(texts[i], i as PlatformType);
+      // Process other platform links
+      if (texts) {
+        for (const key of Object.keys(texts)) {
+          const platformKey = key.toLowerCase() as PlatformType;
+          if (PLATFORM_DATA.has(platformKey)) {
+            const resolvedHandle = resolveHandle(texts[key], platformKey);
+            links[platformKey] = {
+              link: getSocialMediaLink(resolvedHandle, key),
+              handle: resolvedHandle,
+              sources: resolveVerifiedLink(
+                `${platformKey},${resolvedHandle}`,
+                edges,
+              ),
+            };
+          }
+        }
+      }
+      break;
+    case PlatformType.solana:
+    case PlatformType.sns:
+      // Resolve contenthash for SNS
+      contenthash =
+        texts?.["IPNS"] ||
+        texts?.["IPFS"] ||
+        (await resolveContentIPNS(identity)) ||
+        null;
+
+      // Process SNS records
+      if (texts) {
+        for (const recordKey of SNS_RECORDS_LIST) {
+          const handle = resolveHandle(texts[recordKey]);
+          if (handle) {
+            const type = ["CNAME", PlatformType.url].includes(recordKey)
+              ? PlatformType.website
+              : recordKey;
+
+            links[type] = {
+              link: getSocialMediaLink(handle, type)!,
+              handle,
+              sources: resolveVerifiedLink(`${type},${handle}`, edges),
+            };
+          }
+        }
+      }
+      break;
+    case PlatformType.unstoppableDomains:
+      // Process UD accounts
+      if (texts) {
+        for (const accountKey of UD_ACCOUNTS_LIST) {
+          const item = texts[accountKey];
+          if (item && PLATFORM_DATA.has(accountKey)) {
+            const resolvedHandle = resolveHandle(item, accountKey);
+            links[accountKey] = {
+              link: getSocialMediaLink(resolvedHandle, accountKey),
+              handle: resolvedHandle,
+              sources: resolveVerifiedLink(
+                `${accountKey},${resolvedHandle}`,
+                edges,
+              ),
+            };
+          }
+        }
+      }
+      break;
+    case PlatformType.dotbit:
+      // Process dotbit accounts
+      if (texts) {
+        for (const key of Object.keys(texts)) {
+          const platformKey = key as PlatformType;
+          if (PLATFORM_DATA.has(platformKey)) {
+            const item = texts[key];
+            const resolvedHandle = resolveHandle(item, platformKey);
             links[key] = {
-              link: getSocialMediaLink(resolvedHandle, i),
+              link: getSocialMediaLink(item, platformKey)!,
               handle: resolvedHandle,
               sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
             };
           }
         }
-      });
-      break;
-    case PlatformType.solana:
-    case PlatformType.sns:
-      contenthash =
-        data.texts?.["IPNS"] ||
-        data.texts?.["IPFS"] ||
-        (await resolveContentIPNS(data.identity));
-      SNS_RECORDS_LIST.forEach((x) => {
-        const handle = resolveHandle(texts?.[x]);
-        if (handle) {
-          const type = ["CNAME", PlatformType.url].includes(x)
-            ? PlatformType.website
-            : x;
-          links[type] = {
-            link: getSocialMediaLink(handle, type)!,
-            handle: handle,
-            sources: resolveVerifiedLink(`${type},${handle}`, edges),
-          };
-        }
-      });
-      break;
-    case PlatformType.unstoppableDomains:
-      contenthash = data.contenthash;
-      UD_ACCOUNTS_LIST.forEach((x) => {
-        const item = texts?.[x];
-        if (item && PLATFORM_DATA.has(x)) {
-          const resolvedHandle = resolveHandle(item, x);
-          links[x] = {
-            link: getSocialMediaLink(resolvedHandle, x),
-            handle: resolvedHandle,
-            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
-          };
-        }
-      });
-      break;
-    case PlatformType.dotbit:
-      contenthash = data.contenthash;
-      keys.forEach((x) => {
-        if (PLATFORM_DATA.has(x as PlatformType)) {
-          const item = texts[x];
-          const resolvedHandle = resolveHandle(item, x as PlatformType);
-          links[x] = {
-            link: getSocialMediaLink(item, x as PlatformType)!,
-            handle: resolvedHandle,
-            sources: resolveVerifiedLink(`${x},${resolvedHandle}`, edges),
-          };
-        }
-      });
-    default:
+      }
       break;
   }
 
   return { links, contenthash };
 };
+
 export const resolveVerifiedLink = (
   key: string,
   edges?: IdentityGraphEdge[],
-) => {
-  const res = [] as SourceType[];
-  if (!edges?.length) return res;
-  edges
-    .filter((x) => x.target === key)
-    .forEach((x) => {
-      const source = x.dataSource;
-      if (!res.includes(source as SourceType)) res.push(source as SourceType);
-    });
-  return res;
+): SourceType[] => {
+  if (!edges?.length) return [];
+
+  const sourceSet = new Set<SourceType>();
+  for (let i = 0; i < edges.length; i++) {
+    const edge = edges[i];
+    if (edge.target === key) {
+      sourceSet.add(edge.dataSource as SourceType); // O(1) operation
+    }
+  }
+
+  return Array.from(sourceSet);
 };
 
-export const resolveUniversalParams = (ids: string[]) => {
-  const res = new Array();
-  ids.forEach((x) => {
-    if (!x || ![0, 1].includes(x?.split(",")?.length - 1)) {
-      res.push({
-        platform: null,
-        identity: null,
-      });
-    } else {
-      if (x.includes(",")) {
-        res.push({
-          platform: x.split(",")[0],
-          identity: x.split(",")[1],
-        });
-      } else {
-        res.push({
-          platform: handleSearchPlatform(x),
-          identity: prettify(x),
-        });
-      }
+// Resolves and normalizes a user identity string into a standardized format.
+export const resolveIdentity = (input: string): string | null => {
+  if (!input) return null;
+
+  const parts = input.split(",");
+
+  let platform: PlatformType;
+  let identity: string;
+
+  if (parts.length === 2) {
+    [platform, identity] = parts as [PlatformType, string];
+    identity = prettify(identity);
+  } else if (parts.length === 1) {
+    platform = handleSearchPlatform(input);
+    identity = prettify(input);
+  } else {
+    return null;
+  }
+
+  if (!shouldPlatformFetch(platform) || !identity) return null;
+
+  const normalizedIdentity = regexLowercaseExempt.test(identity)
+    ? identity
+    : identity.toLowerCase();
+
+  return `${platform},${normalizedIdentity}`;
+};
+
+export const resolveIdentityBatch = (input: string[]): string[] => {
+  const results: string[] = [];
+
+  for (const id of input) {
+    const processed = resolveIdentity(id);
+    if (processed) {
+      results.push(processed);
     }
-  });
-  return res
-    .filter((x) => shouldPlatformFetch(x.platform) && !!x.identity)
-    .map(
-      (x) =>
-        `${x.platform as PlatformType},${
-          [regexBtc, regexSolana].some((i) => i.test(x.identity))
-            ? x.identity
-            : x.identity.toLowerCase()
-        }`,
-    );
+  }
+  return results;
 };

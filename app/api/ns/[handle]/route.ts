@@ -2,14 +2,14 @@ import { ErrorMessages } from "@/utils/types";
 import { errorHandle, getUserHeaders } from "@/utils/base";
 import { NextRequest } from "next/server";
 import { resolveUniversalHandle } from "../../profile/[handle]/utils";
-import { resolveUniversalParams } from "@/utils/utils";
+import { resolveIdentity } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-  const headers = getUserHeaders(req);
   const handle = searchParams.get("handle") || "";
-  const id = resolveUniversalParams([handle])[0];
+  const id = resolveIdentity(handle);
   if (!id) {
     return errorHandle({
       identity: handle,

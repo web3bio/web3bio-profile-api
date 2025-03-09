@@ -4,8 +4,9 @@ import { ErrorMessages } from "@/utils/types";
 import { handleUniversalBatchRequest } from "@/app/api/profile/batch/universal/[ids]/utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-  const headers = getUserHeaders(req);
+
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
     return handleUniversalBatchRequest(ids, headers, true);

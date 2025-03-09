@@ -10,7 +10,7 @@ export async function GET(req: NextRequest) {
   const size = searchParams.get("size") || 240;
   return await respondWithSVG(
     isValidEthereumAddress(name) ? name.toLowerCase() : name,
-    Number(size)
+    Number(size),
   );
 }
 export const runtime = "edge";

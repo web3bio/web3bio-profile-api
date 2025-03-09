@@ -7,7 +7,7 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   try {
     const url = new URL(searchParams.get("url")!);
-    
+
     const imageBuffer = await fetch(url!).then((res) => res.arrayBuffer());
     const resultBuffer = await sharp(imageBuffer)
       .jpeg({
@@ -20,7 +20,7 @@ export async function GET(req: NextRequest) {
       headers: {
         "Content-Type": "image/jpeg",
         "Cache-Control":
-          "public, s-maxage=604800, stale-while-revalidate=86400",
+          "public, max-age=43200, s-maxage=604800, stale-while-revalidate=86400",
       },
     });
   } catch (e) {

@@ -1,15 +1,16 @@
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { GET_GRAPH_QUERY, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as PlatformType;
-  const headers = getUserHeaders(req);
+
   if (!identity || !platform)
     return errorHandle({
       identity: identity,
@@ -19,9 +20,9 @@ export async function GET(req: NextRequest) {
     });
   try {
     let rawJson = await queryIdentityGraph(
+      QueryType.GET_GRAPH_QUERY,
       identity,
       platform,
-      GET_GRAPH_QUERY,
       headers,
     );
 

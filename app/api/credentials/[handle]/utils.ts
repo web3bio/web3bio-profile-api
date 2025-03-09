@@ -1,6 +1,6 @@
 import { respondWithCache } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
-import { GET_CREDENTIALS_QUERY, queryIdentityGraph } from "@/utils/query";
+import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   AuthHeaders,
   CredentialRecord,
@@ -10,16 +10,16 @@ import {
 export const resolveCredentialsHandle = async (
   identity: string,
   platform: PlatformType,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ) => {
   const res = await queryIdentityGraph(
+    QueryType.GET_CREDENTIALS_QUERY,
     identity,
     platform,
-    GET_CREDENTIALS_QUERY,
-    headers
+    headers,
   );
   const credentials = res?.data?.identity?.identityGraph?.vertices?.filter(
-    (x: CredentialRecord) => x.credentials
+    (x: CredentialRecord) => x.credentials,
   );
   const json = !credentials?.length
     ? []
@@ -51,7 +51,7 @@ const resolveCredentialsStruct = (data: CredentialRecord[]) => {
           isHuman: null,
           isRisky: null,
           isSpam: null,
-        } as any
+        } as any,
       ),
     });
   });
