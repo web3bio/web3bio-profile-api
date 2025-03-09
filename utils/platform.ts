@@ -591,10 +591,11 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.nostr,
     {
-      color: "#0ea5e9",
+      color: "#5E287D",
       icon: "icons/icon-nostr.svg",
       label: "Nostr",
       urlPrefix: "https://app.coracle.social/",
+      ensText: ["nostr"],
       dotbitText: ["profile.nostr"],
       system: PlatformSystem.web2,
     },

@@ -5,19 +5,16 @@ import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
 import { regexDomain, regexEIP } from "./regexp";
 
-export const resolveMediaURL = (
-  url: string,
-  identity?: string,
-): string | null => {
+export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
   if (url.startsWith("data:") || url.startsWith("https://")) return url;
   if (url.startsWith("ar://"))
     return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
   if (url.startsWith("ipfs://") || isIPFS_Resource(url))
     return resolveIPFS_URL(url) || url;
-  return identity
-    ? `https://api.web3.bio/api/avatar/svg?hanlde=${identity}`
-    : url;
+  return !id
+    ? url
+    : `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}`;
 };
 
 export const resolveHandle = (
@@ -91,25 +88,31 @@ function resolveSocialMediaLink(
 
 export const resolveEipAssetURL = async (
   source: string,
-  identity?: string,
 ): Promise<string | null> => {
   if (!source) return null;
-  const match = source?.match(regexEIP);
-  if (match) {
-    const [full, chainId, protocol, contractAddress, tokenId] = match;
-    const network = chainIdToNetwork(Number(chainId));
-    if (contractAddress && tokenId && network) {
-      const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
-      const res = await _fetcher(fetchURL);
-      if (res?.nft_id) {
-        return resolveMediaURL(res.image_url || res.previews?.image_large_url);
-      } else {
-        return null;
-      }
+
+  const match = source.match(regexEIP);
+  if (!match) return resolveMediaURL(source);
+
+  const [full, chainId, protocol, contractAddress, tokenId] = match;
+
+  if (!contractAddress || !tokenId) return resolveMediaURL(source);
+
+  const network = chainIdToNetwork(Number(chainId));
+  if (!network) return resolveMediaURL(source);
+
+  try {
+    const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
+    const res = await _fetcher(fetchURL);
+
+    if (res?.nft_id) {
+      return res.previews?.image_medium_url || res.image_url;
     }
+  } catch (error) {
+    console.error("Failed to fetch NFT data:", error);
   }
 
-  return resolveMediaURL(source, identity);
+  return resolveMediaURL(source);
 };
 
 export const getLensDefaultAvatar = async (tokenId: number) => {

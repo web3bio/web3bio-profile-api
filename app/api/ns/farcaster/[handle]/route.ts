@@ -8,13 +8,13 @@ import { PlatformType } from "@/utils/platform";
 import { regexFarcaster, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 
-export const runtime = "edge";
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
+
   const resolvedHandle = regexSolana.test(handle)
     ? handle
     : handle.toLowerCase();
@@ -24,7 +24,6 @@ export async function GET(req: NextRequest) {
       isValidEthereumAddress(resolvedHandle),
       regexSolana.test(resolvedHandle),
       regexFarcaster.test(resolvedHandle),
-      /#\d+/.test(handle),
     ].some((x) => !!x)
   )
     return errorHandle({
@@ -35,10 +34,12 @@ export async function GET(req: NextRequest) {
     });
 
   const queryInput = prettify(handle);
-  return resolveIdentityRespond(
+  return resolveIdentityHandle(
     queryInput,
     PlatformType.farcaster,
     headers,
-    true
+    true,
   );
 }
+
+export const runtime = "edge";

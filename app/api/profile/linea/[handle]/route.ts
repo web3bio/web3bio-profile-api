@@ -7,16 +7,18 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const inputName = searchParams.get("handle") || "";
-  const headers = getUserHeaders(req);
+
   const handle = isValidEthereumAddress(inputName)
     ? inputName.toLowerCase()
     : uglify(inputName, PlatformType.linea);
+
   if (!regexLinea.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
@@ -24,7 +26,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveIdentityRespond(handle, PlatformType.linea, headers, false);
+  return resolveIdentityHandle(handle, PlatformType.linea, headers, false);
 }
 
 export const runtime = "edge";

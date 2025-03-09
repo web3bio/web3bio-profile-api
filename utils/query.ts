@@ -1,46 +1,52 @@
-import { IDENTITY_GRAPH_SERVER } from "@/app/api/profile/[handle]/utils";
 import {
-  PLATFORMS_TO_EXCLUDE,
-  formatText,
   handleSearchPlatform,
-  isSameAddress,
+  IDENTITY_GRAPH_SERVER,
+  formatText,
+  isWeb3Address,
 } from "./base";
 import { PlatformType } from "./platform";
 import {
-  IdentityRecord,
-  IdentityGraphQueryResponse,
   AuthHeaders,
+  ErrorMessages,
+  ProfileAPIResponse,
+  ProfileNSResponse,
 } from "./types";
+import { generateProfileStruct } from "@/utils/utils";
+import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 
-const directPass = (identity: IdentityRecord) => {
-  if (identity.isPrimary && identity.platform !== PlatformType.linea)
-    return true;
-  return [PlatformType.farcaster, PlatformType.lens].includes(
-    identity.platform
-  );
-};
+export enum QueryType {
+  GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
+  GET_GRAPH_QUERY = "GET_GRAPH_QUERY",
+  GET_PROFILES_NS = "GET_PROFILES_NS",
+  GET_PROFILES = "GET_PROFILES",
+  BATCH_GET_UNIVERSAL = "BATCH_GET_UNIVERSAL",
+}
 
-export const GET_CREDENTIALS_QUERY = `
- query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-     	identityGraph{
-        vertices{
-          id
-          credentials{
-            category
-            type
-            value
-            platform
-            dataSource
+export function getQuery(type: QueryType): string {
+  return QUERIES[type];
+}
+
+const QUERIES = {
+  [QueryType.GET_CREDENTIALS_QUERY]: `
+    query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
+        identityGraph {
+          vertices {
+            id
+            credentials {
+              category
+              type
+              value
+              platform
+              dataSource
+            }
           }
         }
       }
     }
-  }
-`;
-
-export const GET_GRAPH_QUERY = `
- query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
+  `,
+  [QueryType.GET_GRAPH_QUERY]: `
+    query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
         identity
         platform
@@ -88,18 +94,67 @@ export const GET_GRAPH_QUERY = `
             }
           }
           edges {
-          source
-          target
-          dataSource
-          edgeType
+            source
+            target
+            dataSource
+            edgeType
+          }
         }
-        }     
       }
-  }
-`;
-
-export const GET_PROFILES = (single?: boolean) => `
-  query GET_PROFILES($platform: Platform!, $identity: String!) {
+    }
+  `,
+  [QueryType.GET_PROFILES_NS]: `
+    query GET_PROFILES_NS($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
+        identity
+        platform
+        isPrimary
+        expiredAt
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          avatar
+          description
+        }
+        identityGraph {
+          vertices {
+            identity
+            platform
+            isPrimary
+            expiredAt
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
+            profile {
+              identity
+              platform
+              address
+              displayName
+              avatar
+              description
+            }
+          }
+        }
+      }
+    }
+  `,
+  [QueryType.GET_PROFILES]: `
+    query GET_PROFILES($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity) {
         identity
         platform
@@ -128,9 +183,7 @@ export const GET_PROFILES = (single?: boolean) => `
             following
           }
         }
-        ${
-          !single
-            ? `identityGraph {
+        identityGraph {
           vertices {
             identity
             platform
@@ -160,167 +213,21 @@ export const GET_PROFILES = (single?: boolean) => `
               }
             }
           }
-            
           edges {
-          source
-          target
-          dataSource
-          edgeType
-        }
-        }`
-            : ``
-        }
-      }
-  }
-`;
-
-export const primaryDomainResolvedRequestArray = (
-  data: IdentityGraphQueryResponse,
-  platform: PlatformType
-) => {
-  const resolvedRecord = data?.data?.identity;
-
-  if (!resolvedRecord) {
-    return [];
-  }
-
-  const {
-    identity,
-    platform: recordPlatform,
-    resolvedAddress,
-    identityGraph,
-    profile,
-  } = resolvedRecord;
-  const defaultReturn = profile
-    ? {
-        ...profile,
-        isPrimary: resolvedRecord.isPrimary,
-        displayName: profile.displayName || formatText(identity),
-      }
-    : {
-        address: resolvedAddress?.[0]?.address || null,
-        identity,
-        platform: recordPlatform,
-        displayName: formatText(identity),
-        isPrimary: resolvedRecord.isPrimary,
-      };
-  if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
-    return [defaultReturn];
-  }
-
-  if (
-    directPass(resolvedRecord) &&
-    !(
-      recordPlatform === PlatformType.basenames &&
-      resolvedRecord.ownerAddress[0]?.address !== resolvedAddress[0]?.address
-    ) &&
-    identityGraph?.vertices?.length > 0
-  ) {
-    const resolved = identityGraph.vertices
-      .filter(
-        (x) =>
-          directPass(x) &&
-          (x.platform !== PlatformType.ens ||
-            x.ownerAddress?.[0]?.address === x.resolvedAddress?.[0]?.address)
-      )
-      .map((x) => ({ ...x.profile, isPrimary: x.isPrimary }));
-
-    return resolved;
-  }
-
-  const validPlatforms = [
-    PlatformType.ethereum,
-    PlatformType.ens,
-    PlatformType.basenames,
-    PlatformType.unstoppableDomains,
-    PlatformType.dotbit,
-    PlatformType.twitter,
-    PlatformType.linea,
-    PlatformType.nextid,
-  ];
-
-  if (validPlatforms.includes(recordPlatform)) {
-    const vertices =
-      identityGraph?.vertices
-        .filter((x) => {
-          if (
-            x.isPrimary ||
-            [PlatformType.farcaster, PlatformType.lens].includes(x.platform)
-          ) {
-            if (
-              [PlatformType.twitter, PlatformType.nextid].includes(
-                recordPlatform
-              )
-            ) {
-              return true;
-            }
-
-            const sourceAddr =
-              recordPlatform === PlatformType.ethereum
-                ? identity
-                : resolvedAddress[0]?.address;
-
-            return x.platform === PlatformType.farcaster
-              ? x.ownerAddress?.find((i) =>
-                  isSameAddress(i.address, sourceAddr)
-                )
-              : isSameAddress(x.resolvedAddress?.[0]?.address, sourceAddr);
+            source
+            target
+            dataSource
+            edgeType
           }
-        })
-        .map((x) => ({ ...x.profile, isPrimary: x.isPrimary })) || [];
-    if (
-      (recordPlatform === PlatformType.ethereum &&
-        !vertices.some(
-          (x) => x.isPrimary && x.platform === PlatformType.ens
-        )) ||
-      ![
-        PlatformType.ethereum,
-        PlatformType.twitter,
-        PlatformType.nextid,
-      ].includes(recordPlatform)
-    ) {
-      return [...vertices, defaultReturn];
-    }
-
-    return vertices;
-  }
-
-  return [defaultReturn];
-};
-export const BATCH_GET_UNIVERSAL = `
-  query BATCH_GET_UNIVERSAL($ids: [String!]!) {
-  identitiesWithGraph(ids: $ids) {
-    id
-    aliases
-    identity
-    platform
-    isPrimary
-    resolvedAddress {
-      network
-      address
-    }
-    ownerAddress {
-      network
-      address
-    }
-    profile {
-      identity
-      platform
-      address
-      displayName
-      avatar
-      description
-      contenthash
-      texts
-      social {
-        uid
-        follower
-        following
+        }
       }
     }
-    identityGraph {
-      graphId
-      vertices {
+  `,
+  [QueryType.BATCH_GET_UNIVERSAL]: `
+    query BATCH_GET_UNIVERSAL($ids: [String!]!) {
+      identitiesWithGraph(ids: $ids) {
+        id
+        aliases
         identity
         platform
         isPrimary
@@ -347,23 +254,53 @@ export const BATCH_GET_UNIVERSAL = `
             following
           }
         }
-      }
-      edges {
-        source
-        target
-        dataSource
-        edgeType
+        identityGraph {
+          graphId
+          vertices {
+            identity
+            platform
+            isPrimary
+            resolvedAddress {
+              network
+              address
+            }
+            ownerAddress {
+              network
+              address
+            }
+            profile {
+              identity
+              platform
+              address
+              displayName
+              avatar
+              description
+              contenthash
+              texts
+              social {
+                uid
+                follower
+                following
+              }
+            }
+          }
+          edges {
+            source
+            target
+            dataSource
+            edgeType
+          }
+        }
       }
     }
-  }
-}
-`;
+  `,
+};
 
 export async function queryIdentityGraph(
+  query: QueryType,
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
-  query: string,
-  headers: AuthHeaders
+  headers: AuthHeaders,
 ): Promise<any> {
   try {
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
@@ -373,7 +310,7 @@ export async function queryIdentityGraph(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query,
+        query: getQuery(query),
         variables: {
           identity: handle,
           platform,
@@ -384,5 +321,99 @@ export async function queryIdentityGraph(
     return await response.json();
   } catch (e) {
     return { errors: e };
+  }
+}
+
+export async function fetchIdentityGraphBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders,
+): Promise<
+  ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
+> {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
+        variables: { ids },
+      }),
+    });
+
+    const json = await response.json();
+    if (json.code) return json;
+
+    if (!json?.data?.identitiesWithGraph?.length) return [];
+
+    // Process all profiles concurrently rather than sequentially
+    return Promise.all(
+      json.data.identitiesWithGraph.filter(Boolean).map(async (item: any) => {
+        const profile = item.profile || {
+          address: isWeb3Address(item.identity) ? item.identity : null,
+          identity: item.identity,
+          platform: item.platform,
+          displayName: isWeb3Address(item.identity)
+            ? formatText(item.identity)
+            : item.identity,
+        };
+
+        return {
+          ...(await generateProfileStruct(
+            profile,
+            ns,
+            item.identityGraph?.edges,
+          )),
+          aliases: item.aliases,
+        };
+      }),
+    );
+  } catch (e) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
+  }
+}
+
+export async function fetchUniversalBatch(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders,
+) {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
+        variables: { ids },
+      }),
+    });
+
+    const json = await response.json();
+    if (!json || json?.code) return json;
+
+    // Process all identities in parallel
+    return Promise.all(
+      (json.data.identitiesWithGraph || []).map(async (item: any) => {
+        const [platform, handle] = item.id.split(",");
+        return {
+          id: item.id,
+          aliases: item.aliases,
+          profiles: await resolveWithIdentityGraph({
+            handle,
+            platform,
+            ns,
+            response: { data: { identity: { ...item } } },
+          }),
+        };
+      }),
+    );
+  } catch (e) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }

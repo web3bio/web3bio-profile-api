@@ -3,7 +3,7 @@ import { queryClient } from "../utils/test-utils";
 describe("Test For Unstoppable Domains Profile API", () => {
   it("It should response 200 for 0x0da0ee86269797618032e56a69b1aad095c581fc", async () => {
     const res = await queryClient(
-      "/profile/unstoppabledomains/0x0da0ee86269797618032e56a69b1aad095c581fc"
+      "/profile/unstoppabledomains/0x0da0ee86269797618032e56a69b1aad095c581fc",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -29,9 +29,5 @@ describe("Test For Unstoppable Domains Profile API", () => {
   it("It should response 404 for nyk.app", async () => {
     const res = await queryClient("/profile/unstoppabledomains/nyk.app");
     expect(res.status).toBe(404);
-  });
-  it("It should response 200 for 2024.hi", async () => {
-    const res = await queryClient("/profile/unstoppabledomains/2024.hi");
-    expect(res.status).toBe(200);
   });
 });

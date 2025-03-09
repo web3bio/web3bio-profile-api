@@ -3,12 +3,13 @@ import { PlatformType } from "@/utils/platform";
 import { regexUID } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
-import { resolveIdentityRespond } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
+  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const uid = searchParams.get("uid")?.toLowerCase() || "";
-  const headers = getUserHeaders(req);
+
   if (!regexUID.test(uid))
     return errorHandle({
       identity: uid,
@@ -16,7 +17,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
-  return resolveIdentityRespond(`#${uid}`, PlatformType.lens, headers, false);
+  return resolveIdentityHandle(`#${uid}`, PlatformType.lens, headers, false);
 }
 
 export const runtime = "edge";

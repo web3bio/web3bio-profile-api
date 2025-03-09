@@ -61,11 +61,13 @@ interface SocialRecord {
   follower: number;
   following: number;
 }
+
 interface AddressRecord {
   address: string;
   network: string;
   __typename: "Address";
 }
+
 export interface IdentityGraphQueryResponse {
   data: {
     identity: IdentityRecord;
@@ -78,6 +80,7 @@ export interface IdentityGraphEdge {
   dataSource: string;
   edgeType: string;
 }
+
 export interface IdentityRecord {
   id: string;
   expiredAt: number;
@@ -96,10 +99,10 @@ export interface IdentityRecord {
 }
 
 export interface ProfileRecord {
-  // from web3bio IdentityGraph Service
+  // from Web3.bio Identity Graph
   uid: string;
   address: string;
-  avatar: string;
+  avatar: string | null;
   contenthash: string;
   description: string;
   displayName: string;
@@ -107,17 +110,19 @@ export interface ProfileRecord {
   network: string;
   platform: PlatformType;
   social: SocialRecord;
-  texts: { [index: string]: string };
+  texts: Record<string, string>;
   addresses: AddressRecord[];
   aliases?: string[];
 }
 
+export type CredentialCategory = "isHuman" | "isRisky" | "isSpam";
+
 export interface CredentialRecordRaw {
-  category: "isHuman" | "isRisky" | "isSpam";
+  category: CredentialCategory;
   value: string;
   type: string;
   platform: PlatformType;
-  dataSource: String;
+  dataSource: string;
 }
 
 export interface CredentialRecord extends CredentialRecordRaw {
@@ -127,9 +132,7 @@ export interface CredentialRecord extends CredentialRecordRaw {
 export interface CredentialsResponse {
   id: string;
   credentials: {
-    isHuman: CredentialsResponseItem | null;
-    isRisky: CredentialsResponseItem | null;
-    isSpam: CredentialsResponseItem | null;
+    [K in CredentialCategory]: CredentialsResponseItem | null;
   };
 }
 

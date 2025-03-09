@@ -1,26 +1,26 @@
+import { NextResponse } from "next/server";
 import { isAddress } from "viem";
 import { PlatformType } from "./platform";
 import {
+  regexBasenames,
+  regexBtc,
+  regexCluster,
+  regexCrossbell,
   regexDotbit,
   regexEns,
   regexEth,
+  regexFarcaster,
+  regexGenome,
   regexLens,
+  regexLinea,
+  regexNext,
+  regexSns,
+  regexSolana,
+  regexSpaceid,
   regexTwitter,
   regexUnstoppableDomains,
-  regexSpaceid,
-  regexFarcaster,
-  regexCrossbell,
-  regexSns,
-  regexBtc,
-  regexSolana,
-  regexBasenames,
-  regexGenome,
-  regexCluster,
-  regexNext,
-  regexLinea,
 } from "./regexp";
 import { AuthHeaders, errorHandleProps } from "./types";
-import { NextRequest, NextResponse } from "next/server";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -28,7 +28,8 @@ export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
-
+export const IDENTITY_GRAPH_SERVER =
+  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
 
 const web3AddressRegexes = [
@@ -42,8 +43,8 @@ const web3AddressRegexes = [
 export const isWeb3Address = (address: string): boolean =>
   web3AddressRegexes.some((regex) => regex.test(address));
 
-export const getUserHeaders = (req: NextRequest): AuthHeaders => {
-  const userToken = req.headers?.get("x-api-key");
+export const getUserHeaders = (headers: Headers): AuthHeaders => {
+  const userToken = headers?.get("x-api-key");
 
   if (userToken && userToken?.length > 0) {
     return {
@@ -61,20 +62,27 @@ export const isSameAddress = (
   return address.toLowerCase() === otherAddress.toLowerCase();
 };
 
-export const errorHandle = (props: errorHandleProps) => {
-  const isValidAddress = isValidEthereumAddress(props.identity || "");
+export const errorHandle = ({
+  identity = "",
+  platform,
+  message,
+  code = 500,
+  headers = {},
+}: errorHandleProps) => {
+  const isValidAddress = isValidEthereumAddress(identity || "");
+
   return NextResponse.json(
     {
-      address: isValidAddress ? props.identity : null,
-      identity: isValidAddress ? null : props.identity,
-      platform: props.platform,
-      error: props.message,
+      address: isValidAddress ? identity : null,
+      identity: isValidAddress ? null : identity || null,
+      platform,
+      error: message,
     },
     {
-      status: isNaN(props.code) ? 500 : props.code,
+      status: typeof code === "number" && !isNaN(code) ? code : 500,
       headers: {
         "Cache-Control": "no-store",
-        ...props.headers,
+        ...headers,
       },
     },
   );
@@ -85,7 +93,8 @@ export const respondWithCache = (json: string) => {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": "public, s-maxage=604800, stale-while-revalidate=86400",
+      "Cache-Control":
+        "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200",
     },
   });
 };
@@ -182,12 +191,6 @@ export const prettify = (input: string): string => {
 export const uglify = (input: string, platform: PlatformType) => {
   if (!input) return "";
   switch (platform) {
-    case PlatformType.basenames:
-      return input.endsWith(".base.eth")
-        ? input
-        : input.endsWith(".base")
-          ? `${input}.eth`
-          : `${input}.base.eth`;
     case PlatformType.farcaster:
       return input.endsWith(".farcaster") ||
         input.endsWith(".fcast.id") ||
@@ -196,6 +199,12 @@ export const uglify = (input: string, platform: PlatformType) => {
         : `${input}.farcaster`;
     case PlatformType.lens:
       return input.endsWith(".lens") ? input : `${input}.lens`;
+    case PlatformType.basenames:
+      return input.endsWith(".base.eth")
+        ? input
+        : input.endsWith(".base")
+          ? `${input}.eth`
+          : `${input}.base.eth`;
     case PlatformType.linea:
       return input.endsWith(".linea.eth")
         ? input
