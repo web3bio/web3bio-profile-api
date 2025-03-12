@@ -118,11 +118,12 @@ export interface ProfileRecord {
 export type CredentialCategory = "isHuman" | "isRisky" | "isSpam";
 
 export interface CredentialRecordRaw {
-  category: CredentialCategory;
   value: string;
   type: string;
   platform: PlatformType;
   dataSource: string;
+  link: string;
+  category?: CredentialCategory;
 }
 
 export interface CredentialRecord extends CredentialRecordRaw {

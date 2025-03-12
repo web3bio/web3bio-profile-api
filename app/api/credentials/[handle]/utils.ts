@@ -5,6 +5,8 @@ import {
   AuthHeaders,
   CredentialRecord,
   CredentialsResponse,
+  CredentialCategory,
+  CredentialRecordRaw,
 } from "@/utils/types";
 
 export const resolveCredentialsHandle = async (
@@ -21,40 +23,39 @@ export const resolveCredentialsHandle = async (
   const credentials = res?.data?.identity?.identityGraph?.vertices?.filter(
     (x: CredentialRecord) => x.credentials,
   );
-  const json = !credentials?.length
-    ? []
-    : resolveCredentialsStruct(credentials);
+  const json = credentials?.length ? resolveCredentialsStruct(credentials) : [];
 
   return respondWithCache(JSON.stringify(json));
 };
 
-const resolveCredentialsStruct = (data: CredentialRecord[]) => {
-  const result: CredentialsResponse[] = [];
-  data.forEach((x) => {
-    result.push({
-      id: x.id,
-      credentials: x.credentials.reduce(
-        (pre, cur) => {
-          const { category, ...rest } = cur;
-          if (!pre[category]) {
-            pre[category] = {
+const resolveCredentialsStruct = (
+  data: CredentialRecord[],
+): CredentialsResponse[] => {
+  return data.map((record) => ({
+    id: record.id,
+    credentials: record.credentials.reduce(
+      (result, credential) => {
+        const { category, ...sourceData } = credential;
+        if (category) {
+          if (!result[category]) {
+            result[category] = {
               value: true,
-              sources: [{ ...rest }],
+              sources: [sourceData],
             };
           } else {
-            pre[category].sources.push({ ...rest });
+            result[category]?.sources.push(sourceData);
           }
-
-          return pre;
-        },
-        {
-          isHuman: null,
-          isRisky: null,
-          isSpam: null,
-        } as any,
-      ),
-    });
-  });
-
-  return result;
+        }
+        return result;
+      },
+      {
+        isHuman: null,
+        isRisky: null,
+        isSpam: null,
+      } as Record<
+        CredentialCategory,
+        { value: boolean; sources: CredentialRecordRaw[] } | null
+      >,
+    ),
+  }));
 };
