@@ -39,6 +39,7 @@ const QUERIES = {
               value
               platform
               dataSource
+              link
             }
           }
         }

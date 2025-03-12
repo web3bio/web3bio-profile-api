@@ -166,4 +166,11 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].platform).toBe("ens");
     expect(json.some((x) => x.platform === "nextid")).toBe(false);
   });
+  it("It should response 200 for 8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL.nextid", async () => {
+    const res = await queryClient(
+      "/profile/8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
+    );
+    const json = await res.json();
+    expect(json[0].address).toBe("8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL");
+  });
 });
