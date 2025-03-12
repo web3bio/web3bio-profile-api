@@ -160,7 +160,7 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.farcaster,
     {
-      color: "#8a63d2",
+      color: "#432C8D",
       icon: "icons/icon-farcaster.svg",
       label: "Farcaster",
       description:
@@ -198,7 +198,7 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.lens,
     {
-      color: "#6bc674",
+      color: "#2CC256",
       icon: "icons/icon-lens.svg",
       label: "Lens",
       description: "Lens Protocol social identity (.lens handle)",
