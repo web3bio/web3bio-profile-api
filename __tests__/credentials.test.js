@@ -8,7 +8,7 @@ describe("Test For Credentials API", () => {
 
     expect(json[0].id).toBe("farcaster,ggmonster");
     expect(json[0].credentials.isRisky.sources[0].value).toBe("dmca");
-    expect(json[0].credentials.isRisky.sources[0].links).toBe(
+    expect(json[0].credentials.isRisky.sources[0].link).toBe(
       "https://web3.bio/p/dmca-notice-policy",
     );
   });

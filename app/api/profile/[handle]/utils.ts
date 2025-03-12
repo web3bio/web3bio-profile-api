@@ -3,6 +3,7 @@ import {
   errorHandle,
   formatText,
   isSameAddress,
+  isWeb3Address,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
@@ -228,7 +229,7 @@ export const getResolvedProfileArray = (
         displayName: profile.displayName || formatText(identity),
       }
     : {
-        address: firstResolvedAddress || null,
+        address: isWeb3Address(identity) ? identity : null,
         identity,
         platform: recordPlatform,
         displayName: formatText(identity),
