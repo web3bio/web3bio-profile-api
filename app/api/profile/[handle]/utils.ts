@@ -100,15 +100,22 @@ export const resolveWithIdentityGraph = async ({
 
   const profilesArray = getResolvedProfileArray(resolvedResponse, platform);
 
-  const responsesToSort = await Promise.all(
-    profilesArray.map((_profile) =>
-      generateProfileStruct(
-        _profile as ProfileRecord,
-        ns,
-        response.data.identity.identityGraph?.edges,
+  const responsesToSort = (
+    await Promise.allSettled(
+      profilesArray.map((_profile) =>
+        generateProfileStruct(
+          _profile as ProfileRecord,
+          ns,
+          response.data.identity.identityGraph?.edges,
+        ),
       ),
-    ),
-  );
+    )
+  )
+    .filter(
+      (result): result is PromiseFulfilledResult<any> =>
+        result.status === "fulfilled",
+    )
+    .map((result) => result.value);
 
   const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? responsesToSort
