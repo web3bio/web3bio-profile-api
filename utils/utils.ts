@@ -138,16 +138,23 @@ export async function generateProfileStruct(
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName,
+    displayName: data.displayName || formatText(data.identity),
     avatar: null,
     description: data.description || null,
   };
 
   // Fetch social links and avatar concurrently
-  const [{ links, contenthash }, avatar] = await Promise.all([
+  const results = await Promise.allSettled([
     generateSocialLinks(data, edges),
     avatarPromise,
   ]);
+
+  const { links, contenthash } =
+    results[0].status === "fulfilled"
+      ? results[0].value
+      : { links: {}, contenthash: null };
+
+  const avatar = results[1].status === "fulfilled" ? results[1].value : null;
 
   // Set resolved avatar
   nsObj.avatar = avatar;
