@@ -72,10 +72,11 @@ export const resolveIdentityResponse = async (
     platform as PlatformType,
     headers,
   );
+
   if (res.msg) {
     return {
       identity: handle,
-      platform: platform,
+      platform,
       message: res.msg,
       code: res.code,
     };
@@ -84,11 +85,11 @@ export const resolveIdentityResponse = async (
   const profile = res?.data?.identity?.profile;
 
   if (!profile) {
-    let nsResponse = null;
     if ([PlatformType.sns, PlatformType.ens].includes(platform)) {
       if (platform === PlatformType.ens && !isValidEthereumAddress(handle))
         throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
-      nsResponse = {
+
+      const nsResponse = {
         address: isWeb3Address(handle) ? handle : null,
         identity: handle,
         platform:
@@ -98,23 +99,25 @@ export const resolveIdentityResponse = async (
         displayName: formatText(handle),
         avatar: null,
       };
-      return ns
-        ? nsResponse
-        : {
-            ...nsResponse,
-            description: null,
-            email: null,
-            location: null,
-            header: null,
-            contenthash: null,
-            links: {},
-            social: {},
-          };
-    } else {
-      throw new Error(ErrorMessages.notFound, { cause: 404 });
+
+      if (ns) return nsResponse;
+
+      return {
+        ...nsResponse,
+        description: null,
+        email: null,
+        location: null,
+        header: null,
+        contenthash: null,
+        links: {},
+        social: {},
+      };
     }
+
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
-  return await generateProfileStruct(
+
+  return generateProfileStruct(
     profile,
     ns,
     res.data.identity?.identityGraph?.edges,
@@ -156,10 +159,8 @@ export async function generateProfileStruct(
 
   const avatar = results[1].status === "fulfilled" ? results[1].value : null;
 
-  // Set resolved avatar
   nsObj.avatar = avatar;
 
-  // Return minimal object if ns flag is true
   if (ns) {
     return nsObj;
   }
@@ -240,7 +241,6 @@ export const generateSocialLinks = async (
         const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
         );
-
         if (platformKey) {
           const resolvedHandle = resolveHandle(texts[textKey], platformKey);
           if (resolvedHandle) {
@@ -266,7 +266,6 @@ export const generateSocialLinks = async (
           edges,
         ),
       };
-      // Add Twitter link if available
       if (texts?.twitter) {
         const resolvedHandle = resolveHandle(texts.twitter);
         links[PlatformType.twitter] = {
@@ -287,7 +286,6 @@ export const generateSocialLinks = async (
         handle: identity,
         sources: resolveVerifiedLink(`${PlatformType.lens},${identity}`, edges),
       };
-      // Process other platform links
       if (texts) {
         for (const key of Object.keys(texts)) {
           const platformKey = key.toLowerCase() as PlatformType;
@@ -380,10 +378,9 @@ export const resolveVerifiedLink = (
   if (!edges?.length) return [];
 
   const sourceSet = new Set<SourceType>();
-  for (let i = 0; i < edges.length; i++) {
-    const edge = edges[i];
+  for (const edge of edges) {
     if (edge.target === key) {
-      sourceSet.add(edge.dataSource as SourceType); // O(1) operation
+      sourceSet.add(edge.dataSource as SourceType);
     }
   }
 
