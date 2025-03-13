@@ -10,7 +10,7 @@ import { ErrorMessages } from "@/utils/types";
 import { resolveIdentity } from "@/utils/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
-import { respondWithSVG } from "../svg/utils";
+import { respondWithSVG } from "../svg/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

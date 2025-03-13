@@ -126,8 +126,8 @@ export const getThemeColor = (
     }
   }
 
-  // Use hash to create larger variations for each color channel
-  const adjustedRange = range + (Math.abs(hashCode) % 30); // Dynamic range based on input
+  // Use hash to create variations for each color channel
+  const adjustedRange = range + (Math.abs(hashCode) % 30);
   const rVariation = ((hashCode & 0xff) % adjustedRange) - adjustedRange / 2;
   const gVariation =
     (((hashCode >> 8) & 0xff) % adjustedRange) - adjustedRange / 2;
@@ -139,7 +139,7 @@ export const getThemeColor = (
   g = Math.max(0, Math.min(255, g + gVariation));
   b = Math.max(0, Math.min(255, b + bVariation));
 
-  // Generate a secondary color with more pronounced differences
+  // Generate a secondary color with variations
   const secondaryVariance = 15 + (Math.abs(hashCode) % 15);
   const r2 = Math.max(
     0,
@@ -163,24 +163,44 @@ export const getThemeColor = (
     ),
   );
 
+  // Convert primary colors to HSL for better control over lightness
   const [h, s, l] = rgbToHsl(r, g, b);
 
+  // Apply moderate lightness increase to primary color
+  const primaryLightness = Math.min(0.7, l + 0.12);
+  const [rPrimary, gPrimary, bPrimary] = hslToRgb(h, s, primaryLightness);
+
+  // Convert secondary colors to HSL
+  const [h2, s2, l2] = rgbToHsl(r2, g2, b2);
+
+  // Apply moderate lightness increase to secondary color
+  const secondaryLightness = Math.min(0.75, l2 + 0.15);
+  const [rSecondary, gSecondary, bSecondary] = hslToRgb(
+    h2,
+    s2,
+    secondaryLightness,
+  );
+
+  // Generate tertiary color with a hue shift and slightly higher lightness
   const hueShift = ((hashCode & 0xff) % 10) / 100;
   const newHue = (h + hueShift) % 1.0;
-
   const newSat = Math.max(0.15, s * 0.7);
   const newLight = Math.min(
-    0.95,
-    l + 0.25 + (((hashCode >> 4) & 0xff) % 35) / 100,
+    0.8,
+    l + 0.2 + (((hashCode >> 4) & 0xff) % 20) / 100,
   );
 
   const [r3, g3, b3] = hslToRgb(newHue, newSat, newLight);
 
-  const primaryColor = rgbToHex(Math.round(r), Math.round(g), Math.round(b));
+  const primaryColor = rgbToHex(
+    Math.round(rPrimary),
+    Math.round(gPrimary),
+    Math.round(bPrimary),
+  );
   const secondaryColor = rgbToHex(
-    Math.round(r2),
-    Math.round(g2),
-    Math.round(b2),
+    Math.round(rSecondary),
+    Math.round(gSecondary),
+    Math.round(bSecondary),
   );
   const tertiaryColor = rgbToHex(
     Math.round(r3),
