@@ -69,6 +69,9 @@ const QUERIES = {
           displayName
           avatar
           description
+          social {
+            uid
+          }
         }
         identityGraph {
           vertices {
@@ -92,6 +95,9 @@ const QUERIES = {
               displayName
               avatar
               description
+              social {
+                uid
+              }
             }
           }
           edges {
