@@ -71,7 +71,7 @@ export const processJson = async (json: any) => {
 
     // Process all avatars in parallel
     promises.push(
-      Promise.all(
+      Promise.allSettled(
         vertices
           .filter((item) => item?.profile)
           .map(async (item) => {
@@ -83,7 +83,9 @@ export const processJson = async (json: any) => {
       ),
     );
   }
-  await Promise.all(promises);
+
+  // Wait for all processing to complete with Promise.allSettled
+  await Promise.allSettled(promises);
 
   return _json;
 };

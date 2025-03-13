@@ -69,6 +69,9 @@ const QUERIES = {
           displayName
           avatar
           description
+          social {
+            uid
+          }
         }
         identityGraph {
           vertices {
@@ -92,6 +95,9 @@ const QUERIES = {
               displayName
               avatar
               description
+              social {
+                uid
+              }
             }
           }
           edges {
@@ -351,7 +357,7 @@ export async function fetchIdentityGraphBatch(
     if (!json?.data?.identitiesWithGraph?.length) return [];
 
     // Process all profiles concurrently rather than sequentially
-    return Promise.all(
+    const settledResults = await Promise.allSettled(
       json.data.identitiesWithGraph.filter(Boolean).map(async (item: any) => {
         const profile = item.profile || {
           address: isWeb3Address(item.identity) ? item.identity : null,
@@ -372,6 +378,12 @@ export async function fetchIdentityGraphBatch(
         };
       }),
     );
+    return settledResults
+      .filter(
+        (result): result is PromiseFulfilledResult<any> =>
+          result.status === "fulfilled" && result.value && !result.value.error,
+      )
+      .map((result) => result.value);
   } catch (e) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
