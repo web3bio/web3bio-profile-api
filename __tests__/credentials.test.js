@@ -11,6 +11,7 @@ describe("Test For Credentials API", () => {
     expect(json[0].credentials.isRisky.sources[0].link).toBe(
       "https://web3.bio/p/dmca-notice-policy",
     );
+    expect(json[0].credentials.isSpam.value).toBeTruthy();
   });
   it("It should response 200 for 0xb6a5426b885172fb73d3c8fcf9612610612df707", async () => {
     const res = await queryClient(
@@ -29,5 +30,11 @@ describe("Test For Credentials API", () => {
     const json = await res.json();
     expect(json[0].id).toBe("ens,jchip300.eth");
     expect(json[0].credentials.isHuman.sources[0].value).toBe("true");
+  });
+  it("It should response 200 for 0xhelena.eth", async () => {
+    const res = await queryClient("/credentials/0xhelena.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[1].credentials.isSpam.value).toBe(false);
   });
 });

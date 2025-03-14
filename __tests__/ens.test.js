@@ -5,6 +5,9 @@ describe("Test For ENS Profile API", () => {
     const res = await queryClient("/profile/ens/brantly.eth");
     const json = await res.json();
     expect(json.address).toBeTruthy();
+    expect(json.status).toBe(
+      "building an onchain social graph for ethereum accounts",
+    );
     expect(json.links.twitter.handle).toBe("brantlymillegan");
     expect(json.links.twitter.link).toBe("https://x.com/brantlymillegan");
     expect(json.links.discord.link).toBe("");
@@ -33,7 +36,7 @@ describe("Test For ENS Profile API", () => {
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
     expect(json.contenthash.startsWith("ipns")).toBeTruthy();
-    expect(json.address).toBe('0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5')
+    expect(json.address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
   });
   it("It should response 200 for ricmoo.eth", async () => {
     const res = await queryClient("/profile/ens/ricmoo.eth");

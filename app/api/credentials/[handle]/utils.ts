@@ -28,10 +28,61 @@ export const resolveCredentialsHandle = async (
   return respondWithCache(JSON.stringify(json));
 };
 
+const calculateCategoryValue = (
+  category: CredentialCategory,
+  sources: CredentialRecordRaw[],
+): boolean => {
+  switch (category) {
+    case "isHuman":
+      // if (
+      //   sources.find(
+      //     (x) => x.platform === 'passport' && Number(x.value) >= 20,
+      //   )
+      // )
+      //   return true;
+      return sources.length > 0;
+
+    case "isRisky":
+      return sources.length > 0;
+
+    case "isSpam":
+      if (
+        sources.find(
+          (x) =>
+            x.dataSource === "warpcast" &&
+            x.type === "score" &&
+            Number(x.value) === 0,
+        )
+      )
+        return true;
+
+    default:
+      return false;
+  }
+};
+
+const calculateValue = (data: CredentialsResponse[]): CredentialsResponse[] => {
+  for (let i = 0; i < data.length; i++) {
+    const credentials = data[i].credentials;
+    const keys = Object.keys(credentials);
+
+    for (let j = 0; j < keys.length; j++) {
+      const category = keys[j] as CredentialCategory;
+      const item = credentials[category];
+
+      if (item) {
+        item.value = calculateCategoryValue(category, item.sources);
+      }
+    }
+  }
+
+  return data;
+};
+
 const resolveCredentialsStruct = (
   data: CredentialRecord[],
 ): CredentialsResponse[] => {
-  return data.map((record) => ({
+  const res = data.map((record) => ({
     id: record.id,
     credentials: record.credentials.reduce(
       (result, credential) => {
@@ -39,7 +90,8 @@ const resolveCredentialsStruct = (
         if (category) {
           if (!result[category]) {
             result[category] = {
-              value: true,
+              // init value
+              value: false,
               sources: [sourceData],
             };
           } else {
@@ -58,4 +110,6 @@ const resolveCredentialsStruct = (
       >,
     ),
   }));
+
+  return calculateValue(res);
 };

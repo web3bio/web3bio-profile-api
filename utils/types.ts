@@ -47,6 +47,7 @@ export interface ProfileNSResponse {
   displayName: string | null;
 }
 export interface ProfileAPIResponse extends ProfileNSResponse {
+  status: string | null;
   email: string | null;
   contenthash: string | null;
   header: string | null;
