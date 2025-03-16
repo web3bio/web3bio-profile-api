@@ -168,6 +168,7 @@ export async function generateProfileStruct(
   // Return full profile for API response
   return {
     ...nsObj,
+    status: data.texts?.status || null,
     email: data.texts?.email || null,
     location: data.texts?.location || null,
     header: data.texts?.header
