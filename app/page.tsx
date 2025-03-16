@@ -45,6 +45,7 @@ export async function generateMetadata() {
       "DID Search Engine",
       "DID Explorer",
       "Ethereum Identity Kit",
+      "Ethereum OnchainKit",
       "Web3 Domain Search",
       "Web3 Domain Explorer",
       "Web3 Domain WHOIS",
@@ -75,7 +76,7 @@ export default function Home() {
             <strong className="text-bold">Web3.bio Profile API</strong>
           </h1>
           <h2 className="h6 text-gray mb-4 pb-4">
-            Multi-Chain Identity & Domain Resolver API for Ethereum, ENS
+            Universal Identity & Domain Resolver API for Ethereum, ENS
             Ecosystem, Farcaster, Lens, and Solana.
           </h2>
           <section className="mt-4 pt-4 pb-4">
@@ -862,6 +863,7 @@ export default function Home() {
         "displayName": "vitalik.eth",
         "avatar": "https://euc.li/vitalik.eth",
         "description": "mi pinxe lo crino tcati",
+        "status": null,
         "email": null,
         "location": null,
         "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
@@ -896,6 +898,7 @@ export default function Home() {
         "displayName": "Vitalik Buterin",
         "avatar": "https://i.imgur.com/IzJxuId.jpg",
         "description": "hullo",
+        "status": null,
         "email": null,
         "location": null,
         "header": null,
@@ -922,6 +925,7 @@ export default function Home() {
         "displayName": "vitalik.lens",
         "avatar": "https://api.hey.xyz/avatar?id=100275",
         "description": null,
+        "status": null,
         "email": null,
         "location": null,
         "header": null,
@@ -1083,6 +1087,7 @@ export default function Home() {
     "displayName": "vitalik.eth",
     "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
     "description": null,
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -1239,6 +1244,7 @@ export default function Home() {
     "displayName": "tony.base.eth",
     "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
     "description": "mfer building on base",
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -1397,6 +1403,7 @@ export default function Home() {
     "displayName": "name.linea.eth",
     "avatar": null,
     "description": null,
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -1540,6 +1547,7 @@ export default function Home() {
     "displayName": "Dan Romero",
     "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
     "description": "Working on Farcaster and Warpcast.",
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -1678,6 +1686,8 @@ export default function Home() {
     "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
     "email": null,
     "description": "@Avara (@Aave @Lens @Family)",
+    "status": null,
+    "email": null,
     "location": null,
     "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
     "contenthash": null,
@@ -1820,6 +1830,7 @@ export default function Home() {
     "displayName": "Pink Mamba",
     "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
     "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
+    "status": null,
     "email": null,
     "location": "Metaverse",
     "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
@@ -1968,6 +1979,7 @@ export default function Home() {
     "displayName": "bonfida.sol",
     "avatar": null,
     "description": null,
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -2094,6 +2106,7 @@ export default function Home() {
     "displayName": "bestcase.bit",
     "avatar": "https://uploads-ssl.webflow.com/621ed3ca24af847de76a2dae/635cf43497c26382c70e1c15_bestcase.jpg",
     "description": ".bit is a brand dedicated to assist every single individual and community to unleash their potential and discover more possibilities through the development of self-sovereign identity.   .bit (https://did.id) is also a product which is the only cross-chain unified DID protocol, based on the unique technical architecture, .bit provides services for more than Web3 users. .bit is able to verify signatures by different asymmetric cryptographic algorithms, which allow users to manage and control their .bit accounts with public chain addresses, email addresses, even customized passcodes and biometric data from mobile devices.  .bit determines to build the most practical and applicable suite of infrastructural tools, safeguarding the endowed right of identity sovereignty for each bit of the world.",
+    "status": null,
     "email": null,
     "location": null,
     "header": null,
@@ -2393,6 +2406,7 @@ export default function Home() {
         "displayName": "vitalik.eth",
         "avatar": "https://euc.li/vitalik.eth",
         "description": "mi pinxe lo crino tcati",
+        "status": null,
         "email": null,
         "location": null,
         "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
@@ -2427,6 +2441,7 @@ export default function Home() {
         "displayName": "Stani",
         "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
         "description": "@Avara (@Aave @Lens @Family)",
+        "status": null,
         "email": null,
         "location": null,
         "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
@@ -2456,6 +2471,7 @@ export default function Home() {
         "displayName": "Dan Romero",
         "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
         "description": "Working on Farcaster and Warpcast.",
+        "status": null,
         "email": null,
         "location": null,
         "header": null,
@@ -2487,6 +2503,7 @@ export default function Home() {
         "displayName": "tony.base.eth",
         "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
         "description": "mfer building on base",
+        "status": null,
         "email": null,
         "location": null,
         "header": null,
@@ -2526,6 +2543,7 @@ export default function Home() {
         "displayName": "sujiyan.eth",
         "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
         "description": null,
+        "status": null,
         "email": "suji.yan@dimension.im",
         "location": null,
         "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
@@ -2700,6 +2718,16 @@ export default function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎨</span>{" "}
+              March Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added new
+                field <code>status</code> to the Profile API.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
               February Update
