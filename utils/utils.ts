@@ -34,7 +34,6 @@ const UD_ACCOUNTS_LIST = [
   PlatformType.lens,
   PlatformType.telegram,
   PlatformType.youtube,
-  PlatformType.website,
   PlatformType.url,
 ];
 const SNS_RECORDS_LIST = [
@@ -338,11 +337,15 @@ export const generateSocialLinks = async (
           const item = texts[accountKey];
           if (item && PLATFORM_DATA.has(accountKey)) {
             const resolvedHandle = resolveHandle(item, accountKey);
-            links[accountKey] = {
-              link: getSocialMediaLink(resolvedHandle, accountKey),
+            const reolvedKey =
+              accountKey === PlatformType.url
+                ? PlatformType.website
+                : accountKey;
+            links[reolvedKey] = {
+              link: getSocialMediaLink(resolvedHandle, reolvedKey),
               handle: resolvedHandle,
               sources: resolveVerifiedLink(
-                `${accountKey},${resolvedHandle}`,
+                `${reolvedKey},${resolvedHandle}`,
                 edges,
               ),
             };
@@ -380,11 +383,9 @@ export const resolveVerifiedLink = (
 
   const [platformType, identity] = key.split(",");
 
-  const isWebSite = [
-    PlatformType.website,
-    PlatformType.url,
-    PlatformType.dns,
-  ].includes(platformType as PlatformType);
+  const isWebSite = [PlatformType.website, PlatformType.dns].includes(
+    platformType as PlatformType,
+  );
 
   const sourceSet = new Set<SourceType>();
 
