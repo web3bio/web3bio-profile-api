@@ -378,9 +378,23 @@ export const resolveVerifiedLink = (
 ): SourceType[] => {
   if (!edges?.length) return [];
 
+  const [platformType, identity] = key.split(",");
+
+  const isWebSite = [
+    PlatformType.website,
+    PlatformType.url,
+    PlatformType.dns,
+  ].includes(platformType as PlatformType);
+
   const sourceSet = new Set<SourceType>();
+
   for (const edge of edges) {
-    if (edge.target === key) {
+    if (isWebSite) {
+      const [, targetIdentity] = edge.target.split(",");
+      if (targetIdentity === identity) {
+        sourceSet.add(edge.dataSource as SourceType);
+      }
+    } else if (edge.target === key) {
       sourceSet.add(edge.dataSource as SourceType);
     }
   }

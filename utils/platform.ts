@@ -438,6 +438,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-web.svg",
       label: "DNS",
       urlPrefix: "https://",
+      ensText: ["dns"],
       system: PlatformSystem.web2,
     },
   ],
