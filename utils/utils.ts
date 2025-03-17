@@ -26,6 +26,7 @@ import {
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 import { regexLowercaseExempt } from "@/utils/regexp";
+import { isIPFS_Resource } from "./ipfs";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -134,13 +135,16 @@ export async function generateProfileStruct(
     : data.platform === PlatformType.lens && data?.social?.uid
       ? getLensDefaultAvatar(Number(data.social.uid))
       : Promise.resolve(null);
-
   // Basic profile data used in both response types
   const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || formatText(data.identity),
+    displayName: data.displayName
+      ? data.displayName
+      : isWeb3Address(data.identity)
+        ? formatText(data.identity)
+        : data.identity,
     avatar: null,
     description: data.description || null,
   };
@@ -223,7 +227,9 @@ export const generateSocialLinks = async (
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, any> = {};
-  let contenthash = originalContenthash || null;
+  let contenthash = isIPFS_Resource(originalContenthash)
+    ? `ipfs://${originalContenthash}`
+    : originalContenthash;
 
   const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
   if (!texts && !identityBasedPlatforms.includes(platform)) {

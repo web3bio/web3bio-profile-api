@@ -350,7 +350,6 @@ export async function fetchIdentityGraphBatch(
         variables: { ids },
       }),
     });
-
     const json = await response.json();
     if (json.code) return json;
 

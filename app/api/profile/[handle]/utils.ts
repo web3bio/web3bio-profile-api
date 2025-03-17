@@ -20,6 +20,7 @@ import {
 
 import { generateProfileStruct } from "@/utils/utils";
 import { processJson } from "../../graph/utils";
+import { format } from "sharp";
 
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
@@ -228,18 +229,16 @@ export const getResolvedProfileArray = (
 
   const firstResolvedAddress = resolvedAddress?.[0]?.address;
   const firstOwnerAddress = ownerAddress?.[0]?.address;
-
   const defaultReturn = profile
     ? {
         ...profile,
         isPrimary,
-        displayName: profile.displayName || formatText(identity),
       }
     : {
         address: isWeb3Address(identity) ? identity : null,
         identity,
         platform: recordPlatform,
-        displayName: formatText(identity),
+        displayName: isWeb3Address(identity) ? formatText(identity) : identity,
         isPrimary,
       };
 
