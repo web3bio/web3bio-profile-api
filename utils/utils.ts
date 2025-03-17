@@ -227,9 +227,7 @@ export const generateSocialLinks = async (
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, any> = {};
-  let contenthash = isIPFS_Resource(originalContenthash)
-    ? `ipfs://${originalContenthash}`
-    : originalContenthash;
+  let contenthash = originalContenthash || null;
 
   const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
   if (!texts && !identityBasedPlatforms.includes(platform)) {
@@ -337,6 +335,10 @@ export const generateSocialLinks = async (
       }
       break;
     case PlatformType.unstoppableDomains:
+      // Resolve contenthash for UD
+      contenthash = isIPFS_Resource(originalContenthash)
+        ? `ipfs://${originalContenthash}`
+        : originalContenthash;
       // Process UD accounts
       if (texts) {
         for (const accountKey of UD_ACCOUNTS_LIST) {
