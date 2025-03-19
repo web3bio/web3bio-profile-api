@@ -26,7 +26,7 @@ import {
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
 import { regexLowercaseExempt } from "@/utils/regexp";
-import { isIPFS_Resource } from "./ipfs";
+import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -46,19 +46,6 @@ const SNS_RECORDS_LIST = [
   PlatformType.discord,
   "CNAME",
 ];
-
-const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
-
-export const resolveContentIPNS = async (handle: string) => {
-  const res = await fetch(SnsSDKProxyEndpoint + "domain-data/" + handle)
-    .then((res) => res.json())
-    .catch(() => null);
-  if (!res || res?.s === "error") return "";
-  const ipnsMatch = Buffer.from(res?.result, "base64")
-    .toString("utf-8")
-    .match(/ipns=(k51[a-zA-Z0-9]{59})/);
-  return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
-};
 
 export const resolveIdentityResponse = async (
   handle: string,
@@ -221,13 +208,66 @@ export const resolveIdentityHandle = async (
   }
 };
 
+const resolveContenthash = async (
+  originalContenthash: string,
+  platform: PlatformType,
+  texts: Record<string, string>,
+) => {
+  // early return if not a supported platform
+  if (
+    ![
+      PlatformType.unstoppableDomains,
+      PlatformType.solana,
+      PlatformType.sns,
+    ].includes(platform)
+  ) {
+    return originalContenthash || null;
+  }
+  // for ud
+  if (platform === PlatformType.unstoppableDomains) {
+    if (!originalContenthash) return null;
+    return isIPFS_Resource(originalContenthash)
+      ? `ipfs://${originalContenthash}`
+      : originalContenthash;
+  }
+  // for sns/solana
+  if ([PlatformType.solana, PlatformType.sns].includes(platform)) {
+    const ipnsHash = texts?.["ipns"];
+    const ipfsHash = texts?.["ipfs"];
+    if (ipnsHash) {
+      return ipnsHash.startsWith("ipns://") ? ipnsHash : `ipns://${ipnsHash}`;
+    }
+
+    if (ipfsHash) {
+      return ipfsHash.startsWith("ipfs://") ? ipfsHash : `ipfs://${ipfsHash}`;
+    }
+
+    if (!ipnsHash && !ipfsHash) {
+      if (!originalContenthash) return null;
+      const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
+      if (ipnsMatch && ipnsMatch[1]) {
+        return `ipns://${ipnsMatch[1]}`;
+      }
+      if (isIPFS_Resource(originalContenthash)) {
+        return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
+      }
+      return null;
+    }
+  }
+};
+
 export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, any> = {};
-  let contenthash = originalContenthash || null;
+
+  let contenthash = await resolveContenthash(
+    originalContenthash,
+    platform,
+    texts,
+  );
 
   const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
   if (!texts && !identityBasedPlatforms.includes(platform)) {
@@ -309,13 +349,6 @@ export const generateSocialLinks = async (
       break;
     case PlatformType.solana:
     case PlatformType.sns:
-      // Resolve contenthash for SNS
-      contenthash =
-        texts?.["IPNS"] ||
-        texts?.["IPFS"] ||
-        (await resolveContentIPNS(identity)) ||
-        null;
-
       // Process SNS records
       if (texts) {
         for (const recordKey of SNS_RECORDS_LIST) {
@@ -335,10 +368,6 @@ export const generateSocialLinks = async (
       }
       break;
     case PlatformType.unstoppableDomains:
-      // Resolve contenthash for UD
-      contenthash = isIPFS_Resource(originalContenthash)
-        ? `ipfs://${originalContenthash}`
-        : originalContenthash;
       // Process UD accounts
       if (texts) {
         for (const accountKey of UD_ACCOUNTS_LIST) {
