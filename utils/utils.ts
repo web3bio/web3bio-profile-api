@@ -25,7 +25,7 @@ import {
 } from "@/utils/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
-import { regexLowercaseExempt } from "@/utils/regexp";
+import { regexDomain, regexLowercaseExempt } from "@/utils/regexp";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
 const UD_ACCOUNTS_LIST = [
@@ -235,15 +235,17 @@ const resolveContenthash = async (
     const ipnsHash = texts?.["ipns"];
     const ipfsHash = texts?.["ipfs"];
     if (ipnsHash) {
-      return ipnsHash.startsWith("ipns://") ? ipnsHash : `ipns://${ipnsHash}`;
+      if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipnsHash)) return ipnsHash;
+      return `ipns://${ipnsHash}`;
     }
 
     if (ipfsHash) {
-      return ipfsHash.startsWith("ipfs://") ? ipfsHash : `ipfs://${ipfsHash}`;
+      if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipfsHash)) return ipfsHash;
+      return isIPFS_Resource(ipfsHash)
+        ? `ipfs://${resolveIPFS_CID(ipfsHash)}`
+        : null;
     }
-
-    if (!ipnsHash && !ipfsHash) {
-      if (!originalContenthash) return null;
+    if (originalContenthash) {
       const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
       if (ipnsMatch && ipnsMatch[1]) {
         return `ipns://${ipnsMatch[1]}`;
@@ -251,8 +253,9 @@ const resolveContenthash = async (
       if (isIPFS_Resource(originalContenthash)) {
         return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
       }
-      return null;
     }
+
+    return null;
   }
 };
 

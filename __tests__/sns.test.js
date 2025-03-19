@@ -36,6 +36,14 @@ describe("Test For Solana Profile API", () => {
       "ipfs://QmNzcrH1Rf9765XeGBmXTtQs8jbefGf9x3VQJcCJsQjvqx",
     );
   });
+  it("It should response 200 for anarcrypt.sol", async () => {
+    const res = await queryClient("/profile/sns/anarcrypt.sol");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.contenthash).toBe(
+      "https://ipfs.io/anarcrypt/ipns/k2k4r8o2rubcjyax7hnw3z1aulvwemx6ip0by6x7h4fyc4arooqdr6pc",
+    );
+  });
   it("It should response 200 for CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK", async () => {
     const res = await queryClient(
       "/profile/sns/CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK",
