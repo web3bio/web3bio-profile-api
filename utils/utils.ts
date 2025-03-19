@@ -235,7 +235,7 @@ const resolveContenthash = async (
     const ipnsHash = texts?.["ipns"];
     const ipfsHash = texts?.["ipfs"];
     if (ipnsHash) {
-      if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipnsHash)) return ipnsHash;
+      if (/^(https?:\/\/|ipns:\/\/)/i.test(ipnsHash)) return ipnsHash;
       return `ipns://${ipnsHash}`;
     }
 
