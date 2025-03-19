@@ -20,7 +20,6 @@ import {
 
 import { generateProfileStruct } from "@/utils/utils";
 import { processJson } from "../../graph/utils";
-import { format } from "sharp";
 
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
