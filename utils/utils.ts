@@ -25,7 +25,8 @@ import {
 } from "@/utils/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { SourceType } from "./source";
-import { regexLowercaseExempt } from "@/utils/regexp";
+import { regexDomain, regexLowercaseExempt } from "@/utils/regexp";
+import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -34,7 +35,6 @@ const UD_ACCOUNTS_LIST = [
   PlatformType.lens,
   PlatformType.telegram,
   PlatformType.youtube,
-  PlatformType.website,
   PlatformType.url,
 ];
 const SNS_RECORDS_LIST = [
@@ -46,19 +46,6 @@ const SNS_RECORDS_LIST = [
   PlatformType.discord,
   "CNAME",
 ];
-
-const SnsSDKProxyEndpoint = "https://sns-sdk-proxy.bonfida.workers.dev/";
-
-export const resolveContentIPNS = async (handle: string) => {
-  const res = await fetch(SnsSDKProxyEndpoint + "domain-data/" + handle)
-    .then((res) => res.json())
-    .catch(() => null);
-  if (!res || res?.s === "error") return "";
-  const ipnsMatch = Buffer.from(res?.result, "base64")
-    .toString("utf-8")
-    .match(/ipns=(k51[a-zA-Z0-9]{59})/);
-  return ipnsMatch ? "ipns://" + ipnsMatch[1] : null;
-};
 
 export const resolveIdentityResponse = async (
   handle: string,
@@ -135,13 +122,16 @@ export async function generateProfileStruct(
     : data.platform === PlatformType.lens && data?.social?.uid
       ? getLensDefaultAvatar(Number(data.social.uid))
       : Promise.resolve(null);
-
   // Basic profile data used in both response types
   const nsObj = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName || formatText(data.identity),
+    displayName: data.displayName
+      ? data.displayName
+      : isWeb3Address(data.identity)
+        ? formatText(data.identity)
+        : data.identity,
     avatar: null,
     description: data.description || null,
   };
@@ -218,13 +208,69 @@ export const resolveIdentityHandle = async (
   }
 };
 
+const resolveContenthash = async (
+  originalContenthash: string,
+  platform: PlatformType,
+  texts: Record<string, string>,
+) => {
+  // early return if not a supported platform
+  if (
+    ![
+      PlatformType.unstoppableDomains,
+      PlatformType.solana,
+      PlatformType.sns,
+    ].includes(platform)
+  ) {
+    return originalContenthash || null;
+  }
+  // for ud
+  if (platform === PlatformType.unstoppableDomains) {
+    if (!originalContenthash) return null;
+    return isIPFS_Resource(originalContenthash)
+      ? `ipfs://${originalContenthash}`
+      : originalContenthash;
+  }
+  // for sns/solana
+  if ([PlatformType.solana, PlatformType.sns].includes(platform)) {
+    const ipnsHash = texts?.["ipns"];
+    const ipfsHash = texts?.["ipfs"];
+    if (ipnsHash) {
+      if (/^(https?:\/\/|ipns:\/\/)/i.test(ipnsHash)) return ipnsHash;
+      return `ipns://${ipnsHash}`;
+    }
+
+    if (ipfsHash) {
+      if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipfsHash)) return ipfsHash;
+      return isIPFS_Resource(ipfsHash)
+        ? `ipfs://${resolveIPFS_CID(ipfsHash)}`
+        : null;
+    }
+    if (originalContenthash) {
+      const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
+      if (ipnsMatch && ipnsMatch[1]) {
+        return `ipns://${ipnsMatch[1]}`;
+      }
+      if (isIPFS_Resource(originalContenthash)) {
+        return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
+      }
+    }
+
+    return null;
+  }
+};
+
 export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, any> = {};
-  let contenthash = originalContenthash || null;
+
+  let contenthash = await resolveContenthash(
+    originalContenthash,
+    platform,
+    texts,
+  );
 
   const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
   if (!texts && !identityBasedPlatforms.includes(platform)) {
@@ -306,13 +352,6 @@ export const generateSocialLinks = async (
       break;
     case PlatformType.solana:
     case PlatformType.sns:
-      // Resolve contenthash for SNS
-      contenthash =
-        texts?.["IPNS"] ||
-        texts?.["IPFS"] ||
-        (await resolveContentIPNS(identity)) ||
-        null;
-
       // Process SNS records
       if (texts) {
         for (const recordKey of SNS_RECORDS_LIST) {
@@ -338,11 +377,15 @@ export const generateSocialLinks = async (
           const item = texts[accountKey];
           if (item && PLATFORM_DATA.has(accountKey)) {
             const resolvedHandle = resolveHandle(item, accountKey);
-            links[accountKey] = {
-              link: getSocialMediaLink(resolvedHandle, accountKey),
+            const reolvedKey =
+              accountKey === PlatformType.url
+                ? PlatformType.website
+                : accountKey;
+            links[reolvedKey] = {
+              link: getSocialMediaLink(resolvedHandle, reolvedKey),
               handle: resolvedHandle,
               sources: resolveVerifiedLink(
-                `${accountKey},${resolvedHandle}`,
+                `${reolvedKey},${resolvedHandle}`,
                 edges,
               ),
             };
@@ -378,9 +421,21 @@ export const resolveVerifiedLink = (
 ): SourceType[] => {
   if (!edges?.length) return [];
 
+  const [platformType, identity] = key.split(",");
+
+  const isWebSite = [PlatformType.website, PlatformType.dns].includes(
+    platformType as PlatformType,
+  );
+
   const sourceSet = new Set<SourceType>();
+
   for (const edge of edges) {
-    if (edge.target === key) {
+    if (isWebSite) {
+      const [, targetIdentity] = edge.target.split(",");
+      if (targetIdentity === identity) {
+        sourceSet.add(edge.dataSource as SourceType);
+      }
+    } else if (edge.target === key) {
       sourceSet.add(edge.dataSource as SourceType);
     }
   }

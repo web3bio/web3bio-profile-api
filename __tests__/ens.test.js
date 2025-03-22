@@ -35,7 +35,9 @@ describe("Test For ENS Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.links.website.handle).toBe("mask.io");
-    expect(json.contenthash.startsWith("ipns")).toBeTruthy();
+    expect(json.contenthash).toBe(
+      "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
+    );
     expect(json.address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
   });
   it("It should response 200 for ricmoo.eth", async () => {
