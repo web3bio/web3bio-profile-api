@@ -25,10 +25,10 @@ describe("Test For Credentials API", () => {
     expect(json[0].credentials.isRisky.sources[0].value).toBe("hacker");
   });
   it("It should response 200 for jchip300.eth", async () => {
-    const res = await queryClient("/credentials/jchip300.eth");
+    const res = await queryClient("/credentials/supahmars.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].id).toBe("ens,jchip300.eth");
+    expect(json[0].id).toBe("ens,supahmars.eth");
     expect(json[0].credentials.isHuman.sources[0].value).toBe("true");
   });
   it("It should response 200 for 0xhelena.eth", async () => {
