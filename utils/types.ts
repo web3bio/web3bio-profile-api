@@ -47,11 +47,12 @@ export interface ProfileNSResponse {
   displayName: string | null;
 }
 export interface ProfileAPIResponse extends ProfileNSResponse {
-  status: string | null;
   email: string | null;
   contenthash: string | null;
   header: string | null;
   location: string | null;
+  createdAt: string | null;
+  status: string | null;
   error?: string;
   links: Links | {};
   social: SocialRecord | {};
@@ -85,6 +86,7 @@ export interface IdentityGraphEdge {
 export interface IdentityRecord {
   id: string;
   expiredAt: number;
+  registeredAt: number;
   identity: string;
   isPrimary: boolean;
   network: string;
@@ -114,6 +116,7 @@ export interface ProfileRecord {
   texts: Record<string, string>;
   addresses: AddressRecord[];
   aliases?: string[];
+  createdAt?: number;
 }
 
 export type CredentialCategory = "isHuman" | "isRisky" | "isSpam";
