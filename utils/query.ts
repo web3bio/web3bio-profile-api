@@ -429,3 +429,45 @@ export async function fetchUniversalBatch(
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
 }
+export async function fetchBatchResponse(
+  ids: string[],
+  ns: boolean,
+  headers: AuthHeaders,
+) {
+  try {
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
+        variables: { ids },
+      }),
+    });
+
+    const json = await response.json();
+    if (!json || json?.code) return json;
+
+    // Process all identities in parallel
+    return Promise.all(
+      (json.data.identitiesWithGraph || []).map(async (item: any) => {
+        const [platform, handle] = item.id.split(",");
+        const profiles = (await resolveWithIdentityGraph({
+          handle,
+          platform,
+          ns,
+          response: { data: { identity: { ...item } } },
+        })) as any;
+        if (profiles?.code) return [];
+        return {
+          ...profiles[0],
+          aliases: item.aliases,
+        };
+      }),
+    );
+  } catch (e) {
+    throw new Error(ErrorMessages.notFound, { cause: 404 });
+  }
+}

@@ -1,5 +1,5 @@
 import { errorHandle, respondWithCache } from "@/utils/base";
-import { fetchIdentityGraphBatch } from "@/utils/query";
+import { fetchBatchResponse, fetchIdentityGraphBatch } from "@/utils/query";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { resolveIdentityBatch } from "@/utils/utils";
 
@@ -17,7 +17,9 @@ export async function handleRequest(
     });
   try {
     const queryIds = resolveIdentityBatch(ids);
-    const json = (await fetchIdentityGraphBatch(queryIds, ns, headers)) as any;
+    const json = ns
+      ? await fetchBatchResponse(queryIds, ns, headers)
+      : await fetchIdentityGraphBatch(queryIds, ns, headers);
     if (json.code) {
       return errorHandle({
         identity: JSON.stringify(ids),
