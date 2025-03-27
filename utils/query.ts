@@ -350,11 +350,12 @@ export async function queryIdentityGraphBatch(
           ns,
           response: { data: { identity: { ...item } } },
         })) as any;
-        if (profiles?.code) return [];
-        return {
-          ...profiles[0],
-          aliases: item.aliases,
-        };
+        if (profiles?.[0]) {
+          return {
+            ...profiles[0],
+            aliases: item.aliases,
+          };
+        }
       }),
     );
     return responses
