@@ -19,7 +19,6 @@ const AvatarPixel = (props: any) => {
       height={size}
       {...otherProps}
     >
-      {title && <title>{title}</title>}
       <mask
         id={maskID}
         mask-type="alpha"
