@@ -232,6 +232,7 @@ export const getResolvedProfileArray = (
     ? {
         ...profile,
         isPrimary,
+        createdAt: resolvedRecord.registeredAt,
       }
     : {
         address: isWeb3Address(identity) ? identity : null,
@@ -271,6 +272,7 @@ export const getResolvedProfileArray = (
       .map((vertex) => ({
         ...vertex.profile,
         isPrimary: vertex.isPrimary,
+        createdAt: vertex.registeredAt,
       }));
   } else if (VALID_PLATFORMS.has(recordPlatform)) {
     // Get source address for comparison only once
@@ -306,6 +308,7 @@ export const getResolvedProfileArray = (
       .map((vertex) => ({
         ...vertex.profile,
         isPrimary: vertex.isPrimary,
+        createdAt: vertex.registeredAt,
       }));
 
     if (

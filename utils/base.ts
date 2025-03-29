@@ -88,13 +88,17 @@ export const errorHandle = ({
   );
 };
 
+const cacheControl =
+  process.env.NODE_ENV === "production"
+    ? "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200"
+    : "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
+
 export const respondWithCache = (json: string) => {
   return NextResponse.json(JSON.parse(json), {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control":
-        "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200",
+      "Cache-Control": cacheControl,
     },
   });
 };

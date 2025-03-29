@@ -16,6 +16,7 @@ describe("Test For Universal Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("lilgho.lens");
+    expect(json[0].createdAt).toBe("2023-02-10T19:45:20.000Z");
     expect(json[1].platform).toBe("lens");
     expect(json.length).toBe(11);
   });
@@ -171,6 +172,8 @@ describe("Test For Universal Profile API", () => {
       "/profile/8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
     );
     const json = await res.json();
-    expect(json[0].address).toBe("8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL");
+    expect(json[0].address).toBe(
+      "8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
+    );
   });
 });

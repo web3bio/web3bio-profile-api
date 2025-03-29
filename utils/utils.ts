@@ -105,7 +105,10 @@ export const resolveIdentityResponse = async (
   }
 
   return generateProfileStruct(
-    profile,
+    {
+      ...profile,
+      createdAt: res.data.identity?.registeredAt,
+    },
     ns,
     res.data.identity?.identityGraph?.edges,
   );
@@ -159,6 +162,9 @@ export async function generateProfileStruct(
   return {
     ...nsObj,
     status: data.texts?.status || null,
+    createdAt: data.createdAt
+      ? new Date(data.createdAt * 1000).toISOString()
+      : null,
     email: data.texts?.email || null,
     location: data.texts?.location || null,
     header: data.texts?.header
@@ -432,7 +438,12 @@ export const resolveVerifiedLink = (
   for (const edge of edges) {
     if (isWebSite) {
       const [, targetIdentity] = edge.target.split(",");
-      if (targetIdentity === identity) {
+      if (
+        targetIdentity === identity &&
+        [SourceType.ens, SourceType.keybase].includes(
+          edge.dataSource as SourceType,
+        )
+      ) {
         sourceSet.add(edge.dataSource as SourceType);
       }
     } else if (edge.target === key) {

@@ -53,7 +53,7 @@ const QUERIES = {
         platform
         isPrimary
         expiredAt
-        updatedAt
+        registeredAt
         resolvedAddress {
           network
           address
@@ -79,7 +79,7 @@ const QUERIES = {
             platform
             isPrimary
             expiredAt
-            updatedAt
+            registeredAt
             resolvedAddress {
               network
               address
@@ -116,7 +116,6 @@ const QUERIES = {
         identity
         platform
         isPrimary
-        expiredAt
         resolvedAddress {
           network
           address
@@ -138,7 +137,6 @@ const QUERIES = {
             identity
             platform
             isPrimary
-            expiredAt
             resolvedAddress {
               network
               address
@@ -167,6 +165,7 @@ const QUERIES = {
         platform
         isPrimary
         expiredAt
+        registeredAt
         resolvedAddress {
           network
           address
@@ -196,6 +195,7 @@ const QUERIES = {
             platform
             isPrimary
             expiredAt
+            registeredAt
             resolvedAddress {
               network
               address
@@ -238,6 +238,7 @@ const QUERIES = {
         identity
         platform
         isPrimary
+        registeredAt
         resolvedAddress {
           network
           address
@@ -267,6 +268,7 @@ const QUERIES = {
             identity
             platform
             isPrimary
+            registeredAt
             resolvedAddress {
               network
               address
@@ -354,11 +356,13 @@ export async function fetchIdentityGraphBatch(
     if (json.code) return json;
 
     if (!json?.data?.identitiesWithGraph?.length) return [];
-
     // Process all profiles concurrently rather than sequentially
     const settledResults = await Promise.allSettled(
       json.data.identitiesWithGraph.filter(Boolean).map(async (item: any) => {
-        const profile = item.profile || {
+        const profile = {
+          ...item.profile,
+          createdAt: item.registeredAt,
+        } || {
           address: isWeb3Address(item.identity) ? item.identity : null,
           identity: item.identity,
           platform: item.platform,

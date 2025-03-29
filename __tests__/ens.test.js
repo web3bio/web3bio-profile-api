@@ -3,16 +3,17 @@ import { queryClient } from "../utils/test-utils";
 describe("Test For ENS Profile API", () => {
   it("It should response 200 for brantly.eth", async () => {
     const res = await queryClient("/profile/ens/brantly.eth");
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBeTruthy();
     expect(json.status).toBe(
       "building an onchain social graph for ethereum accounts",
     );
+    expect(json.createdAt).toBe("2020-02-04T02:23:59.000Z");
     expect(json.links.twitter.handle).toBe("brantlymillegan");
     expect(json.links.twitter.link).toBe("https://x.com/brantlymillegan");
     expect(json.links.discord.link).toBe("");
     expect(json.links.discord.handle).toBeTruthy();
-    expect(res.status).toBe(200);
   });
   it("It should response 200 for dr3a.eth", async () => {
     const res = await queryClient("/profile/ens/dr3a.eth");
