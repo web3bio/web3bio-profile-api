@@ -1,17 +1,6 @@
-import {
-  handleSearchPlatform,
-  IDENTITY_GRAPH_SERVER,
-  formatText,
-  isWeb3Address,
-} from "./base";
+import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./base";
 import { PlatformType } from "./platform";
-import {
-  AuthHeaders,
-  ErrorMessages,
-  ProfileAPIResponse,
-  ProfileNSResponse,
-} from "./types";
-import { generateProfileStruct } from "@/utils/utils";
+import { AuthHeaders, ErrorMessages } from "./types";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 
 export enum QueryType {
@@ -333,66 +322,7 @@ export async function queryIdentityGraph(
   }
 }
 
-export async function fetchIdentityGraphBatch(
-  ids: string[],
-  ns: boolean,
-  headers: AuthHeaders,
-): Promise<
-  ProfileAPIResponse[] | ProfileNSResponse[] | { error: { message: string } }
-> {
-  try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
-        variables: { ids },
-      }),
-    });
-    const json = await response.json();
-    if (json.code) return json;
-
-    if (!json?.data?.identitiesWithGraph?.length) return [];
-    // Process all profiles concurrently rather than sequentially
-    const settledResults = await Promise.allSettled(
-      json.data.identitiesWithGraph.filter(Boolean).map(async (item: any) => {
-        const profile = {
-          ...item.profile,
-          createdAt: item.registeredAt,
-        } || {
-          address: isWeb3Address(item.identity) ? item.identity : null,
-          identity: item.identity,
-          platform: item.platform,
-          displayName: isWeb3Address(item.identity)
-            ? formatText(item.identity)
-            : item.identity,
-        };
-
-        return {
-          ...(await generateProfileStruct(
-            profile,
-            ns,
-            item.identityGraph?.edges,
-          )),
-          aliases: item.aliases,
-        };
-      }),
-    );
-    return settledResults
-      .filter(
-        (result): result is PromiseFulfilledResult<any> =>
-          result.status === "fulfilled" && result.value && !result.value.error,
-      )
-      .map((result) => result.value);
-  } catch (e) {
-    throw new Error(ErrorMessages.notFound, { cause: 404 });
-  }
-}
-
-export async function fetchUniversalBatch(
+export async function queryIdentityGraphBatch(
   ids: string[],
   ns: boolean,
   headers: AuthHeaders,
@@ -412,23 +342,27 @@ export async function fetchUniversalBatch(
 
     const json = await response.json();
     if (!json || json?.code) return json;
-
     // Process all identities in parallel
-    return Promise.all(
+    const responses = await Promise.allSettled(
       (json.data.identitiesWithGraph || []).map(async (item: any) => {
         const [platform, handle] = item.id.split(",");
-        return {
-          id: item.id,
-          aliases: item.aliases,
-          profiles: await resolveWithIdentityGraph({
-            handle,
-            platform,
-            ns,
-            response: { data: { identity: { ...item } } },
-          }),
-        };
+        const profiles = (await resolveWithIdentityGraph({
+          handle,
+          platform,
+          ns,
+          response: { data: { identity: { ...item } } },
+        })) as any;
+        if (profiles?.[0]) {
+          return {
+            ...profiles[0],
+            aliases: item.aliases,
+          };
+        }
       }),
     );
+    return responses
+      .filter((x) => x.status === "fulfilled")
+      .map((x) => (x as any).value);
   } catch (e) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
