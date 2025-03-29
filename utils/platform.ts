@@ -128,7 +128,7 @@ export const PLATFORM_DATA: ReadonlyMap<
     {
       color: "#000000",
       icon: "icons/icon-x.svg",
-      label: "Twitter",
+      label: "Twitter (X)",
       urlPrefix: "https://x.com/",
       ensText: ["com.twitter", "com.x", "vnd.twitter", "twitter"],
       dotbitText: ["profile.twitter"],
@@ -163,8 +163,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       color: "#432C8D",
       icon: "icons/icon-farcaster.svg",
       label: "Farcaster",
-      description:
-        "Farcaster social identity (Fname handle and .farcaster.eth domain)",
+      description: "Farcaster social identity (Fname handle)",
       urlPrefix: "https://warpcast.com/",
       ensText: ["farcaster", "xyz.farcaster"],
       registerlink:
@@ -201,7 +200,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       color: "#2CC256",
       icon: "icons/icon-lens.svg",
       label: "Lens",
-      description: "Lens Protocol social identity (.lens handle)",
+      description: "Lens social identity (.lens handle)",
       urlPrefix: "https://hey.xyz/u/",
       ensText: ["lens"],
       registerlink: "https://www.lens.xyz/mint?name={name}",
@@ -258,6 +257,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-spaceid.svg",
       label: "SPACE ID",
       registerlink: "https://space.id/search?query={name}",
+      urlPrefix: "https://web3.bio/?s=",
       system: PlatformSystem.web3,
     },
   ],
@@ -643,10 +643,10 @@ export const PLATFORM_DATA: ReadonlyMap<
   [
     PlatformType.firefly,
     {
-      color: "#D543ED",
+      color: "#1A183D",
       icon: "icons/icon-firefly.svg",
       label: "Firefly",
-      urlPrefix: "https://firefly.land/",
+      urlPrefix: "https://firefly.social/",
       system: PlatformSystem.web3,
     },
   ],
