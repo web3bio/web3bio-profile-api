@@ -24,6 +24,6 @@ describe("Test For Batch Query", () => {
     const json = await res.json();
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
-    expect(json[4].createdAt).toBe("2023-11-07T19:42:51.000Z");
+    expect(json[5].createdAt).toBe("2023-11-07T19:42:51.000Z");
   });
 });
