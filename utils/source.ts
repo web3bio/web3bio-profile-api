@@ -4,14 +4,8 @@ export enum SourceType {
   ens = "ens",
   twitter = "twitter",
   keybase = "keybase",
-  sybil = "sybil",
   nextid = "nextid",
   rss3 = "rss3",
-  knn3 = "knn3",
-  cyberconnect = "cyberconnect",
-  ethLeaderboard = "ethLeaderboard",
-  the_graph = "the_graph",
-  rpc_server = "rpc_server",
   dotbit = "dotbit",
   unstoppabledomains = "unstoppabledomains",
   lens = "lens",
@@ -22,10 +16,7 @@ export enum SourceType {
   solana = "solana",
   sns = "sns",
   opensea = "opensea",
-  twitter_hexagon = "twitter_hexagon",
   firefly = "firefly",
-  pfp = "pfp",
-  manually_added = "manually_added",
   basenames = "basenames",
   dentity = "dentity",
   nftd = "nftd",
@@ -40,8 +31,9 @@ export enum SourceType {
   nostr = "nostr",
   talentprotocol = "talentprotocol",
   firefly_campaigns = "firefly_campaigns",
-  mask_campaigns = "mask_campaigns",
+  mask_stake = "mask_stake",
   crowdsourcing = "crowdsourcing",
+  particle = "particle",
 }
 
 interface SourceInfo {
@@ -66,10 +58,6 @@ export const SOURCE_DATA: Readonly<Record<SourceType, SourceInfo>> = {
     name: "Keybase",
     description: "Secure messaging and file-sharing",
   },
-  [SourceType.sybil]: {
-    name: "Sybil",
-    description: "Ethereum social verification",
-  },
   [SourceType.nextid]: {
     name: "Next.ID",
     description: "Decentralized identity protocol",
@@ -77,26 +65,6 @@ export const SOURCE_DATA: Readonly<Record<SourceType, SourceInfo>> = {
   [SourceType.rss3]: {
     name: "RSS3",
     description: "Open information syndication protocol",
-  },
-  [SourceType.knn3]: {
-    name: "KNN3",
-    description: "Web3 data network",
-  },
-  [SourceType.cyberconnect]: {
-    name: "CyberConnect",
-    description: "Decentralized social graph protocol",
-  },
-  [SourceType.ethLeaderboard]: {
-    name: "ETH Leaderboard",
-    description: "Ethereum address ranking",
-  },
-  [SourceType.the_graph]: {
-    name: "Ethereum",
-    description: "via The Graph indexing protocol",
-  },
-  [SourceType.rpc_server]: {
-    name: "RPC Server",
-    description: "Remote Procedure Call server",
   },
   [SourceType.dotbit]: {
     name: ".bit",
@@ -119,7 +87,7 @@ export const SOURCE_DATA: Readonly<Record<SourceType, SourceInfo>> = {
     description: "Multi-chain name service",
   },
   [SourceType.gravity]: {
-    name: "Gravity Name Service",
+    name: "Gravity",
     description: "Gravity alpha mainnet name service",
   },
   [SourceType.crossbell]: {
@@ -142,21 +110,9 @@ export const SOURCE_DATA: Readonly<Record<SourceType, SourceInfo>> = {
     name: "OpenSea",
     description: "NFT marketplace",
   },
-  [SourceType.twitter_hexagon]: {
-    name: "Twitter Hexagon",
-    description: "Twitter's NFT profile picture feature",
-  },
   [SourceType.firefly]: {
     name: "Firefly",
     description: "Web3 social platform",
-  },
-  [SourceType.pfp]: {
-    name: "PFP",
-    description: "Twitter Profile Picture NFTs",
-  },
-  [SourceType.manually_added]: {
-    name: "Manually Added",
-    description: "Information added manually",
   },
   [SourceType.basenames]: {
     name: "Basenames",
@@ -203,20 +159,24 @@ export const SOURCE_DATA: Readonly<Record<SourceType, SourceInfo>> = {
     description: "Web3 social platform",
   },
   [SourceType.talentprotocol]: {
-    name: "Talent Protocol",
+    name: "Talent",
     description: "Decentralized onchain passport",
   },
   [SourceType.firefly_campaigns]: {
-    name: "Firefly Campaigns",
+    name: "Firefly",
     description: "Firefly campaigns",
   },
-  [SourceType.mask_campaigns]: {
-    name: "MASK Campaigns",
+  [SourceType.mask_stake]: {
+    name: "MASK",
     description: "MASK campaigns",
   },
   [SourceType.crowdsourcing]: {
     name: "Crowdsourcing",
     description: "Crowdsourcing",
+  },
+  [SourceType.particle]: {
+    name: "Particle",
+    description: "Particle",
   },
 } as const;
 

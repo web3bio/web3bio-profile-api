@@ -11,13 +11,14 @@ describe("Test For Farcaster Profile API", () => {
   });
   it("It should response 200 for 0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2", async () => {
     const res = await queryClient(
-      "/profile/farcaster/0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2"
+      "/profile/farcaster/0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
     expect(json.address).toBeTruthy();
     expect(json.links.farcaster.handle).toBe("suji");
+    expect(json.createdAt).toBe("2023-11-07T22:14:15.000Z");
   });
   it("It should response 200 for farcaster", async () => {
     const res = await queryClient("/profile/farcaster/farcaster");

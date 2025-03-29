@@ -5,6 +5,7 @@ describe("Test For BaseNames Profile API", () => {
     const res = await queryClient("/profile/basenames/suji.base");
     expect(res.status).toBe(200);
     const json = await res.json();
+    expect(json.createdAt).toBe("2024-08-22T06:32:25.000Z");
     expect(json.address).toBe("0xc9d18042baabe51d38297d1f3520cfbef0c83c32");
   });
   it("It should response 200 for tony.base.eth", async () => {
@@ -21,7 +22,7 @@ describe("Test For BaseNames Profile API", () => {
   });
   it("It should response 200 for 0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e", async () => {
     const res = await queryClient(
-      "/profile/basenames/0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e"
+      "/profile/basenames/0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
