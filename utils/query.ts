@@ -42,7 +42,7 @@ const QUERIES = {
         platform
         isPrimary
         expiredAt
-        updatedAt
+        registeredAt
         resolvedAddress {
           network
           address
@@ -68,7 +68,7 @@ const QUERIES = {
             platform
             isPrimary
             expiredAt
-            updatedAt
+            registeredAt
             resolvedAddress {
               network
               address
@@ -105,7 +105,6 @@ const QUERIES = {
         identity
         platform
         isPrimary
-        expiredAt
         resolvedAddress {
           network
           address
@@ -127,7 +126,6 @@ const QUERIES = {
             identity
             platform
             isPrimary
-            expiredAt
             resolvedAddress {
               network
               address
@@ -156,6 +154,7 @@ const QUERIES = {
         platform
         isPrimary
         expiredAt
+        registeredAt
         resolvedAddress {
           network
           address
@@ -185,6 +184,7 @@ const QUERIES = {
             platform
             isPrimary
             expiredAt
+            registeredAt
             resolvedAddress {
               network
               address
@@ -227,6 +227,7 @@ const QUERIES = {
         identity
         platform
         isPrimary
+        registeredAt
         resolvedAddress {
           network
           address
@@ -256,6 +257,7 @@ const QUERIES = {
             identity
             platform
             isPrimary
+            registeredAt
             resolvedAddress {
               network
               address
