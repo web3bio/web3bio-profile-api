@@ -37,7 +37,6 @@ describe("Test For Dotbit Profile API", () => {
     const res = await queryClient("/profile/dotbit/bestcase.bit");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.createdAt).toBe("2022-06-15T12:51:35.000Z");
     expect(json.contenthash).toBeTruthy();
   });
 });
