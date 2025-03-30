@@ -15,10 +15,10 @@ describe("Test For Farcaster Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.identity).toBe("suji");
+    expect(json.identity).toBe("dragon2024");
     expect(json.address).toBeTruthy();
-    expect(json.links.farcaster.handle).toBe("suji");
-    expect(json.createdAt).toBe("2023-11-07T22:14:15.000Z");
+    expect(json.links.farcaster.handle).toBe("dragon2024");
+    expect(json.createdAt).toBe("2024-02-22T06:26:09.000Z");
   });
   it("It should response 200 for farcaster", async () => {
     const res = await queryClient("/profile/farcaster/farcaster");
