@@ -7,6 +7,7 @@ import {
   regexCluster,
   regexCrossbell,
   regexDotbit,
+  regexEmoji,
   regexEns,
   regexEth,
   regexFarcaster,
@@ -21,6 +22,7 @@ import {
   regexUnstoppableDomains,
 } from "./regexp";
 import { AuthHeaders, errorHandleProps } from "./types";
+import { ens_normalize } from "@adraffy/ens-normalize";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -173,6 +175,19 @@ export const handleSearchPlatform = (term: string) => {
     }
   }
   return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
+};
+
+export const normalizeText = (input?: string) => {
+  if (!input) return "";
+  const decodedInput = decodeURIComponent(input);
+  try {
+    if (regexEmoji.test(decodedInput)) {
+      return ens_normalize(decodedInput);
+    }
+    return input;
+  } catch (error) {
+    return input;
+  }
 };
 
 export const prettify = (input: string): string => {
