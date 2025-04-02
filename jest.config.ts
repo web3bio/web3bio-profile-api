@@ -8,7 +8,6 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   preset: "ts-jest",
-  reporters: [["default", { summaryThreshold: 1 }]],
   coverageProvider: "v8",
   testEnvironment: "node",
   testTimeout: 200000,
