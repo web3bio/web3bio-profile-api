@@ -20,12 +20,12 @@ jobs:
           node-version: 22
 
       - name: Install dependencies
-        run: npm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Log deployment URL
         run: echo "Running tests against ${{ github.event.deployment_status.target_url }}"
 
       - name: Run tests against deployed URL
-        run: npm test
+        run: pnpm test
         env:
           BASE_URL: ${{ github.event.deployment_status.target_url }}
