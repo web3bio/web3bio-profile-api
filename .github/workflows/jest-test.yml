@@ -1,0 +1,31 @@
+name: Profile API Test Cases
+
+on:
+  deployment_status:
+
+jobs:
+  run_tests:
+    if: |
+      github.event.deployment_status.state == 'success'
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Log deployment URL
+        run: echo "Running tests against ${{ github.event.deployment_status.target_url }}"
+
+      - name: Run tests against deployed URL
+        run: yarn test
+        env:
+          BASE_URL: ${{ github.event.deployment_status.target_url }}
