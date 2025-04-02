@@ -23,4 +23,6 @@ export const regexEns = /^.+\.(eth|xyz|bio|app|luxe|kred|art|ceo|club|box)$/i,
   regexEIP = /^eip155:(\d+)\/(erc1155|erc721):(.+)\/(.+)$/i,
   regexDomain = /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/\n]+)/,
   regexTon = /^(EQ|UQ)[a-zA-Z0-9_-]{46}$/,
-  regexUID = /^\d{1,20}$/;
+  regexUID = /^\d{1,20}$/,
+  regexEmoji =
+    /(\u00a9|\u00ae|[\u2000-\u3300]|\ud83c[\ud000-\udfff]|\ud83d[\ud000-\udfff]|\ud83e[\ud000-\udfff])/gi;

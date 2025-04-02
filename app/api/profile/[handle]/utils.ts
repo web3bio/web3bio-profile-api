@@ -4,6 +4,7 @@ import {
   formatText,
   isSameAddress,
   isWeb3Address,
+  normalizeText,
   respondWithCache,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
@@ -60,7 +61,9 @@ function sortProfilesByPlatform(
       i === 0
         ? [
             responses.find(
-              (x) => x.identity === handle && x.platform === targetPlatform,
+              (x) =>
+                x.identity === normalizeText(handle) &&
+                x.platform === targetPlatform,
             ),
           ]
         : [],

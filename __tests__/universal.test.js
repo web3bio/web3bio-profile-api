@@ -176,4 +176,12 @@ describe("Test For Universal Profile API", () => {
       "8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
     );
   });
+  // test sort for emoji 🦊%EF%B8%8F🦊%EF%B8%8F🦊%EF%B8%8F.eth
+  it("It should response 200 for %F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth", async () => {
+    const res = await queryClient(
+      "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
+    );
+    const json = await res.json();
+    expect(json[0].identity).toBe("🦊🦊🦊.eth");
+  });
 });
