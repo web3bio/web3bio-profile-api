@@ -19,6 +19,31 @@ jobs:
         with:
           node-version: 22
 
+      - name: Setup pnpm 10.7.1
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+          run_install: false
+      - name: Setup pnpm cache
+        id: pnpm-cache
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_OUTPUT
+
+      - name: Cache pnpm store
+        uses: actions/cache@v4
+        with:
+          path: ${{ steps.pnpm-cache.outputs.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Setup npmrc for CI
+        run: |
+          echo "node-linker=hoisted" > .npmrc
+          echo "shamefully-hoist=true" >> .npmrc
+          echo "strict-peer-dependencies=false" >> .npmrc
+
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -29,3 +54,11 @@ jobs:
         run: pnpm test
         env:
           BASE_URL: ${{ github.event.deployment_status.target_url }}
+      - name: Test results summary
+        run: |
+          if [ "${{ steps.run_tests.outcome }}" == "success" ]; then
+                  echo "✅ Tests passed successfully!"
+                else
+                  echo "☠️ Tests failed! Check logs for details."
+                  exit 1
+                fi
