@@ -37,13 +37,6 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-
-      - name: Setup npmrc for CI
-        run: |
-          echo "node-linker=hoisted" > .npmrc
-          echo "shamefully-hoist=true" >> .npmrc
-          echo "strict-peer-dependencies=false" >> .npmrc
-
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
