@@ -8,8 +8,6 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   preset: "ts-jest",
-  verbose: false,
-  useStderr: true,
   coverageProvider: "v8",
   testEnvironment: "node",
   testTimeout: 200000,
