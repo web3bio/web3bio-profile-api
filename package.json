@@ -13,7 +13,7 @@
   },
   "scripts": {
     "dev": "next dev",
-    "build": "jest && next build",
+    "build": "next build",
     "start": "next start",
     "test": "jest",
     "lint": "next lint"
