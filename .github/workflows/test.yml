@@ -24,6 +24,8 @@ jobs:
 
       - name: Run tests
         run: yarn test
+        env:
+          BASE_URL: ${{ github.event.client_payload.url }}
 
       - name: Notify on success
         if: success()
