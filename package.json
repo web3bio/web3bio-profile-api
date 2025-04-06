@@ -1,16 +1,9 @@
 {
   "name": "web3bio-profile-api",
   "version": "0.1.2",
+  "packageManager": "pnpm@10.7.1",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
-  "resolutions": {
-    "strip-ansi": "6.0.1",
-    "strip-ansi-cjs": "npm:strip-ansi@6.0.1",
-    "string-width": "4.2.3",
-    "string-width-cjs": "npm:string-width@4.2.3",
-    "wrap-ansi": "7.0.0",
-    "wrap-ansi-cjs": "npm:wrap-ansi@7.0.0"
-  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
