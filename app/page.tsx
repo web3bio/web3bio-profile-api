@@ -517,7 +517,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Universal Profile API</div>
+                <div className="mr-2">Universal Profiles</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -527,13 +527,13 @@ export default function Home() {
             </a>
 
             <a
-              href="#ens-profile-api"
+              href="#platform-profiles"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Ethereum / ENS Profile API</div>
+                <div className="mr-2">Platform Profiles</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -541,117 +541,6 @@ export default function Home() {
                 </div>
               </div>
             </a>
-            <a
-              href="#basenames-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Basenames Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#linea-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Linea Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#farcaster-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Farcaster Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#lens-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Lens Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#unstoppabledomains-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Unstoppable Domains Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#solana-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Solana / SNS Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            {/* <a
-              href="#dotbit-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">.bit Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a> */}
 
             <a
               href="#batch-query"
@@ -660,7 +549,7 @@ export default function Home() {
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Batch Query</div>
+                <div className="mr-2">Batch Profile Query</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -705,6 +594,29 @@ export default function Home() {
               following format:
               <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
             </p>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <pre className="code" data-lang="JSON">
+              <code>
+                <span className="text-gray">{`// Shell`}</span>
+                <br />
+                curl -H "X-API-KEY: Bearer YOUR_API_KEY" {BASE_URL}
+                /profile/vitalik.eth
+                <br />
+                <br />
+                <span className="text-gray">{`// Javascript`}</span>
+                <br />
+                {`fetch("${BASE_URL}/profile/vitalik.eth", {
+  headers: {
+    "X-API-KEY": "Bearer YOUR_API_KEY"
+  }
+})
+                `}
+                <br />
+              </code>
+            </pre>
           </section>
 
           <section
@@ -712,11 +624,8 @@ export default function Home() {
             id="universal-profile-api"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Universal Profile API</h2>
-            <p>
-              Retrieve Universal profiles or name service resolution across
-              platforms{" "}
-            </p>
+            <h2 className="text-bold h4">Universal Profiles</h2>
+            <p>Fetch detailed Universal Profiles across multiple platforms</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -984,11 +893,139 @@ export default function Home() {
 
           <section
             className="pb-4"
+            id="platform-profiles"
+            style={{ paddingTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Platform Profiles</h2>
+            <p>
+              Fetch a detailed platform-specific profile information by an
+              Ethereum address or a domain name.
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <a
+              href="#ens-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">ENS Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+            <a
+              href="#basenames-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Basenames Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#linea-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Linea Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#farcaster-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Farcaster Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#lens-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Lens Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#unstoppabledomains-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Unstoppable Domains Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#solana-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Solana / SNS Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+          </section>
+
+          <section
+            className="pb-4"
             id="ens-profile-api"
             style={{ paddingTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Ethereum / ENS Profile API</h2>
-            <p>Retrieve an Ethereum / ENS profile or name service resolution</p>
+            <h2 className="text-bold h4">ENS Profile API</h2>
+            <p>
+              Fetch a detailed ENS profile information by an Ethereum address or
+              an ENS domain.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1139,7 +1176,10 @@ export default function Home() {
             style={{ paddingTop: "4rem" }}
           >
             <h2 className="text-bold h4">Basenames Profile API</h2>
-            <p>Retrieve a Basenames profile or name service resolution</p>
+            <p>
+              Fetch a detailed Basenames profile information by an Ethereum
+              address or a Basenames domain
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1301,7 +1341,10 @@ export default function Home() {
             style={{ paddingTop: "4rem" }}
           >
             <h2 className="text-bold h4">Linea Profile API</h2>
-            <p>Retrieve a Linea profile or name service resolution</p>
+            <p>
+              Fetch a detailed Linea profile information by an Ethereum address
+              or a Linea domain.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1439,7 +1482,11 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Farcaster Profile API</h2>
-            <p>Retrieve a Farcaster profile or name service resolution</p>
+            <p>
+              Fetch a detailed Farcaster profile information by an Ethereum
+              address or a Farcaster username/fname or a Farcaster FID (with
+              fid/).
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1593,7 +1640,10 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Lens Profile API</h2>
-            <p>Retrieve a Lens profile or name service resolution</p>
+            <p>
+              Fetch a detailed Lens profile information by an Ethereum address
+              or a Lens handle.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -1638,7 +1688,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum/Polygon address or a Lens handle.
+                An Ethereum address or a Lens handle.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1731,7 +1781,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
             <p>
-              Retrieve an Unstoppable Domains profile or name service resolution
+              Fetch a detailed Unstoppable Domains profile information by an
+              Ethereum address or an Unstoppable Domains domain
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1883,8 +1934,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Solana / SNS Profile API</h2>
             <p>
-              Retrieve a Solana / Solana Name Service (SNS) profile or name
-              service resolution
+              Fetch a detailed Solana Name Service (SNS) profile by a Solana
+              address or a Solana Name Service domain
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -2011,7 +2062,10 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">.bit Profile API</h2>
-            <p>Retrieve a .bit profile or name service resolution</p>
+            <p>
+              Fetch a detailed .bit profile information by an Ethereum address
+              or a .bit domain
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2056,7 +2110,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a .bit username.
+                An Ethereum address or a .bit domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -2168,8 +2222,8 @@ export default function Home() {
             id="batch-query"
             style={{ marginTop: "4rem" }}
           >
-            <h2 className="text-bold h4">Batch Query</h2>
-            <p>Retrieve profiles for multiple identities using query IDs</p>
+            <h2 className="text-bold h4">Batch Profile Query</h2>
+            <p>Fetch profiles for multiple identities using query IDs</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2842,8 +2896,8 @@ export default function Home() {
             <ul>
               <li>
                 <span className="label label-primary">Feature</span> Added
-                Universal Profile API. Developers can retrieve universal
-                profiles across supported platforms with a single query.
+                Universal Profile API. Developers can Fetch universal profiles
+                across supported platforms with a single query.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
