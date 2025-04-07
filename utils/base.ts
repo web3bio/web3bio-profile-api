@@ -22,7 +22,7 @@ import {
   regexUnstoppableDomains,
 } from "./regexp";
 import { AuthHeaders, errorHandleProps } from "./types";
-import { ens_normalize } from "@adraffy/ens-normalize";
+import { normalize } from "viem/ens";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -177,15 +177,13 @@ export const handleSearchPlatform = (term: string) => {
   return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
 };
 
-export const normalizeText = (input?: string) => {
+export const normalizeText = (input?: string): string => {
   if (!input) return "";
-  const decodedInput = decodeURIComponent(input);
+
   try {
-    if (regexEmoji.test(decodedInput)) {
-      return ens_normalize(decodedInput);
-    }
-    return input;
+    return normalize(input);
   } catch (error) {
+    console.warn("Text normalization failed:", error);
     return input;
   }
 };
