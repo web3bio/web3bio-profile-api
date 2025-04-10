@@ -88,4 +88,11 @@ describe("Test For ENS Profile API", () => {
     expect(json.address).toBe("0xffd1ac3e8818adcbe5c597ea076e8d3210b45df5");
     // expect(json.email).toBeTruthy();
   });
+  it("It should response 200 for ethidfoundation.eth", async () => {
+    const res = await queryClient("/profile/ens/ethidfoundation.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json.address).toBe("0x6856bd704089ee2ca0e5fb680716f1501c665095");
+    // expect(json.email).toBeTruthy();
+  });
 });
