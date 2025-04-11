@@ -18,7 +18,6 @@ export async function GET(req: NextRequest) {
   const resolvedHandle = regexSolana.test(handle)
     ? handle
     : handle.toLowerCase();
-
   if (
     ![
       isValidEthereumAddress(resolvedHandle),
@@ -32,6 +31,7 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.invalidIdentity,
     });
+
   const queryInput = prettify(resolvedHandle);
   return resolveIdentityHandle(
     queryInput,

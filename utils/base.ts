@@ -192,6 +192,8 @@ export const prettify = (input: string): string => {
   if (!input) return "";
   if (input.endsWith(".twitter")) return input.replace(".twitter", "");
   if (input.endsWith(".nextid")) return input.replace(".nextid", "");
+  if (input.startsWith("farcaster,#") || input.startsWith("lens,#"))
+    return input.replace(/^(farcaster|lens),/, "");
   if (
     input.endsWith(".farcaster") ||
     input.endsWith(".fcast.id") ||
