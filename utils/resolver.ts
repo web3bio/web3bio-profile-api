@@ -106,12 +106,11 @@ export const resolveEipAssetURL = async (
       headers: {
         "x-api-key": process.env.OPENSEA_API_KEY || "",
       },
-    })
-      .then((res) => res.json())
-      .catch((e) => null);
-    const nft = res?.nft;
-    if (!nft) return null;
-    return resolveMediaURL(nft?.image_url);
+    });
+    if (res.ok) {
+      const nft = (await res.json())?.nft;
+      return resolveMediaURL(nft?.image_url);
+    }
   } catch (error) {
     console.error("Failed to fetch NFT data:", error);
   }
@@ -126,11 +125,9 @@ export const getLensDefaultAvatar = async (tokenId: number) => {
       headers: {
         "x-api-key": process.env.OPENSEA_API_KEY || "",
       },
-    })
-      .then((res) => res.json())
-      .catch((e) => null);
-    const nft = res?.nft;
-    if (!nft) return null;
+    });
+    if (!res.ok) return null;
+    const nft = (await res.json())?.nft;
     return resolveMediaURL(nft?.image_url);
   } catch (e) {
     return null;
