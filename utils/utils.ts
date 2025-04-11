@@ -126,7 +126,7 @@ export async function generateProfileStruct(
       ? getLensDefaultAvatar(Number(data.social.uid))
       : Promise.resolve(null);
   // Basic profile data used in both response types
-  const nsObj = {
+  const nsObj: ProfileNSResponse = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,

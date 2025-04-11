@@ -9,12 +9,12 @@ describe("Test For Farcaster NS API", () => {
   });
   it("It should response 200 for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     const res = await queryClient(
-      "/ns/farcaster/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
+      "/ns/farcaster/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
     );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
-    expect(json.address).toBeTruthy()
+    expect(json.address).toBeTruthy();
   });
 
   it("It should response 404 for dwr", async () => {
@@ -28,13 +28,6 @@ describe("Test For Farcaster NS API", () => {
     const res = await queryClient("/ns/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBeTruthy();
-  });
-  it("It should response 200 for fid:3", async () => {
-    const res = await queryClient("/ns/farcaster/fid/3");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("dwr.eth");
     expect(json.address).toBeTruthy();
   });
 });

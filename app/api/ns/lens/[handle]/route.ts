@@ -2,6 +2,7 @@ import {
   errorHandle,
   getUserHeaders,
   isValidEthereumAddress,
+  prettify,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { regexLens } from "@/utils/regexp";
@@ -23,7 +24,12 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return resolveIdentityHandle(handle, PlatformType.lens, headers, true);
+  return resolveIdentityHandle(
+    prettify(handle),
+    PlatformType.lens,
+    headers,
+    true,
+  );
 }
 
 export const runtime = "edge";

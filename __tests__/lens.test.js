@@ -33,4 +33,9 @@ describe("Test For Lens Profile API", () => {
     expect(res.status).toBe(404);
     expect((await res.json()).error).toBe("Invalid Identity or Domain");
   });
+  it("It should response 200 for lens%2C%233", async () => {
+    const res = await queryClient("/profile/lens/lens%2C%233");
+    expect(res.status).toBe(200);
+    expect((await res.json()).identity).toBe("aavegrants.lens");
+  });
 });
