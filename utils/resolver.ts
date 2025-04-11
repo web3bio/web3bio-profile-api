@@ -101,7 +101,7 @@ export const resolveEipAssetURL = async (
   if (!network) return resolveMediaURL(source);
 
   try {
-    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/ethereum/contract/${contractAddress}/nfts/${tokenId}`;
+    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
     const res = await fetch(fetchURL, {
       headers: {
         "x-api-key": process.env.OPENSEA_API_KEY || "",
