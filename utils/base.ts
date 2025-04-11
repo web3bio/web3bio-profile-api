@@ -27,7 +27,7 @@ import { normalize } from "viem/ens";
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
-export const SIMPLEHASH_URL = process.env.NEXT_PUBLIC_SIMPLEHASH_PROXY_ENDPOINT;
+export const OPENSEA_API_ENDPOINT = "https://api.opensea.io";
 export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 export const IDENTITY_GRAPH_SERVER =

@@ -1,5 +1,4 @@
-import { ARWEAVE_ASSET_PREFIX, SIMPLEHASH_URL } from "./base";
-import { _fetcher } from "./fetcher";
+import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./base";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";
@@ -102,12 +101,17 @@ export const resolveEipAssetURL = async (
   if (!network) return resolveMediaURL(source);
 
   try {
-    const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/${network}/${contractAddress}/${tokenId}`;
-    const res = await _fetcher(fetchURL);
-
-    if (res?.nft_id) {
-      return res.previews?.image_medium_url || res.image_url;
-    }
+    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/ethereum/contract/${contractAddress}/nfts/${tokenId}`;
+    const res = await fetch(fetchURL, {
+      headers: {
+        "x-api-key": process.env.OPENSEA_API_KEY || "",
+      },
+    })
+      .then((res) => res.json())
+      .catch((e) => null);
+    const nft = res?.nft;
+    if (!nft) return null;
+    return resolveMediaURL(nft?.image_url);
   } catch (error) {
     console.error("Failed to fetch NFT data:", error);
   }
@@ -117,11 +121,17 @@ export const resolveEipAssetURL = async (
 
 export const getLensDefaultAvatar = async (tokenId: number) => {
   try {
-    const fetchURL = `${SIMPLEHASH_URL}/api/v0/nfts/polygon/0xdb46d1dc155634fbc732f92e853b10b288ad5a1d/${tokenId}`;
-    const res = await fetch(fetchURL)
+    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/matic/contract/0xdb46d1dc155634fbc732f92e853b10b288ad5a1d/nfts/${tokenId}`;
+    const res = await fetch(fetchURL, {
+      headers: {
+        "x-api-key": process.env.OPENSEA_API_KEY || "",
+      },
+    })
       .then((res) => res.json())
       .catch((e) => null);
-    return res?.previews?.image_medium_url || res?.image_url;
+    const nft = res?.nft;
+    if (!nft) return null;
+    return resolveMediaURL(nft?.image_url);
   } catch (e) {
     return null;
   }
