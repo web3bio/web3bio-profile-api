@@ -212,11 +212,35 @@ const INCLUSIVE_PLATFORMS = new Set([
   PlatformType.nextid,
 ]);
 
+const getResolvedRecord = (identity: IdentityRecord) => {
+  if (!identity) return null;
+  const res = { ...identity };
+  const vertices = res.identityGraph?.vertices || [];
+  const farcasterEqualsENS = vertices
+    .filter((x) => x.platform === PlatformType.ens && !x.isPrimary)
+    .map((x) => {
+      if (
+        vertices.some(
+          (i) =>
+            i.platform === PlatformType.farcaster && i.identity === x.identity,
+        )
+      ) {
+        x.isPrimary = true;
+        x.isPriamryFarcaster = true;
+        return x;
+      }
+    })
+    .filter((x) => !!x);
+  if (farcasterEqualsENS.length > 0) res.isPrimary = true;
+
+  return res;
+};
+
 export const getResolvedProfileArray = (
   data: IdentityGraphQueryResponse,
   platform: PlatformType,
 ) => {
-  const resolvedRecord = data?.data?.identity;
+  const resolvedRecord = getResolvedRecord(data?.data?.identity);
   if (!resolvedRecord) return [];
 
   const {
@@ -228,7 +252,6 @@ export const getResolvedProfileArray = (
     isPrimary,
     ownerAddress,
   } = resolvedRecord;
-
   const firstResolvedAddress = resolvedAddress?.[0]?.address;
   const firstOwnerAddress = ownerAddress?.[0]?.address;
   const defaultReturn = profile
@@ -260,12 +283,14 @@ export const getResolvedProfileArray = (
   }
 
   let results = [];
-
   if (directPass(resolvedRecord) && !isBadBasename) {
     results = vertices
       .filter((vertex) => {
         if (!directPass(vertex)) return false;
-        if (vertex.platform === PlatformType.ens) {
+        if (
+          vertex.platform === PlatformType.ens &&
+          !vertex.isPriamryFarcaster
+        ) {
           const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
           const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
           return vertexOwnerAddr === vertexResolvedAddr;

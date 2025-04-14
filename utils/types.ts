@@ -89,6 +89,7 @@ export interface IdentityRecord {
   registeredAt: number;
   identity: string;
   isPrimary: boolean;
+  isPriamryFarcaster?: boolean;
   network: string;
   ownerAddress: AddressRecord[];
   resolvedAddress: AddressRecord[];

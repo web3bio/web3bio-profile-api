@@ -404,7 +404,7 @@ export const PLATFORM_DATA: ReadonlyMap<
       icon: "icons/icon-web.svg",
       label: "Website",
       urlPrefix: "",
-      ensText: ["url"],
+      ensText: ["url", "website"],
       system: PlatformSystem.web2,
     },
   ],

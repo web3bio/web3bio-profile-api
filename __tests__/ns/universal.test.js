@@ -76,4 +76,12 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(false);
   });
+  it("It should response 200 data for stevedylandev.eth.farcaster", async () => {
+    const res = await queryClient("/ns/farcaster,stevedylandev.eth");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].platform).toBe("farcaster");
+    expect(json[1].identity).toBe("stevedylandev.eth");
+    expect(json[1].platform).toBe("ens");
+  });
 });
