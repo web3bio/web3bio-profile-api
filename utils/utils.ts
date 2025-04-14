@@ -339,20 +339,21 @@ export const generateSocialLinks = async (
         handle: identity,
         sources: resolveVerifiedLink(`${PlatformType.lens},${identity}`, edges),
       };
-      if (texts) {
-        for (const key of Object.keys(texts)) {
-          const platformKey = key.toLowerCase() as PlatformType;
-          if (PLATFORM_DATA.has(platformKey)) {
-            const resolvedHandle = resolveHandle(texts[key], platformKey);
-            links[platformKey] = {
-              link: getSocialMediaLink(resolvedHandle, key),
-              handle: resolvedHandle,
-              sources: resolveVerifiedLink(
-                `${platformKey},${resolvedHandle}`,
-                edges,
-              ),
-            };
-          }
+      if (!texts) break;
+      for (const textKey of Object.keys(texts)) {
+        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
+        );
+        if (platformKey) {
+          const resolvedHandle = resolveHandle(texts[textKey], platformKey);
+          links[platformKey] = {
+            link: getSocialMediaLink(resolvedHandle, platformKey),
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(
+              `${platformKey},${resolvedHandle}`,
+              edges,
+            ),
+          };
         }
       }
       break;
@@ -363,14 +364,14 @@ export const generateSocialLinks = async (
         for (const recordKey of SNS_RECORDS_LIST) {
           const handle = resolveHandle(texts[recordKey]);
           if (handle) {
-            const type = ["CNAME", PlatformType.url].includes(recordKey)
+            const platformKey = ["CNAME", PlatformType.url].includes(recordKey)
               ? PlatformType.website
               : recordKey;
 
-            links[type] = {
-              link: getSocialMediaLink(handle, type)!,
+            links[platformKey] = {
+              link: getSocialMediaLink(handle, platformKey)!,
               handle,
-              sources: resolveVerifiedLink(`${type},${handle}`, edges),
+              sources: resolveVerifiedLink(`${platformKey},${handle}`, edges),
             };
           }
         }
@@ -383,15 +384,15 @@ export const generateSocialLinks = async (
           const item = texts[accountKey];
           if (item && PLATFORM_DATA.has(accountKey)) {
             const resolvedHandle = resolveHandle(item, accountKey);
-            const reolvedKey =
+            const platformKey =
               accountKey === PlatformType.url
                 ? PlatformType.website
                 : accountKey;
-            links[reolvedKey] = {
-              link: getSocialMediaLink(resolvedHandle, reolvedKey),
+            links[platformKey] = {
+              link: getSocialMediaLink(resolvedHandle, platformKey),
               handle: resolvedHandle,
               sources: resolveVerifiedLink(
-                `${reolvedKey},${resolvedHandle}`,
+                `${platformKey},${resolvedHandle}`,
                 edges,
               ),
             };
@@ -401,18 +402,22 @@ export const generateSocialLinks = async (
       break;
     case PlatformType.dotbit:
       // Process dotbit accounts
-      if (texts) {
-        for (const key of Object.keys(texts)) {
-          const platformKey = key as PlatformType;
-          if (PLATFORM_DATA.has(platformKey)) {
-            const item = texts[key];
-            const resolvedHandle = resolveHandle(item, platformKey);
-            links[key] = {
-              link: getSocialMediaLink(item, platformKey)!,
-              handle: resolvedHandle,
-              sources: resolveVerifiedLink(`${key},${resolvedHandle}`, edges),
-            };
-          }
+      if (!texts) break;
+      for (const textKey of Object.keys(texts)) {
+        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
+          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
+        );
+        if (platformKey) {
+          const item = texts[textKey];
+          const resolvedHandle = resolveHandle(item, platformKey);
+          links[textKey] = {
+            link: getSocialMediaLink(item, platformKey)!,
+            handle: resolvedHandle,
+            sources: resolveVerifiedLink(
+              `${platformKey},${resolvedHandle}`,
+              edges,
+            ),
+          };
         }
       }
       break;
