@@ -226,7 +226,7 @@ const getResolvedRecord = (identity: IdentityRecord) => {
         )
       ) {
         x.isPrimary = true;
-        x.isPriamryFarcaster = true;
+        x.isPrimaryFarcaster = true;
         return x;
       }
     })
@@ -289,7 +289,7 @@ export const getResolvedProfileArray = (
         if (!directPass(vertex)) return false;
         if (
           vertex.platform === PlatformType.ens &&
-          !vertex.isPriamryFarcaster
+          !vertex.isPrimaryFarcaster
         ) {
           const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
           const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
