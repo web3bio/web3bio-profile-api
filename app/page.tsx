@@ -602,8 +602,7 @@ export default function Home() {
               <code>
                 <span className="text-gray">{`// Shell`}</span>
                 <br />
-                curl -H "X-API-KEY: Bearer YOUR_API_KEY" {BASE_URL}
-                /profile/vitalik.eth
+                {`curl -H "X-API-KEY: Bearer YOUR_API_KEY" ${BASE_URL}/profile/vitalik.eth`}
                 <br />
                 <br />
                 <span className="text-gray">{`// Javascript`}</span>
