@@ -86,7 +86,7 @@ function resolveSocialMediaLink(
 }
 
 export const resolveEipAssetURL = async (
-  source: string,
+  source: string | null,
 ): Promise<string | null> => {
   if (!source) return null;
 

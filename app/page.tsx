@@ -848,7 +848,7 @@ export default function Home() {
             }
         },
         "social": {
-            "uid": 100275,
+            "uid": null,
             "follower": 42267,
             "following": 7
         }
@@ -1647,7 +1647,7 @@ export default function Home() {
             <h2 className="text-bold h4">Lens Profile API</h2>
             <p>
               Fetch a detailed Lens profile information by an Ethereum address
-              or a Lens handle or a Lens UID (encoded format)
+              or a Lens handle
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1693,8 +1693,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a Lens handle or a Lens UID (encoded
-                format)
+                An Ethereum address or a Lens handle
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1727,27 +1726,12 @@ export default function Home() {
                   /ns/lens/stani.lens
                 </a>
               </li>
-              <li>
-                <span className="label">UID</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/lens/lens%2C%235`}
-                  target="_blank"
-                >
-                  /profile/lens/lens%2C%235
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/lens/lens%2C%235`} target="_blank">
-                  /ns/lens/lens%2C%235
-                </a>
-              </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/lens/lens%2C%235`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
@@ -1772,7 +1756,7 @@ export default function Home() {
         }
     },
     "social": {
-        "uid": 5,
+        "uid": null,
         "follower": 115084,
         "following": 1265
     }
@@ -1782,8 +1766,6 @@ export default function Home() {
                 <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/lens/lens%2C%235`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
@@ -2531,7 +2513,7 @@ export default function Home() {
             }
         },
         "social": {
-            "uid": 5,
+            "uid": null,
             "following": 1265,
             "follower": 115084
         },

@@ -120,11 +120,7 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
   // Pre-fetch avatar asynchronously
-  const avatarPromise = data.avatar
-    ? resolveEipAssetURL(data.avatar)
-    : data.platform === PlatformType.lens && data?.social?.uid
-      ? getLensDefaultAvatar(Number(data.social.uid))
-      : Promise.resolve(null);
+  const avatarPromise = resolveEipAssetURL(data.avatar);
   // Basic profile data used in both response types
   const nsObj: ProfileNSResponse = {
     address: data.address,
