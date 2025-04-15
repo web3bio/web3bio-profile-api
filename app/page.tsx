@@ -602,8 +602,7 @@ export default function Home() {
               <code>
                 <span className="text-gray">{`// Shell`}</span>
                 <br />
-                curl -H "X-API-KEY: Bearer YOUR_API_KEY" {BASE_URL}
-                /profile/vitalik.eth
+                {`curl -H "X-API-KEY: Bearer YOUR_API_KEY" ${BASE_URL}/profile/vitalik.eth`}
                 <br />
                 <br />
                 <span className="text-gray">{`// Javascript`}</span>
@@ -1484,8 +1483,8 @@ export default function Home() {
             <h2 className="text-bold h4">Farcaster Profile API</h2>
             <p>
               Fetch a detailed Farcaster profile information by an Ethereum
-              address or a Farcaster username/fname or a Farcaster FID (with
-              fid/).
+              address or a Farcaster username/fname or a Farcaster FID.(encoded
+              format)
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1532,7 +1531,7 @@ export default function Home() {
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
                 An Ethereum address or a Farcaster username/fname or a Farcaster
-                FID (with fid/).
+                FID (encoded format)
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1570,12 +1569,18 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
-                <a href={`${BASE_URL}/profile/farcaster/fid/3`} target="_blank">
-                  /profile/farcaster/fid/3
+                <a
+                  href={`${BASE_URL}/profile/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /profile/farcaster/farcaster%2C%233
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/fid/3`} target="_blank">
-                  /ns/farcaster/fid/3
+                <a
+                  href={`${BASE_URL}/ns/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /ns/farcaster/farcaster%2C%233
                 </a>
               </li>
             </ul>
@@ -1585,7 +1590,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid/3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/farcaster%2C%233`}</span>
                 <br />
                 {`{
     "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
@@ -1620,7 +1625,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid/3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/farcaster%2C%233`}</span>
                 <br />
                 {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
@@ -1642,7 +1647,7 @@ export default function Home() {
             <h2 className="text-bold h4">Lens Profile API</h2>
             <p>
               Fetch a detailed Lens profile information by an Ethereum address
-              or a Lens handle.
+              or a Lens handle or a Lens UID (encoded format)
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1688,7 +1693,8 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a Lens handle.
+                An Ethereum address or a Lens handle or a Lens UID (encoded
+                format)
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1721,12 +1727,27 @@ export default function Home() {
                   /ns/lens/stani.lens
                 </a>
               </li>
+              <li>
+                <span className="label">UID</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/lens/lens%2C%235`}
+                  target="_blank"
+                >
+                  /profile/lens/lens%2C%235
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/lens/lens%2C%235`} target="_blank">
+                  /ns/lens/lens%2C%235
+                </a>
+              </li>
             </ul>
             <pre className="code" data-lang="JSON">
               <code>
                 <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/profile/lens/lens%2C%235`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
@@ -1761,6 +1782,8 @@ export default function Home() {
                 <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
+                <br />
+                <span className="text-gray">{`// ${BASE_URL}/ns/lens/lens%2C%235`}</span>
                 <br />
                 {`{
     "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
