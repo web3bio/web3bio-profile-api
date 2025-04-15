@@ -1,4 +1,4 @@
-import { getLensDefaultAvatar, resolveEipAssetURL } from "@/utils/resolver";
+import { resolveEipAssetURL } from "@/utils/resolver";
 import { IdentityRecord, ProfileRecord } from "@/utils/types";
 
 const processProfileAvatar = async (

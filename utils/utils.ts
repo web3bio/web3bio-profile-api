@@ -12,7 +12,6 @@ import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { regexLowercaseExempt } from "@/utils/regexp";
 import {
-  getLensDefaultAvatar,
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,

@@ -117,19 +117,3 @@ export const resolveEipAssetURL = async (
 
   return resolveMediaURL(source);
 };
-
-export const getLensDefaultAvatar = async (tokenId: number) => {
-  try {
-    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/matic/contract/0xdb46d1dc155634fbc732f92e853b10b288ad5a1d/nfts/${tokenId}`;
-    const res = await fetch(fetchURL, {
-      headers: {
-        "x-api-key": process.env.OPENSEA_API_KEY || "",
-      },
-    });
-    if (!res.ok) return null;
-    const nft = (await res.json())?.nft;
-    return resolveMediaURL(nft?.image_url);
-  } catch (e) {
-    return null;
-  }
-};

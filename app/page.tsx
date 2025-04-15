@@ -2382,7 +2382,6 @@ export default function Home() {
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
                     ]),
                   )}`}
                   target="_blank"
@@ -2395,25 +2394,11 @@ export default function Home() {
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
                     ]),
                   )}`}
                   target="_blank"
                 >
                   lens,0xd8da...6045
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "lens,stani.lens",
-                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
-                    ]),
-                  )}`}
-                  target="_blank"
-                >
-                  lens,#11874
                 </a>
               </li>
               <li>
@@ -2518,7 +2503,6 @@ export default function Home() {
             "follower": 115084
         },
         "aliases": [
-            "lens,#5",
             "lens,stani.lens",
             "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
         ]
@@ -2671,7 +2655,6 @@ export default function Home() {
         "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
         "description": "@Avara (@Aave @Lens @Family)",
         "aliases": [
-            "lens,#5",
             "lens,stani.lens",
             "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
         ]
