@@ -1,5 +1,4 @@
-import { PlatformType } from "@/utils/platform";
-import { getLensDefaultAvatar, resolveEipAssetURL } from "@/utils/resolver";
+import { resolveEipAssetURL } from "@/utils/resolver";
 import { IdentityRecord, ProfileRecord } from "@/utils/types";
 
 const processProfileAvatar = async (
@@ -15,14 +14,6 @@ const processProfileAvatar = async (
     } catch {
       avatarUrl = null;
     }
-  }
-
-  if (
-    !avatarUrl &&
-    profile.platform === PlatformType.lens &&
-    profile.social?.uid
-  ) {
-    avatarUrl = await getLensDefaultAvatar(Number(profile.social.uid));
   }
 
   return avatarUrl;
