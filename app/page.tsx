@@ -1572,14 +1572,14 @@ export default function Home() {
                   href={`${BASE_URL}/profile/farcaster/farcaster%2C%233`}
                   target="_blank"
                 >
-                  /profile/farcaster/farcaster%2C%233
+                  /profile/farcaster/farcaster,#3
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a
                   href={`${BASE_URL}/ns/farcaster/farcaster%2C%233`}
                   target="_blank"
                 >
-                  /ns/farcaster/farcaster%2C%233
+                  /ns/farcaster/farcaster,#3
                 </a>
               </li>
             </ul>
