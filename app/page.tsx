@@ -602,8 +602,7 @@ export default function Home() {
               <code>
                 <span className="text-gray">{`// Shell`}</span>
                 <br />
-                curl -H "X-API-KEY: Bearer YOUR_API_KEY" {BASE_URL}
-                /profile/vitalik.eth
+                {`curl -H "X-API-KEY: Bearer YOUR_API_KEY" ${BASE_URL}/profile/vitalik.eth`}
                 <br />
                 <br />
                 <span className="text-gray">{`// Javascript`}</span>
@@ -625,7 +624,7 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Universal Profiles</h2>
-            <p>Fetch detailed Universal Profiles across multiple platforms</p>
+            <p>Fetch detailed Universal Profiles across multiple platforms.</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -849,7 +848,7 @@ export default function Home() {
             }
         },
         "social": {
-            "uid": 100275,
+            "uid": null,
             "follower": 42267,
             "following": 7
         }
@@ -898,8 +897,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Platform Profiles</h2>
             <p>
-              Fetch a detailed platform-specific profile information by an
-              Ethereum address or a domain name.
+              Fetch a detailed platform-specific profile using an Ethereum
+              address, Solana address or domain name.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1023,8 +1022,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">ENS Profile API</h2>
             <p>
-              Fetch a detailed ENS profile information by an Ethereum address or
-              an ENS domain.
+              Fetch a detailed ENS profile using an Ethereum address or ENS
+              domain.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1177,8 +1176,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Basenames Profile API</h2>
             <p>
-              Fetch a detailed Basenames profile information by an Ethereum
-              address or a Basenames domain
+              Fetch a detailed Basenames profile using an Ethereum address or
+              Basenames domain.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1342,8 +1341,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Linea Profile API</h2>
             <p>
-              Fetch a detailed Linea profile information by an Ethereum address
-              or a Linea domain.
+              Fetch a detailed Linea profile using an Ethereum address or Linea
+              domain.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1483,9 +1482,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Farcaster Profile API</h2>
             <p>
-              Fetch a detailed Farcaster profile information by an Ethereum
-              address or a Farcaster username/fname or a Farcaster FID (with
-              fid/).
+              Fetch a detailed Farcaster profile using an Ethereum address or
+              Farcaster username/fname or encoded Farcaster FID.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1531,8 +1529,8 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a Farcaster username/fname or a Farcaster
-                FID (with fid/).
+                An Ethereum address or Farcaster username/fname or encoded
+                Farcaster FID.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1570,12 +1568,18 @@ export default function Home() {
               </li>
               <li>
                 <span className="label">Farcaster</span>{" "}
-                <a href={`${BASE_URL}/profile/farcaster/fid/3`} target="_blank">
-                  /profile/farcaster/fid/3
+                <a
+                  href={`${BASE_URL}/profile/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /profile/farcaster/farcaster,#3
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/fid/3`} target="_blank">
-                  /ns/farcaster/fid/3
+                <a
+                  href={`${BASE_URL}/ns/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /ns/farcaster/farcaster,#3
                 </a>
               </li>
             </ul>
@@ -1585,7 +1589,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/fid/3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/farcaster%2C%233`}</span>
                 <br />
                 {`{
     "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
@@ -1620,7 +1624,7 @@ export default function Home() {
                 <br />
                 <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
                 <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/fid/3`}</span>
+                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/farcaster%2C%233`}</span>
                 <br />
                 {`{
     "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
@@ -1641,8 +1645,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Lens Profile API</h2>
             <p>
-              Fetch a detailed Lens profile information by an Ethereum address
-              or a Lens handle.
+              Fetch a detailed Lens profile using an Ethereum address or Lens
+              handle.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1688,7 +1692,7 @@ export default function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address or a Lens handle.
+                An Ethereum address or a Lens handle
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -1751,7 +1755,7 @@ export default function Home() {
         }
     },
     "social": {
-        "uid": 5,
+        "uid": null,
         "follower": 115084,
         "following": 1265
     }
@@ -1781,8 +1785,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
             <p>
-              Fetch a detailed Unstoppable Domains profile information by an
-              Ethereum address or an Unstoppable Domains domain
+              Fetch a detailed Unstoppable Domains profile using an Ethereum
+              address or Unstoppable Domains domain.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -1934,8 +1938,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">Solana / SNS Profile API</h2>
             <p>
-              Fetch a detailed Solana Name Service (SNS) profile by a Solana
-              address or a Solana Name Service domain
+              Fetch a detailed Solana Name Service (SNS) profile using a Solana
+              address or Solana Name Service domain
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -2063,8 +2067,8 @@ export default function Home() {
           >
             <h2 className="text-bold h4">.bit Profile API</h2>
             <p>
-              Fetch a detailed .bit profile information by an Ethereum address
-              or a .bit domain
+              Fetch a detailed .bit profile using an Ethereum address or .bit
+              domain.
             </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
@@ -2223,7 +2227,9 @@ export default function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Batch Profile Query</h2>
-            <p>Fetch profiles for multiple identities using query IDs</p>
+            <p>
+              Fetch profiles for multiple identities using a list of query IDs.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2377,7 +2383,6 @@ export default function Home() {
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
                     ]),
                   )}`}
                   target="_blank"
@@ -2390,25 +2395,11 @@ export default function Home() {
                     JSON.stringify([
                       "lens,stani.lens",
                       "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
                     ]),
                   )}`}
                   target="_blank"
                 >
                   lens,0xd8da...6045
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/profile/batch/${encodeURIComponent(
-                    JSON.stringify([
-                      "lens,stani.lens",
-                      "lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "lens,#11874",
-                    ]),
-                  )}`}
-                  target="_blank"
-                >
-                  lens,#11874
                 </a>
               </li>
               <li>
@@ -2508,12 +2499,11 @@ export default function Home() {
             }
         },
         "social": {
-            "uid": 5,
+            "uid": null,
             "following": 1265,
             "follower": 115084
         },
         "aliases": [
-            "lens,#5",
             "lens,stani.lens",
             "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
         ]
@@ -2666,7 +2656,6 @@ export default function Home() {
         "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
         "description": "@Avara (@Aave @Lens @Family)",
         "aliases": [
-            "lens,#5",
             "lens,stani.lens",
             "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
         ]

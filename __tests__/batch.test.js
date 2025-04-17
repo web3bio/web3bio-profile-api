@@ -13,8 +13,8 @@ describe("Test For Batch Query", () => {
     "linea,0xthor.linea.eth",
     "184.linea",
     "farcaster,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
-    // "ens,2️⃣2️⃣.eth",
     "ens,аррӏе.eth",
+    "farcaster,#3",
   ];
 
   it("It should response 200 for Batch Query GET", async () => {
@@ -25,5 +25,6 @@ describe("Test For Batch Query", () => {
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
     expect(json[5].createdAt).toBe("2023-11-07T19:42:51.000Z");
+    expect(json[12].identity).toBe("dwr.eth");
   });
 });
