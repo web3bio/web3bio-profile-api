@@ -48,29 +48,37 @@ function sortProfilesByPlatform(
     ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
   ];
 
-  const sortedResponses = responses.reduce(
-    (acc, response) => {
-      const { platform } = response;
-      const index = order.indexOf(platform as PlatformType);
-      if (index >= 0 && index < 6) {
-        acc[index].push(response);
-      }
-      return acc;
-    },
-    Array.from({ length: 6 }, (_, i) =>
-      i === 0
-        ? [
-            responses.find(
-              (x) =>
-                x.identity === normalizeText(handle) &&
-                x.platform === targetPlatform,
-            ),
-          ]
-        : [],
-    ),
+  const normalizedHandle = normalizeText(handle);
+
+  const exactMatch = responses.find(
+    (x) => x.identity === normalizedHandle && x.platform === targetPlatform,
   );
 
-  return sortedResponses.flat().filter(Boolean) as ProfileAPIResponse[];
+  const sortedResponses = responses
+    .filter(
+      (response) =>
+        !(
+          response.identity === normalizedHandle &&
+          response.platform === targetPlatform
+        ),
+    )
+    .sort((a, b) => {
+      const indexA = order.indexOf(a.platform as PlatformType);
+      const indexB = order.indexOf(b.platform as PlatformType);
+
+      const validA = indexA !== -1;
+      const validB = indexB !== -1;
+
+      if (!validA && !validB) return 0;
+      if (!validA) return 1;
+      if (!validB) return -1;
+
+      return indexA - indexB;
+    });
+
+  return [exactMatch, ...sortedResponses].filter(
+    Boolean,
+  ) as ProfileAPIResponse[];
 }
 
 export const resolveWithIdentityGraph = async ({

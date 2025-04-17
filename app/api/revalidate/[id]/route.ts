@@ -11,8 +11,7 @@ export async function GET(req: NextRequest) {
   if (!id || !id.includes(",")) {
     return NextResponse.json({ message: "Missing Params" }, { status: 400 });
   }
-  const platform = id.split(",")?.[0];
-  const identity = id.split(",")?.[1];
+  const [platform, identity] = id.split(",");
   const res = await queryIdentityGraph(
     QueryType.GET_REFRESH_PROFILE,
     identity,
