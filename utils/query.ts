@@ -297,7 +297,6 @@ const QUERIES = {
     query GET_REFRESH_PROFILE($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity, refresh: true) {
         status
-        updatedAt
         identityGraph {
           graphId
         }
@@ -377,32 +376,5 @@ export async function queryIdentityGraphBatch(
       .map((x) => (x as any).value);
   } catch (e) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
-  }
-}
-
-export async function refreshIdentityGraph(
-  handle: string,
-  platform: PlatformType,
-  headers: AuthHeaders,
-) {
-  try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(QueryType.GET_REFRESH_PROFILE),
-        variables: {
-          identity: handle,
-          platform,
-        },
-      }),
-    });
-
-    return await response.json();
-  } catch (e) {
-    return { errors: e };
   }
 }
