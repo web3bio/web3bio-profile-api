@@ -9,6 +9,7 @@ export enum QueryType {
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
   BATCH_GET_UNIVERSAL = "BATCH_GET_UNIVERSAL",
+  GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
 }
 
 export function getQuery(type: QueryType): string {
@@ -17,7 +18,7 @@ export function getQuery(type: QueryType): string {
 
 const QUERIES = {
   [QueryType.GET_CREDENTIALS_QUERY]: `
-    query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
+    query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: str!) {
       identity(platform: $platform, identity: $identity) {
         identityGraph {
           vertices {
@@ -36,7 +37,7 @@ const QUERIES = {
     }
   `,
   [QueryType.GET_GRAPH_QUERY]: `
-    query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
+    query GET_GRAPH_QUERY($platform: Platform!, $identity: str!) {
       identity(platform: $platform, identity: $identity) {
         identity
         platform
@@ -100,7 +101,7 @@ const QUERIES = {
     }
   `,
   [QueryType.GET_PROFILES_NS]: `
-    query GET_PROFILES_NS($platform: Platform!, $identity: String!) {
+    query GET_PROFILES_NS($platform: Platform!, $identity: str!) {
       identity(platform: $platform, identity: $identity) {
         identity
         platform
@@ -148,7 +149,7 @@ const QUERIES = {
     }
   `,
   [QueryType.GET_PROFILES]: `
-    query GET_PROFILES($platform: Platform!, $identity: String!) {
+    query GET_PROFILES($platform: Platform!, $identity: str!) {
       identity(platform: $platform, identity: $identity) {
         identity
         platform
@@ -220,7 +221,7 @@ const QUERIES = {
     }
   `,
   [QueryType.BATCH_GET_UNIVERSAL]: `
-    query BATCH_GET_UNIVERSAL($ids: [String!]!) {
+    query BATCH_GET_UNIVERSAL($ids: [str!]!) {
       identitiesWithGraph(ids: $ids) {
         id
         aliases
@@ -288,6 +289,16 @@ const QUERIES = {
             dataSource
             edgeType
           }
+        }
+      }
+    }
+  `,
+  [QueryType.GET_REFRESH_PROFILE]: `
+    query GET_REFRESH_PROFILE($platform: Platform!, $identity: str!) {
+      identity(platform: $platform, identity: $identity, refresh: true) {
+        status
+        identityGraph {
+          graphId
         }
       }
     }
