@@ -29,6 +29,10 @@ export async function generateMetadata() {
       site: "@web3bio",
       creator: "@web3bio",
     },
+    icons: {
+      icon: "/favicon.svg",
+      shortcut: "/favicon.svg",
+    },
     keywords: [
       "Web3",
       "Web3.bio",
