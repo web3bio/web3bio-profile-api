@@ -7,7 +7,6 @@ import {
   regexCluster,
   regexCrossbell,
   regexDotbit,
-  regexEmoji,
   regexEns,
   regexEth,
   regexFarcaster,

@@ -6,6 +6,7 @@ import {
   isWeb3Address,
   normalizeText,
   respondWithCache,
+  shouldPlatformFetch,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
@@ -362,6 +363,7 @@ export const getResolvedProfileArray = (
   }
 
   return results
+    .filter((x) => shouldPlatformFetch(x.platform))
     .filter(
       (item, index, self) =>
         index ===
