@@ -287,7 +287,7 @@ export const getResolvedProfileArray = (
     firstOwnerAddress !== firstResolvedAddress;
 
   const vertices = identityGraph?.vertices;
-  if (!vertices?.length) {
+  if (vertices?.length <= 1) {
     return [defaultReturn];
   }
 
