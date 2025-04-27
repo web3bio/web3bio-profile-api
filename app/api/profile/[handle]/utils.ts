@@ -6,6 +6,7 @@ import {
   isWeb3Address,
   normalizeText,
   respondWithCache,
+  shouldPlatformFetch,
 } from "@/utils/base";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
@@ -276,21 +277,17 @@ export const getResolvedProfileArray = (
         isPrimary,
       };
 
-  if (PLATFORMS_TO_EXCLUDE.includes(platform)) {
-    return [defaultReturn];
-  }
-
-  // Handle direct pass case
-  const isBadBasename =
-    recordPlatform === PlatformType.basenames &&
-    firstOwnerAddress !== firstResolvedAddress;
-
   const vertices = identityGraph?.vertices;
-  if (!vertices?.length) {
+
+  if (PLATFORMS_TO_EXCLUDE.includes(platform) || vertices?.length <= 1) {
     return [defaultReturn];
   }
 
   let results = [];
+  // Handle direct pass case
+  const isBadBasename =
+    recordPlatform === PlatformType.basenames &&
+    firstOwnerAddress !== firstResolvedAddress;
   if (directPass(resolvedRecord) && !isBadBasename) {
     results = vertices
       .filter((vertex) => {
@@ -362,6 +359,7 @@ export const getResolvedProfileArray = (
   }
 
   return results
+    .filter((x) => shouldPlatformFetch(x.platform))
     .filter(
       (item, index, self) =>
         index ===
