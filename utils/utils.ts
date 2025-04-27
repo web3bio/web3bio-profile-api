@@ -503,9 +503,13 @@ const resolveLocation = (location: any) => {
     ? location.country.replace("United States of America", "US")
     : null;
   if (!city && !state && !country) return null;
-  if (city && state) return `${city}, ${state}`;
-  if (state && country) return `${state}, ${country}`;
-  if (city && country) return `${city}, ${country}`;
+
+  const formatPair = (a: string | null, b: string | null): string =>
+    a === b ? (a as string) : `${a}, ${b}`;
+
+  if (city && state) return formatPair(city, state);
+  if (state && country) return formatPair(state, country);
+  if (city && country) return formatPair(city, country);
 
   return country;
 };
