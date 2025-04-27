@@ -26,6 +26,7 @@ import {
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import { SourceType } from "./source";
+import { rm } from "fs/promises";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
@@ -161,7 +162,7 @@ export async function generateProfileStruct(
       ? new Date(data.createdAt * 1000).toISOString()
       : null,
     email: data.texts?.email || null,
-    location: data.texts?.location || null,
+    location: resolveLocation(data.texts?.location) || null,
     header: data.texts?.header
       ? await resolveEipAssetURL(data.texts.header)
       : null,
@@ -492,4 +493,20 @@ export const resolveIdentityBatch = (input: string[]): string[] => {
     }
   }
   return results;
+};
+
+const resolveLocation = (location: any) => {
+  if (!location) return null;
+  if (typeof location === "string") return location;
+  const city = location.city || null;
+  const state = location.state || null;
+  const country = location.country
+    ? location.country.replace("United States of America", "US")
+    : null;
+  if (!city && !state && !country) return null;
+  if (city && state) return `${city}, ${state}`;
+  if (state && country) return `${state}, ${country}`;
+  if (city && country) return `${city}, ${country}`;
+
+  return country;
 };
