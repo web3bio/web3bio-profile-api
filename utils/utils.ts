@@ -26,7 +26,6 @@ import {
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import { SourceType } from "./source";
-import { rm } from "fs/promises";
 
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
