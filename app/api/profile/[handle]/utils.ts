@@ -16,7 +16,6 @@ import {
   IdentityGraphQueryResponse,
   IdentityRecord,
   ProfileAPIResponse,
-  ProfileNSResponse,
   ProfileRecord,
 } from "@/utils/types";
 
@@ -40,10 +39,10 @@ const directPass = (identity: IdentityRecord) => {
 };
 
 function sortProfilesByPlatform(
-  responses: ProfileAPIResponse[] | ProfileNSResponse[],
+  responses: ProfileRecord[],
   targetPlatform: PlatformType,
   handle: string,
-): ProfileAPIResponse[] {
+): ProfileRecord[] {
   const order = [
     targetPlatform,
     ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
@@ -61,7 +60,7 @@ function sortProfilesByPlatform(
         !(
           response.identity === normalizedHandle &&
           response.platform === targetPlatform
-        ),
+        ) && DEFAULT_PLATFORM_ORDER.includes(response.platform as PlatformType),
     )
     .sort((a, b) => {
       const indexA = order.indexOf(a.platform as PlatformType);
@@ -77,9 +76,7 @@ function sortProfilesByPlatform(
       return indexA - indexB;
     });
 
-  return [exactMatch, ...sortedResponses].filter(
-    Boolean,
-  ) as ProfileAPIResponse[];
+  return [exactMatch, ...sortedResponses].filter(Boolean) as ProfileRecord[];
 }
 
 export const resolveWithIdentityGraph = async ({
@@ -111,10 +108,13 @@ export const resolveWithIdentityGraph = async ({
   const resolvedResponse = await processJson(response);
 
   const profilesArray = getResolvedProfileArray(resolvedResponse, platform);
+  const sortedProfiles = PLATFORMS_TO_EXCLUDE.includes(platform)
+    ? profilesArray
+    : sortProfilesByPlatform(profilesArray as any, platform, handle);
 
-  const responsesToSort = (
+  const returnRes = (
     await Promise.allSettled(
-      profilesArray.map((_profile) =>
+      sortedProfiles.map((_profile) =>
         generateProfileStruct(
           _profile as ProfileRecord,
           ns,
@@ -128,10 +128,6 @@ export const resolveWithIdentityGraph = async ({
         result.status === "fulfilled",
     )
     .map((result) => result.value);
-
-  const returnRes = PLATFORMS_TO_EXCLUDE.includes(platform)
-    ? responsesToSort
-    : sortProfilesByPlatform(responsesToSort, platform, handle);
 
   if (!returnRes.length && platform === PlatformType.ethereum) {
     const nsObj = {
