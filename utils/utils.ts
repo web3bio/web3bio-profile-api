@@ -494,22 +494,24 @@ export const resolveIdentityBatch = (input: string[]): string[] => {
   return results;
 };
 
-const resolveLocation = (location: any) => {
+const resolveLocation = (location: any): string | null => {
   if (!location) return null;
   if (typeof location === "string") return location;
-  const city = location.city || null;
-  const state = location.state || null;
-  const country = location.country
-    ? location.country.replace("United States of America", "US")
+
+  const { city = null, state = null, country: rawCountry = null } = location;
+
+  const country = rawCountry
+    ? rawCountry.replace("United States of America", "US")
     : null;
+
   if (!city && !state && !country) return null;
 
   const formatPair = (a: string | null, b: string | null): string =>
     a === b ? (a as string) : `${a}, ${b}`;
 
   if (city && state) return formatPair(city, state);
-  if (state && country) return formatPair(state, country);
   if (city && country) return formatPair(city, country);
+  if (state && country) return formatPair(state, country);
 
-  return country;
+  return city || state || country;
 };
