@@ -6,6 +6,7 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
+    expect(json.location).toBe("Chūō, Japan");
     expect(json.links.twitter.handle).toBe("suji_yan");
     expect(json.links.twitter.sources.includes("farcaster")).toBeTruthy();
   });
@@ -31,23 +32,26 @@ describe("Test For Farcaster Profile API", () => {
     const json = await res.json();
     expect(json.error).toBe("Invalid Identity or Domain");
   });
-  it("It should response 200 for undefined", async () => {
-    const res = await queryClient("/profile/farcaster/undefined");
+  it("It should response 200 for guoxin", async () => {
+    const res = await queryClient("/profile/farcaster/guoxin");
     expect(res.status).toBe(200);
     const json = await res.json();
+    expect(json.address).toBe("0xeb8a789abd73e0e1af784fbc95a0547cd0458adc");
+    expect(json.location).toBe("Los Angeles, California");
   });
   it("It should response 200 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.displayName).toBe("Dan Romero");
-    expect(json.address).toBeTruthy();
+    expect(json.location).toBe("Los Angeles, California");
   });
   it("It should response 200 for dwr.eth", async () => {
     const res = await queryClient("/profile/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBeTruthy();
+    expect(json.address).toBe("0xd7029bdea1c17493893aafe29aad69ef892b8ff2");
+    expect(json.location).toBe("Los Angeles, California");
   });
   it("It should response 200 for farcaster%2C%233", async () => {
     const res = await queryClient("/profile/farcaster/farcaster%2C%233");
