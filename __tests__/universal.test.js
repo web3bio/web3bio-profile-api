@@ -10,6 +10,7 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
     expect(json[0].displayName).toBe("sujiyan.eth");
     expect(json[1].platform).toBe("basenames");
+    expect(json.find((x) => x.location === "Chūō, Japan")).toBeTruthy();
   });
   it("It should response 200 data for lilgho.lens", async () => {
     const res = await queryClient("/profile/lilgho.lens");
@@ -183,5 +184,10 @@ describe("Test For Universal Profile API", () => {
     );
     const json = await res.json();
     expect(json[0].identity).toBe("🦊🦊🦊.eth");
+  });
+  it("It should response 200 for filelly.eth", async () => {
+    const res = await queryClient("/profile/filelly.eth");
+    const json = await res.json();
+    expect(json[0].address).toBe("0xea1c2886d9cb0c3b119cd145c9c1a6bc1f26f150");
   });
 });

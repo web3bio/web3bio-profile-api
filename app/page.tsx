@@ -1604,7 +1604,7 @@ export default function Home() {
     "description": "Working on Farcaster and Warpcast.",
     "status": null,
     "email": null,
-    "location": null,
+    "location": "Los Angeles, California",
     "header": null,
     "contenthash": null,
     "links": {
@@ -2521,7 +2521,7 @@ export default function Home() {
         "description": "Working on Farcaster and Warpcast.",
         "status": null,
         "email": null,
-        "location": null,
+        "location": "Los Angeles, California",
         "header": null,
         "contenthash": null,
         "links": {
