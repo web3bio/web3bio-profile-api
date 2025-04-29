@@ -233,7 +233,7 @@ export const getResolvedProfileArray = (
       );
 
     if (shouldAddDefault) {
-      results.push(defaultReturn);
+      results = [...results, defaultReturn];
     }
   } else {
     results = [defaultReturn];
