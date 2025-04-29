@@ -37,4 +37,14 @@ describe("Test For Credentials API", () => {
     const json = await res.json();
     expect(json[1].credentials.isSpam.value).toBe(false);
   });
+  it("It should response 200 for 0x54503eeded1fc55b94330bf82092ad41a76a8683", async () => {
+    const res = await queryClient(
+      "/credentials/0x54503eeded1fc55b94330bf82092ad41a76a8683",
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[1].credentials.isHuman.value).toBe(true);
+    expect(json[1].credentials.isHuman.sources[0].dataSource).toBe("binance");
+    expect(json[1].credentials.isHuman.sources[1].dataSource).toBe("coinbase");
+  });
 });
