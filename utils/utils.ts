@@ -27,6 +27,7 @@ import {
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import { SourceType } from "./source";
 
+// Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
   PlatformType.twitter,
   PlatformType.discord,
@@ -36,6 +37,7 @@ const UD_ACCOUNTS_LIST = [
   PlatformType.youtube,
   PlatformType.url,
 ];
+
 const SNS_RECORDS_LIST = [
   PlatformType.twitter,
   PlatformType.telegram,
@@ -46,6 +48,12 @@ const SNS_RECORDS_LIST = [
   "CNAME",
 ];
 
+// Create a Set for faster platform lookups
+const IDENTITY_BASED_PLATFORMS = new Set([
+  PlatformType.farcaster,
+  PlatformType.lens,
+]);
+
 export const resolveIdentityResponse = async (
   handle: string,
   platform: PlatformType,
@@ -55,7 +63,7 @@ export const resolveIdentityResponse = async (
   const res = await queryIdentityGraph(
     ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
     handle,
-    platform as PlatformType,
+    platform,
     headers,
   );
 
@@ -118,34 +126,25 @@ export async function generateProfileStruct(
   ns?: boolean,
   edges?: IdentityGraphEdge[],
 ): Promise<ProfileAPIResponse | ProfileNSResponse> {
-  // Pre-fetch avatar asynchronously
-  const avatarPromise = resolveEipAssetURL(data.avatar);
   // Basic profile data used in both response types
   const nsObj: ProfileNSResponse = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
-    displayName: data.displayName
-      ? data.displayName
-      : isWeb3Address(data.identity)
+    displayName:
+      data.displayName ||
+      (isWeb3Address(data.identity)
         ? formatText(data.identity)
-        : data.identity,
+        : data.identity),
     avatar: null,
     description: data.description || null,
   };
 
   // Fetch social links and avatar concurrently
-  const results = await Promise.allSettled([
+  const [socialData, avatar] = await Promise.all([
     generateSocialLinks(data, edges),
-    avatarPromise,
+    resolveEipAssetURL(data.avatar),
   ]);
-
-  const { links, contenthash } =
-    results[0].status === "fulfilled"
-      ? results[0].value
-      : { links: {}, contenthash: null };
-
-  const avatar = results[1].status === "fulfilled" ? results[1].value : null;
 
   nsObj.avatar = avatar;
 
@@ -153,7 +152,6 @@ export async function generateProfileStruct(
     return nsObj;
   }
 
-  // Return full profile for API response
   return {
     ...nsObj,
     status: data.texts?.status || null,
@@ -161,12 +159,12 @@ export async function generateProfileStruct(
       ? new Date(data.createdAt * 1000).toISOString()
       : null,
     email: data.texts?.email || null,
-    location: resolveLocation(data.texts?.location) || null,
+    location: resolveLocation(data.texts?.location),
     header: data.texts?.header
       ? await resolveEipAssetURL(data.texts.header)
       : null,
-    contenthash: contenthash || null,
-    links: links || {},
+    contenthash: socialData.contenthash || null,
+    links: socialData.links || {},
     social: data.social
       ? {
           uid: data.social.uid ? Number(data.social.uid) : null,
@@ -202,7 +200,7 @@ export const resolveIdentityHandle = async (
   } catch (e: any) {
     return errorHandle({
       identity: handle,
-      platform: platform,
+      platform,
       code: e.cause || 500,
       message: e.message,
     });
@@ -214,7 +212,6 @@ const resolveContenthash = async (
   platform: PlatformType,
   texts: Record<string, string>,
 ) => {
-  // early return if not a supported platform
   if (
     ![
       PlatformType.unstoppableDomains,
@@ -224,40 +221,43 @@ const resolveContenthash = async (
   ) {
     return originalContenthash || null;
   }
-  // for ud
+
+  // UD
   if (platform === PlatformType.unstoppableDomains) {
     if (!originalContenthash) return null;
     return isIPFS_Resource(originalContenthash)
       ? `ipfs://${originalContenthash}`
       : originalContenthash;
   }
-  // for sns/solana
-  if ([PlatformType.solana, PlatformType.sns].includes(platform)) {
-    const ipnsHash = texts?.["ipns"];
-    const ipfsHash = texts?.["ipfs"];
-    if (ipnsHash) {
-      if (/^(https?:\/\/|ipns:\/\/)/i.test(ipnsHash)) return ipnsHash;
-      return `ipns://${ipnsHash}`;
-    }
 
-    if (ipfsHash) {
-      if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipfsHash)) return ipfsHash;
-      return isIPFS_Resource(ipfsHash)
-        ? `ipfs://${resolveIPFS_CID(ipfsHash)}`
-        : null;
-    }
-    if (originalContenthash) {
-      const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
-      if (ipnsMatch && ipnsMatch[1]) {
-        return `ipns://${ipnsMatch[1]}`;
-      }
-      if (isIPFS_Resource(originalContenthash)) {
-        return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
-      }
-    }
+  // SNS/Solana
+  const ipnsHash = texts?.["ipns"];
+  const ipfsHash = texts?.["ipfs"];
 
-    return null;
+  if (ipnsHash) {
+    return /^(https?:\/\/|ipns:\/\/)/i.test(ipnsHash)
+      ? ipnsHash
+      : `ipns://${ipnsHash}`;
   }
+
+  if (ipfsHash) {
+    if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipfsHash)) return ipfsHash;
+    return isIPFS_Resource(ipfsHash)
+      ? `ipfs://${resolveIPFS_CID(ipfsHash)}`
+      : null;
+  }
+
+  if (originalContenthash) {
+    const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
+    if (ipnsMatch?.[1]) {
+      return `ipns://${ipnsMatch[1]}`;
+    }
+    if (isIPFS_Resource(originalContenthash)) {
+      return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
+    }
+  }
+
+  return null;
 };
 
 export const generateSocialLinks = async (
@@ -267,17 +267,18 @@ export const generateSocialLinks = async (
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, any> = {};
 
-  let contenthash = await resolveContenthash(
+  // Resolve contenthash early
+  const contenthash = await resolveContenthash(
     originalContenthash,
     platform,
     texts,
   );
 
-  const identityBasedPlatforms = [PlatformType.farcaster, PlatformType.lens];
-  if (!texts && !identityBasedPlatforms.includes(platform)) {
+  if (!texts && !IDENTITY_BASED_PLATFORMS.has(platform)) {
     return { links, contenthash };
   }
 
+  // Platform-specific link generation
   switch (platform) {
     case PlatformType.basenames:
     case PlatformType.ethereum:
@@ -285,12 +286,12 @@ export const generateSocialLinks = async (
     case PlatformType.ens:
       if (!texts) break;
       // Process ENS text records
-      for (const textKey of Object.keys(texts)) {
+      for (const [textKey, value] of Object.entries(texts)) {
         const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
         );
         if (platformKey) {
-          const resolvedHandle = resolveHandle(texts[textKey], platformKey);
+          const resolvedHandle = resolveHandle(value, platformKey);
           if (resolvedHandle) {
             links[platformKey] = {
               link: getSocialMediaLink(resolvedHandle, platformKey),
@@ -304,6 +305,7 @@ export const generateSocialLinks = async (
         }
       }
       break;
+
     case PlatformType.farcaster:
       // Add Farcaster link
       links[PlatformType.farcaster] = {
@@ -314,6 +316,7 @@ export const generateSocialLinks = async (
           edges,
         ),
       };
+
       if (texts?.twitter) {
         const resolvedHandle = resolveHandle(texts.twitter);
         links[PlatformType.twitter] = {
@@ -326,6 +329,7 @@ export const generateSocialLinks = async (
         };
       }
       break;
+
     case PlatformType.lens:
       // Add Lens link
       const pureHandle = identity.replace(".lens", "");
@@ -334,13 +338,15 @@ export const generateSocialLinks = async (
         handle: identity,
         sources: resolveVerifiedLink(`${PlatformType.lens},${identity}`, edges),
       };
+
       if (!texts) break;
-      for (const textKey of Object.keys(texts)) {
+
+      for (const [textKey, value] of Object.entries(texts)) {
         const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
         );
         if (platformKey) {
-          const resolvedHandle = resolveHandle(texts[textKey], platformKey);
+          const resolvedHandle = resolveHandle(value, platformKey);
           links[platformKey] = {
             link: getSocialMediaLink(resolvedHandle, platformKey),
             handle: resolvedHandle,
@@ -352,6 +358,7 @@ export const generateSocialLinks = async (
         }
       }
       break;
+
     case PlatformType.solana:
     case PlatformType.sns:
       // Process SNS records
@@ -372,8 +379,8 @@ export const generateSocialLinks = async (
         }
       }
       break;
+
     case PlatformType.unstoppableDomains:
-      // Process UD accounts
       if (texts) {
         for (const accountKey of UD_ACCOUNTS_LIST) {
           const item = texts[accountKey];
@@ -383,6 +390,7 @@ export const generateSocialLinks = async (
               accountKey === PlatformType.url
                 ? PlatformType.website
                 : accountKey;
+
             links[platformKey] = {
               link: getSocialMediaLink(resolvedHandle, platformKey),
               handle: resolvedHandle,
@@ -395,18 +403,18 @@ export const generateSocialLinks = async (
         }
       }
       break;
+
     case PlatformType.dotbit:
-      // Process dotbit accounts
       if (!texts) break;
-      for (const textKey of Object.keys(texts)) {
+
+      for (const [textKey, value] of Object.entries(texts)) {
         const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
           PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
         );
         if (platformKey) {
-          const item = texts[textKey];
-          const resolvedHandle = resolveHandle(item, platformKey);
+          const resolvedHandle = resolveHandle(value, platformKey);
           links[textKey] = {
-            link: getSocialMediaLink(item, platformKey)!,
+            link: getSocialMediaLink(value, platformKey)!,
             handle: resolvedHandle,
             sources: resolveVerifiedLink(
               `${platformKey},${resolvedHandle}`,
@@ -428,11 +436,9 @@ export const resolveVerifiedLink = (
   if (!edges?.length) return [];
 
   const [platformType, identity] = key.split(",");
-
   const isWebSite = [PlatformType.website, PlatformType.dns].includes(
     platformType as PlatformType,
   );
-
   const sourceSet = new Set<SourceType>();
 
   for (const edge of edges) {
@@ -454,7 +460,6 @@ export const resolveVerifiedLink = (
   return Array.from(sourceSet);
 };
 
-// Resolves and normalizes a user identity string into a standardized format.
 export const resolveIdentity = (input: string): string | null => {
   if (!input) return null;
 
@@ -483,15 +488,7 @@ export const resolveIdentity = (input: string): string | null => {
 };
 
 export const resolveIdentityBatch = (input: string[]): string[] => {
-  const results: string[] = [];
-
-  for (const id of input) {
-    const processed = resolveIdentity(id);
-    if (processed) {
-      results.push(processed);
-    }
-  }
-  return results;
+  return input.map(resolveIdentity).filter(Boolean) as string[];
 };
 
 const resolveLocation = (location: any): string | null => {
@@ -499,19 +496,16 @@ const resolveLocation = (location: any): string | null => {
   if (typeof location === "string") return location;
 
   const { city = null, state = null, country: rawCountry = null } = location;
-
   const country = rawCountry
     ? rawCountry.replace("United States of America", "US")
     : null;
 
   if (!city && !state && !country) return null;
 
-  const formatPair = (a: string | null, b: string | null): string =>
-    a === b ? (a as string) : `${a}, ${b}`;
-
-  if (city && state) return formatPair(city, state);
-  if (city && country) return formatPair(city, country);
-  if (state && country) return formatPair(state, country);
+  if (city && state && city === state) return city;
+  if (city && state) return `${city}, ${state}`;
+  if (city && country) return `${city}, ${country}`;
+  if (state && country) return `${state}, ${country}`;
 
   return city || state || country;
 };
