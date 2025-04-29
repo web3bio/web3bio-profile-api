@@ -34,12 +34,15 @@ const calculateCategoryValue = (
 ): boolean => {
   switch (category) {
     case "isHuman":
-      // if (
-      //   sources.find(
-      //     (x) => x.platform === 'passport' && Number(x.value) >= 20,
-      //   )
-      // )
-      //   return true;
+      if (
+        sources.some(
+          (x) =>
+            ["binance", "coinbase"].includes(x.dataSource) &&
+            x.value === "true",
+        )
+      )
+        return true;
+
       return sources.length > 0;
 
     case "isRisky":
