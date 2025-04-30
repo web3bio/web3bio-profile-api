@@ -10,10 +10,8 @@ export async function GET(req: NextRequest) {
 
     const imageBuffer = await fetch(url!).then((res) => res.arrayBuffer());
     const resultBuffer = await sharp(imageBuffer)
-      .jpeg({
-        quality: 92,
-      })
-      .resize(480)
+      .jpeg({ quality: 88 })
+      .resize(480, null, { fastShrinkOnLoad: true })
       .toBuffer();
 
     return new Response(resultBuffer, {
@@ -24,6 +22,9 @@ export async function GET(req: NextRequest) {
       },
     });
   } catch (e) {
-    return NextResponse.json("Invalid Image URL");
+    return NextResponse.json(
+      { error: "Image processing failed" },
+      { status: 400 },
+    );
   }
 }

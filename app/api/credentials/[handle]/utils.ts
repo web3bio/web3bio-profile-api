@@ -1,4 +1,4 @@
-import { respondWithCache } from "@/utils/base";
+import { respondWithCache } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
@@ -20,96 +20,81 @@ export const resolveCredentialsHandle = async (
     platform,
     headers,
   );
-  const credentials = res?.data?.identity?.identityGraph?.vertices?.filter(
+
+  // Early return if no identity data
+  if (!res?.data?.identity?.identityGraph?.vertices) {
+    return respondWithCache("[]");
+  }
+
+  const credentials = res.data.identity.identityGraph.vertices.filter(
     (x: CredentialRecord) => x.credentials,
   );
-  const json = credentials?.length ? resolveCredentialsStruct(credentials) : [];
 
+  if (!credentials.length) {
+    return respondWithCache("[]");
+  }
+
+  const json = resolveCredentialsStruct(credentials);
   return respondWithCache(JSON.stringify(json));
 };
 
-const calculateCategoryValue = (
-  category: CredentialCategory,
-  sources: CredentialRecordRaw[],
-): boolean => {
-  switch (category) {
-    case "isHuman":
-      // if (
-      //   sources.find(
-      //     (x) => x.platform === 'passport' && Number(x.value) >= 20,
-      //   )
-      // )
-      //   return true;
-      return sources.length > 0;
-
-    case "isRisky":
-      return sources.length > 0;
-
-    case "isSpam":
-      if (
-        sources.find(
-          (x) =>
-            x.dataSource === "warpcast" &&
-            x.type === "score" &&
-            Number(x.value) === 0,
-        )
-      )
-        return true;
-
-    default:
-      return false;
-  }
-};
-
-const calculateValue = (data: CredentialsResponse[]): CredentialsResponse[] => {
-  for (let i = 0; i < data.length; i++) {
-    const credentials = data[i].credentials;
-    const keys = Object.keys(credentials);
-
-    for (let j = 0; j < keys.length; j++) {
-      const category = keys[j] as CredentialCategory;
-      const item = credentials[category];
-
-      if (item) {
-        item.value = calculateCategoryValue(category, item.sources);
-      }
-    }
-  }
-
-  return data;
-};
-
+// Simpler and combined function to handle credential processing
 const resolveCredentialsStruct = (
   data: CredentialRecord[],
 ): CredentialsResponse[] => {
-  const res = data.map((record) => ({
-    id: record.id,
-    credentials: record.credentials.reduce(
-      (result, credential) => {
-        const { category, ...sourceData } = credential;
-        if (category) {
-          if (!result[category]) {
-            result[category] = {
-              // init value
-              value: false,
-              sources: [sourceData],
-            };
-          } else {
-            result[category]?.sources.push(sourceData);
-          }
-        }
-        return result;
-      },
-      {
-        isHuman: null,
-        isRisky: null,
-        isSpam: null,
-      } as Record<
-        CredentialCategory,
-        { value: boolean; sources: CredentialRecordRaw[] } | null
-      >,
-    ),
-  }));
+  return data.map((record) => {
+    const result: Record<
+      CredentialCategory,
+      { value: boolean; sources: CredentialRecordRaw[] } | null
+    > = {
+      isHuman: null,
+      isRisky: null,
+      isSpam: null,
+    };
 
-  return calculateValue(res);
+    // Group credentials by category
+    for (const credential of record.credentials) {
+      const { category, ...sourceData } = credential;
+      if (!category) continue;
+
+      if (!result[category]) {
+        result[category] = {
+          value: false,
+          sources: [sourceData],
+        };
+      } else if (result[category]) {
+        result[category].sources.push(sourceData);
+      }
+    }
+
+    // Calculate values for each category once
+    if (result.isHuman) {
+      const sources = result.isHuman.sources;
+      result.isHuman.value =
+        sources.some(
+          (x) =>
+            ["binance", "coinbase"].includes(x.dataSource) &&
+            x.value === "true",
+        ) || sources.length > 0;
+    }
+
+    if (result.isRisky) {
+      result.isRisky.value = result.isRisky.sources.length > 0;
+    }
+
+    if (result.isSpam) {
+      const sources = result.isSpam.sources;
+      result.isSpam.value = sources.some(
+        (x) =>
+          x.dataSource === "warpcast" &&
+          x.type === "score" &&
+          Number(x.value) === 0,
+      );
+    }
+
+    return {
+      id: record.id,
+      credentials: result,
+    };
+  });
 };

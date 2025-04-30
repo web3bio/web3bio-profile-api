@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Script from "next/script";
-import { BASE_URL } from "../utils/base";
+import { BASE_URL } from "../utils/utils";
 
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";

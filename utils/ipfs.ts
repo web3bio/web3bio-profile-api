@@ -2,7 +2,7 @@ const IPFS_CID_PATTERN =
   "Qm[1-9A-HJ-NP-Za-km-z]{44,}|b[2-7A-Za-z]{58,}|B[2-7A-Z]{58,}|z[1-9A-HJ-NP-Za-km-z]{48,}|F[\\dA-F]{50,}";
 const CORS_HOST = "https://cors-next.r2d2.to";
 const CF_IPFS_HOST = "https://cloudflare-ipfs.com";
-const IPFS_GATEWAY_HOST = "https://gateway.pinata.cloud";
+const IPFS_GATEWAY_HOST = "https://ipfs.io";
 
 const MATCH_IPFS_DATA_RE = /ipfs\/(data:.*)$/;
 const MATCH_IPFS_CID_RE = new RegExp(IPFS_CID_PATTERN);

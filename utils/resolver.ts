@@ -1,4 +1,4 @@
-import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./base";
+import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { PlatformType, SocialPlatformMapping } from "./platform";

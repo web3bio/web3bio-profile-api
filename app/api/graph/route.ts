@@ -1,4 +1,4 @@
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/base";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";

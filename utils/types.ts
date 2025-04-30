@@ -128,6 +128,7 @@ export interface CredentialRecordRaw {
   platform: PlatformType;
   dataSource: string;
   link: string;
+  updatedAt: number;
   category?: CredentialCategory;
 }
 
