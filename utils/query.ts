@@ -30,6 +30,7 @@ const QUERIES = {
               platform
               dataSource
               link
+              updatedAt
             }
           }
         }
