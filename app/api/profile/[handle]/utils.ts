@@ -7,7 +7,7 @@ import {
   normalizeText,
   respondWithCache,
   shouldPlatformFetch,
-} from "@/utils/base";
+} from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
@@ -19,7 +19,7 @@ import {
   ProfileRecord,
 } from "@/utils/types";
 
-import { generateProfileStruct } from "@/utils/utils";
+import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
 
 // Constants

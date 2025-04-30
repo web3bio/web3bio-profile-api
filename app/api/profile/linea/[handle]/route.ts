@@ -3,11 +3,11 @@ import {
   getUserHeaders,
   isValidEthereumAddress,
   uglify,
-} from "@/utils/base";
+} from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityHandle } from "@/utils/utils";
+import { resolveIdentityHandle } from "@/utils/base";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {

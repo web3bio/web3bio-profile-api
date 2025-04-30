@@ -1,4 +1,4 @@
-import { respondWithCache } from "@/utils/base";
+import { respondWithCache } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {

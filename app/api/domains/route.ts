@@ -3,7 +3,7 @@ import {
   errorHandle,
   getUserHeaders,
   respondWithCache,
-} from "@/utils/base";
+} from "@/utils/utils";
 import { AuthHeaders, ErrorMessages } from "@/utils/types";
 import { NextRequest } from "next/server";
 
