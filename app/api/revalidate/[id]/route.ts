@@ -1,4 +1,4 @@
-import { getUserHeaders } from "@/utils/base";
+import { getUserHeaders } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { NextRequest, NextResponse } from "next/server";

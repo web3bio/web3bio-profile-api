@@ -3,11 +3,11 @@ import {
   errorHandle,
   getUserHeaders,
   shouldPlatformFetch,
-} from "@/utils/base";
+} from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
-import { resolveIdentity } from "@/utils/utils";
+import { resolveIdentity } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";

@@ -1,5 +1,5 @@
 import { PlatformType, SocialPlatformMapping } from "@/utils/platform";
-import { resolveIdentity } from "@/utils/utils";
+import { resolveIdentity } from "@/utils/base";
 
 const ELEMENTS = 256;
 const SIZE = 160;

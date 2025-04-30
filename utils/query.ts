@@ -1,4 +1,4 @@
-import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./base";
+import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./utils";
 import { PlatformType } from "./platform";
 import { AuthHeaders, ErrorMessages } from "./types";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
@@ -30,6 +30,7 @@ const QUERIES = {
               platform
               dataSource
               link
+              updatedAt
             }
           }
         }
