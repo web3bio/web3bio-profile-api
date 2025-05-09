@@ -190,4 +190,9 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].address).toBe("0xea1c2886d9cb0c3b119cd145c9c1a6bc1f26f150");
   });
+  it("It should response 200 for 30315.eth", async () => {
+    const res = await queryClient("/profile/30315.eth");
+    const json = await res.json();
+    expect(json[0].identity).toBe("30315.eth");
+  });
 });

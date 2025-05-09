@@ -53,11 +53,11 @@ const INCLUSIVE_PLATFORMS = new Set([
 const isPrimaryOrSocialPlatform = (identity: IdentityRecord) =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
 
-function sortProfilesByPlatform(
+const sortProfilesByPlatform = (
   responses: ProfileRecord[],
   targetPlatform: PlatformType,
   handle: string,
-): ProfileRecord[] {
+): ProfileRecord[] => {
   const order = [
     targetPlatform,
     ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
@@ -88,7 +88,7 @@ function sortProfilesByPlatform(
     });
 
   return [exactMatch, ...sortedResponses].filter(Boolean) as ProfileRecord[];
-}
+};
 
 const getResolvedRecord = (identity: IdentityRecord) => {
   if (!identity) return null;
@@ -171,6 +171,11 @@ export const getResolvedProfileArray = (
     // Direct pass case
     results = vertices
       .filter((vertex) => {
+        if (
+          vertex.identity === resolvedRecord.identity &&
+          vertex.platform === resolvedRecord.platform
+        )
+          return false;
         if (!isPrimaryOrSocialPlatform(vertex)) return false;
         if (
           vertex.platform === PlatformType.ens &&
@@ -187,6 +192,9 @@ export const getResolvedProfileArray = (
         isPrimary: vertex.isPrimary,
         createdAt: vertex.registeredAt,
       }));
+    if (DEFAULT_PLATFORM_ORDER.includes(defaultReturn.platform)) {
+      results = [...results, defaultReturn];
+    }
   } else if (VALID_PLATFORMS.has(recordPlatform)) {
     // Get source address for comparison
     const sourceAddr =
