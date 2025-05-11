@@ -43,8 +43,8 @@ describe("Test For Credentials API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[1].credentials.isHuman.value).toBe(true);
-    expect(json[1].credentials.isHuman.sources[0].dataSource).toBe("binance");
-    expect(json[1].credentials.isHuman.sources[1].dataSource).toBe("coinbase");
+    expect(json[0].credentials.isHuman.value).toBe(true);
+    expect(json[0].credentials.isHuman.sources[0].dataSource).toBe("binance");
+    expect(json[0].credentials.isHuman.sources[1].dataSource).toBe("coinbase");
   });
 });
