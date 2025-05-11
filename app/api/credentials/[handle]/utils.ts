@@ -26,9 +26,16 @@ export const resolveCredentialsHandle = async (
     return respondWithCache("[]");
   }
 
-  const credentials = res.data.identity.identityGraph.vertices.filter(
-    (x: CredentialRecord) => x.credentials,
-  );
+  const credentials = (
+    res.data.identity.identityGraph.vertices as CredentialRecord[]
+  )
+    .filter((x) => x.credentials)
+    .sort((a, b) => {
+      const targetId = `${platform},${identity}`;
+      if (a.id === targetId) return -1;
+      if (b.id === targetId) return 1;
+      return 0;
+    });
 
   if (!credentials.length) {
     return respondWithCache("[]");
