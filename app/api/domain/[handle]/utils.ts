@@ -34,14 +34,14 @@ export const resolveDomainQuery = async (
     resolvedAddress: resolvedAddress,
     ownerAddress: ownerAddress,
     managerAddress: managerAddress,
-    displayName: profile?.displayName,
+    displayName: profile?.displayName || null,
     isPrimary: identity.isPrimary,
     status: identity.status,
     createdAt: formatTimestamp(identity.registeredAt),
     updatedAt: formatTimestamp(identity.updatedAt),
     expiredAt: formatTimestamp(identity.expiredAt),
-    contenthash: identity.contenthash,
-    texts: profile?.texts,
+    contenthash: profile?.contenthash || null,
+    texts: profile?.texts || {},
     addresses: profile?.addresses
       ? profile.addresses.reduce(
           (
