@@ -1,6 +1,7 @@
 import {
   errorHandle,
   formatText,
+  formatTimestamp,
   handleSearchPlatform,
   isValidEthereumAddress,
   isWeb3Address,
@@ -155,9 +156,7 @@ export async function generateProfileStruct(
   return {
     ...nsObj,
     status: data.texts?.status || null,
-    createdAt: data.createdAt
-      ? new Date(data.createdAt * 1000).toISOString()
-      : null,
+    createdAt: data.createdAt ? formatTimestamp(data.createdAt) : null,
     email: data.texts?.email || null,
     location: resolveLocation(data.texts?.location),
     header: data.texts?.header
