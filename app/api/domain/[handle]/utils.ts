@@ -23,34 +23,39 @@ export const resolveDomainQuery = async (
       message: ErrorMessages.notFound,
     });
   }
-  const ownerAddress = identity.ownerAddress[0]?.address || null;
-  const resolvedAddress = identity.resolvedAddress[0]?.address || null;
-  const managerAddress = identity.managerAddress[0]?.address || null;
-  const profile = identity.profile;
+  const { profile, isPrimary, status, registeredAt, updatedAt, expiredAt } =
+    identity;
+
+  const ownerAddress = identity.ownerAddress[0]?.address ?? null;
+  const resolvedAddress = identity.resolvedAddress[0]?.address ?? null;
+  const managerAddress = identity.managerAddress[0]?.address ?? null;
+
+  const addresses = profile?.addresses
+    ? Object.fromEntries(
+        profile.addresses.map(
+          ({ network, address }: { network: string; address: string }) => [
+            network,
+            address,
+          ],
+        ),
+      )
+    : {};
 
   const json = {
     identity: identity.identity,
     platform: identity.platform,
-    resolvedAddress: resolvedAddress,
-    ownerAddress: ownerAddress,
-    managerAddress: managerAddress,
-    displayName: profile?.displayName || null,
-    isPrimary: identity.isPrimary,
-    status: identity.status,
-    createdAt: formatTimestamp(identity.registeredAt),
-    updatedAt: formatTimestamp(identity.updatedAt),
-    expiredAt: formatTimestamp(identity.expiredAt),
-    contenthash: profile?.contenthash || null,
-    texts: profile?.texts || {},
-    addresses: profile?.addresses
-      ? profile.addresses.reduce(
-          (
-            pre: { [index: string]: string },
-            { network, address }: { network: string; address: string },
-          ) => ({ ...pre, [network]: address }),
-          {},
-        )
-      : {},
+    resolvedAddress,
+    ownerAddress,
+    managerAddress,
+    displayName: profile?.displayName ?? null,
+    isPrimary,
+    status,
+    createdAt: formatTimestamp(registeredAt),
+    updatedAt: formatTimestamp(updatedAt),
+    expiredAt: formatTimestamp(expiredAt),
+    contenthash: profile?.contenthash ?? null,
+    texts: profile?.texts ?? {},
+    addresses,
   };
 
   return respondWithCache(JSON.stringify(json));
