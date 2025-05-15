@@ -10,6 +10,7 @@ export enum QueryType {
   GET_PROFILES = "GET_PROFILES",
   BATCH_GET_UNIVERSAL = "BATCH_GET_UNIVERSAL",
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
+  GET_DOMAIN = "GET_DOMAIN",
 }
 
 export function getQuery(type: QueryType): string {
@@ -300,6 +301,43 @@ const QUERIES = {
         status
         identityGraph {
           graphId
+        }
+      }
+    }
+  `,
+  [QueryType.GET_DOMAIN]: `
+    query GET_DOMAIN($platform: Platform!, $identity: String!) {
+      identity(platform: $platform, identity: $identity) {
+        platform
+        identity
+        registeredAt
+        updatedAt
+        expiredAt
+        status
+        isPrimary
+        managerAddress {
+          network
+          address
+        }
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          contenthash
+          texts
+          addresses {
+            network
+            address
+          }
         }
       }
     }

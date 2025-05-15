@@ -233,3 +233,7 @@ export const uglify = (input: string, platform: PlatformType) => {
       return input;
   }
 };
+
+export const formatTimestamp = (timestamp: number) => {
+  return new Date(timestamp * 1000).toISOString();
+};
