@@ -1,3 +1,4 @@
+import { resolveIdentity } from "@/utils/base";
 import { ErrorMessages } from "@/utils/types";
 import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
 import { NextRequest } from "next/server";
@@ -5,7 +6,8 @@ import { NextRequest } from "next/server";
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  if (handle) {
+  const id = resolveIdentity(handle);
+  if (!id) {
     return errorHandle({
       identity: handle,
       code: 404,
