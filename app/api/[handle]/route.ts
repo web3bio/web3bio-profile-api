@@ -1,12 +1,9 @@
-import { ErrorMessages } from "@/utils/types";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { NextRequest } from "next/server";
 import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
-import { resolveUniversalHandle } from "../profile/[handle]/utils";
+import { ErrorMessages } from "@/utils/types";
+import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
+import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
   const id = resolveIdentity(handle);
@@ -18,9 +15,15 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.invalidIdentity,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
-  const identity = id.split(",")[1];
 
-  return await resolveUniversalHandle(identity, platform, headers, true);
+  return respondWithCache(
+    JSON.stringify({
+      ns: `${BASE_URL}/ns/${handle}`,
+      profile: `${BASE_URL}/profile/${handle}`,
+      domain: `${BASE_URL}/domain/${handle}`,
+      credentials: `${BASE_URL}/credentials/${handle}`,
+      avatar: `${BASE_URL}/avatar/${handle}`,
+    }),
+  );
 }
 export const runtime = "edge";
