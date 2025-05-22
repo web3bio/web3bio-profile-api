@@ -6,7 +6,7 @@ import {
 } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { ErrorMessages } from "@/utils/types";
+import { ErrorMessages, ProfileAPIError, ProfileResponse } from "@/utils/types";
 import { resolveIdentity } from "@/utils/base";
 import { NextRequest, NextResponse } from "next/server";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
@@ -42,18 +42,18 @@ export async function GET(req: NextRequest) {
         platform,
         ns: true,
         response,
-      })) as any;
+      })) as ProfileResponse[] | ProfileAPIError;
 
-      if (profiles.message) {
+      if ((profiles as ProfileAPIError).message) {
         return NextResponse.json(profiles);
       }
 
-      const profile = profiles?.find((x: any) => !!x.avatar);
+      const profile = (profiles as ProfileResponse[])?.find((x) => !!x.avatar);
       if (!profile) {
         return respondWithSVG(id, 240);
       }
 
-      const rawAvatarUrl = profile.avatar;
+      const rawAvatarUrl = profile.avatar || "";
 
       // Validate URL
       try {

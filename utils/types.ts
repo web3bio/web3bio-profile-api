@@ -38,19 +38,27 @@ export enum ErrorMessages {
   networkError = "Network Error",
 }
 
-export interface ProfileNSResponse {
+export type ProfileAPIError = {
+  address: string | null;
+  identity: string | null;
+  platform: PlatformType;
+  error: ErrorMessages;
+  message?: string;
+};
+
+export interface NSResponse {
   identity: string;
-  address: string;
+  address: string | null;
   avatar: string | null;
   description: string | null;
   platform: string;
   displayName: string | null;
 }
-export interface ProfileAPIResponse extends ProfileNSResponse {
+export interface ProfileResponse extends NSResponse {
   email: string | null;
   contenthash: string | null;
   header: string | null;
-  location: string | null;
+  location: Location | null;
   createdAt: string | null;
   status: string | null;
   error?: string;
@@ -74,6 +82,9 @@ export interface IdentityGraphQueryResponse {
   data: {
     identity: IdentityRecord;
   };
+  errors?: string;
+  msg?: string;
+  code?: number;
 }
 
 export interface IdentityGraphEdge {
@@ -96,10 +107,11 @@ export interface IdentityRecord {
   platform: PlatformType;
   primaryName: string | null;
   profile: ProfileRecord;
-  identityGraph: {
+  identityGraph?: {
     vertices: IdentityRecord[];
     edges: IdentityGraphEdge[];
   };
+  aliases?: string[];
 }
 
 export interface ProfileRecord {
@@ -147,3 +159,11 @@ interface CredentialsResponseItem {
   value: boolean;
   sources: CredentialRecordRaw[];
 }
+
+type Location =
+  | string
+  | {
+      city: string;
+      state: string;
+      country: string;
+    };

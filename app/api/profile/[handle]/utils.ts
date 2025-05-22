@@ -15,7 +15,8 @@ import {
   ErrorMessages,
   IdentityGraphQueryResponse,
   IdentityRecord,
-  ProfileAPIResponse,
+  ProfileResponse,
+  NSResponse,
   ProfileRecord,
 } from "@/utils/types";
 
@@ -290,7 +291,7 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   platform: PlatformType;
   ns?: boolean;
-  response: any;
+  response: IdentityGraphQueryResponse;
 }) => {
   // Handle error cases
   if (response.msg) {
@@ -312,10 +313,13 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const resolvedResponse = await processJson(response);
-  const profilesArray = getResolvedProfileArray(resolvedResponse, platform);
+  const profilesArray = getResolvedProfileArray(
+    resolvedResponse,
+    platform,
+  ) as ProfileRecord[];
   const sortedProfiles = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? profilesArray
-    : sortProfilesByPlatform(profilesArray as any, platform, handle);
+    : sortProfilesByPlatform(profilesArray, platform, handle);
 
   // Process profiles in parallel
   const returnRes = (
@@ -330,7 +334,9 @@ export const resolveWithIdentityGraph = async ({
     )
   )
     .filter(
-      (result): result is PromiseFulfilledResult<any> =>
+      (
+        result,
+      ): result is PromiseFulfilledResult<ProfileResponse | NSResponse> =>
         result.status === "fulfilled",
     )
     .map((result) => result.value);
@@ -355,7 +361,7 @@ export const resolveWithIdentityGraph = async ({
             location: null,
             header: null,
             links: {},
-          } as ProfileAPIResponse),
+          } as ProfileResponse),
     );
   }
 
@@ -366,7 +372,7 @@ export const resolveWithIdentityGraph = async ({
       self.findIndex(
         (x) => x.platform === item.platform && x.identity === item.identity,
       ),
-  ) as ProfileAPIResponse[];
+  ) as ProfileResponse[];
 
   return uniqRes.length && !uniqRes.every((x) => x?.error)
     ? uniqRes

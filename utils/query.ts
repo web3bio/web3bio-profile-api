@@ -1,6 +1,11 @@
 import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./utils";
 import { PlatformType } from "./platform";
-import { AuthHeaders, ErrorMessages } from "./types";
+import {
+  AuthHeaders,
+  ErrorMessages,
+  IdentityRecord,
+  ProfileResponse,
+} from "./types";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 
 export enum QueryType {
@@ -351,7 +356,7 @@ export async function queryIdentityGraph(
   handle: string,
   platform: PlatformType = handleSearchPlatform(handle)!,
   headers: AuthHeaders,
-): Promise<any> {
+) {
   try {
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
@@ -396,25 +401,27 @@ export async function queryIdentityGraphBatch(
     if (!json || json?.code) return json;
     // Process all identities in parallel
     const responses = await Promise.allSettled(
-      (json.data.identitiesWithGraph || []).map(async (item: any) => {
-        const [platform, handle] = item.id.split(",");
-        const profiles = (await resolveWithIdentityGraph({
-          handle,
-          platform,
-          ns,
-          response: { data: { identity: { ...item } } },
-        })) as any;
-        if (profiles?.[0]) {
-          return {
-            ...profiles[0],
-            aliases: item.aliases,
-          };
-        }
-      }),
+      (json.data.identitiesWithGraph || []).map(
+        async (item: IdentityRecord) => {
+          const [platform, handle] = item.id.split(",");
+          const profiles = (await resolveWithIdentityGraph({
+            handle,
+            platform: platform as PlatformType,
+            ns,
+            response: { data: { identity: { ...item } } },
+          })) as ProfileResponse[];
+          if (profiles?.[0]) {
+            return {
+              ...profiles[0],
+              aliases: item.aliases,
+            };
+          }
+        },
+      ),
     );
     return responses
       .filter((x) => x.status === "fulfilled")
-      .map((x) => (x as any).value);
+      .map((x) => x.value);
   } catch (e) {
     throw new Error(ErrorMessages.notFound, { cause: 404 });
   }
