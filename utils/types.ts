@@ -5,19 +5,13 @@ export interface AuthHeaders {
   authorization?: string;
 }
 
-export interface ParamsType {
-  params: {
-    handle: string;
-  };
-}
+type Links = Record<PlatformType, LinksItem>;
 
-export type Links = Record<PlatformType, LinksItem>;
-
-export type LinksItem = {
+export interface LinksItem {
   link: string | null;
   handle: string | null;
   sources: SourceType[];
-};
+}
 
 export interface errorHandleProps {
   identity: string | null;
@@ -38,13 +32,13 @@ export enum ErrorMessages {
   networkError = "Network Error",
 }
 
-export type ProfileAPIError = {
+export interface ProfileAPIError {
   address: string | null;
   identity: string | null;
   platform: PlatformType;
   error: ErrorMessages;
   message?: string;
-};
+}
 
 export interface NSResponse {
   identity: string;
