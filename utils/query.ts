@@ -108,6 +108,7 @@ const QUERIES = {
         identity
         platform
         isPrimary
+        registeredAt
         resolvedAddress {
           network
           address
@@ -129,6 +130,7 @@ const QUERIES = {
             identity
             platform
             isPrimary
+            registeredAt
             resolvedAddress {
               network
               address

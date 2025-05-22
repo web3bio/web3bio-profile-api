@@ -103,7 +103,6 @@ export interface IdentityRecord {
 }
 
 export interface ProfileRecord {
-  // from Web3.bio Identity Graph
   uid: string;
   address: string;
   avatar: string | null;
@@ -116,6 +115,7 @@ export interface ProfileRecord {
   social: SocialRecord;
   texts: Record<string, string>;
   addresses: AddressRecord[];
+  isPrimary: boolean;
   aliases?: string[];
   createdAt?: number;
 }

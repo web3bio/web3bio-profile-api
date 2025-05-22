@@ -195,4 +195,12 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("30315.eth");
   });
+  it("It should response 200 for farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
+    const res = await queryClient(
+      "/profile/farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+    );
+    const json = await res.json();
+    expect(json[0].platform).toBe("farcaster");
+    expect(json[0].identity).toBe("suji");
+  });
 });
