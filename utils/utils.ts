@@ -136,6 +136,7 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
     PlatformType.linea,
     PlatformType.ethereum,
     PlatformType.twitter,
+    PlatformType.github,
     PlatformType.farcaster,
     PlatformType.lens,
     PlatformType.unstoppableDomains,

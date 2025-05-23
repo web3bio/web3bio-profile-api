@@ -4,7 +4,14 @@ import { resolveIdentity } from "@/utils/base";
 const ELEMENTS = 256;
 const SIZE = 160;
 
-const AvatarPixel = (props: any) => {
+type AvatarPixelProps = {
+  colors: string[];
+  title: string;
+  size: number;
+  name: string;
+};
+
+const AvatarPixel = (props: AvatarPixelProps) => {
   const { colors, title, size, ...otherProps } = props;
   const pixelColors = generateColors(title, colors);
   const maskID = String(hashCode(title));

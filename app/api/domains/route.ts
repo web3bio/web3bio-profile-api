@@ -66,12 +66,12 @@ export async function GET(req: NextRequest) {
       });
     }
     return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
+  } catch (e: unknown) {
     return errorHandle({
       identity: name,
       platform: "domains",
-      message: e.message || ErrorMessages.notFound,
-      code: e?.cause || 500,
+      message: e instanceof Error ? e.message : ErrorMessages.notFound,
+      code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });
   }
 }

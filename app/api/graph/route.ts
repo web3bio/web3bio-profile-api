@@ -41,12 +41,12 @@ export async function GET(req: NextRequest) {
     const result = await processJson(rawJson);
 
     return respondWithCache(JSON.stringify(result));
-  } catch (e: any) {
+  } catch (e: unknown) {
     return errorHandle({
       identity: identity,
       platform: platform,
-      code: e.cause || 500,
-      message: e.message || ErrorMessages.notFound,
+      message: e instanceof Error ? e.message : ErrorMessages.notFound,
+      code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });
   }
 }
