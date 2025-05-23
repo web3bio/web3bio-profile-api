@@ -41,12 +41,14 @@ const VALID_PLATFORMS = new Set([
   PlatformType.unstoppableDomains,
   PlatformType.dotbit,
   PlatformType.twitter,
+  PlatformType.github,
   PlatformType.nextid,
 ]);
 
 const SOCIAL_PLATFORMS = new Set([PlatformType.farcaster, PlatformType.lens]);
 const INCLUSIVE_PLATFORMS = new Set([
   PlatformType.twitter,
+  PlatformType.github,
   PlatformType.nextid,
 ]);
 

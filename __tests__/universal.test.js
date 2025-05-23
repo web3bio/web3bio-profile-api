@@ -203,4 +203,10 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].platform).toBe("farcaster");
     expect(json[0].identity).toBe("suji");
   });
+  it("It should response 200 for gihtub,picturepan2", async () => {
+    const res = await queryClient("/profile/github,picturepan2");
+    const json = await res.json();
+    expect(json[0].platform).toBe("ens");
+    expect(json[0].identity).toBe("yanzzz.eth");
+  });
 });
