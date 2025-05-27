@@ -21,9 +21,10 @@ import {
   AuthHeaders,
   ErrorMessages,
   IdentityGraphEdge,
-  ProfileAPIResponse,
-  ProfileNSResponse,
+  LinksItem,
+  NSResponse,
   ProfileRecord,
+  ProfileResponse,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import { SourceType } from "./source";
@@ -126,9 +127,9 @@ export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
   edges?: IdentityGraphEdge[],
-): Promise<ProfileAPIResponse | ProfileNSResponse> {
+): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
-  const nsObj: ProfileNSResponse = {
+  const nsObj: NSResponse = {
     address: data.address,
     identity: data.identity,
     platform: data.platform,
@@ -196,12 +197,12 @@ export const resolveIdentityHandle = async (
       });
     }
     return respondWithCache(JSON.stringify(response));
-  } catch (e: any) {
+  } catch (e: unknown) {
     return errorHandle({
       identity: handle,
       platform,
-      code: e.cause || 500,
-      message: e.message,
+      code: e instanceof Error ? Number(e.cause) : 500,
+      message: e instanceof Error ? e.message : ErrorMessages.unknownError,
     });
   }
 };
@@ -264,7 +265,7 @@ export const generateSocialLinks = async (
   edges?: IdentityGraphEdge[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
-  const links: Record<string, any> = {};
+  const links: Record<string, LinksItem> = {};
 
   // Resolve contenthash early
   const contenthash = await resolveContenthash(
@@ -490,7 +491,15 @@ export const resolveIdentityBatch = (input: string[]): string[] => {
   return input.map(resolveIdentity).filter(Boolean) as string[];
 };
 
-const resolveLocation = (location: any): string | null => {
+const resolveLocation = (
+  location:
+    | string
+    | {
+        city: string;
+        state: string;
+        country: string;
+      },
+): string | null => {
   if (!location) return null;
   if (typeof location === "string") return location;
 
