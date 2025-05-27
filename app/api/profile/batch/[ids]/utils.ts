@@ -28,11 +28,11 @@ export async function handleRequest(
       });
     }
     return respondWithCache(JSON.stringify(json));
-  } catch (e: any) {
+  } catch (e: unknown) {
     return errorHandle({
       identity: JSON.stringify(ids),
       platform: "batch",
-      code: e.cause || 500,
+      code: e instanceof Error ? Number(e.cause) : 500,
       message: ErrorMessages.notFound,
     });
   }

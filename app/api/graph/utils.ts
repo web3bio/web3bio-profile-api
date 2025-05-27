@@ -1,5 +1,9 @@
 import { resolveEipAssetURL } from "@/utils/resolver";
-import { IdentityRecord, ProfileRecord } from "@/utils/types";
+import {
+  IdentityGraphQueryResponse,
+  IdentityRecord,
+  ProfileRecord,
+} from "@/utils/types";
 
 const processProfileAvatar = async (
   profile: ProfileRecord,
@@ -19,7 +23,7 @@ const processProfileAvatar = async (
   return avatarUrl;
 };
 
-export const processJson = async (json: any) => {
+export const processJson = async (json: IdentityGraphQueryResponse) => {
   const _json = structuredClone(json);
   const identity = _json?.data?.identity;
 
@@ -36,7 +40,7 @@ export const processJson = async (json: any) => {
     );
   }
 
-  const vertices: IdentityRecord[] = identity.identityGraph?.vertices;
+  const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
   if (vertices?.length > 0) {
     const currentIdentityExists = vertices.some(
       (x: IdentityRecord) =>

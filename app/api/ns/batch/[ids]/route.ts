@@ -10,12 +10,12 @@ export async function GET(req: NextRequest) {
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
     return handleRequest(ids, headers, true);
-  } catch (e: any) {
+  } catch (e: unknown) {
     return errorHandle({
       identity: searchParams.get("ids"),
       platform: "batch",
       code: 404,
-      message: e.message || ErrorMessages.invalidIdentity,
+      message: e instanceof Error ? e.message : ErrorMessages.invalidIdentity,
     });
   }
 }

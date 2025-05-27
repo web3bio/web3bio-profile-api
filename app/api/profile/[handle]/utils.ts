@@ -15,7 +15,8 @@ import {
   ErrorMessages,
   IdentityGraphQueryResponse,
   IdentityRecord,
-  ProfileAPIResponse,
+  ProfileResponse,
+  NSResponse,
   ProfileRecord,
 } from "@/utils/types";
 
@@ -40,16 +41,17 @@ const VALID_PLATFORMS = new Set([
   PlatformType.unstoppableDomains,
   PlatformType.dotbit,
   PlatformType.twitter,
+  PlatformType.github,
   PlatformType.nextid,
 ]);
 
 const SOCIAL_PLATFORMS = new Set([PlatformType.farcaster, PlatformType.lens]);
 const INCLUSIVE_PLATFORMS = new Set([
   PlatformType.twitter,
+  PlatformType.github,
   PlatformType.nextid,
 ]);
 
-// Helper functions
 const isPrimaryOrSocialPlatform = (identity: IdentityRecord) =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
 
@@ -64,13 +66,11 @@ const sortProfilesByPlatform = (
   ];
   const normalizedHandle = normalizeText(handle);
 
-  // Find exact match
   const exactMatch = responses.find(
     (x) => x.identity === normalizedHandle && x.platform === targetPlatform,
   );
 
-  // Filter and sort remaining responses
-  const sortedResponses = responses
+  const responsesByPlatform = responses
     .filter(
       (response) =>
         !(
@@ -78,14 +78,36 @@ const sortProfilesByPlatform = (
           response.platform === targetPlatform
         ) && DEFAULT_PLATFORM_ORDER.includes(response.platform as PlatformType),
     )
-    .sort((a, b) => {
-      const indexA = order.indexOf(a.platform as PlatformType);
-      const indexB = order.indexOf(b.platform as PlatformType);
+    .reduce(
+      (acc, response) => {
+        const platform = response.platform as PlatformType;
+        if (!acc[platform]) {
+          acc[platform] = [];
+        }
+        acc[platform].push(response);
+        return acc;
+      },
+      {} as Record<PlatformType, ProfileRecord[]>,
+    );
 
-      if (indexA === -1) return indexB === -1 ? 0 : 1;
-      if (indexB === -1) return -1;
-      return indexA - indexB;
+  Object.keys(responsesByPlatform).forEach((platform) => {
+    responsesByPlatform[platform as PlatformType].sort((a, b) => {
+      if (a.isPrimary && !b.isPrimary) return -1;
+      if (!a.isPrimary && b.isPrimary) return 1;
+
+      const aDate = a.createdAt
+        ? new Date(a.createdAt).getTime()
+        : Number.MAX_SAFE_INTEGER;
+      const bDate = b.createdAt
+        ? new Date(b.createdAt).getTime()
+        : Number.MAX_SAFE_INTEGER;
+      return aDate - bDate;
     });
+  });
+
+  const sortedResponses = order
+    .filter((platform) => responsesByPlatform[platform])
+    .flatMap((platform) => responsesByPlatform[platform]);
 
   return [exactMatch, ...sortedResponses].filter(Boolean) as ProfileRecord[];
 };
@@ -127,7 +149,6 @@ export const getResolvedProfileArray = (
 ) => {
   const resolvedRecord = getResolvedRecord(data?.data?.identity);
   if (!resolvedRecord) return [];
-
   const {
     identity,
     platform: recordPlatform,
@@ -136,17 +157,18 @@ export const getResolvedProfileArray = (
     profile,
     isPrimary,
     ownerAddress,
+    registeredAt,
   } = resolvedRecord;
-
   const firstResolvedAddress = resolvedAddress?.[0]?.address;
   const firstOwnerAddress = ownerAddress?.[0]?.address;
   const defaultReturn = profile
-    ? { ...profile, isPrimary, createdAt: resolvedRecord.registeredAt }
+    ? { ...profile, isPrimary, createdAt: registeredAt }
     : {
         address: isWeb3Address(identity) ? identity : null,
         identity,
         platform: recordPlatform,
         displayName: isWeb3Address(identity) ? formatText(identity) : identity,
+        registeredAt,
         isPrimary,
       };
 
@@ -187,11 +209,15 @@ export const getResolvedProfileArray = (
         }
         return true;
       })
-      .map((vertex) => ({
-        ...vertex.profile,
-        isPrimary: vertex.isPrimary,
-        createdAt: vertex.registeredAt,
-      }));
+      .map((vertex) => {
+        if (vertex.platform === PlatformType.farcaster) {
+        }
+        return {
+          ...vertex.profile,
+          isPrimary: vertex.isPrimary,
+          createdAt: vertex.registeredAt,
+        };
+      });
     if (DEFAULT_PLATFORM_ORDER.includes(defaultReturn.platform)) {
       results = [...results, defaultReturn];
     }
@@ -223,7 +249,6 @@ export const getResolvedProfileArray = (
             ) ?? false
           );
         }
-
         return isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
       })
       .map((vertex) => ({
@@ -256,8 +281,7 @@ export const getResolvedProfileArray = (
         self.findIndex(
           (i) => i.platform === item.platform && i.identity === item.identity,
         ),
-    )
-    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+    );
 };
 
 export const resolveWithIdentityGraph = async ({
@@ -269,7 +293,7 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   platform: PlatformType;
   ns?: boolean;
-  response: any;
+  response: IdentityGraphQueryResponse;
 }) => {
   // Handle error cases
   if (response.msg) {
@@ -291,11 +315,13 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const resolvedResponse = await processJson(response);
-  const profilesArray = getResolvedProfileArray(resolvedResponse, platform);
-
+  const profilesArray = getResolvedProfileArray(
+    resolvedResponse,
+    platform,
+  ) as ProfileRecord[];
   const sortedProfiles = PLATFORMS_TO_EXCLUDE.includes(platform)
     ? profilesArray
-    : sortProfilesByPlatform(profilesArray as any, platform, handle);
+    : sortProfilesByPlatform(profilesArray, platform, handle);
 
   // Process profiles in parallel
   const returnRes = (
@@ -310,7 +336,9 @@ export const resolveWithIdentityGraph = async ({
     )
   )
     .filter(
-      (result): result is PromiseFulfilledResult<any> =>
+      (
+        result,
+      ): result is PromiseFulfilledResult<ProfileResponse | NSResponse> =>
         result.status === "fulfilled",
     )
     .map((result) => result.value);
@@ -335,7 +363,7 @@ export const resolveWithIdentityGraph = async ({
             location: null,
             header: null,
             links: {},
-          } as ProfileAPIResponse),
+          } as ProfileResponse),
     );
   }
 
@@ -346,7 +374,7 @@ export const resolveWithIdentityGraph = async ({
       self.findIndex(
         (x) => x.platform === item.platform && x.identity === item.identity,
       ),
-  ) as ProfileAPIResponse[];
+  ) as ProfileResponse[];
 
   return uniqRes.length && !uniqRes.every((x) => x?.error)
     ? uniqRes
