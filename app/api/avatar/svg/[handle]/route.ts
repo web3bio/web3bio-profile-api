@@ -1,5 +1,5 @@
 // Demo: /avatar/svg/ens,vitalik.eth
-import { NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import { respondWithSVG } from "./utils";
 
 export async function GET(req: NextRequest) {

@@ -1,6 +1,6 @@
 import { errorHandle, respondWithCache } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { type AuthHeaders, ErrorMessages } from "@/utils/types";
 import { resolveIdentityBatch } from "@/utils/base";
 
 export async function handleRequest(

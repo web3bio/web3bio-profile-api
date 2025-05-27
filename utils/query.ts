@@ -1,12 +1,8 @@
 import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./utils";
 import { PlatformType } from "./platform";
-import {
-  AuthHeaders,
-  ErrorMessages,
-  IdentityRecord,
-  ProfileResponse,
-} from "./types";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
+import { type AuthHeaders, type IdentityRecord, ErrorMessages } from "./types";
+import type { ProfileResponse } from "web3bio-profile-kit";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",

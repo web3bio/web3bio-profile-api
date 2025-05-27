@@ -1,7 +1,7 @@
 import { respondWithCache } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import {
+import type {
   AuthHeaders,
   CredentialRecord,
   CredentialsResponse,

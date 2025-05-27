@@ -1,8 +1,8 @@
+import type { NextRequest } from "next/server";
+import type { PlatformType } from "@/utils/platform";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
 import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {

@@ -1,5 +1,5 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 import { ErrorMessages } from "@/utils/types";
 import { handleRequest } from "@/app/api/profile/batch/[ids]/utils";
 

@@ -4,8 +4,8 @@ import {
   getUserHeaders,
   respondWithCache,
 } from "@/utils/utils";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
+import { type AuthHeaders, ErrorMessages } from "@/utils/types";
+import type { NextRequest } from "next/server";
 
 const GET_AVAILABLE_DOMAINS = `
   query GET_AVAILABLE_DOMAINS($name: String!) {

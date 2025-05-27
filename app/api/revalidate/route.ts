@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { revalidatePath } from "next/cache";
 
 // e.g `https://api.web3.bio/revalidate?path=/[domain]`
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   if (!path) {
     return NextResponse.json(
       { message: "Missing path param" },
-      { status: 400 }
+      { status: 400 },
     );
   }
 

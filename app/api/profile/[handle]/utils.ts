@@ -11,17 +11,16 @@ import {
 import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
-  AuthHeaders,
   ErrorMessages,
-  IdentityGraphQueryResponse,
-  IdentityRecord,
-  ProfileResponse,
-  NSResponse,
-  ProfileRecord,
+  type AuthHeaders,
+  type IdentityGraphQueryResponse,
+  type IdentityRecord,
+  type ProfileRecord,
 } from "@/utils/types";
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
+import type { NSResponse, ProfileResponse } from "web3bio-profile-kit";
 
 // Constants
 const DEFAULT_PLATFORM_ORDER = [

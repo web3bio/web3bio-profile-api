@@ -1,6 +1,6 @@
-import { PlatformType } from "@/utils/platform";
+import type { PlatformType } from "@/utils/platform";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { type AuthHeaders, ErrorMessages } from "@/utils/types";
 import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
 
 export const resolveDomainQuery = async (

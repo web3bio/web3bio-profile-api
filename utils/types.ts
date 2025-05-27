@@ -5,8 +5,6 @@ export interface AuthHeaders {
   authorization?: string;
 }
 
-type Links = Record<PlatformType, LinksItem>;
-
 export interface LinksItem {
   link: string | null;
   handle: string | null;
@@ -38,26 +36,6 @@ export interface ProfileAPIError {
   platform: PlatformType;
   error: ErrorMessages;
   message?: string;
-}
-
-export interface NSResponse {
-  identity: string;
-  address: string | null;
-  avatar: string | null;
-  description: string | null;
-  platform: string;
-  displayName: string | null;
-}
-export interface ProfileResponse extends NSResponse {
-  email: string | null;
-  contenthash: string | null;
-  header: string | null;
-  location: Location | null;
-  createdAt: string | null;
-  status: string | null;
-  error?: string;
-  links: Links | {};
-  social: SocialRecord | {};
 }
 
 interface SocialRecord {
@@ -153,11 +131,3 @@ interface CredentialsResponseItem {
   value: boolean;
   sources: CredentialRecordRaw[];
 }
-
-type Location =
-  | string
-  | {
-      city: string;
-      state: string;
-      country: string;
-    };

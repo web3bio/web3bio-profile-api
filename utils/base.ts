@@ -18,16 +18,19 @@ import {
   resolveHandle,
 } from "@/utils/resolver";
 import {
-  AuthHeaders,
   ErrorMessages,
-  IdentityGraphEdge,
-  LinksItem,
-  NSResponse,
-  ProfileRecord,
-  ProfileResponse,
+  type AuthHeaders,
+  type IdentityGraphEdge,
+  type LinksItem,
+  type ProfileRecord,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import { SourceType } from "./source";
+import type {
+  NSResponse,
+  ProfileResponse,
+  SocialLinks,
+} from "web3bio-profile-kit";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
@@ -164,7 +167,7 @@ export async function generateProfileStruct(
       ? await resolveEipAssetURL(data.texts.header)
       : null,
     contenthash: socialData.contenthash || null,
-    links: socialData.links || {},
+    links: (socialData.links as SocialLinks) || {},
     social: data.social
       ? {
           uid: data.social.uid ? Number(data.social.uid) : null,

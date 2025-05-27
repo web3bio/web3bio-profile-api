@@ -1,3 +1,5 @@
+import type { ProfileResponse } from "web3bio-profile-kit";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   BASE_URL,
   errorHandle,
@@ -5,10 +7,9 @@ import {
   shouldPlatformFetch,
 } from "@/utils/utils";
 import { PlatformType } from "@/utils/platform";
-import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { ErrorMessages, ProfileAPIError, ProfileResponse } from "@/utils/types";
+import { queryIdentityGraph, QueryType } from "@/utils/query";
+import { ErrorMessages, type ProfileAPIError } from "@/utils/types";
 import { resolveIdentity } from "@/utils/base";
-import { NextRequest, NextResponse } from "next/server";
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";
 

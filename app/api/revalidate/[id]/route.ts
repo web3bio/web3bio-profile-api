@@ -1,7 +1,7 @@
 import { getUserHeaders } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
+import type { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 
 // e.g `https://api.web3.bio/revalidate/ens,sujiyan.eth`
 export async function GET(req: NextRequest) {

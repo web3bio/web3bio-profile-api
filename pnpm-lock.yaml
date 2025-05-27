@@ -29,6 +29,9 @@ importers:
       viem:
         specifier: ^2.27.00
         version: 2.27.0(typescript@5.8.3)
+      web3bio-profile-kit:
+        specifier: 0.1.2
+        version: 0.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/jest':
         specifier: ^29.5.12
@@ -3350,6 +3353,12 @@ packages:
 
   web-vitals@0.2.4:
     resolution: {integrity: sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==}
+
+  web3bio-profile-kit@0.1.2:
+    resolution: {integrity: sha512-oAP6I9obGb+Msn8nILKgqnfL3H+TkBU+pD/znbNiXTP0V0gzSnR+ax/9FDNrdf/Qh8r62bjhPCKivbhbEGHgkQ==}
+    peerDependencies:
+      react: '>=16.8.0'
+      react-dom: '>=16.8.0'
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
@@ -7278,6 +7287,11 @@ snapshots:
       makeerror: 1.0.12
 
   web-vitals@0.2.4: {}
+
+  web3bio-profile-kit@0.1.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+    dependencies:
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
 
   webidl-conversions@3.0.1: {}
 

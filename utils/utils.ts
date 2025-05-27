@@ -20,7 +20,7 @@ import {
   regexTwitter,
   regexUnstoppableDomains,
 } from "./regexp";
-import { AuthHeaders, errorHandleProps } from "./types";
+import { type AuthHeaders, errorHandleProps } from "./types";
 import { normalize } from "viem/ens";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =

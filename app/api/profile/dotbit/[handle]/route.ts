@@ -7,7 +7,7 @@ import { PlatformType } from "@/utils/platform";
 import { regexDotbit } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

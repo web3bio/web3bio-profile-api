@@ -1,9 +1,9 @@
+import type { NextRequest } from "next/server";
+import type { PlatformType } from "@/utils/platform";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
-import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
 import { resolveCredentialsHandle } from "./utils";
+import { resolveIdentity } from "@/utils/base";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
