@@ -20,7 +20,6 @@ import {
   ErrorMessages,
   type AuthHeaders,
   type IdentityGraphEdge,
-  type LinksItem,
   type ProfileRecord,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
@@ -30,6 +29,7 @@ import {
   type NSResponse,
   type ProfileResponse,
   type SocialLinks,
+  type SocialLinksItem,
   PLATFORM_DATA,
 } from "web3bio-profile-kit";
 
@@ -269,7 +269,7 @@ export const generateSocialLinks = async (
   edges?: IdentityGraphEdge[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
-  const links: Record<string, LinksItem> = {};
+  const links: Record<string, SocialLinksItem> = {};
 
   // Resolve contenthash early
   const contenthash = await resolveContenthash(

@@ -2,17 +2,10 @@ import type {
   AddressRecord,
   PlatformType,
   SocialRecord,
-  SourceType,
 } from "web3bio-profile-kit";
 
 export interface AuthHeaders {
   authorization?: string;
-}
-
-export interface LinksItem {
-  link: string | null;
-  handle: string | null;
-  sources: SourceType[];
 }
 
 export interface errorHandleProps {
