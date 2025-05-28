@@ -1,5 +1,6 @@
-import { PlatformType, SocialPlatformMapping } from "@/utils/platform";
+import { SocialPlatformMapping } from "@/utils/platform";
 import { resolveIdentity } from "@/utils/base";
+import type { PlatformType } from "web3bio-profile-kit";
 
 const ELEMENTS = 256;
 const SIZE = 160;

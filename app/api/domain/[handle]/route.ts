@@ -1,9 +1,9 @@
 import type { NextRequest } from "next/server";
-import type { PlatformType } from "@/utils/platform";
 import { ErrorMessages } from "@/utils/types";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery } from "./utils";
 import { resolveIdentity } from "@/utils/base";
+import { PlatformType } from "web3bio-profile-kit";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

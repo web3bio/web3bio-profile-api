@@ -1,5 +1,5 @@
 import { getUserHeaders } from "@/utils/utils";
-import type { PlatformType } from "@/utils/platform";
+import type { PlatformType } from "web3bio-profile-kit";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { type NextRequest, NextResponse } from "next/server";
 

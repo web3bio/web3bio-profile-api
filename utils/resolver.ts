@@ -1,8 +1,9 @@
 import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
-import { PlatformType, SocialPlatformMapping } from "./platform";
+import { SocialPlatformMapping } from "./platform";
 import { regexDomain, regexEIP } from "./regexp";
+import { PlatformType } from "web3bio-profile-kit";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;

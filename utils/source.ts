@@ -1,40 +1,5 @@
 // sources.ts
-export enum SourceType {
-  ethereum = "ethereum",
-  ens = "ens",
-  twitter = "twitter",
-  keybase = "keybase",
-  nextid = "nextid",
-  rss3 = "rss3",
-  dotbit = "dotbit",
-  unstoppabledomains = "unstoppabledomains",
-  lens = "lens",
-  farcaster = "farcaster",
-  space_id = "space_id",
-  crossbell = "crossbell",
-  clusters = "clusters",
-  solana = "solana",
-  sns = "sns",
-  opensea = "opensea",
-  firefly = "firefly",
-  basenames = "basenames",
-  dentity = "dentity",
-  nftd = "nftd",
-  mirror = "mirror",
-  paragraph = "paragraph",
-  foundation = "foundation",
-  rarible = "rarible",
-  soundxyz = "soundxyz",
-  gravity = "gravity",
-  linea = "linea",
-  gmgn = "gmgn",
-  nostr = "nostr",
-  talentprotocol = "talentprotocol",
-  firefly_campaigns = "firefly_campaigns",
-  mask_stake = "mask_stake",
-  crowdsourcing = "crowdsourcing",
-  particle = "particle",
-}
+import { SourceType } from "web3bio-profile-kit";
 
 interface SourceInfo {
   name: string;

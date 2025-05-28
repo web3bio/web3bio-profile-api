@@ -1,5 +1,4 @@
-import { PlatformType } from "./platform";
-import { SourceType } from "./source";
+import type { PlatformType, SourceType } from "web3bio-profile-kit";
 
 export interface AuthHeaders {
   authorization?: string;

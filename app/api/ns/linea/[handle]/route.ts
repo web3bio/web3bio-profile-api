@@ -4,7 +4,7 @@ import {
   isValidEthereumAddress,
   uglify,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
+import { PlatformType } from "web3bio-profile-kit";
 import { regexLinea } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";

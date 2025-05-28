@@ -8,7 +8,7 @@ import {
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
+import { PlatformType } from "web3bio-profile-kit";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   ErrorMessages,

@@ -1,4 +1,4 @@
-import type { ProfileResponse } from "web3bio-profile-kit";
+import type { PlatformType, ProfileResponse } from "web3bio-profile-kit";
 import { type NextRequest, NextResponse } from "next/server";
 import {
   BASE_URL,
@@ -6,7 +6,6 @@ import {
   getUserHeaders,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
 import { ErrorMessages, type ProfileAPIError } from "@/utils/types";
 import { resolveIdentity } from "@/utils/base";

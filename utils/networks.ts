@@ -1,35 +1,4 @@
-export enum Network {
-  aptos = "aptos",
-  arbitrum = "arbitrum",
-  arbitrum_nova = "arbitrum_nova",
-  arbitrum_one = "arbitrum_one",
-  arweave = "arweave",
-  avalanche = "avalanche",
-  base = "base",
-  bitcoin = "bitcoin",
-  binanceSmartChain = "binance-smart-chain",
-  bsc = "bsc",
-  conflux = "conflux",
-  crossbell = "crossbell",
-  erc1577 = "erc1577",
-  ethereum = "ethereum",
-  fantom = "fantom",
-  farcaster = "farcaster",
-  flow = "flow",
-  gnosis = "gnosis",
-  lens = "lens",
-  linea = "linea",
-  mastodon = "mastodon",
-  optimism = "optimism",
-  polygon = "polygon",
-  scroll = "scroll",
-  snapshot = "snapshot",
-  solana = "solana",
-  vsl = "vsl",
-  xLayer = "x-layer",
-  zksync_era = "zksync_era",
-  zora = "zora",
-}
+import { Network } from "web3bio-profile-kit";
 
 interface NetworkMetaData {
   assetPrefix?: string;

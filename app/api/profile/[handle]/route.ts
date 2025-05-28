@@ -2,7 +2,7 @@ import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { ErrorMessages } from "@/utils/types";
 import { resolveUniversalHandle } from "./utils";
 import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import { PlatformType } from "web3bio-profile-kit";
 import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {

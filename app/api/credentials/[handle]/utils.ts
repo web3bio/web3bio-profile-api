@@ -1,5 +1,4 @@
 import { respondWithCache } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
@@ -8,6 +7,7 @@ import type {
   CredentialCategory,
   CredentialRecordRaw,
 } from "@/utils/types";
+import { PlatformType } from "web3bio-profile-kit";
 
 export const resolveCredentialsHandle = async (
   identity: string,

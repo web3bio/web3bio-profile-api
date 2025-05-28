@@ -1,5 +1,5 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
+import { PlatformType } from "web3bio-profile-kit";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";

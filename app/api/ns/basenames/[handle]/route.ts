@@ -1,14 +1,14 @@
+import type { NextRequest } from "next/server";
+import { PlatformType } from "web3bio-profile-kit";
 import {
   errorHandle,
   getUserHeaders,
   isValidEthereumAddress,
   uglify,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
 import { regexBasenames } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";
-import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

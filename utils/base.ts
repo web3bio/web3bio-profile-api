@@ -9,7 +9,7 @@ import {
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PLATFORM_DATA, PlatformType } from "@/utils/platform";
+import { PLATFORM_DATA } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { regexLowercaseExempt } from "@/utils/regexp";
 import {
@@ -25,11 +25,12 @@ import {
   type ProfileRecord,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
-import { SourceType } from "./source";
-import type {
-  NSResponse,
-  ProfileResponse,
-  SocialLinks,
+import {
+  SourceType,
+  PlatformType,
+  type NSResponse,
+  type ProfileResponse,
+  type SocialLinks,
 } from "web3bio-profile-kit";
 
 // Cache platform-specific record lists to avoid recreating them
@@ -463,7 +464,9 @@ export const resolveVerifiedLink = (
   return Array.from(sourceSet);
 };
 
-export const resolveIdentity = (input: string): string | null => {
+export const resolveIdentity = (
+  input: string,
+): `${PlatformType},${string}` | null => {
   if (!input) return null;
 
   const parts = input.split(",");
