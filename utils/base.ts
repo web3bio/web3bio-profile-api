@@ -9,7 +9,6 @@ import {
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PLATFORM_DATA } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { regexLowercaseExempt } from "@/utils/regexp";
 import {
@@ -31,6 +30,7 @@ import {
   type NSResponse,
   type ProfileResponse,
   type SocialLinks,
+  PLATFORM_DATA,
 } from "web3bio-profile-kit";
 
 // Cache platform-specific record lists to avoid recreating them

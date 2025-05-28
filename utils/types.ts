@@ -1,4 +1,9 @@
-import type { PlatformType, SourceType } from "web3bio-profile-kit";
+import type {
+  AddressRecord,
+  PlatformType,
+  SocialRecord,
+  SourceType,
+} from "web3bio-profile-kit";
 
 export interface AuthHeaders {
   authorization?: string;
@@ -35,18 +40,6 @@ export interface ProfileAPIError {
   platform: PlatformType;
   error: ErrorMessages;
   message?: string;
-}
-
-interface SocialRecord {
-  uid: number;
-  follower: number;
-  following: number;
-}
-
-interface AddressRecord {
-  address: string;
-  network: string;
-  __typename: "Address";
 }
 
 export interface IdentityGraphQueryResponse {
