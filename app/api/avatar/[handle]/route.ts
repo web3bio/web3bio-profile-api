@@ -1,4 +1,4 @@
-import type { PlatformType, ProfileResponse } from "web3bio-profile-kit";
+import type { PlatformType, ProfileResponse } from "web3bio-profile-kit/types";
 import { type NextRequest, NextResponse } from "next/server";
 import {
   BASE_URL,

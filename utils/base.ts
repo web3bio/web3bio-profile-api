@@ -30,8 +30,8 @@ import {
   type ProfileResponse,
   type SocialLinks,
   type SocialLinksItem,
-  PLATFORM_DATA,
-} from "web3bio-profile-kit";
+} from "web3bio-profile-kit/types";
+import { PLATFORM_DATA } from "web3bio-profile-kit/utils";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [

@@ -3,7 +3,7 @@ import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { SocialPlatformMapping } from "./platform";
 import { regexDomain, regexEIP } from "./regexp";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;

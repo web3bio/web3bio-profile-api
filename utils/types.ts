@@ -2,7 +2,7 @@ import type {
   AddressRecord,
   PlatformType,
   SocialRecord,
-} from "web3bio-profile-kit";
+} from "web3bio-profile-kit/types";
 
 export interface AuthHeaders {
   authorization?: string;

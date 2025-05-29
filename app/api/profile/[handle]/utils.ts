@@ -8,7 +8,7 @@ import {
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   ErrorMessages,
@@ -20,7 +20,7 @@ import {
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
-import type { NSResponse, ProfileResponse } from "web3bio-profile-kit";
+import type { NSResponse, ProfileResponse } from "web3bio-profile-kit/types";
 
 // Constants
 const DEFAULT_PLATFORM_ORDER = [

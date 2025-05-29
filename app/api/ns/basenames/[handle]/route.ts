@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 import {
   errorHandle,
   getUserHeaders,

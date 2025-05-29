@@ -3,7 +3,7 @@ import {
   getUserHeaders,
   isValidEthereumAddress,
 } from "@/utils/utils";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 import { regexEns } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";

@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import type { PlatformType } from "web3bio-profile-kit";
+import type { PlatformType } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { ErrorMessages } from "@/utils/types";

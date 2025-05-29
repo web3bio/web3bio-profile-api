@@ -1,5 +1,5 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 import { regexSns, regexSolana } from "@/utils/regexp";
 import { ErrorMessages } from "@/utils/types";
 import type { NextRequest } from "next/server";

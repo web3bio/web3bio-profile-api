@@ -7,7 +7,7 @@ import type {
   CredentialCategory,
   CredentialRecordRaw,
 } from "@/utils/types";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 
 export const resolveCredentialsHandle = async (
   identity: string,

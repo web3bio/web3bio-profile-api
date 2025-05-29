@@ -1,4 +1,4 @@
-import { NETWORK_DATA } from "web3bio-profile-kit";
+import { NETWORK_DATA } from "web3bio-profile-kit/utils";
 
 export const networkByIdOrName = (id: number, name?: string) => {
   return Object.values(NETWORK_DATA).find((x) => {

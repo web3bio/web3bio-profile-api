@@ -21,7 +21,7 @@ import {
 } from "./regexp";
 import { type AuthHeaders, errorHandleProps } from "./types";
 import { normalize } from "viem/ens";
-import { PlatformType } from "web3bio-profile-kit";
+import { PlatformType } from "web3bio-profile-kit/types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
