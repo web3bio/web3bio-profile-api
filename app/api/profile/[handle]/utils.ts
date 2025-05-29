@@ -11,7 +11,6 @@ import {
 import { PlatformType } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
-  ErrorMessages,
   type AuthHeaders,
   type IdentityGraphQueryResponse,
   type IdentityRecord,
@@ -20,9 +19,13 @@ import {
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
-import type { NSResponse, ProfileResponse } from "web3bio-profile-kit/types";
+import {
+  NSResponse,
+  ProfileResponse,
+  ErrorMessages,
+} from "web3bio-profile-kit/types";
 
-// Constants
+// Constantsa
 const DEFAULT_PLATFORM_ORDER = [
   PlatformType.ens,
   PlatformType.basenames,
@@ -308,7 +311,7 @@ export const resolveWithIdentityGraph = async ({
     return {
       identity: handle,
       platform,
-      message: response.errors ? response.errors : ErrorMessages.notFound,
+      message: response.errors ? response.errors : ErrorMessages.NOT_FOUND,
       code: response.errors ? 500 : 404,
     };
   }
@@ -380,7 +383,7 @@ export const resolveWithIdentityGraph = async ({
     : {
         identity: handle,
         code: 404,
-        message: uniqRes[0]?.error || ErrorMessages.notFound,
+        message: uniqRes[0]?.error || ErrorMessages.NOT_FOUND,
         platform,
       };
 };

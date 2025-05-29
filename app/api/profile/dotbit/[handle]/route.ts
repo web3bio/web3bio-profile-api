@@ -3,9 +3,8 @@ import {
   getUserHeaders,
   isValidEthereumAddress,
 } from "@/utils/utils";
-import { PlatformType } from "web3bio-profile-kit/types";
-import { regexDotbit } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
+import { ErrorMessages, PlatformType } from "web3bio-profile-kit/types";
+import { REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
 
@@ -14,12 +13,12 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
-  if (!regexDotbit.test(handle) && !isValidEthereumAddress(handle))
+  if (!REGEX.DOTBIT.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.dotbit,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   return resolveIdentityHandle(handle, PlatformType.dotbit, headers, false);
 }

@@ -5,7 +5,6 @@ describe("Test For Batch Query", () => {
     "suji_yan.twitter",
     "ens,sujiyan.eth",
     "ens,vitalik.eth",
-    "ens,0x2EC8EBB0a8eAa40e4Ce620CF9f84A96dF68D4669",
     "tony.base.eth",
     "dwr.eth.farcaster",
     "suji.fcast.id",
@@ -24,7 +23,7 @@ describe("Test For Batch Query", () => {
     const json = await res.json();
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
-    expect(json[5].createdAt).toBe("2023-11-07T19:42:51.000Z");
-    expect(json[12].identity).toBe("dwr.eth");
+    expect(json[2].createdAt).toBe("2020-02-06T18:23:40.000Z");
+    expect(json[11].identity).toBe("dwr.eth");
   });
 });

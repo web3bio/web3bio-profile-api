@@ -1,13 +1,12 @@
 import type { NextRequest } from "next/server";
-import { PlatformType } from "web3bio-profile-kit/types";
+import { PlatformType, ErrorMessages } from "web3bio-profile-kit/types";
+import { REGEX } from "web3bio-profile-kit/utils";
 import {
   errorHandle,
   getUserHeaders,
   isValidEthereumAddress,
   uglify,
 } from "@/utils/utils";
-import { regexBasenames } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";
 
 export async function GET(req: NextRequest) {
@@ -18,12 +17,12 @@ export async function GET(req: NextRequest) {
     ? inputName
     : uglify(inputName, PlatformType.basenames);
 
-  if (!regexBasenames.test(handle) && !isValidEthereumAddress(handle))
+  if (!REGEX.BASENAMES.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.basenames,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   return resolveIdentityHandle(handle, PlatformType.basenames, headers, true);
 }

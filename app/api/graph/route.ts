@@ -1,8 +1,7 @@
 import type { NextRequest } from "next/server";
-import type { PlatformType } from "web3bio-profile-kit/types";
+import { type PlatformType, ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { ErrorMessages } from "@/utils/types";
 import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {
@@ -16,7 +15,7 @@ export async function GET(req: NextRequest) {
       identity: identity,
       platform: platform || "graph",
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   try {
     let rawJson = await queryIdentityGraph(
@@ -35,7 +34,7 @@ export async function GET(req: NextRequest) {
           ? rawJson.msg
           : rawJson.errors
             ? JSON.stringify(rawJson.errors)
-            : ErrorMessages.notFound,
+            : ErrorMessages.NOT_FOUND,
       });
     }
     const result = await processJson(rawJson);
@@ -45,7 +44,7 @@ export async function GET(req: NextRequest) {
     return errorHandle({
       identity: identity,
       platform: platform,
-      message: e instanceof Error ? e.message : ErrorMessages.notFound,
+      message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
       code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });
   }

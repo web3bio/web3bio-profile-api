@@ -2,6 +2,7 @@ import type {
   AddressRecord,
   PlatformType,
   SocialRecord,
+  ErrorMessages,
 } from "web3bio-profile-kit/types";
 
 export interface AuthHeaders {
@@ -14,17 +15,6 @@ export interface errorHandleProps {
   message: ErrorMessages | string;
   platform: PlatformType | string;
   headers?: HeadersInit;
-}
-
-export enum ErrorMessages {
-  notFound = "Not Found",
-  invalidResolver = "Invalid Resolver Address",
-  invalidResolved = "Invalid Resolved Address",
-  notExist = "Does Not Exist",
-  invalidIdentity = "Invalid Identity or Domain",
-  invalidAddr = "Invalid Address",
-  unknownError = "Unknown Error Occurs",
-  networkError = "Network Error",
 }
 
 export interface ProfileAPIError {

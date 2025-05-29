@@ -1,24 +1,6 @@
 import { NextResponse } from "next/server";
 import { isAddress } from "viem";
-import {
-  regexBasenames,
-  regexBtc,
-  regexCluster,
-  regexCrossbell,
-  regexDotbit,
-  regexEns,
-  regexEth,
-  regexFarcaster,
-  regexGenome,
-  regexLens,
-  regexLinea,
-  regexNext,
-  regexSns,
-  regexSolana,
-  regexSpaceid,
-  regexTwitter,
-  regexUnstoppableDomains,
-} from "./regexp";
+import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, errorHandleProps } from "./types";
 import { normalize } from "viem/ens";
 import { PlatformType } from "web3bio-profile-kit/types";
@@ -34,11 +16,11 @@ export const IDENTITY_GRAPH_SERVER =
 export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
 
 const web3AddressRegexes = [
-  regexEth,
-  regexCrossbell,
-  regexBtc,
-  regexSolana,
-  regexNext,
+  REGEX.ETH_ADDRESS,
+  REGEX.CROSSBELL,
+  REGEX.BTC_ADDRESS,
+  REGEX.SOLANA_ADDRESS,
+  REGEX.NEXT_ID,
 ];
 
 export const isWeb3Address = (address: string): boolean =>
@@ -148,23 +130,23 @@ export const shouldPlatformFetch = (platform?: PlatformType | null) => {
 };
 
 const platformMap = new Map([
-  [regexBasenames, PlatformType.basenames],
-  [regexLinea, PlatformType.linea],
-  [regexEns, PlatformType.ens],
-  [regexEth, PlatformType.ethereum],
-  [regexLens, PlatformType.lens],
-  [regexUnstoppableDomains, PlatformType.unstoppableDomains],
-  [regexSpaceid, PlatformType.space_id],
-  [regexCrossbell, PlatformType.crossbell],
-  [regexDotbit, PlatformType.dotbit],
-  [regexSns, PlatformType.sns],
-  [regexGenome, PlatformType.genome],
-  [regexBtc, PlatformType.bitcoin],
-  [regexSolana, PlatformType.solana],
-  [regexFarcaster, PlatformType.farcaster],
-  [regexCluster, PlatformType.clusters],
-  [regexTwitter, PlatformType.twitter],
-  [regexNext, PlatformType.nextid],
+  [REGEX.BASENAMES, PlatformType.basenames],
+  [REGEX.LINEA, PlatformType.linea],
+  [REGEX.ENS, PlatformType.ens],
+  [REGEX.ETH_ADDRESS, PlatformType.ethereum],
+  [REGEX.LENS, PlatformType.lens],
+  [REGEX.UNSTOPPABLE_DOMAINS, PlatformType.unstoppableDomains],
+  [REGEX.SPACE_ID, PlatformType.space_id],
+  [REGEX.CROSSBELL, PlatformType.crossbell],
+  [REGEX.DOTBIT, PlatformType.dotbit],
+  [REGEX.SNS, PlatformType.sns],
+  [REGEX.GENOME, PlatformType.genome],
+  [REGEX.BTC_ADDRESS, PlatformType.bitcoin],
+  [REGEX.SOLANA_ADDRESS, PlatformType.solana],
+  [REGEX.FARCASTER, PlatformType.farcaster],
+  [REGEX.CLUSTER, PlatformType.clusters],
+  [REGEX.TWITTER, PlatformType.twitter],
+  [REGEX.NEXT_ID, PlatformType.nextid],
 ]);
 
 export const handleSearchPlatform = (term: string) => {

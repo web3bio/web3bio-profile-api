@@ -3,23 +3,22 @@ import {
   getUserHeaders,
   isValidEthereumAddress,
 } from "@/utils/utils";
-import { PlatformType } from "web3bio-profile-kit/types";
-import { regexEns } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
+import { PlatformType, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
+import { REGEX } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
-  if (!regexEns.test(handle) && !isValidEthereumAddress(handle))
+  if (!REGEX.ENS.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
       platform: PlatformType.ens,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
 
   return resolveIdentityHandle(handle, PlatformType.ens, headers, false);

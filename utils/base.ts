@@ -10,14 +10,12 @@ import {
   shouldPlatformFetch,
 } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { regexLowercaseExempt } from "@/utils/regexp";
 import {
   getSocialMediaLink,
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
 import {
-  ErrorMessages,
   type AuthHeaders,
   type IdentityGraphEdge,
   type ProfileRecord,
@@ -30,8 +28,9 @@ import {
   type ProfileResponse,
   type SocialLinks,
   type SocialLinksItem,
+  ErrorMessages,
 } from "web3bio-profile-kit/types";
-import { PLATFORM_DATA } from "web3bio-profile-kit/utils";
+import { PLATFORM_DATA, REGEX } from "web3bio-profile-kit/utils";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
@@ -87,7 +86,7 @@ export const resolveIdentityResponse = async (
   if (!profile) {
     if ([PlatformType.sns, PlatformType.ens].includes(platform)) {
       if (platform === PlatformType.ens && !isValidEthereumAddress(handle))
-        throw new Error(ErrorMessages.invalidResolved, { cause: 404 });
+        throw new Error(ErrorMessages.INVALID_RESOLVED, { cause: 404 });
 
       const nsResponse = {
         address: isWeb3Address(handle) ? handle : null,
@@ -114,7 +113,7 @@ export const resolveIdentityResponse = async (
       };
     }
 
-    throw new Error(ErrorMessages.notFound, { cause: 404 });
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }
 
   return generateProfileStruct(
@@ -206,7 +205,7 @@ export const resolveIdentityHandle = async (
       identity: handle,
       platform,
       code: e instanceof Error ? Number(e.cause) : 500,
-      message: e instanceof Error ? e.message : ErrorMessages.unknownError,
+      message: e instanceof Error ? e.message : ErrorMessages.UNKNOWN_ERROR,
     });
   }
 };
@@ -486,7 +485,7 @@ export const resolveIdentity = (
 
   if (!shouldPlatformFetch(platform) || !identity) return null;
 
-  const normalizedIdentity = regexLowercaseExempt.test(identity)
+  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(identity)
     ? identity
     : identity.toLowerCase();
 

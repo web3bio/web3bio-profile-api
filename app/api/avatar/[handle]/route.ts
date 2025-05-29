@@ -1,4 +1,8 @@
-import type { PlatformType, ProfileResponse } from "web3bio-profile-kit/types";
+import {
+  type PlatformType,
+  type ProfileResponse,
+  ErrorMessages,
+} from "web3bio-profile-kit/types";
 import { type NextRequest, NextResponse } from "next/server";
 import {
   BASE_URL,
@@ -7,8 +11,9 @@ import {
   shouldPlatformFetch,
 } from "@/utils/utils";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { ErrorMessages, type ProfileAPIError } from "@/utils/types";
+import { type ProfileAPIError } from "@/utils/types";
 import { resolveIdentity } from "@/utils/base";
+
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";
 
@@ -22,7 +27,7 @@ export async function GET(req: NextRequest) {
       identity: handle,
       code: 404,
       platform: "avatar",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
   const platform = id.split(",")[0] as PlatformType;

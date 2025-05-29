@@ -2,8 +2,8 @@ import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { SocialPlatformMapping } from "./platform";
-import { regexDomain, regexEIP } from "./regexp";
 import { PlatformType } from "web3bio-profile-kit/types";
+import { REGEX } from "web3bio-profile-kit/utils";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
@@ -34,7 +34,7 @@ export const resolveHandle = (
     return match ? match[0] : "";
   }
 
-  if (regexDomain.test(handle)) {
+  if (REGEX.DOMAIN.test(handle)) {
     const parts = handle.split("/");
     return (
       handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
@@ -91,7 +91,7 @@ export const resolveEipAssetURL = async (
 ): Promise<string | null> => {
   if (!source) return null;
 
-  const match = source.match(regexEIP);
+  const match = source.match(REGEX.EIP);
   if (!match) return resolveMediaURL(source);
 
   const [full, chainId, protocol, contractAddress, tokenId] = match;
