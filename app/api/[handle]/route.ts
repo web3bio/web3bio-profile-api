@@ -1,7 +1,7 @@
+import type { NextRequest } from "next/server";
 import { resolveIdentity } from "@/utils/base";
-import { ErrorMessages } from "@/utils/types";
 import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
-import { NextRequest } from "next/server";
+import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
       identity: handle,
       code: 404,
       platform: "universal",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
 

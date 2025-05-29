@@ -4,41 +4,35 @@ import {
   isValidEthereumAddress,
   prettify,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
-import { regexFarcaster, regexSolana } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
+import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentityHandle } from "@/utils/base";
+import type { NextRequest } from "next/server";
+import { REGEX } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
 
-  const resolvedHandle = regexSolana.test(handle)
+  const resolvedHandle = REGEX.SOLANA_ADDRESS.test(handle)
     ? handle
     : handle.toLowerCase();
   if (
     ![
       isValidEthereumAddress(resolvedHandle),
-      regexSolana.test(resolvedHandle),
-      regexFarcaster.test(resolvedHandle),
+      REGEX.SOLANA_ADDRESS.test(resolvedHandle),
+      REGEX.FARCASTER.test(resolvedHandle),
     ].some((x) => !!x)
   )
     return errorHandle({
       identity: resolvedHandle,
-      platform: PlatformType.farcaster,
+      platform: Platform.farcaster,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
 
   const queryInput = prettify(resolvedHandle);
-  return resolveIdentityHandle(
-    queryInput,
-    PlatformType.farcaster,
-    headers,
-    true,
-  );
+  return resolveIdentityHandle(queryInput, Platform.farcaster, headers, true);
 }
 
 export const runtime = "edge";

@@ -1,7 +1,7 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { NextRequest } from "next/server";
-import { ErrorMessages } from "@/utils/types";
+import type { NextRequest } from "next/server";
 import { handleRequest } from "./utils";
+import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
       identity: searchParams.get("ids"),
       platform: "batch",
       code: 404,
-      message: e instanceof Error ? e.message : ErrorMessages.invalidIdentity,
+      message: e instanceof Error ? e.message : ErrorMessages.INVALID_IDENTITY,
     });
   }
 }

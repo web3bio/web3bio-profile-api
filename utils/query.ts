@@ -1,12 +1,11 @@
 import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./utils";
-import { PlatformType } from "./platform";
-import {
-  AuthHeaders,
-  ErrorMessages,
-  IdentityRecord,
-  ProfileResponse,
-} from "./types";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
+import { type AuthHeaders, type IdentityRecord } from "./types";
+import {
+  ErrorMessages,
+  type Platform,
+  type ProfileResponse,
+} from "web3bio-profile-kit/types";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
@@ -354,7 +353,7 @@ const QUERIES = {
 export async function queryIdentityGraph(
   query: QueryType,
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)!,
+  platform: Platform = handleSearchPlatform(handle)!,
   headers: AuthHeaders,
 ) {
   try {
@@ -406,7 +405,7 @@ export async function queryIdentityGraphBatch(
           const [platform, handle] = item.id.split(",");
           const profiles = (await resolveWithIdentityGraph({
             handle,
-            platform: platform as PlatformType,
+            platform: platform as Platform,
             ns,
             response: { data: { identity: { ...item } } },
           })) as ProfileResponse[];
@@ -423,6 +422,6 @@ export async function queryIdentityGraphBatch(
       .filter((x) => x.status === "fulfilled")
       .map((x) => x.value);
   } catch (e) {
-    throw new Error(ErrorMessages.notFound, { cause: 404 });
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }
 }

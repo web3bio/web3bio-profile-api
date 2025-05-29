@@ -1,5 +1,6 @@
-import { PlatformType, SocialPlatformMapping } from "@/utils/platform";
+import { SocialPlatformMapping } from "@/utils/platform";
 import { resolveIdentity } from "@/utils/base";
+import type { Platform } from "web3bio-profile-kit/types";
 
 const ELEMENTS = 256;
 const SIZE = 160;
@@ -289,7 +290,7 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 export const respondWithSVG = async (name: string, size: number) => {
   const id = resolveIdentity(name);
   // Use default color directly without unnecessary variable
-  const platform = id?.split(",")[0] as PlatformType;
+  const platform = id?.split(",")[0] as Platform;
   const themecolorbase = platform
     ? SocialPlatformMapping(platform).color || "#000"
     : "#000";

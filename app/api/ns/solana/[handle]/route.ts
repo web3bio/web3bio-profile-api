@@ -1,8 +1,7 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
-import { regexSns, regexSolana } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { REGEX } from "web3bio-profile-kit/utils";
+import type { NextRequest } from "next/server";
 import { resolveIdentityHandle } from "@/utils/base";
 
 export async function GET(req: NextRequest) {
@@ -10,14 +9,14 @@ export async function GET(req: NextRequest) {
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
 
-  if (!regexSns.test(handle) && !regexSolana.test(handle))
+  if (!REGEX.SNS.test(handle) && !REGEX.SOLANA_ADDRESS.test(handle))
     return errorHandle({
       identity: handle,
-      platform: PlatformType.solana,
+      platform: Platform.solana,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
 
-  return resolveIdentityHandle(handle, PlatformType.sns, headers, true);
+  return resolveIdentityHandle(handle, Platform.sns, headers, true);
 }
 export const runtime = "edge";

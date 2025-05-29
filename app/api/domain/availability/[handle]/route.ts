@@ -4,8 +4,9 @@ import {
   getUserHeaders,
   respondWithCache,
 } from "@/utils/utils";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
+import { type AuthHeaders } from "@/utils/types";
+import type { NextRequest } from "next/server";
+import { ErrorMessages } from "web3bio-profile-kit/types";
 
 const GET_AVAILABLE_DOMAINS = `
   query GET_AVAILABLE_DOMAINS($name: String!) {
@@ -46,13 +47,13 @@ const queryDomains = async (handle: string, headers: AuthHeaders) => {
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-  const name = searchParams.get("name");
+  const name = searchParams.get("handle");
 
   if (!name)
     return errorHandle({
       identity: null,
       platform: "domains",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
       code: 404,
     });
   try {
@@ -61,7 +62,7 @@ export async function GET(req: NextRequest) {
       return errorHandle({
         identity: name,
         platform: "domains",
-        message: json.msg || ErrorMessages.notFound,
+        message: json.msg || ErrorMessages.NOT_FOUND,
         code: json.code,
       });
     }
@@ -70,7 +71,7 @@ export async function GET(req: NextRequest) {
     return errorHandle({
       identity: name,
       platform: "domains",
-      message: e instanceof Error ? e.message : ErrorMessages.notFound,
+      message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
       code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });
   }

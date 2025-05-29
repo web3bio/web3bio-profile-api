@@ -8,48 +8,50 @@ import {
   respondWithCache,
   shouldPlatformFetch,
 } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
+import { Platform } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
-  AuthHeaders,
-  ErrorMessages,
-  IdentityGraphQueryResponse,
-  IdentityRecord,
-  ProfileResponse,
-  NSResponse,
-  ProfileRecord,
+  type AuthHeaders,
+  type IdentityGraphQueryResponse,
+  type IdentityRecord,
+  type ProfileRecord,
 } from "@/utils/types";
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
+import {
+  NSResponse,
+  ProfileResponse,
+  ErrorMessages,
+} from "web3bio-profile-kit/types";
 
-// Constants
+// Constantsa
 const DEFAULT_PLATFORM_ORDER = [
-  PlatformType.ens,
-  PlatformType.basenames,
-  PlatformType.linea,
-  PlatformType.ethereum,
-  PlatformType.farcaster,
-  PlatformType.lens,
+  Platform.ens,
+  Platform.basenames,
+  Platform.linea,
+  Platform.ethereum,
+  Platform.farcaster,
+  Platform.lens,
 ];
 
 const VALID_PLATFORMS = new Set([
-  PlatformType.ethereum,
-  PlatformType.ens,
-  PlatformType.basenames,
-  PlatformType.linea,
-  PlatformType.unstoppableDomains,
-  PlatformType.dotbit,
-  PlatformType.twitter,
-  PlatformType.github,
-  PlatformType.nextid,
+  Platform.ethereum,
+  Platform.ens,
+  Platform.basenames,
+  Platform.linea,
+  Platform.unstoppableDomains,
+  Platform.dotbit,
+  Platform.twitter,
+  Platform.github,
+  Platform.nextid,
 ]);
 
-const SOCIAL_PLATFORMS = new Set([PlatformType.farcaster, PlatformType.lens]);
+const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 const INCLUSIVE_PLATFORMS = new Set([
-  PlatformType.twitter,
-  PlatformType.github,
-  PlatformType.nextid,
+  Platform.twitter,
+  Platform.github,
+  Platform.nextid,
 ]);
 
 const isPrimaryOrSocialPlatform = (identity: IdentityRecord) =>
@@ -57,7 +59,7 @@ const isPrimaryOrSocialPlatform = (identity: IdentityRecord) =>
 
 const sortProfilesByPlatform = (
   responses: ProfileRecord[],
-  targetPlatform: PlatformType,
+  targetPlatform: Platform,
   handle: string,
 ): ProfileRecord[] => {
   const order = [
@@ -76,22 +78,22 @@ const sortProfilesByPlatform = (
         !(
           response.identity === normalizedHandle &&
           response.platform === targetPlatform
-        ) && DEFAULT_PLATFORM_ORDER.includes(response.platform as PlatformType),
+        ) && DEFAULT_PLATFORM_ORDER.includes(response.platform as Platform),
     )
     .reduce(
       (acc, response) => {
-        const platform = response.platform as PlatformType;
+        const platform = response.platform as Platform;
         if (!acc[platform]) {
           acc[platform] = [];
         }
         acc[platform].push(response);
         return acc;
       },
-      {} as Record<PlatformType, ProfileRecord[]>,
+      {} as Record<Platform, ProfileRecord[]>,
     );
 
   Object.keys(responsesByPlatform).forEach((platform) => {
-    responsesByPlatform[platform as PlatformType].sort((a, b) => {
+    responsesByPlatform[platform as Platform].sort((a, b) => {
       if (a.isPrimary && !b.isPrimary) return -1;
       if (!a.isPrimary && b.isPrimary) return 1;
 
@@ -120,12 +122,11 @@ const getResolvedRecord = (identity: IdentityRecord) => {
 
   // Process Farcaster-ENS relationships
   const farcasterEqualENSEntries = vertices
-    .filter((x) => x.platform === PlatformType.ens && !x.isPrimary)
+    .filter((x) => x.platform === Platform.ens && !x.isPrimary)
     .map((x) => {
       if (
         vertices.some(
-          (i) =>
-            i.platform === PlatformType.farcaster && i.identity === x.identity,
+          (i) => i.platform === Platform.farcaster && i.identity === x.identity,
         )
       ) {
         x.isPrimary = true;
@@ -145,7 +146,7 @@ const getResolvedRecord = (identity: IdentityRecord) => {
 
 export const getResolvedProfileArray = (
   data: IdentityGraphQueryResponse,
-  platform: PlatformType,
+  platform: Platform,
 ) => {
   const resolvedRecord = getResolvedRecord(data?.data?.identity);
   if (!resolvedRecord) return [];
@@ -186,7 +187,7 @@ export const getResolvedProfileArray = (
   // Process based on platform type
   let results = [];
   const isBadBasename =
-    recordPlatform === PlatformType.basenames &&
+    recordPlatform === Platform.basenames &&
     firstOwnerAddress !== firstResolvedAddress;
 
   if (isPrimaryOrSocialPlatform(resolvedRecord) && !isBadBasename) {
@@ -199,10 +200,7 @@ export const getResolvedProfileArray = (
         )
           return false;
         if (!isPrimaryOrSocialPlatform(vertex)) return false;
-        if (
-          vertex.platform === PlatformType.ens &&
-          !vertex.isPrimaryFarcaster
-        ) {
+        if (vertex.platform === Platform.ens && !vertex.isPrimaryFarcaster) {
           const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
           const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
           return vertexOwnerAddr === vertexResolvedAddr;
@@ -210,7 +208,7 @@ export const getResolvedProfileArray = (
         return true;
       })
       .map((vertex) => {
-        if (vertex.platform === PlatformType.farcaster) {
+        if (vertex.platform === Platform.farcaster) {
         }
         return {
           ...vertex.profile,
@@ -224,9 +222,7 @@ export const getResolvedProfileArray = (
   } else if (VALID_PLATFORMS.has(recordPlatform)) {
     // Get source address for comparison
     const sourceAddr =
-      recordPlatform === PlatformType.ethereum
-        ? identity
-        : firstResolvedAddress;
+      recordPlatform === Platform.ethereum ? identity : firstResolvedAddress;
 
     // Filter vertices according to platform rules
     results = vertices
@@ -242,7 +238,7 @@ export const getResolvedProfileArray = (
         }
 
         // Address comparison logic
-        if (vertex.platform === PlatformType.farcaster) {
+        if (vertex.platform === Platform.farcaster) {
           return (
             vertex.ownerAddress?.some((addr) =>
               isSameAddress(addr.address, sourceAddr),
@@ -258,11 +254,11 @@ export const getResolvedProfileArray = (
       }));
 
     const shouldAddDefault =
-      (recordPlatform === PlatformType.ethereum &&
-        !results.some((x) => x.isPrimary && x.platform === PlatformType.ens)) ||
+      (recordPlatform === Platform.ethereum &&
+        !results.some((x) => x.isPrimary && x.platform === Platform.ens)) ||
       !(
         INCLUSIVE_PLATFORMS.has(recordPlatform) ||
-        recordPlatform === PlatformType.ethereum
+        recordPlatform === Platform.ethereum
       );
 
     if (shouldAddDefault) {
@@ -291,7 +287,7 @@ export const resolveWithIdentityGraph = async ({
   response,
 }: {
   handle: string;
-  platform: PlatformType;
+  platform: Platform;
   ns?: boolean;
   response: IdentityGraphQueryResponse;
 }) => {
@@ -309,7 +305,7 @@ export const resolveWithIdentityGraph = async ({
     return {
       identity: handle,
       platform,
-      message: response.errors ? response.errors : ErrorMessages.notFound,
+      message: response.errors ? response.errors : ErrorMessages.NOT_FOUND,
       code: response.errors ? 500 : 404,
     };
   }
@@ -344,11 +340,11 @@ export const resolveWithIdentityGraph = async ({
     .map((result) => result.value);
 
   // Handle Ethereum fallback
-  if (!returnRes.length && platform === PlatformType.ethereum) {
+  if (!returnRes.length && platform === Platform.ethereum) {
     const nsObj = {
       address: handle,
       identity: handle,
-      platform: PlatformType.ethereum,
+      platform: Platform.ethereum,
       displayName: formatText(handle),
       avatar: null,
       description: null,
@@ -381,14 +377,14 @@ export const resolveWithIdentityGraph = async ({
     : {
         identity: handle,
         code: 404,
-        message: uniqRes[0]?.error || ErrorMessages.notFound,
+        message: uniqRes[0]?.error || ErrorMessages.NOT_FOUND,
         platform,
       };
 };
 
 export const resolveUniversalHandle = async (
   handle: string,
-  platform: PlatformType,
+  platform: Platform,
   headers: AuthHeaders,
   ns: boolean = false,
 ) => {

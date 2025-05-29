@@ -1,7 +1,8 @@
 import { errorHandle, respondWithCache } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { type AuthHeaders } from "@/utils/types";
 import { resolveIdentityBatch } from "@/utils/base";
+import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function handleRequest(
   ids: string[],
@@ -13,7 +14,7 @@ export async function handleRequest(
       identity: null,
       platform: "batch",
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   try {
     const queryIds = resolveIdentityBatch(ids);
@@ -33,7 +34,7 @@ export async function handleRequest(
       identity: JSON.stringify(ids),
       platform: "batch",
       code: e instanceof Error ? Number(e.cause) : 500,
-      message: ErrorMessages.notFound,
+      message: ErrorMessages.NOT_FOUND,
     });
   }
 }
