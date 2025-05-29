@@ -1,7 +1,7 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveUniversalHandle } from "./utils";
 import { resolveIdentity } from "@/utils/base";
-import { ErrorMessages, PlatformType } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import type { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   return resolveUniversalHandle(identity, platform, headers, false);

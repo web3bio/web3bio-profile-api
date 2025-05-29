@@ -4,7 +4,7 @@ import {
   isValidEthereumAddress,
   prettify,
 } from "@/utils/utils";
-import { ErrorMessages, PlatformType } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import type { NextRequest } from "next/server";
 import { resolveIdentityHandle } from "@/utils/base";
@@ -26,18 +26,13 @@ export async function GET(req: NextRequest) {
   )
     return errorHandle({
       identity: resolvedHandle,
-      platform: PlatformType.farcaster,
+      platform: Platform.farcaster,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
 
   const queryInput = prettify(resolvedHandle);
-  return resolveIdentityHandle(
-    queryInput,
-    PlatformType.farcaster,
-    headers,
-    false,
-  );
+  return resolveIdentityHandle(queryInput, Platform.farcaster, headers, false);
 }
 
 export const runtime = "edge";

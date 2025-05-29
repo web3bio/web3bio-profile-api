@@ -3,7 +3,7 @@ import {
   getUserHeaders,
   isValidEthereumAddress,
 } from "@/utils/utils";
-import { ErrorMessages, PlatformType } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
@@ -19,14 +19,14 @@ export async function GET(req: NextRequest) {
   ) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.unstoppableDomains,
+      platform: Platform.unstoppableDomains,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
   return resolveIdentityHandle(
     handle,
-    PlatformType.unstoppableDomains,
+    Platform.unstoppableDomains,
     headers,
     true,
   );

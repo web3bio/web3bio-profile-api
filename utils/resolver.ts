@@ -2,7 +2,7 @@ import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 import { chainIdToNetwork } from "./networks";
 import { SocialPlatformMapping } from "./platform";
-import { PlatformType } from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
@@ -19,17 +19,17 @@ export const resolveMediaURL = (url: string, id?: string): string | null => {
 
 export const resolveHandle = (
   handle: string,
-  platform?: PlatformType,
+  platform?: Platform,
 ): string | null => {
   if (!handle) return null;
-  if (platform === PlatformType.website) {
+  if (platform === Platform.website) {
     return handle
       .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
       .replace(/\/+$/g, "")
       .toLowerCase();
   }
 
-  if (platform === PlatformType.youtube) {
+  if (platform === Platform.youtube) {
     const match = handle.match(/@(.*?)(?=[\/]|$)/);
     return match ? match[0] : "";
   }
@@ -49,7 +49,7 @@ export const resolveHandle = (
 
 export const getSocialMediaLink = (
   url: string | null,
-  type: PlatformType | string,
+  type: Platform | string,
 ): string | null => {
   if (!url) return null;
   const normalizedUrl = url.toLowerCase().replace(/\?$/, "");
@@ -58,30 +58,27 @@ export const getSocialMediaLink = (
     : resolveSocialMediaLink(normalizedUrl, type);
 };
 
-function resolveSocialMediaLink(
-  name: string,
-  type: PlatformType | string,
-): string {
-  if (!(type in PlatformType)) {
+function resolveSocialMediaLink(name: string, type: Platform | string): string {
+  if (!(type in Platform)) {
     return `https://web3.bio/?s=${name}`;
   }
 
   switch (type) {
-    case PlatformType.url:
+    case Platform.url:
       return name.toLowerCase();
-    case PlatformType.website:
+    case Platform.website:
       return `https://${name}`;
-    case PlatformType.discord:
+    case Platform.discord:
       return name.includes("https://")
         ? SocialPlatformMapping(type).urlPrefix + name
         : "";
-    case PlatformType.lens:
+    case Platform.lens:
       return (
-        SocialPlatformMapping(PlatformType.lens).urlPrefix +
+        SocialPlatformMapping(Platform.lens).urlPrefix +
         name.replace(/\.lens$/, "")
       );
     default:
-      const prefix = SocialPlatformMapping(type as PlatformType).urlPrefix;
+      const prefix = SocialPlatformMapping(type as Platform).urlPrefix;
       return prefix ? prefix + name : "";
   }
 }

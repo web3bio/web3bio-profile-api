@@ -7,11 +7,11 @@ import type {
   CredentialCategory,
   CredentialRecordRaw,
 } from "@/utils/types";
-import { PlatformType } from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 
 export const resolveCredentialsHandle = async (
   identity: string,
-  platform: PlatformType,
+  platform: Platform,
   headers: AuthHeaders,
 ) => {
   const res = await queryIdentityGraph(

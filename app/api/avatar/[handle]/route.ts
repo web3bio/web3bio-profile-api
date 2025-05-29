@@ -1,5 +1,5 @@
 import {
-  type PlatformType,
+  type Platform,
   type ProfileResponse,
   ErrorMessages,
 } from "web3bio-profile-kit/types";
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   if (shouldPlatformFetch(platform)) {

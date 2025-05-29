@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { type PlatformType, ErrorMessages } from "web3bio-profile-kit/types";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { processJson } from "./utils";
@@ -8,7 +8,7 @@ export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const identity = searchParams.get("identity");
-  const platform = searchParams.get("platform") as PlatformType;
+  const platform = searchParams.get("platform") as Platform;
 
   if (!identity || !platform)
     return errorHandle({

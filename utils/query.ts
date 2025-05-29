@@ -3,7 +3,7 @@ import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 import { type AuthHeaders, type IdentityRecord } from "./types";
 import {
   ErrorMessages,
-  type PlatformType,
+  type Platform,
   type ProfileResponse,
 } from "web3bio-profile-kit/types";
 
@@ -353,7 +353,7 @@ const QUERIES = {
 export async function queryIdentityGraph(
   query: QueryType,
   handle: string,
-  platform: PlatformType = handleSearchPlatform(handle)!,
+  platform: Platform = handleSearchPlatform(handle)!,
   headers: AuthHeaders,
 ) {
   try {
@@ -405,7 +405,7 @@ export async function queryIdentityGraphBatch(
           const [platform, handle] = item.id.split(",");
           const profiles = (await resolveWithIdentityGraph({
             handle,
-            platform: platform as PlatformType,
+            platform: platform as Platform,
             ns,
             response: { data: { identity: { ...item } } },
           })) as ProfileResponse[];

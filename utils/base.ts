@@ -22,8 +22,8 @@ import {
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 import {
-  SourceType,
-  PlatformType,
+  Source,
+  Platform,
   type NSResponse,
   type ProfileResponse,
   type SocialLinks,
@@ -34,34 +34,31 @@ import { PLATFORM_DATA, REGEX } from "web3bio-profile-kit/utils";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
-  PlatformType.twitter,
-  PlatformType.discord,
-  PlatformType.reddit,
-  PlatformType.lens,
-  PlatformType.telegram,
-  PlatformType.youtube,
-  PlatformType.url,
+  Platform.twitter,
+  Platform.discord,
+  Platform.reddit,
+  Platform.lens,
+  Platform.telegram,
+  Platform.youtube,
+  Platform.url,
 ];
 
 const SNS_RECORDS_LIST = [
-  PlatformType.twitter,
-  PlatformType.telegram,
-  PlatformType.reddit,
-  PlatformType.url,
-  PlatformType.github,
-  PlatformType.discord,
+  Platform.twitter,
+  Platform.telegram,
+  Platform.reddit,
+  Platform.url,
+  Platform.github,
+  Platform.discord,
   "CNAME",
 ];
 
 // Create a Set for faster platform lookups
-const IDENTITY_BASED_PLATFORMS = new Set([
-  PlatformType.farcaster,
-  PlatformType.lens,
-]);
+const IDENTITY_BASED_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 
 export const resolveIdentityResponse = async (
   handle: string,
-  platform: PlatformType,
+  platform: Platform,
   headers: AuthHeaders,
   ns: boolean,
 ) => {
@@ -84,17 +81,15 @@ export const resolveIdentityResponse = async (
   const profile = res?.data?.identity?.profile;
 
   if (!profile) {
-    if ([PlatformType.sns, PlatformType.ens].includes(platform)) {
-      if (platform === PlatformType.ens && !isValidEthereumAddress(handle))
+    if ([Platform.sns, Platform.ens].includes(platform)) {
+      if (platform === Platform.ens && !isValidEthereumAddress(handle))
         throw new Error(ErrorMessages.INVALID_RESOLVED, { cause: 404 });
 
       const nsResponse = {
         address: isWeb3Address(handle) ? handle : null,
         identity: handle,
         platform:
-          platform === PlatformType.ens
-            ? PlatformType.ethereum
-            : PlatformType.solana,
+          platform === Platform.ens ? Platform.ethereum : Platform.solana,
         displayName: formatText(handle),
         avatar: null,
       };
@@ -180,7 +175,7 @@ export async function generateProfileStruct(
 
 export const resolveIdentityHandle = async (
   handle: string,
-  platform: PlatformType,
+  platform: Platform,
   headers: AuthHeaders,
   ns: boolean = false,
 ) => {
@@ -212,21 +207,19 @@ export const resolveIdentityHandle = async (
 
 const resolveContenthash = async (
   originalContenthash: string,
-  platform: PlatformType,
+  platform: Platform,
   texts: Record<string, string>,
 ) => {
   if (
-    ![
-      PlatformType.unstoppableDomains,
-      PlatformType.solana,
-      PlatformType.sns,
-    ].includes(platform)
+    ![Platform.unstoppableDomains, Platform.solana, Platform.sns].includes(
+      platform,
+    )
   ) {
     return originalContenthash || null;
   }
 
   // UD
-  if (platform === PlatformType.unstoppableDomains) {
+  if (platform === Platform.unstoppableDomains) {
     if (!originalContenthash) return null;
     return isIPFS_Resource(originalContenthash)
       ? `ipfs://${originalContenthash}`
@@ -283,10 +276,10 @@ export const generateSocialLinks = async (
 
   // Platform-specific link generation
   switch (platform) {
-    case PlatformType.basenames:
-    case PlatformType.ethereum:
-    case PlatformType.linea:
-    case PlatformType.ens:
+    case Platform.basenames:
+    case Platform.ethereum:
+    case Platform.linea:
+    case Platform.ens:
       if (!texts) break;
       // Process ENS text records
       for (const [textKey, value] of Object.entries(texts)) {
@@ -309,37 +302,37 @@ export const generateSocialLinks = async (
       }
       break;
 
-    case PlatformType.farcaster:
+    case Platform.farcaster:
       // Add Farcaster link
-      links[PlatformType.farcaster] = {
-        link: getSocialMediaLink(identity, PlatformType.farcaster),
+      links[Platform.farcaster] = {
+        link: getSocialMediaLink(identity, Platform.farcaster),
         handle: identity,
         sources: resolveVerifiedLink(
-          `${PlatformType.farcaster},${identity}`,
+          `${Platform.farcaster},${identity}`,
           edges,
         ),
       };
 
       if (texts?.twitter) {
         const resolvedHandle = resolveHandle(texts.twitter);
-        links[PlatformType.twitter] = {
-          link: getSocialMediaLink(resolvedHandle, PlatformType.twitter),
+        links[Platform.twitter] = {
+          link: getSocialMediaLink(resolvedHandle, Platform.twitter),
           handle: resolvedHandle,
           sources: resolveVerifiedLink(
-            `${PlatformType.twitter},${resolvedHandle}`,
+            `${Platform.twitter},${resolvedHandle}`,
             edges,
           ),
         };
       }
       break;
 
-    case PlatformType.lens:
+    case Platform.lens:
       // Add Lens link
       const pureHandle = identity.replace(".lens", "");
-      links[PlatformType.lens] = {
-        link: getSocialMediaLink(pureHandle, PlatformType.lens),
+      links[Platform.lens] = {
+        link: getSocialMediaLink(pureHandle, Platform.lens),
         handle: identity,
-        sources: resolveVerifiedLink(`${PlatformType.lens},${identity}`, edges),
+        sources: resolveVerifiedLink(`${Platform.lens},${identity}`, edges),
       };
 
       if (!texts) break;
@@ -362,15 +355,15 @@ export const generateSocialLinks = async (
       }
       break;
 
-    case PlatformType.solana:
-    case PlatformType.sns:
+    case Platform.solana:
+    case Platform.sns:
       // Process SNS records
       if (texts) {
         for (const recordKey of SNS_RECORDS_LIST) {
           const handle = resolveHandle(texts[recordKey]);
           if (handle) {
-            const platformKey = ["CNAME", PlatformType.url].includes(recordKey)
-              ? PlatformType.website
+            const platformKey = ["CNAME", Platform.url].includes(recordKey)
+              ? Platform.website
               : recordKey;
 
             links[platformKey] = {
@@ -383,16 +376,14 @@ export const generateSocialLinks = async (
       }
       break;
 
-    case PlatformType.unstoppableDomains:
+    case Platform.unstoppableDomains:
       if (texts) {
         for (const accountKey of UD_ACCOUNTS_LIST) {
           const item = texts[accountKey];
           if (item && PLATFORM_DATA.has(accountKey)) {
             const resolvedHandle = resolveHandle(item, accountKey);
             const platformKey =
-              accountKey === PlatformType.url
-                ? PlatformType.website
-                : accountKey;
+              accountKey === Platform.url ? Platform.website : accountKey;
 
             links[platformKey] = {
               link: getSocialMediaLink(resolvedHandle, platformKey),
@@ -407,7 +398,7 @@ export const generateSocialLinks = async (
       }
       break;
 
-    case PlatformType.dotbit:
+    case Platform.dotbit:
       if (!texts) break;
 
       for (const [textKey, value] of Object.entries(texts)) {
@@ -435,28 +426,26 @@ export const generateSocialLinks = async (
 export const resolveVerifiedLink = (
   key: string,
   edges?: IdentityGraphEdge[],
-): SourceType[] => {
+): Source[] => {
   if (!edges?.length) return [];
 
-  const [platformType, identity] = key.split(",");
-  const isWebSite = [PlatformType.website, PlatformType.dns].includes(
-    platformType as PlatformType,
+  const [platform, identity] = key.split(",");
+  const isWebSite = [Platform.website, Platform.dns].includes(
+    platform as Platform,
   );
-  const sourceSet = new Set<SourceType>();
+  const sourceSet = new Set<Source>();
 
   for (const edge of edges) {
     if (isWebSite) {
       const [, targetIdentity] = edge.target.split(",");
       if (
         targetIdentity === identity &&
-        [SourceType.ens, SourceType.keybase].includes(
-          edge.dataSource as SourceType,
-        )
+        [Source.ens, Source.keybase].includes(edge.dataSource as Source)
       ) {
-        sourceSet.add(edge.dataSource as SourceType);
+        sourceSet.add(edge.dataSource as Source);
       }
     } else if (edge.target === key) {
-      sourceSet.add(edge.dataSource as SourceType);
+      sourceSet.add(edge.dataSource as Source);
     }
   }
 
@@ -465,16 +454,16 @@ export const resolveVerifiedLink = (
 
 export const resolveIdentity = (
   input: string,
-): `${PlatformType},${string}` | null => {
+): `${Platform},${string}` | null => {
   if (!input) return null;
 
   const parts = input.split(",");
 
-  let platform: PlatformType;
+  let platform: Platform;
   let identity: string;
 
   if (parts.length === 2) {
-    [platform, identity] = parts as [PlatformType, string];
+    [platform, identity] = parts as [Platform, string];
     identity = prettify(identity);
   } else if (parts.length === 1) {
     platform = handleSearchPlatform(input);

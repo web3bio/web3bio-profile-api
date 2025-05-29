@@ -3,7 +3,7 @@ import { isAddress } from "viem";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, errorHandleProps } from "./types";
 import { normalize } from "viem/ens";
-import { PlatformType } from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -13,7 +13,7 @@ export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
-export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
+export const PLATFORMS_TO_EXCLUDE = [Platform.sns, Platform.solana];
 
 const web3AddressRegexes = [
   REGEX.ETH_ADDRESS,
@@ -110,53 +110,53 @@ export const isValidEthereumAddress = (address: string) => {
   return true;
 };
 
-export const shouldPlatformFetch = (platform?: PlatformType | null) => {
+export const shouldPlatformFetch = (platform?: Platform | null) => {
   if (!platform) return false;
   return [
-    PlatformType.ens,
-    PlatformType.basenames,
-    PlatformType.linea,
-    PlatformType.ethereum,
-    PlatformType.twitter,
-    PlatformType.github,
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.unstoppableDomains,
-    PlatformType.nextid,
-    PlatformType.dotbit,
-    PlatformType.solana,
-    PlatformType.sns,
+    Platform.ens,
+    Platform.basenames,
+    Platform.linea,
+    Platform.ethereum,
+    Platform.twitter,
+    Platform.github,
+    Platform.farcaster,
+    Platform.lens,
+    Platform.unstoppableDomains,
+    Platform.nextid,
+    Platform.dotbit,
+    Platform.solana,
+    Platform.sns,
   ].includes(platform);
 };
 
 const platformMap = new Map([
-  [REGEX.BASENAMES, PlatformType.basenames],
-  [REGEX.LINEA, PlatformType.linea],
-  [REGEX.ENS, PlatformType.ens],
-  [REGEX.ETH_ADDRESS, PlatformType.ethereum],
-  [REGEX.LENS, PlatformType.lens],
-  [REGEX.UNSTOPPABLE_DOMAINS, PlatformType.unstoppableDomains],
-  [REGEX.SPACE_ID, PlatformType.space_id],
-  [REGEX.CROSSBELL, PlatformType.crossbell],
-  [REGEX.DOTBIT, PlatformType.dotbit],
-  [REGEX.SNS, PlatformType.sns],
-  [REGEX.GENOME, PlatformType.genome],
-  [REGEX.BTC_ADDRESS, PlatformType.bitcoin],
-  [REGEX.SOLANA_ADDRESS, PlatformType.solana],
-  [REGEX.FARCASTER, PlatformType.farcaster],
-  [REGEX.CLUSTER, PlatformType.clusters],
-  [REGEX.TWITTER, PlatformType.twitter],
-  [REGEX.NEXT_ID, PlatformType.nextid],
+  [REGEX.BASENAMES, Platform.basenames],
+  [REGEX.LINEA, Platform.linea],
+  [REGEX.ENS, Platform.ens],
+  [REGEX.ETH_ADDRESS, Platform.ethereum],
+  [REGEX.LENS, Platform.lens],
+  [REGEX.UNSTOPPABLE_DOMAINS, Platform.unstoppableDomains],
+  [REGEX.SPACE_ID, Platform.space_id],
+  [REGEX.CROSSBELL, Platform.crossbell],
+  [REGEX.DOTBIT, Platform.dotbit],
+  [REGEX.SNS, Platform.sns],
+  [REGEX.GENOME, Platform.genome],
+  [REGEX.BTC_ADDRESS, Platform.bitcoin],
+  [REGEX.SOLANA_ADDRESS, Platform.solana],
+  [REGEX.FARCASTER, Platform.farcaster],
+  [REGEX.CLUSTER, Platform.clusters],
+  [REGEX.TWITTER, Platform.twitter],
+  [REGEX.NEXT_ID, Platform.nextid],
 ]);
 
 export const handleSearchPlatform = (term: string) => {
-  if (term.endsWith(".farcaster.eth")) return PlatformType.farcaster;
-  for (const [regex, platformType] of platformMap) {
+  if (term.endsWith(".farcaster.eth")) return Platform.farcaster;
+  for (const [regex, Platform] of platformMap) {
     if (regex.test(term)) {
-      return platformType;
+      return Platform;
     }
   }
-  return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
+  return term.includes(".") ? Platform.ens : Platform.farcaster;
 };
 
 export const normalizeText = (input?: string): string => {
@@ -189,24 +189,24 @@ export const prettify = (input: string): string => {
   return input;
 };
 
-export const uglify = (input: string, platform: PlatformType) => {
+export const uglify = (input: string, platform: Platform) => {
   if (!input) return "";
   switch (platform) {
-    case PlatformType.farcaster:
+    case Platform.farcaster:
       return input.endsWith(".farcaster") ||
         input.endsWith(".fcast.id") ||
         input.endsWith(".farcaster.eth")
         ? input
         : `${input}.farcaster`;
-    case PlatformType.lens:
+    case Platform.lens:
       return input.endsWith(".lens") ? input : `${input}.lens`;
-    case PlatformType.basenames:
+    case Platform.basenames:
       return input.endsWith(".base.eth")
         ? input
         : input.endsWith(".base")
           ? `${input}.eth`
           : `${input}.base.eth`;
-    case PlatformType.linea:
+    case Platform.linea:
       return input.endsWith(".linea.eth")
         ? input
         : input.endsWith(".linea")

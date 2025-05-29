@@ -1,5 +1,5 @@
 import { getUserHeaders } from "@/utils/utils";
-import type { PlatformType } from "web3bio-profile-kit/types";
+import type { Platform } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { type NextRequest, NextResponse } from "next/server";
 
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const res = await queryIdentityGraph(
     QueryType.GET_REFRESH_PROFILE,
     identity,
-    platform as PlatformType,
+    platform as Platform,
     headers,
   );
   const refreshed = res?.data?.identity;

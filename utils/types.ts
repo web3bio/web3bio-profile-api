@@ -1,6 +1,6 @@
 import type {
   AddressRecord,
-  PlatformType,
+  Platform,
   SocialRecord,
   ErrorMessages,
 } from "web3bio-profile-kit/types";
@@ -13,14 +13,14 @@ export interface errorHandleProps {
   identity: string | null;
   code: number;
   message: ErrorMessages | string;
-  platform: PlatformType | string;
+  platform: Platform | string;
   headers?: HeadersInit;
 }
 
 export interface ProfileAPIError {
   address: string | null;
   identity: string | null;
-  platform: PlatformType;
+  platform: Platform;
   error: ErrorMessages;
   message?: string;
 }
@@ -51,7 +51,7 @@ export interface IdentityRecord {
   network: string;
   ownerAddress: AddressRecord[];
   resolvedAddress: AddressRecord[];
-  platform: PlatformType;
+  platform: Platform;
   primaryName: string | null;
   profile: ProfileRecord;
   identityGraph?: {
@@ -70,7 +70,7 @@ export interface ProfileRecord {
   displayName: string;
   identity: string;
   network: string;
-  platform: PlatformType;
+  platform: Platform;
   social: SocialRecord;
   texts: Record<string, string>;
   addresses: AddressRecord[];
@@ -84,7 +84,7 @@ export type CredentialCategory = "isHuman" | "isRisky" | "isSpam";
 export interface CredentialRecordRaw {
   value: string;
   type: string;
-  platform: PlatformType;
+  platform: Platform;
   dataSource: string;
   link: string;
   updatedAt: number;

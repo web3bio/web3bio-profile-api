@@ -1,9 +1,9 @@
 import { DEFAULT_PLATFORM, PLATFORM_DATA } from "web3bio-profile-kit/utils";
-import type { PlatformType, SocialPlatform } from "web3bio-profile-kit/types";
+import type { Platform, PlatformType } from "web3bio-profile-kit/types";
 
 export const SocialPlatformMapping = (
-  platform: PlatformType,
-): Readonly<SocialPlatform> => {
+  platform: Platform,
+): Readonly<PlatformType> => {
   return (
     PLATFORM_DATA.get(platform) || { ...DEFAULT_PLATFORM, label: platform }
   );

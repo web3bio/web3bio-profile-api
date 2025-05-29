@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { PlatformType, ErrorMessages } from "web3bio-profile-kit/types";
+import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery } from "./utils";
 import { resolveIdentity } from "@/utils/base";
@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   return await resolveDomainQuery(identity, platform, headers);

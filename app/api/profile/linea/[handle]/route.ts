@@ -4,7 +4,7 @@ import {
   isValidEthereumAddress,
   uglify,
 } from "@/utils/utils";
-import { ErrorMessages, PlatformType } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
@@ -16,16 +16,16 @@ export async function GET(req: NextRequest) {
 
   const handle = isValidEthereumAddress(inputName)
     ? inputName.toLowerCase()
-    : uglify(inputName, PlatformType.linea);
+    : uglify(inputName, Platform.linea);
 
   if (!REGEX.LINEA.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
-      platform: PlatformType.linea,
+      platform: Platform.linea,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
-  return resolveIdentityHandle(handle, PlatformType.linea, headers, false);
+  return resolveIdentityHandle(handle, Platform.linea, headers, false);
 }
 
 export const runtime = "edge";
