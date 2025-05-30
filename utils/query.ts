@@ -1,4 +1,4 @@
-import { handleSearchPlatform, IDENTITY_GRAPH_SERVER } from "./utils";
+import { IDENTITY_GRAPH_SERVER } from "./utils";
 import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
 import { type AuthHeaders, type IdentityRecord } from "./types";
 import {
@@ -6,6 +6,7 @@ import {
   type Platform,
   type ProfileResponse,
 } from "web3bio-profile-kit/types";
+import { detectPlatform } from "web3bio-profile-kit/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
@@ -353,7 +354,7 @@ const QUERIES = {
 export async function queryIdentityGraph(
   query: QueryType,
   handle: string,
-  platform: Platform = handleSearchPlatform(handle)!,
+  platform: Platform = detectPlatform(handle)!,
   headers: AuthHeaders,
 ) {
   try {

@@ -2,13 +2,20 @@ import {
   PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
-  isSameAddress,
-  isWeb3Address,
   normalizeText,
   respondWithCache,
-  shouldPlatformFetch,
 } from "@/utils/utils";
-import { Platform } from "web3bio-profile-kit/types";
+import {
+  Platform,
+  NSResponse,
+  ProfileResponse,
+  ErrorMessages,
+} from "web3bio-profile-kit/types";
+import {
+  isSameAddress,
+  isSupportedPlatform,
+  isWeb3Address,
+} from "web3bio-profile-kit/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
   type AuthHeaders,
@@ -19,11 +26,6 @@ import {
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";
-import {
-  NSResponse,
-  ProfileResponse,
-  ErrorMessages,
-} from "web3bio-profile-kit/types";
 
 // Constantsa
 const DEFAULT_PLATFORM_ORDER = [
@@ -270,7 +272,7 @@ export const getResolvedProfileArray = (
 
   // Filter duplicates and sort by primary status
   return results
-    .filter((x) => shouldPlatformFetch(x.platform))
+    .filter((x) => isSupportedPlatform(x.platform))
     .filter(
       (item, index, self) =>
         index ===

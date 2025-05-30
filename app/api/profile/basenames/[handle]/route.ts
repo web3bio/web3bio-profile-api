@@ -1,11 +1,10 @@
-import {
-  errorHandle,
-  getUserHeaders,
-  isValidEthereumAddress,
-  uglify,
-} from "@/utils/utils";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
-import { REGEX } from "web3bio-profile-kit/utils";
+import {
+  isValidEthereumAddress,
+  REGEX,
+  uglify,
+} from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
 

@@ -1,8 +1,8 @@
 import type { NextRequest } from "next/server";
 import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery } from "./utils";
-import { resolveIdentity } from "@/utils/base";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

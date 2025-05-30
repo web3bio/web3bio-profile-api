@@ -1,12 +1,8 @@
-import {
-  errorHandle,
-  getUserHeaders,
-  isValidEthereumAddress,
-} from "@/utils/utils";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
+import { isValidEthereumAddress, REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import type { NextRequest } from "next/server";
-import { REGEX } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
