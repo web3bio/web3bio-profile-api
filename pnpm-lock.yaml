@@ -30,8 +30,8 @@ importers:
         specifier: ^2.27.00
         version: 2.27.0(typescript@5.8.3)
       web3bio-profile-kit:
-        specifier: 0.1.4
-        version: 0.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 0.1.5
+        version: 0.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/jest':
         specifier: ^29.5.12
@@ -3354,8 +3354,8 @@ packages:
   web-vitals@0.2.4:
     resolution: {integrity: sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==}
 
-  web3bio-profile-kit@0.1.4:
-    resolution: {integrity: sha512-PiM/zkU6O1b+D4uVNu4pDBXOir/mFD52hK8+32LMU0AemOX8ZG+EN9RzpRHQFjPJo7mLISE3IiPBqruIyl8j4g==}
+  web3bio-profile-kit@0.1.5:
+    resolution: {integrity: sha512-5nVlkfLP845nSb7urEtLHJu+mMAbvNFy8D17JFzq2F1QAj+KrhF6CH+EpDuzg1KbRc+gaFcB0uuH9inc8XtHSQ==}
     peerDependencies:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
@@ -7288,7 +7288,7 @@ snapshots:
 
   web-vitals@0.2.4: {}
 
-  web3bio-profile-kit@0.1.4(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  web3bio-profile-kit@0.1.5(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
