@@ -41,6 +41,7 @@ const AvatarPixel = (props: AvatarPixelProps) => {
         <rect width={SIZE} height={SIZE} rx={0} fill="#FFFFFF" />
       </mask>
       <g mask={`url(#${maskID})`}>
+        <rect width={SIZE} height={SIZE} rx={0} fill={colors[0]} />
         {Array.from({ length: ITEMS }).map((_, row) =>
           Array.from({ length: ITEMS }).map((_, col) => {
             const index = row * ITEMS + col;
