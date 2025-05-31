@@ -1,8 +1,7 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
-import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import type { NextRequest } from "next/server";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveCredentialsHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
@@ -14,10 +13,10 @@ export async function GET(req: NextRequest) {
       identity: handle,
       code: 404,
       platform: "credentials",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   return resolveCredentialsHandle(identity, platform, headers);

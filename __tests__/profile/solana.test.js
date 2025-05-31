@@ -1,4 +1,4 @@
-import { queryClient } from "../utils/test-utils";
+import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Solana Profile API", () => {
   it("It should response 200 for sujiyan.sol", async () => {
@@ -9,11 +9,12 @@ describe("Test For Solana Profile API", () => {
     expect(json.platform).toBe("sns");
   });
   it("It should response 200 for 46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y", async () => {
-    const res = await queryClient("/profile/solana/46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y");
+    const res = await queryClient(
+      "/profile/solana/46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
+    );
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y");
     expect(json.platform).toBe("sns");
   });
-
 });

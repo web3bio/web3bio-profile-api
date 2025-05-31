@@ -1,14 +1,12 @@
-import {
-  errorHandle,
-  getUserHeaders,
-  isValidEthereumAddress,
-  uglify,
-} from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
-import { regexLinea } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";
-import { NextRequest } from "next/server";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import {
+  isValidEthereumAddress,
+  REGEX,
+  uglify,
+} from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -17,16 +15,16 @@ export async function GET(req: NextRequest) {
 
   const handle = isValidEthereumAddress(inputName)
     ? inputName.toLowerCase()
-    : uglify(inputName, PlatformType.linea);
+    : uglify(inputName, Platform.linea);
 
-  if (!regexLinea.test(handle) && !isValidEthereumAddress(handle))
+  if (!REGEX.LINEA.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
-      platform: PlatformType.linea,
+      platform: Platform.linea,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
-  return resolveIdentityHandle(handle, PlatformType.linea, headers, false);
+  return resolveIdentityHandle(handle, Platform.linea, headers, false);
 }
 
 export const runtime = "edge";

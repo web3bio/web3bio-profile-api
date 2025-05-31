@@ -1,9 +1,8 @@
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { ErrorMessages } from "@/utils/types";
-import { NextRequest } from "next/server";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "./utils";
-import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -15,10 +14,10 @@ export async function GET(req: NextRequest) {
       identity: handle,
       code: 404,
       platform: "universal",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   return resolveUniversalHandle(identity, platform, headers, false);

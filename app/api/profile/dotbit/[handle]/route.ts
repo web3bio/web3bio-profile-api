@@ -1,27 +1,22 @@
-import {
-  errorHandle,
-  getUserHeaders,
-  isValidEthereumAddress,
-} from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
-import { regexDotbit } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
 import { resolveIdentityHandle } from "@/utils/base";
-import { NextRequest } from "next/server";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { isValidEthereumAddress, REGEX } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
-  if (!regexDotbit.test(handle) && !isValidEthereumAddress(handle))
+  if (!REGEX.DOTBIT.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
-      platform: PlatformType.dotbit,
+      platform: Platform.dotbit,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
-  return resolveIdentityHandle(handle, PlatformType.dotbit, headers, false);
+  return resolveIdentityHandle(handle, Platform.dotbit, headers, false);
 }
 
 export const runtime = "edge";

@@ -1,8 +1,7 @@
-import { ErrorMessages } from "@/utils/types";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { NextRequest } from "next/server";
-import { resolveIdentity } from "@/utils/base";
-import { PlatformType } from "@/utils/platform";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveDomainQuery } from "./utils";
 
 export async function GET(req: NextRequest) {
@@ -15,10 +14,10 @@ export async function GET(req: NextRequest) {
       identity: handle,
       code: 404,
       platform: "domain",
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as PlatformType;
+  const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
   return await resolveDomainQuery(identity, platform, headers);

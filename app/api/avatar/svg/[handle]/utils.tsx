@@ -1,8 +1,11 @@
-import { PlatformType, SocialPlatformMapping } from "@/utils/platform";
-import { resolveIdentity } from "@/utils/base";
+import { getPlatform } from "@/utils/platform";
+import type { Platform } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 
-const ELEMENTS = 256;
-const SIZE = 160;
+const ITEMS = 12;
+const SIZE = 480;
+const ELEMENTS = ITEMS * ITEMS;
+const UNIT = SIZE / ITEMS;
 
 type AvatarPixelProps = {
   colors: string[];
@@ -35,19 +38,20 @@ const AvatarPixel = (props: AvatarPixelProps) => {
         width={SIZE}
         height={SIZE}
       >
-        <rect width={SIZE} height={SIZE} rx={undefined} fill="#FFFFFF" />
+        <rect width={SIZE} height={SIZE} rx={0} fill="#FFFFFF" />
       </mask>
       <g mask={`url(#${maskID})`}>
-        {Array.from({ length: 16 }).map((_, row) =>
-          Array.from({ length: 16 }).map((_, col) => {
-            const index = row * 16 + col;
+        <rect width={SIZE} height={SIZE} rx={0} fill={colors[0]} />
+        {Array.from({ length: ITEMS }).map((_, row) =>
+          Array.from({ length: ITEMS }).map((_, col) => {
+            const index = row * ITEMS + col;
             return (
               <rect
                 key={index}
-                x={col * 10}
-                y={row * 10}
-                width={10}
-                height={10}
+                x={col * UNIT}
+                y={row * UNIT}
+                width={UNIT}
+                height={UNIT}
                 fill={pixelColors[index]}
               />
             );
@@ -62,7 +66,7 @@ function generateColors(name: string, colors: string[]): string[] {
   const numFromName = hashCode(name);
 
   if (!colors || colors.length === 0) {
-    colors = ["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4", "#C20D90"];
+    colors = ["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4"];
   }
 
   const colorList = Array.from({ length: ELEMENTS }, (_, i) => {
@@ -192,7 +196,7 @@ export const getThemeColor = (
   const newHue = (h + hueShift) % 1.0;
   const newSat = Math.max(0.15, s * 0.7);
   const newLight = Math.min(
-    0.8,
+    0.75,
     l + 0.2 + (((hashCode >> 4) & 0xff) % 20) / 100,
   );
 
@@ -289,9 +293,9 @@ function hslToRgb(h: number, s: number, l: number): [number, number, number] {
 export const respondWithSVG = async (name: string, size: number) => {
   const id = resolveIdentity(name);
   // Use default color directly without unnecessary variable
-  const platform = id?.split(",")[0] as PlatformType;
+  const platform = id?.split(",")[0] as Platform;
   const themecolorbase = platform
-    ? SocialPlatformMapping(platform).color || "#000"
+    ? getPlatform(platform).color || "#000"
     : "#000";
 
   // Create avatar props directly

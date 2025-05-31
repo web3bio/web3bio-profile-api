@@ -1,27 +1,8 @@
 import { NextResponse } from "next/server";
-import { isAddress } from "viem";
-import { PlatformType } from "./platform";
-import {
-  regexBasenames,
-  regexBtc,
-  regexCluster,
-  regexCrossbell,
-  regexDotbit,
-  regexEns,
-  regexEth,
-  regexFarcaster,
-  regexGenome,
-  regexLens,
-  regexLinea,
-  regexNext,
-  regexSns,
-  regexSolana,
-  regexSpaceid,
-  regexTwitter,
-  regexUnstoppableDomains,
-} from "./regexp";
-import { AuthHeaders, errorHandleProps } from "./types";
+import { isValidEthereumAddress } from "web3bio-profile-kit/utils";
+import { type AuthHeaders, errorHandleProps } from "./types";
 import { normalize } from "viem/ens";
+import { Platform } from "web3bio-profile-kit/types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -31,18 +12,7 @@ export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
-export const PLATFORMS_TO_EXCLUDE = [PlatformType.sns, PlatformType.solana];
-
-const web3AddressRegexes = [
-  regexEth,
-  regexCrossbell,
-  regexBtc,
-  regexSolana,
-  regexNext,
-];
-
-export const isWeb3Address = (address: string): boolean =>
-  web3AddressRegexes.some((regex) => regex.test(address));
+export const PLATFORMS_TO_EXCLUDE = [Platform.sns, Platform.solana];
 
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
   const userToken = headers?.get("x-api-key");
@@ -53,14 +23,6 @@ export const getUserHeaders = (headers: Headers): AuthHeaders => {
     };
   }
   return {};
-};
-
-export const isSameAddress = (
-  address?: string,
-  otherAddress?: string,
-): boolean => {
-  if (!address || !otherAddress) return false;
-  return address.toLowerCase() === otherAddress.toLowerCase();
 };
 
 export const errorHandle = ({
@@ -122,61 +84,6 @@ export const formatText = (string: string, length?: number) => {
   }
 };
 
-export const isValidEthereumAddress = (address: string) => {
-  if (!isAddress(address)) return false; // invalid ethereum address
-  if (address.match(/^0x0*.$|0x[123468abef]*$|0x0*dead$/i)) return false; // empty & burn address
-  return true;
-};
-
-export const shouldPlatformFetch = (platform?: PlatformType | null) => {
-  if (!platform) return false;
-  return [
-    PlatformType.ens,
-    PlatformType.basenames,
-    PlatformType.linea,
-    PlatformType.ethereum,
-    PlatformType.twitter,
-    PlatformType.github,
-    PlatformType.farcaster,
-    PlatformType.lens,
-    PlatformType.unstoppableDomains,
-    PlatformType.nextid,
-    PlatformType.dotbit,
-    PlatformType.solana,
-    PlatformType.sns,
-  ].includes(platform);
-};
-
-const platformMap = new Map([
-  [regexBasenames, PlatformType.basenames],
-  [regexLinea, PlatformType.linea],
-  [regexEns, PlatformType.ens],
-  [regexEth, PlatformType.ethereum],
-  [regexLens, PlatformType.lens],
-  [regexUnstoppableDomains, PlatformType.unstoppableDomains],
-  [regexSpaceid, PlatformType.space_id],
-  [regexCrossbell, PlatformType.crossbell],
-  [regexDotbit, PlatformType.dotbit],
-  [regexSns, PlatformType.sns],
-  [regexGenome, PlatformType.genome],
-  [regexBtc, PlatformType.bitcoin],
-  [regexSolana, PlatformType.solana],
-  [regexFarcaster, PlatformType.farcaster],
-  [regexCluster, PlatformType.clusters],
-  [regexTwitter, PlatformType.twitter],
-  [regexNext, PlatformType.nextid],
-]);
-
-export const handleSearchPlatform = (term: string) => {
-  if (term.endsWith(".farcaster.eth")) return PlatformType.farcaster;
-  for (const [regex, platformType] of platformMap) {
-    if (regex.test(term)) {
-      return platformType;
-    }
-  }
-  return term.includes(".") ? PlatformType.ens : PlatformType.farcaster;
-};
-
 export const normalizeText = (input?: string): string => {
   if (!input) return "";
 
@@ -185,53 +92,6 @@ export const normalizeText = (input?: string): string => {
   } catch (error) {
     console.warn("Text normalization failed:", error);
     return input;
-  }
-};
-
-export const prettify = (input: string): string => {
-  if (!input) return "";
-  if (input.endsWith(".twitter")) return input.replace(".twitter", "");
-  if (input.endsWith(".nextid")) return input.replace(".nextid", "");
-  if (input.startsWith("farcaster,#"))
-    return input.replace(/^(farcaster),/, "");
-  if (
-    input.endsWith(".farcaster") ||
-    input.endsWith(".fcast.id") ||
-    input.endsWith(".farcaster.eth")
-  ) {
-    return input.replace(/(\.farcaster|\.fcast\.id|\.farcaster\.eth)$/, "");
-  }
-  if (input.endsWith(".base") || input.endsWith(".linea")) {
-    return input.split(".")[0] + "." + input.split(".").pop() + ".eth";
-  }
-  return input;
-};
-
-export const uglify = (input: string, platform: PlatformType) => {
-  if (!input) return "";
-  switch (platform) {
-    case PlatformType.farcaster:
-      return input.endsWith(".farcaster") ||
-        input.endsWith(".fcast.id") ||
-        input.endsWith(".farcaster.eth")
-        ? input
-        : `${input}.farcaster`;
-    case PlatformType.lens:
-      return input.endsWith(".lens") ? input : `${input}.lens`;
-    case PlatformType.basenames:
-      return input.endsWith(".base.eth")
-        ? input
-        : input.endsWith(".base")
-          ? `${input}.eth`
-          : `${input}.base.eth`;
-    case PlatformType.linea:
-      return input.endsWith(".linea.eth")
-        ? input
-        : input.endsWith(".linea")
-          ? `${input}.eth`
-          : `${input}.linea.eth`;
-    default:
-      return input;
   }
 };
 
