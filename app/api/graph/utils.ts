@@ -1,5 +1,5 @@
 import { resolveEipAssetURL } from "@/utils/resolver";
-import {
+import type {
   IdentityGraphQueryResponse,
   IdentityRecord,
   ProfileRecord,

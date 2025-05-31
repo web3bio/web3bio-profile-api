@@ -1,4 +1,4 @@
-import { queryClient } from "../utils/test-utils";
+import { queryClient } from "../../utils/test-utils";
 
 describe("Test For ENS Profile API", () => {
   it("It should response 200 for brantly.eth", async () => {

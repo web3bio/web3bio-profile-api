@@ -1,4 +1,4 @@
-import { queryClient } from "../utils/test-utils";
+import { queryClient } from "../../utils/test-utils";
 
 describe("Test For BaseNames Profile API", () => {
   it("It should response 200 for suji.base", async () => {

@@ -1,7 +1,7 @@
-import { getUserHeaders } from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { NextRequest, NextResponse } from "next/server";
+import { getUserHeaders } from "@/utils/utils";
+import { type NextRequest, NextResponse } from "next/server";
+import type { Platform } from "web3bio-profile-kit/types";
 
 // e.g `https://api.web3.bio/revalidate/ens,sujiyan.eth`
 export async function GET(req: NextRequest) {
@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
   const res = await queryIdentityGraph(
     QueryType.GET_REFRESH_PROFILE,
     identity,
-    platform as PlatformType,
+    platform as Platform,
     headers,
   );
   const refreshed = res?.data?.identity;

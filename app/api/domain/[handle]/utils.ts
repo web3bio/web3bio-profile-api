@@ -1,11 +1,11 @@
-import { PlatformType } from "@/utils/platform";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { AuthHeaders, ErrorMessages } from "@/utils/types";
+import { type AuthHeaders } from "@/utils/types";
 import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 
 export const resolveDomainQuery = async (
   handle: string,
-  platform: PlatformType,
+  platform: Platform,
   headers: AuthHeaders,
 ) => {
   const response = await queryIdentityGraph(
@@ -20,7 +20,7 @@ export const resolveDomainQuery = async (
       identity: handle,
       platform: platform,
       code: 404,
-      message: ErrorMessages.notFound,
+      message: ErrorMessages.NOT_FOUND,
     });
   }
   const { profile, isPrimary, status, registeredAt, updatedAt, expiredAt } =

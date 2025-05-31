@@ -1,35 +1,28 @@
+import { resolveIdentityHandle } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
-  errorHandle,
-  getUserHeaders,
+  REGEX,
   isValidEthereumAddress,
   prettify,
-} from "@/utils/utils";
-import { PlatformType } from "@/utils/platform";
-import { regexLens } from "@/utils/regexp";
-import { ErrorMessages } from "@/utils/types";
-import { resolveIdentityHandle } from "@/utils/base";
-import { NextRequest } from "next/server";
+} from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
-  if (!regexLens.test(handle) && !isValidEthereumAddress(handle)) {
+  if (!REGEX.LENS.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
       identity: handle,
-      platform: PlatformType.lens,
+      platform: Platform.lens,
       code: 404,
-      message: ErrorMessages.invalidIdentity,
+      message: ErrorMessages.INVALID_IDENTITY,
     });
   }
 
-  return resolveIdentityHandle(
-    prettify(handle),
-    PlatformType.lens,
-    headers,
-    true,
-  );
+  return resolveIdentityHandle(prettify(handle), Platform.lens, headers, true);
 }
 
 export const runtime = "edge";

@@ -93,9 +93,9 @@ export default function Home() {
               >
                 Ethereum / ENS
               </span>
-              , <span className="text-underline">Basenames</span>,{" "}
-              <span className="text-underline">Farcaster</span>,{" "}
+              , <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Lens</span>,{" "}
+              <span className="text-underline">Basenames</span>,{" "}
               <span className="text-underline">Linea Name Service</span>,{" "}
               <span
                 className="text-underline"
