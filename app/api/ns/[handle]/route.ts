@@ -1,8 +1,8 @@
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import { resolveUniversalHandle } from "../../profile/[handle]/utils";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
+import { resolveUniversalHandle } from "../../profile/[handle]/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

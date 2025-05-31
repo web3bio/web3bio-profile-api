@@ -1,8 +1,8 @@
 import type {
   AddressRecord,
+  ErrorMessages,
   Platform,
   SocialRecord,
-  ErrorMessages,
 } from "web3bio-profile-kit/types";
 
 export interface AuthHeaders {

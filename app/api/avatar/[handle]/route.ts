@@ -1,3 +1,7 @@
+import { queryIdentityGraph, QueryType } from "@/utils/query";
+import { type ProfileAPIError } from "@/utils/types";
+import { BASE_URL, errorHandle, getUserHeaders } from "@/utils/utils";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   type Platform,
   type ProfileResponse,
@@ -7,10 +11,6 @@ import {
   isSupportedPlatform,
   resolveIdentity,
 } from "web3bio-profile-kit/utils";
-import { type NextRequest, NextResponse } from "next/server";
-import { BASE_URL, errorHandle, getUserHeaders } from "@/utils/utils";
-import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { type ProfileAPIError } from "@/utils/types";
 
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";

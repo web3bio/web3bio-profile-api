@@ -1,3 +1,10 @@
+import { QueryType, queryIdentityGraph } from "@/utils/query";
+import type {
+  AuthHeaders,
+  IdentityGraphQueryResponse,
+  IdentityRecord,
+  ProfileRecord,
+} from "@/utils/types";
 import {
   PLATFORMS_TO_EXCLUDE,
   errorHandle,
@@ -6,23 +13,16 @@ import {
   respondWithCache,
 } from "@/utils/utils";
 import {
-  Platform,
-  NSResponse,
-  ProfileResponse,
   ErrorMessages,
+  NSResponse,
+  Platform,
+  ProfileResponse,
 } from "web3bio-profile-kit/types";
 import {
   isSameAddress,
   isSupportedPlatform,
   isWeb3Address,
 } from "web3bio-profile-kit/utils";
-import { QueryType, queryIdentityGraph } from "@/utils/query";
-import {
-  type AuthHeaders,
-  type IdentityGraphQueryResponse,
-  type IdentityRecord,
-  type ProfileRecord,
-} from "@/utils/types";
 
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../graph/utils";

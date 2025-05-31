@@ -1,6 +1,6 @@
+import { handleRequest } from "@/app/api/profile/batch/[ids]/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import { handleRequest } from "@/app/api/profile/batch/[ids]/utils";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function GET(req: NextRequest) {

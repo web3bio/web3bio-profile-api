@@ -1,7 +1,7 @@
 import { queryIdentityGraph, QueryType } from "@/utils/query";
 import { type AuthHeaders } from "@/utils/types";
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 
 export const resolveDomainQuery = async (
   handle: string,
