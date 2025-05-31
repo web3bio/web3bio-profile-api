@@ -1,7 +1,7 @@
 import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
-import { chainIdToNetwork } from "./networks";
-import { SocialPlatformMapping } from "./platform";
+import { getNetworkByChainId } from "./networks";
+import { getPlatform } from "./platform";
 import { Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 
@@ -70,15 +70,12 @@ function resolveSocialMediaLink(name: string, type: Platform | string): string {
       return `https://${name}`;
     case Platform.discord:
       return name.includes("https://")
-        ? SocialPlatformMapping(type).urlPrefix + name
+        ? getPlatform(type).urlPrefix + name
         : "";
     case Platform.lens:
-      return (
-        SocialPlatformMapping(Platform.lens).urlPrefix +
-        name.replace(/\.lens$/, "")
-      );
+      return getPlatform(Platform.lens).urlPrefix + name.replace(/\.lens$/, "");
     default:
-      const prefix = SocialPlatformMapping(type as Platform).urlPrefix;
+      const prefix = getPlatform(type as Platform).urlPrefix;
       return prefix ? prefix + name : "";
   }
 }
@@ -95,7 +92,7 @@ export const resolveEipAssetURL = async (
 
   if (!contractAddress || !tokenId) return resolveMediaURL(source);
 
-  const network = chainIdToNetwork(Number(chainId));
+  const network = getNetworkByChainId(Number(chainId));
   if (!network) return resolveMediaURL(source);
 
   try {

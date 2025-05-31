@@ -295,9 +295,7 @@ export default function Home() {
                         </span>
                       </a>
                     </div>
-                    <div className="card-description">
-                      Working on Farcaster and Warpcast.
-                    </div>
+                    <div className="card-description">Working on Farcaster</div>
                   </div>
                 </div>
                 <div className="profile-card">
@@ -817,7 +815,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "farcaster": {
-                "link": "https://warpcast.com/vitalik.eth",
+                "link": "https://farcaster.xyz/vitalik.eth",
                 "handle": "vitalik.eth",
                 "sources": [
                     "farcaster"
@@ -1309,7 +1307,7 @@ export default function Home() {
         "sources": []
       },
       "farcaster": {
-        "link": "https://warpcast.com/to",
+        "link": "https://farcaster.xyz/to",
         "handle": "to",
         "sources": []
       }
@@ -1601,7 +1599,7 @@ export default function Home() {
     "platform": "farcaster",
     "displayName": "Dan Romero",
     "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-    "description": "Working on Farcaster and Warpcast.",
+    "description": "Working on Farcaster",
     "status": null,
     "email": null,
     "location": "Los Angeles, California",
@@ -1609,7 +1607,7 @@ export default function Home() {
     "contenthash": null,
     "links": {
         "farcaster": {
-            "link": "https://warpcast.com/dwr.eth",
+            "link": "https://farcaster.xyz/dwr.eth",
             "handle": "dwr.eth",
             "sources": [
                 "farcaster"
@@ -2526,7 +2524,7 @@ export default function Home() {
         "contenthash": null,
         "links": {
             "farcaster": {
-                "link": "https://warpcast.com/dwr.eth",
+                "link": "https://farcaster.xyz/dwr.eth",
                 "handle": "dwr.eth",
                 "sources": []
             }
@@ -2573,7 +2571,7 @@ export default function Home() {
                 "sources": []
             },
             "farcaster": {
-                "link": "https://warpcast.com/to",
+                "link": "https://farcaster.xyz/to",
                 "handle": "to",
                 "sources": []
             }

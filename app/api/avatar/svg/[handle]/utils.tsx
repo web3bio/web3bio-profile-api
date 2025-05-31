@@ -1,4 +1,4 @@
-import { SocialPlatformMapping } from "@/utils/platform";
+import { getPlatform } from "@/utils/platform";
 import type { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
@@ -295,7 +295,7 @@ export const respondWithSVG = async (name: string, size: number) => {
   // Use default color directly without unnecessary variable
   const platform = id?.split(",")[0] as Platform;
   const themecolorbase = platform
-    ? SocialPlatformMapping(platform).color || "#000"
+    ? getPlatform(platform).color || "#000"
     : "#000";
 
   // Create avatar props directly
