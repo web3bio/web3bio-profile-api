@@ -1,7 +1,7 @@
+import { QueryType, queryIdentityGraph } from "@/utils/query";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
-import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {

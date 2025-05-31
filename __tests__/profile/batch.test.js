@@ -1,4 +1,4 @@
-import { queryClient } from "../utils/test-utils";
+import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Batch Query", () => {
   const getIds = [

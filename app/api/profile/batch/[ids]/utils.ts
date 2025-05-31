@@ -1,7 +1,7 @@
-import { errorHandle, respondWithCache } from "@/utils/utils";
+import { resolveIdentityBatch } from "@/utils/base";
 import { queryIdentityGraphBatch } from "@/utils/query";
 import { type AuthHeaders } from "@/utils/types";
-import { resolveIdentityBatch } from "@/utils/base";
+import { errorHandle, respondWithCache } from "@/utils/utils";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function handleRequest(

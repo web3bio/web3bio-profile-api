@@ -1,4 +1,4 @@
-import { queryClient } from "../utils/test-utils";
+import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Dotbit Profile API", () => {
   it("It should response 404 for 0x42e573b38e41cfa26be5d85235368e596dc6d12b", async () => {

@@ -1,18 +1,16 @@
+import { queryIdentityGraph, QueryType } from "@/utils/query";
+import { type ProfileAPIError } from "@/utils/types";
+import { BASE_URL, errorHandle, getUserHeaders } from "@/utils/utils";
+import { type NextRequest, NextResponse } from "next/server";
 import {
   type Platform,
   type ProfileResponse,
   ErrorMessages,
 } from "web3bio-profile-kit/types";
-import { type NextRequest, NextResponse } from "next/server";
 import {
-  BASE_URL,
-  errorHandle,
-  getUserHeaders,
-  shouldPlatformFetch,
-} from "@/utils/utils";
-import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { type ProfileAPIError } from "@/utils/types";
-import { resolveIdentity } from "@/utils/base";
+  isSupportedPlatform,
+  resolveIdentity,
+} from "web3bio-profile-kit/utils";
 
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";
@@ -33,7 +31,7 @@ export async function GET(req: NextRequest) {
   const platform = id.split(",")[0] as Platform;
   const identity = id.split(",")[1];
 
-  if (shouldPlatformFetch(platform)) {
+  if (isSupportedPlatform(platform)) {
     try {
       const response = await queryIdentityGraph(
         QueryType.GET_PROFILES_NS,

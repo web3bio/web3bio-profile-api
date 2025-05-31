@@ -1,13 +1,12 @@
+import { resolveIdentityHandle } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
-  errorHandle,
-  getUserHeaders,
+  REGEX,
   isValidEthereumAddress,
   prettify,
-} from "@/utils/utils";
-import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
-import { resolveIdentityHandle } from "@/utils/base";
-import type { NextRequest } from "next/server";
-import { REGEX } from "web3bio-profile-kit/utils";
+} from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);

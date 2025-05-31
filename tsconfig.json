@@ -15,16 +15,7 @@
     "jsx": "preserve",
     "incremental": true,
     "paths": {
-      "@/*": ["./*"],
-      "web3bio-profile-kit/types": [
-        "./node_modules/web3bio-profile-kit/dist/types"
-      ],
-      "web3bio-profile-kit/utils": [
-        "./node_modules/web3bio-profile-kit/dist/utils"
-      ],
-      "web3bio-profile-kit/hooks": [
-        "./node_modules/web3bio-profile-kit/dist/hooks"
-      ]
+      "@/*": ["./*"]
     },
     "plugins": [
       {

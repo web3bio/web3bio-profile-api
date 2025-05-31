@@ -1,12 +1,12 @@
-import { respondWithCache } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
-  CredentialRecord,
-  CredentialsResponse,
   CredentialCategory,
+  CredentialRecord,
   CredentialRecordRaw,
+  CredentialsResponse,
 } from "@/utils/types";
+import { respondWithCache } from "@/utils/utils";
 import { Platform } from "web3bio-profile-kit/types";
 
 export const resolveCredentialsHandle = async (

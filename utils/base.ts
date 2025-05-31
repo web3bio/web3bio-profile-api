@@ -2,12 +2,7 @@ import {
   errorHandle,
   formatText,
   formatTimestamp,
-  handleSearchPlatform,
-  isValidEthereumAddress,
-  isWeb3Address,
-  prettify,
   respondWithCache,
-  shouldPlatformFetch,
 } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
@@ -30,7 +25,12 @@ import {
   type SocialLinksItem,
   ErrorMessages,
 } from "web3bio-profile-kit/types";
-import { PLATFORM_DATA, REGEX } from "web3bio-profile-kit/utils";
+import {
+  PLATFORM_DATA,
+  isValidEthereumAddress,
+  isWeb3Address,
+  resolveIdentity,
+} from "web3bio-profile-kit/utils";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
@@ -450,35 +450,6 @@ export const resolveVerifiedLink = (
   }
 
   return Array.from(sourceSet);
-};
-
-export const resolveIdentity = (
-  input: string,
-): `${Platform},${string}` | null => {
-  if (!input) return null;
-
-  const parts = input.split(",");
-
-  let platform: Platform;
-  let identity: string;
-
-  if (parts.length === 2) {
-    [platform, identity] = parts as [Platform, string];
-    identity = prettify(identity);
-  } else if (parts.length === 1) {
-    platform = handleSearchPlatform(input);
-    identity = prettify(input);
-  } else {
-    return null;
-  }
-
-  if (!shouldPlatformFetch(platform) || !identity) return null;
-
-  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(identity)
-    ? identity
-    : identity.toLowerCase();
-
-  return `${platform},${normalizedIdentity}`;
 };
 
 export const resolveIdentityBatch = (input: string[]): string[] => {

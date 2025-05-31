@@ -1,15 +1,15 @@
-import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
-import { REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { isValidSolanaAddress, REGEX } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
 
-  if (!REGEX.SNS.test(handle) && !REGEX.SOLANA_ADDRESS.test(handle))
+  if (!REGEX.SNS.test(handle) && !isValidSolanaAddress(handle))
     return errorHandle({
       identity: handle,
       platform: Platform.solana,

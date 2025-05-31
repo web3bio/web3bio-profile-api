@@ -1,10 +1,10 @@
+import { type AuthHeaders } from "@/utils/types";
 import {
   IDENTITY_GRAPH_SERVER,
   errorHandle,
   getUserHeaders,
   respondWithCache,
 } from "@/utils/utils";
-import { type AuthHeaders } from "@/utils/types";
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 
