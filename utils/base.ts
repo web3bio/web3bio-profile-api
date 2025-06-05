@@ -1,4 +1,19 @@
 import {
+  Source,
+  Platform,
+  type NSResponse,
+  type ProfileResponse,
+  type SocialLinks,
+  type SocialLinksItem,
+  ErrorMessages,
+} from "web3bio-profile-kit/types";
+import {
+  PLATFORM_DATA,
+  isValidEthereumAddress,
+  isWeb3Address,
+  resolveIdentity,
+} from "web3bio-profile-kit/utils";
+import {
   errorHandle,
   formatText,
   formatTimestamp,
@@ -16,21 +31,6 @@ import {
   type ProfileRecord,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
-import {
-  Source,
-  Platform,
-  type NSResponse,
-  type ProfileResponse,
-  type SocialLinks,
-  type SocialLinksItem,
-  ErrorMessages,
-} from "web3bio-profile-kit/types";
-import {
-  PLATFORM_DATA,
-  isValidEthereumAddress,
-  isWeb3Address,
-  resolveIdentity,
-} from "web3bio-profile-kit/utils";
 
 // Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [

@@ -1,4 +1,4 @@
-import { getPlatform } from "@/utils/platform";
+import { getPlatform } from "web3bio-profile-kit/utils";
 import type { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
