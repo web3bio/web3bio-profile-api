@@ -1,7 +1,6 @@
 import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
-import { getNetworkByChainId } from "./networks";
-import { getPlatform } from "./platform";
+import { getPlatform, getNetwork } from "web3bio-profile-kit/utils";
 import { Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 
@@ -92,7 +91,7 @@ export const resolveEipAssetURL = async (
 
   if (!contractAddress || !tokenId) return resolveMediaURL(source);
 
-  const network = getNetworkByChainId(Number(chainId));
+  const network = getNetwork(Number(chainId));
   if (!network) return resolveMediaURL(source);
 
   try {
