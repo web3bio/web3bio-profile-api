@@ -3,7 +3,6 @@ const IPFS_CID_PATTERN =
 const CORS_HOST = "https://cors-next.r2d2.to";
 const CF_IPFS_HOST = "https://cloudflare-ipfs.com";
 const IPFS_GATEWAY_HOST = "https://ipfs.io";
-
 const MATCH_IPFS_DATA_RE = /ipfs\/(data:.*)$/;
 const MATCH_IPFS_CID_RE = new RegExp(IPFS_CID_PATTERN);
 const MATCH_IPFS_CID_AT_STARTS_RE = new RegExp(
