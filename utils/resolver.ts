@@ -1,8 +1,7 @@
+import { getPlatform, getNetwork, REGEX } from "web3bio-profile-kit/utils";
+import { Platform } from "web3bio-profile-kit/types";
 import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
-import { getPlatform, getNetwork } from "web3bio-profile-kit/utils";
-import { Platform } from "web3bio-profile-kit/types";
-import { REGEX } from "web3bio-profile-kit/utils";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
