@@ -74,7 +74,7 @@ function resolveSocialMediaLink(name: string, type: Platform | string): string {
     case Platform.lens:
       return getPlatform(Platform.lens).urlPrefix + name.replace(/\.lens$/, "");
     default:
-      const prefix = getPlatform(type as Platform).urlPrefix;
+      const prefix = getPlatform(type as Platform)?.urlPrefix;
       return prefix ? prefix + name : "";
   }
 }

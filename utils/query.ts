@@ -1,12 +1,12 @@
-import { IDENTITY_GRAPH_SERVER } from "./utils";
-import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
-import { type AuthHeaders, type IdentityRecord } from "./types";
 import {
   ErrorMessages,
   type Platform,
   type ProfileResponse,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
+import { IDENTITY_GRAPH_SERVER } from "./utils";
+import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
+import { type AuthHeaders, type IdentityRecord } from "./types";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
