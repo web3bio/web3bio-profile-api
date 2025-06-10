@@ -5,7 +5,7 @@ async function verifyAuth(token: string) {
   try {
     const { payload } = await jwtVerify(
       token,
-      new TextEncoder().encode(process.env.JWT_KEY)
+      new TextEncoder().encode(process.env.JWT_KEY),
     );
     return payload;
   } catch {
@@ -16,7 +16,7 @@ async function verifyAuth(token: string) {
 export const config = {
   matcher: [
     "/domains/:path*",
-    "/graph/:path*",
+    "/search/:path*",
     "/ns/:path*",
     "/profile/:path*",
   ],
@@ -48,7 +48,7 @@ function logWithInfo(req: NextRequest, token: string) {
   } = {
     key: token?.replace("Bearer ", ""),
   };
-  if (["/graph", "/domains"].includes(pathname)) {
+  if (["/search", "/domains"].includes(pathname)) {
     message.params = search.replace("?", "");
   }
   return console.log(JSON.stringify(message));
@@ -82,7 +82,7 @@ export async function middleware(req: NextRequest) {
         platform: null,
         error: "Invalid API Token",
       },
-      { status: 403 }
+      { status: 403 },
     );
   } else {
     logWithInfo(req, userToken);
