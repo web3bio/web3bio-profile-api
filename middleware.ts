@@ -15,10 +15,12 @@ async function verifyAuth(token: string) {
 
 export const config = {
   matcher: [
-    "/domains/:path*",
+    "/stats/:path*",
+    "/domain/:path*",
     "/search/:path*",
     "/ns/:path*",
     "/profile/:path*",
+    "/credentials/:path*",
   ],
 };
 
@@ -48,7 +50,7 @@ function logWithInfo(req: NextRequest, token: string) {
   } = {
     key: token?.replace("Bearer ", ""),
   };
-  if (["/search", "/domains"].includes(pathname)) {
+  if (["/search"].includes(pathname)) {
     message.params = search.replace("?", "");
   }
   return console.log(JSON.stringify(message));
@@ -58,7 +60,6 @@ export async function middleware(req: NextRequest) {
   const userHeaders = initHeaders(req);
   const isTrusted = userHeaders.get("origin")?.endsWith("web3.bio");
   const userToken = userHeaders.get("x-api-key");
-
   if (!userToken) {
     // request from *.web3.bio set x-api-key as WEB3BIO_KEY or GENERAL_KEY
     userHeaders.set("x-api-key", isTrusted ? WEB3BIO_KEY : GENERAL_KEY);
