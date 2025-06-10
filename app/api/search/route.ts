@@ -6,13 +6,8 @@ import {
   respondWithCache,
 } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import {
-  type Platform,
-  ErrorMessages,
-  PlatformSystem,
-} from "web3bio-profile-kit/types";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { processJson } from "./utils";
-import { getPlatform } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -48,7 +43,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    if (isSingleWeb2Identity(platform, rawJson.data.identity?.identityGraph)) {
+    if (isSingleWeb2Identity(rawJson.data.identity)) {
       return errorHandle({
         identity: identity,
         platform: platform || "graph",

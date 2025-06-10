@@ -105,12 +105,10 @@ export const formatTimestamp = (timestamp: number) => {
   return new Date(timestamp * 1000).toISOString();
 };
 
-export const isSingleWeb2Identity = (
-  platform: Platform,
-  identityGraph: { vertices: IdentityRecord[]; edges: IdentityGraphEdge[] },
-) => {
-  if (getPlatform(platform)?.system === PlatformSystem.web2) {
-    const { vertices, edges } = identityGraph;
+export const isSingleWeb2Identity = (identity: IdentityRecord) => {
+  if (!identity || !identity?.identityGraph) return true;
+  if (getPlatform(identity.platform)?.system === PlatformSystem.web2) {
+    const { vertices, edges } = identity.identityGraph;
     return vertices.length === 1 && edges.length === 0;
   }
   return false;
