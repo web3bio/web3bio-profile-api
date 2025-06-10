@@ -1,8 +1,13 @@
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
+import {
+  type Platform,
+  ErrorMessages,
+  PlatformSystem,
+} from "web3bio-profile-kit/types";
 import { processJson } from "./utils";
+import { getPlatform } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
@@ -37,6 +42,22 @@ export async function GET(req: NextRequest) {
             : ErrorMessages.NOT_FOUND,
       });
     }
+
+    if (getPlatform(platform)?.system === PlatformSystem.web2) {
+      const _identityGraph = rawJson.data.identity?.identityGraph;
+      if (
+        _identityGraph.vertices.length === 1 &&
+        _identityGraph.edges.length === 0
+      ) {
+        return errorHandle({
+          identity: identity,
+          platform: platform || "graph",
+          code: 404,
+          message: ErrorMessages.NOT_FOUND,
+        });
+      }
+    }
+
     const result = await processJson(rawJson);
 
     return respondWithCache(JSON.stringify(result));
