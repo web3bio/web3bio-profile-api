@@ -1,5 +1,10 @@
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
+import {
+  errorHandle,
+  getUserHeaders,
+  isSingleWeb2Identity,
+  respondWithCache,
+} from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import {
   type Platform,
@@ -43,19 +48,13 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    if (getPlatform(platform)?.system === PlatformSystem.web2) {
-      const _identityGraph = rawJson.data.identity?.identityGraph;
-      if (
-        _identityGraph.vertices.length === 1 &&
-        _identityGraph.edges.length === 0
-      ) {
-        return errorHandle({
-          identity: identity,
-          platform: platform || "graph",
-          code: 404,
-          message: ErrorMessages.NOT_FOUND,
-        });
-      }
+    if (isSingleWeb2Identity(platform, rawJson.data.identity?.identityGraph)) {
+      return errorHandle({
+        identity: identity,
+        platform: platform || "graph",
+        code: 404,
+        message: ErrorMessages.NOT_FOUND,
+      });
     }
 
     const result = await processJson(rawJson);

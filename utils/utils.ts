@@ -1,8 +1,14 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import { isValidEthereumAddress } from "web3bio-profile-kit/utils";
-import { Platform } from "web3bio-profile-kit/types";
-import { type AuthHeaders, errorHandleProps } from "./types";
+import { getPlatform, isValidEthereumAddress } from "web3bio-profile-kit/utils";
+import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
+import {
+  type AuthHeaders,
+  errorHandleProps,
+  IdentityGraphEdge,
+  IdentityGraphQueryResponse,
+  IdentityRecord,
+} from "./types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -97,4 +103,15 @@ export const normalizeText = (input?: string): string => {
 
 export const formatTimestamp = (timestamp: number) => {
   return new Date(timestamp * 1000).toISOString();
+};
+
+export const isSingleWeb2Identity = (
+  platform: Platform,
+  identityGraph: { vertices: IdentityRecord[]; edges: IdentityGraphEdge[] },
+) => {
+  if (getPlatform(platform)?.system === PlatformSystem.web2) {
+    const { vertices, edges } = identityGraph;
+    return vertices.length === 1 && edges.length === 0;
+  }
+  return false;
 };
