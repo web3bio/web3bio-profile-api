@@ -16,6 +16,7 @@ export enum QueryType {
   BATCH_GET_UNIVERSAL = "BATCH_GET_UNIVERSAL",
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
+  GET_BATCH = "GET_BATCH",
 }
 
 export function getQuery(type: QueryType): string {
@@ -309,6 +310,34 @@ const QUERIES = {
         identityGraph {
           graphId
         }
+      }
+    }
+  `,
+  [QueryType.GET_BATCH]: `
+    query GET_BATCH($ids: [String!]!) {
+      identities(ids: $ids) {
+        aliases
+        id
+        profile {
+          address
+          avatar
+          contenthash
+          description
+          displayName
+          identity
+          network
+          platform
+          texts
+          uid
+          social {
+            follower
+            following
+            uid
+            updatedAt
+          }
+        }
+        identity
+        platform
       }
     }
   `,
