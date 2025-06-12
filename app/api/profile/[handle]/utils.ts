@@ -24,7 +24,7 @@ import {
   respondWithCache,
 } from "@/utils/utils";
 import { generateProfileStruct } from "@/utils/base";
-import { processJson } from "../../graph/utils";
+import { processJson } from "../../search/utils";
 
 // Constantsa
 const DEFAULT_PLATFORM_ORDER = [
