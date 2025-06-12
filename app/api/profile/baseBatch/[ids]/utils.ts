@@ -22,6 +22,7 @@ export async function handleOrininalbatch(
     });
   try {
     const queryIds = resolveIdentityBatch(ids);
+
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -36,18 +37,23 @@ export async function handleOrininalbatch(
       .then((res) => res.json())
       .catch(null);
 
-    const resJson = response.data.identities.map((x: any) => {
-      const _profile = x.profile;
-      return {
-        address: _profile.address,
-        identity: _profile.identity,
-        platform: _profile.platform,
-        displayName: _profile.displayName,
-        avatar: _profile.avatar,
-        description: _profile.description,
-        aliases: x.aliases,
-      };
-    });
+    const resJson = response.data.identities
+      .map((x: any) => {
+        const _profile = x.profile;
+        if (_profile) {
+          return {
+            address: _profile.address,
+            identity: _profile.identity,
+            platform: _profile.platform,
+            displayName: _profile.displayName,
+            avatar: _profile.avatar,
+            description: _profile.description,
+            aliases: x.aliases,
+          };
+        }
+        return null;
+      })
+      .filter((x: any) => !!x);
 
     return respondWithCache(JSON.stringify(resJson));
   } catch (e: unknown) {
