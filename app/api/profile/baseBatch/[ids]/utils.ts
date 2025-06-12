@@ -36,9 +36,20 @@ export async function handleOrininalbatch(
       .then((res) => res.json())
       .catch(null);
 
-    console.log(response);
+    const resJson = response.data.identities.map((x: any) => {
+      const _profile = x.profile;
+      return {
+        address: _profile.address,
+        identity: _profile.identity,
+        platform: _profile.platform,
+        displayName: _profile.displayName,
+        avatar: _profile.avatar,
+        description: _profile.description,
+        aliases: x.aliases,
+      };
+    });
 
-    return respondWithCache(JSON.stringify(response));
+    return respondWithCache(JSON.stringify(resJson));
   } catch (e: unknown) {
     return errorHandle({
       identity: JSON.stringify(ids),

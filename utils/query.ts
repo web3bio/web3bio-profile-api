@@ -317,7 +317,6 @@ const QUERIES = {
     query GET_BATCH($ids: [String!]!) {
       identities(ids: $ids) {
         aliases
-        id
         profile {
           address
           avatar
@@ -336,8 +335,6 @@ const QUERIES = {
             updatedAt
           }
         }
-        identity
-        platform
       }
     }
   `,
