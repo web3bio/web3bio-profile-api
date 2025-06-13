@@ -339,7 +339,6 @@ export async function queryIdentityGraphBatch(
 ) {
   try {
     const queryIds = resolveIdentityBatch(ids);
-
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -382,6 +381,7 @@ export async function queryIdentityGraphBatch(
         return null;
       })
       .filter(Boolean);
+
     return queryIds
       .map((x) =>
         results.find((i) => {
@@ -389,7 +389,7 @@ export async function queryIdentityGraphBatch(
           const [_platform, _identity] = x.split(",");
           if (
             i.platform === _platform &&
-            i.identity === normalizeText(_identity)
+            normalizeText(i.identity) === normalizeText(_identity)
           )
             return i;
           return null;
