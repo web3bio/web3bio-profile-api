@@ -7,7 +7,6 @@ import { detectPlatform } from "web3bio-profile-kit/utils";
 import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
 import { ProfileRecord, type AuthHeaders } from "./types";
 import { generateProfileStruct, resolveIdentityBatch } from "./base";
-import { __InputValue } from "graphql";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",

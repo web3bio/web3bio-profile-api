@@ -144,7 +144,6 @@ export async function generateProfileStruct(
     return nsObj;
   }
 
-  // Fetch social links and avatar concurrently
   const socialData = await generateSocialLinks(data, edges);
 
   return {
