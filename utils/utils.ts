@@ -1,14 +1,12 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import { getPlatform, isValidEthereumAddress } from "web3bio-profile-kit/utils";
-import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
 import {
-  type AuthHeaders,
-  errorHandleProps,
-  IdentityGraphEdge,
-  IdentityGraphQueryResponse,
-  IdentityRecord,
-} from "./types";
+  getPlatform,
+  isValidEthereumAddress,
+  REGEX,
+} from "web3bio-profile-kit/utils";
+import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
+import { type AuthHeaders, errorHandleProps, IdentityRecord } from "./types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -90,13 +88,16 @@ export const formatText = (string: string, length?: number) => {
   }
 };
 
-export const normalizeText = (input?: string): string => {
+export const normalizeText = (input?: string) => {
   if (!input) return "";
-
   try {
-    return normalize(input);
+    const decodedInput = decodeURIComponent(input);
+    if (REGEX.EMOJI.test(decodedInput)) {
+      return normalize(decodedInput);
+    } else {
+      return input;
+    }
   } catch (error) {
-    console.warn("Text normalization failed:", error);
     return input;
   }
 };

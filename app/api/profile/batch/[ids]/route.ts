@@ -1,15 +1,15 @@
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { handleRequest } from "./utils";
+import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
+import { queryIdentityGraphBatch } from "@/utils/query";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
   const { searchParams } = req.nextUrl;
-
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
-    return handleRequest(ids, headers, false);
+    const resJson = await queryIdentityGraphBatch(ids, false, headers);
+    return respondWithCache(JSON.stringify(resJson));
   } catch (e: unknown) {
     return errorHandle({
       identity: searchParams.get("ids"),

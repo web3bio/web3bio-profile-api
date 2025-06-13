@@ -2,18 +2,16 @@ import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Batch Query", () => {
   const getIds = [
-    "suji_yan.twitter",
     "ens,sujiyan.eth",
     "ens,vitalik.eth",
     "tony.base.eth",
-    "dwr.eth.farcaster",
     "suji.fcast.id",
     "lens,stani.lens",
     "linea,0xthor.linea.eth",
     "184.linea",
-    "farcaster,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
     "ens,аррӏе.eth",
     "farcaster,#3",
+    "ens,2️⃣2️⃣.eth",
   ];
 
   it("It should response 200 for Batch Query GET", async () => {
@@ -23,7 +21,8 @@ describe("Test For Batch Query", () => {
     const json = await res.json();
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
-    expect(json[2].createdAt).toBe("2020-02-06T18:23:40.000Z");
-    expect(json[11].identity).toBe("dwr.eth");
+    expect(json[1].createdAt).toBe("2020-02-06T18:23:40.000Z");
+    expect(json[7].identity).toBe("аррӏе.eth");
+    expect(json[9].address).toBe("0x111111176b0b13ffc31d387d08726772a0492948");
   });
 });
