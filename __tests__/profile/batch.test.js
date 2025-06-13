@@ -22,7 +22,7 @@ describe("Test For Batch Query", () => {
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
     expect(json[1].createdAt).toBe("2020-02-06T18:23:40.000Z");
-    expect(json[8].identity).toBe("dwr.eth");
+    expect(json[7].identity).toBe("аррӏе.eth");
     expect(json[9].address).toBe("0x111111176b0b13ffc31d387d08726772a0492948");
   });
 });
