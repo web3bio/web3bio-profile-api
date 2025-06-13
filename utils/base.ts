@@ -136,21 +136,16 @@ export async function generateProfileStruct(
       (isWeb3Address(data.identity)
         ? formatText(data.identity)
         : data.identity),
-    avatar: null,
+    avatar: await resolveEipAssetURL(data.avatar),
     description: data.description || null,
   };
-
-  // Fetch social links and avatar concurrently
-  const [socialData, avatar] = await Promise.all([
-    generateSocialLinks(data, edges),
-    resolveEipAssetURL(data.avatar),
-  ]);
-
-  nsObj.avatar = avatar;
 
   if (ns) {
     return nsObj;
   }
+
+  // Fetch social links and avatar concurrently
+  const socialData = await generateSocialLinks(data, edges);
 
   return {
     ...nsObj,
