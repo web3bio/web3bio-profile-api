@@ -4,9 +4,10 @@ import {
   type Platform,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
-import { IDENTITY_GRAPH_SERVER } from "./utils";
+import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
 import { ProfileRecord, type AuthHeaders } from "./types";
 import { generateProfileStruct, resolveIdentityBatch } from "./base";
+import { __InputValue } from "graphql";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
@@ -339,6 +340,7 @@ export async function queryIdentityGraphBatch(
 ) {
   try {
     const queryIds = resolveIdentityBatch(ids);
+
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -353,24 +355,16 @@ export async function queryIdentityGraphBatch(
 
     const json = await response.json();
     if (!json || json?.code || !json.data.identities) return json;
-    const resultsMap = new Map();
-    await Promise.allSettled(
-      json.data.identities.map(
-        async (x: {
-          profile: ProfileRecord;
-          aliases: IdentityString[];
-          registeredAt: number;
-        }) => {
-          const matchingId = queryIds.find(
-            (id) =>
-              x.aliases.includes(id) ||
-              (x.profile.identity === id.split(",")[1] &&
-                x.profile.platform === id.split(",")[0]),
-          );
 
-          if (matchingId) {
-            const originalIndex = queryIds.indexOf(matchingId);
-            const result = {
+    const results = (
+      await Promise.allSettled(
+        json.data.identities.map(
+          async (x: {
+            profile: ProfileRecord;
+            aliases: IdentityString[];
+            registeredAt: number;
+          }) => {
+            return {
               ...(await generateProfileStruct(
                 {
                   ...x.profile,
@@ -380,13 +374,28 @@ export async function queryIdentityGraphBatch(
               )),
               aliases: x.aliases,
             };
-            resultsMap.set(originalIndex, result);
-          }
-        },
-      ),
-    );
+          },
+        ),
+      )
+    )
+      .map((x) => {
+        if (x.status === "fulfilled") return x.value;
+        return null;
+      })
+      .filter(Boolean);
     return queryIds
-      .map((_, index) => resultsMap.get(index) || null)
+      .map((x) =>
+        results.find((i) => {
+          if (i.aliases.includes(x)) return i;
+          const [_platform, _identity] = x.split(",");
+          if (
+            i.platform === _platform &&
+            i.identity === normalizeText(_identity)
+          )
+            return i;
+          return null;
+        }),
+      )
       .filter(Boolean);
   } catch (e) {
     throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
