@@ -16,7 +16,6 @@ describe("Test For Batch Query", () => {
 
   it("It should response 200 for Batch Query GET", async () => {
     const url = `/profile/batch/${encodeURIComponent(JSON.stringify(getIds))}`;
-    console.log(url, "kk");
     const res = await queryClient(url);
     expect(res.status).toBe(200);
     const json = await res.json();
