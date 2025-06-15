@@ -1,6 +1,6 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "packageManager": "pnpm@10.11.0",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
@@ -8,7 +8,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest",
+    "test": "jest --testPathIgnorePatterns=\"/__tests__/(ns|profile)/(ud|dotbit).test.js$\"",
+    "test:all": "jest",
     "lint": "next lint"
   },
   "dependencies": {
