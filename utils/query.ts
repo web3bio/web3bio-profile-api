@@ -1,21 +1,21 @@
-import { IDENTITY_GRAPH_SERVER } from "./utils";
-import { resolveWithIdentityGraph } from "../app/api/profile/[handle]/utils";
-import { type AuthHeaders, type IdentityRecord } from "./types";
 import {
   ErrorMessages,
+  IdentityString,
   type Platform,
-  type ProfileResponse,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
+import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
+import { ProfileRecord, type AuthHeaders } from "./types";
+import { generateProfileStruct, resolveIdentityBatch } from "./base";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
   GET_GRAPH_QUERY = "GET_GRAPH_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
-  BATCH_GET_UNIVERSAL = "BATCH_GET_UNIVERSAL",
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
+  GET_BATCH = "GET_BATCH",
 }
 
 export function getQuery(type: QueryType): string {
@@ -229,85 +229,38 @@ const QUERIES = {
       }
     }
   `,
-  [QueryType.BATCH_GET_UNIVERSAL]: `
-    query BATCH_GET_UNIVERSAL($ids: [String!]!) {
-      identitiesWithGraph(ids: $ids) {
-        id
-        aliases
-        identity
-        platform
-        isPrimary
-        registeredAt
-        resolvedAddress {
-          network
-          address
-        }
-        ownerAddress {
-          network
-          address
-        }
-        profile {
-          identity
-          platform
-          address
-          displayName
-          avatar
-          description
-          contenthash
-          texts
-          social {
-            uid
-            follower
-            following
-          }
-        }
-        identityGraph {
-          graphId
-          vertices {
-            identity
-            platform
-            isPrimary
-            registeredAt
-            resolvedAddress {
-              network
-              address
-            }
-            ownerAddress {
-              network
-              address
-            }
-            profile {
-              identity
-              platform
-              address
-              displayName
-              avatar
-              description
-              contenthash
-              texts
-              social {
-                uid
-                follower
-                following
-              }
-            }
-          }
-          edges {
-            source
-            target
-            dataSource
-            edgeType
-          }
-        }
-      }
-    }
-  `,
   [QueryType.GET_REFRESH_PROFILE]: `
     query GET_REFRESH_PROFILE($platform: Platform!, $identity: String!) {
       identity(platform: $platform, identity: $identity, refresh: true) {
         status
         identityGraph {
           graphId
+        }
+      }
+    }
+  `,
+  [QueryType.GET_BATCH]: `
+    query GET_BATCH($ids: [String!]!) {
+      identities(ids: $ids) {
+        aliases
+        registeredAt
+        profile {
+          address
+          avatar
+          contenthash
+          description
+          displayName
+          identity
+          network
+          platform
+          texts
+          uid
+          social {
+            follower
+            following
+            uid
+            updatedAt
+          }
         }
       }
     }
@@ -385,6 +338,7 @@ export async function queryIdentityGraphBatch(
   headers: AuthHeaders,
 ) {
   try {
+    const queryIds = resolveIdentityBatch(ids);
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -392,36 +346,56 @@ export async function queryIdentityGraphBatch(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        query: getQuery(QueryType.BATCH_GET_UNIVERSAL),
-        variables: { ids },
+        query: getQuery(QueryType.GET_BATCH),
+        variables: { ids: queryIds },
       }),
     });
 
     const json = await response.json();
-    if (!json || json?.code) return json;
-    // Process all identities in parallel
-    const responses = await Promise.allSettled(
-      (json.data.identitiesWithGraph || []).map(
-        async (item: IdentityRecord) => {
-          const [platform, handle] = item.id.split(",");
-          const profiles = (await resolveWithIdentityGraph({
-            handle,
-            platform: platform as Platform,
-            ns,
-            response: { data: { identity: { ...item } } },
-          })) as ProfileResponse[];
-          if (profiles?.[0]) {
+    if (!json || json?.code || !json.data.identities) return json;
+
+    const results = (
+      await Promise.allSettled(
+        json.data.identities.map(
+          async (x: {
+            profile: ProfileRecord;
+            aliases: IdentityString[];
+            registeredAt: number;
+          }) => {
             return {
-              ...profiles[0],
-              aliases: item.aliases,
+              ...(await generateProfileStruct(
+                {
+                  ...x.profile,
+                  createdAt: x.registeredAt,
+                },
+                ns,
+              )),
+              aliases: x.aliases,
             };
-          }
-        },
-      ),
-    );
-    return responses
-      .filter((x) => x.status === "fulfilled")
-      .map((x) => x.value);
+          },
+        ),
+      )
+    )
+      .map((x) => {
+        if (x.status === "fulfilled") return x.value;
+        return null;
+      })
+      .filter(Boolean);
+
+    return queryIds
+      .map((x) =>
+        results.find((i) => {
+          if (i.aliases.includes(x)) return i;
+          const [_platform, _identity] = x.split(",");
+          if (
+            i.platform === _platform &&
+            normalizeText(i.identity) === normalizeText(_identity)
+          )
+            return i;
+          return null;
+        }),
+      )
+      .filter(Boolean);
   } catch (e) {
     throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }

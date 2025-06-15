@@ -1,3 +1,14 @@
+import {
+  ErrorMessages,
+  NSResponse,
+  Platform,
+  ProfileResponse,
+} from "web3bio-profile-kit/types";
+import {
+  isSameAddress,
+  isSupportedPlatform,
+  isWeb3Address,
+} from "web3bio-profile-kit/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
@@ -12,20 +23,8 @@ import {
   normalizeText,
   respondWithCache,
 } from "@/utils/utils";
-import {
-  ErrorMessages,
-  NSResponse,
-  Platform,
-  ProfileResponse,
-} from "web3bio-profile-kit/types";
-import {
-  isSameAddress,
-  isSupportedPlatform,
-  isWeb3Address,
-} from "web3bio-profile-kit/utils";
-
 import { generateProfileStruct } from "@/utils/base";
-import { processJson } from "../../graph/utils";
+import { processJson } from "../../search/utils";
 
 // Constantsa
 const DEFAULT_PLATFORM_ORDER = [

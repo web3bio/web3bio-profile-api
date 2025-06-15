@@ -130,6 +130,12 @@ describe("Test For Universal Profile API", () => {
       json.find((x) => x.platform === "farcaster").links.twitter.handle,
     ).toBe("livid");
   });
+  it("It should response 200 data for griff.eth.farcaster", async () => {
+    const res = await queryClient("/profile/griff.eth.farcaster");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].platform).toBe("farcaster");
+  });
   it("It should response 200 data for аррӏе.eth", async () => {
     const res = await queryClient("/profile/аррӏе.eth");
     expect(res.status).toBe(200);

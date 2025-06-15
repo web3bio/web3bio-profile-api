@@ -1,5 +1,10 @@
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
+import {
+  errorHandle,
+  getUserHeaders,
+  isSingleWeb2Identity,
+  respondWithCache,
+} from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { processJson } from "./utils";
@@ -37,6 +42,16 @@ export async function GET(req: NextRequest) {
             : ErrorMessages.NOT_FOUND,
       });
     }
+
+    if (isSingleWeb2Identity(rawJson.data.identity)) {
+      return errorHandle({
+        identity: identity,
+        platform: platform || "graph",
+        code: 404,
+        message: ErrorMessages.NOT_FOUND,
+      });
+    }
+
     const result = await processJson(rawJson);
 
     return respondWithCache(JSON.stringify(result));

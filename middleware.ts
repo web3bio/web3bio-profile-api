@@ -17,7 +17,7 @@ export const config = {
   matcher: [
     "/stats/:path*",
     "/domain/:path*",
-    "/graph/:path*",
+    "/search/:path*",
     "/ns/:path*",
     "/profile/:path*",
     "/credentials/:path*",
@@ -50,7 +50,7 @@ function logWithInfo(req: NextRequest, token: string) {
   } = {
     key: token?.replace("Bearer ", ""),
   };
-  if (["/graph"].includes(pathname)) {
+  if (["/search"].includes(pathname)) {
     message.params = search.replace("?", "");
   }
   return console.log(JSON.stringify(message));
