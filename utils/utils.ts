@@ -27,6 +27,7 @@ export const getUserHeaders = (headers: Headers): AuthHeaders => {
 
 export const errorHandle = ({
   identity = "",
+  path,
   platform,
   message,
   code = 500,
@@ -37,6 +38,7 @@ export const errorHandle = ({
   return NextResponse.json(
     {
       address: isValidAddress ? identity : null,
+      path,
       identity: isValidAddress ? null : identity || null,
       platform,
       error: message,

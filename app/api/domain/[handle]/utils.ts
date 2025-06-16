@@ -7,6 +7,7 @@ export const resolveDomainQuery = async (
   handle: string,
   platform: Platform,
   headers: AuthHeaders,
+  pathname: string,
 ) => {
   const response = await queryIdentityGraph(
     QueryType.GET_DOMAIN,
@@ -19,6 +20,7 @@ export const resolveDomainQuery = async (
     return errorHandle({
       identity: handle,
       platform: platform,
+      path: pathname,
       code: 404,
       message: ErrorMessages.NOT_FOUND,
     });

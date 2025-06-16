@@ -46,13 +46,14 @@ const queryDomains = async (handle: string, headers: AuthHeaders) => {
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const name = searchParams.get("handle");
 
   if (!name)
     return errorHandle({
       identity: null,
-      platform: "domains",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
       code: 404,
     });
@@ -61,7 +62,8 @@ export async function GET(req: NextRequest) {
     if (json.code) {
       return errorHandle({
         identity: name,
-        platform: "domains",
+        platform: null,
+        path: pathname,
         message: json.msg || ErrorMessages.NOT_FOUND,
         code: json.code,
       });
@@ -70,7 +72,8 @@ export async function GET(req: NextRequest) {
   } catch (e: unknown) {
     return errorHandle({
       identity: name,
-      platform: "domains",
+      platform: null,
+      path: pathname,
       message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
       code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });

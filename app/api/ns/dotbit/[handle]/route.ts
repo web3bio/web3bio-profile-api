@@ -8,18 +8,25 @@ export const runtime = "edge";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
 
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
   if (!REGEX.DOTBIT.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
       identity: handle,
+      path: pathname,
       platform: Platform.dotbit,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
 
-  return resolveIdentityHandle(handle, Platform.dotbit, headers, true);
+  return resolveIdentityHandle(
+    handle,
+    Platform.dotbit,
+    headers,
+    true,
+    pathname,
+  );
 }

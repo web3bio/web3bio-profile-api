@@ -4,18 +4,18 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
-  console.log(handle);
-  if (!handle) {
+  const { searchParams, pathname } = req.nextUrl;
+  const path = searchParams.get("path") || "";
+  if (!path) {
     return errorHandle({
-      identity: handle,
+      identity: path,
       code: 404,
-      platform: "stats",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const response = await fetch(`https://graph.web3.bio/stats/${handle}`, {
+  const response = await fetch(`https://graph.web3.bio/stats/${path}`, {
     headers: {
       ...headers,
     },
@@ -24,9 +24,10 @@ export async function GET(req: NextRequest) {
     .catch(null);
   if (!response || response.error) {
     return errorHandle({
-      identity: handle,
+      identity: path,
       code: 404,
-      platform: "stats",
+      path: req.nextUrl.pathname,
+      platform: null,
       message: ErrorMessages.NOT_FOUND,
     });
   }

@@ -10,7 +10,7 @@ import {
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
 
   const resolvedHandle = REGEX.SOLANA_ADDRESS.test(handle)
@@ -25,13 +25,20 @@ export async function GET(req: NextRequest) {
   )
     return errorHandle({
       identity: resolvedHandle,
+      path: pathname,
       platform: Platform.farcaster,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
 
   const queryInput = prettify(resolvedHandle);
-  return resolveIdentityHandle(queryInput, Platform.farcaster, headers, false);
+  return resolveIdentityHandle(
+    queryInput,
+    Platform.farcaster,
+    headers,
+    false,
+    pathname,
+  );
 }
 
 export const runtime = "edge";

@@ -10,7 +10,7 @@ import {
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const inputName = searchParams.get("handle")?.toLowerCase() || "";
   const handle = isValidEthereumAddress(inputName)
     ? inputName
@@ -19,11 +19,18 @@ export async function GET(req: NextRequest) {
   if (!REGEX.BASENAMES.test(handle) && !isValidEthereumAddress(handle))
     return errorHandle({
       identity: handle,
+      path: pathname,
       platform: Platform.basenames,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
-  return resolveIdentityHandle(handle, Platform.basenames, headers, true);
+  return resolveIdentityHandle(
+    handle,
+    Platform.basenames,
+    headers,
+    true,
+    pathname,
+  );
 }
 
 export const runtime = "edge";

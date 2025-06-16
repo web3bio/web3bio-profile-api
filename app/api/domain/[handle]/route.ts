@@ -6,20 +6,21 @@ import { resolveDomainQuery } from "./utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
   const id = resolveIdentity(handle);
-  if (!id) {
+  const platform = id?.split(",")[0] as Platform;
+  const identity = id?.split(",")[1];
+  if (!identity || !platform) {
     return errorHandle({
       identity: handle,
       code: 404,
-      platform: "domain",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as Platform;
-  const identity = id.split(",")[1];
 
-  return await resolveDomainQuery(identity, platform, headers);
+  return await resolveDomainQuery(identity, platform, headers, pathname);
 }
 export const runtime = "edge";

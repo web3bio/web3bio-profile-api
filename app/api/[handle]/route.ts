@@ -4,14 +4,15 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
   const id = resolveIdentity(handle);
   if (!id) {
     return errorHandle({
       identity: handle,
       code: 404,
-      platform: "universal",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }

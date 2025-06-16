@@ -389,6 +389,7 @@ export const resolveUniversalHandle = async (
   platform: Platform,
   headers: AuthHeaders,
   ns: boolean = false,
+  pathname: string,
 ) => {
   const response = await queryIdentityGraph(
     ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
@@ -407,6 +408,7 @@ export const resolveUniversalHandle = async (
   if ("message" in res) {
     return errorHandle({
       identity: res.identity,
+      path: pathname,
       platform: res.platform,
       code: res.code,
       message: res.message,

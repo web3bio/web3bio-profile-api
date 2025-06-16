@@ -8,11 +8,13 @@ export async function handleRequest(
   ids: string[],
   headers: AuthHeaders,
   ns: boolean,
+  pathname: string,
 ) {
   if (!ids?.length)
     return errorHandle({
       identity: null,
-      platform: "batch",
+      platform: null,
+      path: pathname,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
@@ -23,7 +25,8 @@ export async function handleRequest(
     if (json.code) {
       return errorHandle({
         identity: JSON.stringify(ids),
-        platform: "batch",
+        platform: null,
+        path: pathname,
         code: json.code,
         message: json.msg,
       });
@@ -32,7 +35,8 @@ export async function handleRequest(
   } catch (e: unknown) {
     return errorHandle({
       identity: JSON.stringify(ids),
-      platform: "batch",
+      platform: null,
+      path: pathname,
       code: e instanceof Error ? Number(e.cause) : 500,
       message: ErrorMessages.NOT_FOUND,
     });

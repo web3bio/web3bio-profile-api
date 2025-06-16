@@ -6,13 +6,15 @@ import { resolveCredentialsHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const handle = req.nextUrl.searchParams.get("handle") || "";
+  const { searchParams, pathname } = req.nextUrl;
+  const handle = searchParams.get("handle") || "";
   const id = resolveIdentity(handle);
   if (!id) {
     return errorHandle({
       identity: handle,
       code: 404,
-      platform: "credentials",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }

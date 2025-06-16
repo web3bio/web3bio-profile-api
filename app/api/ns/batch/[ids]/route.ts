@@ -5,15 +5,16 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
 
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
-    return handleRequest(ids, headers, true);
+    return handleRequest(ids, headers, true, pathname);
   } catch (e: unknown) {
     return errorHandle({
       identity: searchParams.get("ids"),
-      platform: "batch",
+      path: pathname,
+      platform: null,
       code: 404,
       message: e instanceof Error ? e.message : ErrorMessages.INVALID_IDENTITY,
     });
