@@ -3,6 +3,22 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { AuthHeaders } from "@/utils/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 
+enum StatsPath {
+  ens = "ens",
+  farcaster = "farcaster",
+  lens = "lens",
+  basenames = "basenames",
+  linea = "linea",
+  web2 = "web2",
+  graph = "graph",
+  sns = "sns",
+  box = "box",
+  clusters = "cluster",
+}
+
+function isValidStatsPath(path: string): path is StatsPath {
+  return Object.values(StatsPath).includes(path as StatsPath);
+}
 const GRAPH_API_BASE_URL = "https://graph.web3.bio/stats";
 
 async function fetchStatsData(
@@ -26,7 +42,7 @@ export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const path = searchParams.get("path");
 
-  if (!path) {
+  if (!path || !isValidStatsPath(path)) {
     return errorHandle({
       identity: path,
       code: 404,
