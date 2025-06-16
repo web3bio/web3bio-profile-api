@@ -1,6 +1,5 @@
-import { getPlatform } from "web3bio-profile-kit/utils";
+import { getPlatform, resolveIdentity } from "web3bio-profile-kit/utils";
 import type { Platform } from "web3bio-profile-kit/types";
-import { resolveIdentity } from "web3bio-profile-kit/utils";
 
 const ITEMS = 12;
 const SIZE = 480;

@@ -1,8 +1,7 @@
+import { getPlatform, getNetwork, REGEX } from "web3bio-profile-kit/utils";
+import { Platform } from "web3bio-profile-kit/types";
 import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
-import { getPlatform, getNetwork } from "web3bio-profile-kit/utils";
-import { Platform } from "web3bio-profile-kit/types";
-import { REGEX } from "web3bio-profile-kit/utils";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
@@ -74,7 +73,7 @@ function resolveSocialMediaLink(name: string, type: Platform | string): string {
     case Platform.lens:
       return getPlatform(Platform.lens).urlPrefix + name.replace(/\.lens$/, "");
     default:
-      const prefix = getPlatform(type as Platform).urlPrefix;
+      const prefix = getPlatform(type as Platform)?.urlPrefix;
       return prefix ? prefix + name : "";
   }
 }
@@ -91,11 +90,12 @@ export const resolveEipAssetURL = async (
 
   if (!contractAddress || !tokenId) return resolveMediaURL(source);
 
-  const network = getNetwork(Number(chainId));
+  const network = getNetwork(Number(chainId))?.key;
   if (!network) return resolveMediaURL(source);
 
   try {
     const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
+
     const res = await fetch(fetchURL, {
       headers: {
         "x-api-key": process.env.OPENSEA_API_KEY || "",

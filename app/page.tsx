@@ -5,7 +5,7 @@ import { BASE_URL } from "../utils/utils";
 export async function generateMetadata() {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and Unstoppable Domains into their apps.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and more into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -103,8 +103,7 @@ export default function Home() {
               >
                 Solana / SNS
               </span>
-              , <span className="text-underline">Unstoppable Domains</span>, and
-              more into their apps. These APIs are already integrated into{" "}
+              , and more into their apps. These APIs are already integrated into{" "}
               <a
                 href="https://web3.bio"
                 target="_blank"
@@ -669,7 +668,7 @@ export default function Home() {
                 <br />
                 An Ethereum address, an ENS domain, a Basenames domain, a Linea
                 Name Service domain, a Farcaster username (ends with
-                .farcaster), a Lens handle or an Unstoppable Domains domain.
+                .farcaster), or a Lens handle.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -743,16 +742,6 @@ export default function Home() {
                 <span className="text-gray ml-2 mr-2">OR</span>
                 <a href={`${BASE_URL}/ns/stani.lens`} target="_blank">
                   /ns/stani.lens
-                </a>
-              </li>
-              <li>
-                <span className="label">Unstoppable Domains</span>{" "}
-                <a href={`${BASE_URL}/profile/sandy.nft`} target="_blank">
-                  /profile/sandy.nft
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/sandy.nft`} target="_blank">
-                  /ns/sandy.nft
                 </a>
               </li>
             </ul>
