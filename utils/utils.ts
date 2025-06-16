@@ -42,8 +42,8 @@ export const errorHandle = ({
   return NextResponse.json(
     {
       address: isValidAddress ? identity : null,
-      path,
       identity: isValidAddress ? null : identity || null,
+      path,
       platform,
       error: message,
     },
