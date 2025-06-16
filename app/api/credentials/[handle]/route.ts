@@ -9,17 +9,17 @@ export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
   const id = resolveIdentity(handle);
-  if (!id) {
+  const platform = id?.split(",")[0] as Platform;
+  const identity = id?.split(",")[1];
+  if (!identity || !platform) {
     return errorHandle({
       identity: handle,
       code: 404,
       path: pathname,
-      platform: null,
+      platform: platform,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as Platform;
-  const identity = id.split(",")[1];
 
   return resolveCredentialsHandle(identity, platform, headers);
 }
