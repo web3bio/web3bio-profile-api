@@ -1,4 +1,4 @@
-import { Platform } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
@@ -7,12 +7,13 @@ import type {
   CredentialRecordRaw,
   CredentialsResponse,
 } from "@/utils/types";
-import { respondWithCache } from "@/utils/utils";
+import { errorHandle, respondWithCache } from "@/utils/utils";
 
 export const resolveCredentialsHandle = async (
   identity: string,
   platform: Platform,
   headers: AuthHeaders,
+  pathname: string,
 ) => {
   const res = await queryIdentityGraph(
     QueryType.GET_CREDENTIALS_QUERY,
@@ -23,7 +24,13 @@ export const resolveCredentialsHandle = async (
 
   // Early return if no identity data
   if (!res?.data?.identity?.identityGraph?.vertices) {
-    return respondWithCache("[]");
+    return errorHandle({
+      identity: identity,
+      code: 404,
+      path: pathname,
+      platform: platform,
+      message: ErrorMessages.NOT_FOUND,
+    });
   }
 
   const credentials = (
@@ -38,7 +45,13 @@ export const resolveCredentialsHandle = async (
     });
 
   if (!credentials.length) {
-    return respondWithCache("[]");
+    return errorHandle({
+      identity: identity,
+      code: 404,
+      path: pathname,
+      platform: platform,
+      message: ErrorMessages.NOT_FOUND,
+    });
   }
 
   const json = resolveCredentialsStruct(credentials);

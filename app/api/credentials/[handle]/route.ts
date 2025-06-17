@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return resolveCredentialsHandle(identity, platform, headers);
+  return resolveCredentialsHandle(identity, platform, headers, pathname);
 }
 
 export const runtime = "edge";
