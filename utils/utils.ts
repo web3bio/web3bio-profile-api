@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import {
-  getPlatform,
-  isValidEthereumAddress,
-  REGEX,
-} from "web3bio-profile-kit/utils";
+import { getPlatform, REGEX } from "web3bio-profile-kit/utils";
 import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
 import { type AuthHeaders, errorHandleProps, IdentityRecord } from "./types";
 
@@ -37,12 +33,9 @@ export const errorHandle = ({
   code = 500,
   headers = {},
 }: errorHandleProps) => {
-  const isValidAddress = isValidEthereumAddress(identity || "");
-
   return NextResponse.json(
     {
-      address: isValidAddress ? identity : null,
-      identity: isValidAddress ? null : identity || null,
+      identity,
       path,
       platform,
       error: message,

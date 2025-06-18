@@ -10,7 +10,7 @@ enum StatsPath {
   basenames = "basenames",
   linea = "linea",
   web2 = "web2",
-  overview = "overview",
+  graph = "graph",
   sns = "sns",
   box = "box",
   clusters = "clusters",
@@ -24,9 +24,11 @@ const GRAPH_API_BASE_URL = "https://graph.web3.bio/stats";
 async function fetchStatsData(
   path: string,
   headers: AuthHeaders,
+  refresh?: boolean,
 ): Promise<any | null> {
   try {
-    const response = await fetch(`${GRAPH_API_BASE_URL}/${path}`, {
+    const fetchURL = `${GRAPH_API_BASE_URL}/${path}${refresh ? "?refresh=true" : ""}`;
+    const response = await fetch(fetchURL, {
       headers: {
         ...headers,
       },
@@ -41,7 +43,7 @@ async function fetchStatsData(
 export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const path = searchParams.get("path");
-
+  const refresh = searchParams.get("refresh");
   if (!path || !isValidStatsPath(path)) {
     return errorHandle({
       identity: path,
@@ -53,7 +55,7 @@ export async function GET(req: NextRequest) {
   }
 
   const headers = getUserHeaders(req.headers);
-  const response = await fetchStatsData(path, headers);
+  const response = await fetchStatsData(path, headers, Boolean(refresh));
 
   if (!response?.data || response.error) {
     return errorHandle({
