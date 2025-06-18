@@ -68,12 +68,16 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(true);
   });
-  it("It should response 200 data for solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y", async () => {
+  it("It should response 200 data for solana,HZYSfq2C4bxv5sUj2nioZXdKZmWtB8gAdvgzjKguiJsh", async () => {
     const res = await queryClient(
-      "/ns/solana,46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
+      "/ns/solana,HZYSfq2C4bxv5sUj2nioZXdKZmWtB8gAdvgzjKguiJsh",
     );
     expect(res.status).toBe(200);
+  });
+  it("It should response 200 data for ens,planetable.eth", async () => {
+    const res = await queryClient("/ns/ens,planetable.eth");
+    expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.some((x) => x.platform === "linea")).toBe(false);
+    expect(json.some((x) => x.platform === "sns")).toBe(true);
   });
 });

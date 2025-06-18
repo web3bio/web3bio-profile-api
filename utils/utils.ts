@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
 import { getPlatform, REGEX } from "web3bio-profile-kit/utils";
-import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
+import { PlatformSystem } from "web3bio-profile-kit/types";
 import { type AuthHeaders, errorHandleProps, IdentityRecord } from "./types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
