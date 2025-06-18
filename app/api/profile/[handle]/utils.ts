@@ -17,7 +17,6 @@ import type {
   ProfileRecord,
 } from "@/utils/types";
 import {
-  PLATFORMS_TO_EXCLUDE,
   errorHandle,
   formatText,
   normalizeText,
@@ -34,6 +33,8 @@ const DEFAULT_PLATFORM_ORDER = [
   Platform.ethereum,
   Platform.farcaster,
   Platform.lens,
+  Platform.sns,
+  Platform.solana,
 ];
 
 const VALID_PLATFORMS = new Set([
@@ -174,16 +175,7 @@ export const getResolvedProfileArray = (
         isPrimary,
       };
 
-  const vertices = identityGraph?.vertices;
-
-  // Early return for excluded platforms or single vertices
-  if (
-    PLATFORMS_TO_EXCLUDE.includes(platform) ||
-    !vertices ||
-    vertices.length <= 1
-  ) {
-    return [defaultReturn];
-  }
+  const vertices = identityGraph?.vertices || [];
 
   // Process based on platform type
   let results = [];
@@ -316,9 +308,11 @@ export const resolveWithIdentityGraph = async ({
     resolvedResponse,
     platform,
   ) as ProfileRecord[];
-  const sortedProfiles = PLATFORMS_TO_EXCLUDE.includes(platform)
-    ? profilesArray
-    : sortProfilesByPlatform(profilesArray, platform, handle);
+  const sortedProfiles = sortProfilesByPlatform(
+    profilesArray,
+    platform,
+    handle,
+  );
 
   // Process profiles in parallel
   const returnRes = (

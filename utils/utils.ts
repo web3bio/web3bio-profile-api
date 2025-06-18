@@ -16,7 +16,6 @@ export const BASE_URL =
   process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
-export const PLATFORMS_TO_EXCLUDE = [Platform.sns, Platform.solana];
 
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
   const userToken = headers?.get("x-api-key");
