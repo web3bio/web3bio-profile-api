@@ -190,7 +190,7 @@ export const resolveIdentityHandle = async (
         message: response.message,
       });
     }
-    return respondWithCache(JSON.stringify(response));
+    return respondWithCache(response);
   } catch (e: unknown) {
     return errorHandle({
       identity: handle,

@@ -5,23 +5,55 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveCredentialsHandle } from "./utils";
 
 export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
   const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
-  const platform = id?.split(",")[0] as Platform;
-  const identity = id?.split(",")[1];
-  if (!identity || !platform) {
+
+  // Early validation for empty handle
+  if (!handle.trim()) {
     return errorHandle({
       identity: handle,
-      code: 404,
+      code: 400,
       path: pathname,
-      platform: platform,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
 
-  return resolveCredentialsHandle(identity, platform, headers, pathname);
+  // Resolve identity once and validate
+  const resolvedId = resolveIdentity(handle);
+  if (!resolvedId) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: null,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Parse platform and identity from resolved ID
+  const [platform, identity] = resolvedId.split(",", 2);
+
+  // Validate both platform and identity exist
+  if (!platform || !identity) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: (platform as Platform) || null,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Get headers only after validation passes
+  const headers = getUserHeaders(req.headers);
+
+  return resolveCredentialsHandle(
+    identity,
+    platform as Platform,
+    headers,
+    pathname,
+  );
 }
 
 export const runtime = "edge";

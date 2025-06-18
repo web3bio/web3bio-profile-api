@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
   try {
     const ids = JSON.parse(searchParams.get("ids") || "");
     const resJson = await queryIdentityGraphBatch(ids, false, headers);
-    return respondWithCache(JSON.stringify(resJson));
+    return respondWithCache(resJson);
   } catch (e: unknown) {
     return errorHandle({
       identity: searchParams.get("ids"),

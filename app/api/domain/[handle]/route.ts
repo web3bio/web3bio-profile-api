@@ -4,14 +4,27 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery } from "./utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
-  const platform = id?.split(",")[0] as Platform;
-  const identity = id?.split(",")[1];
-  if (!identity || !platform) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
+
+  // Early validation
+  if (!handle) {
+    return errorHandle({
+      identity: "",
+      code: 400,
+      path: pathname,
+      platform: null,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Resolve identity once
+  const resolvedId = resolveIdentity(handle);
+  if (!resolvedId) {
     return errorHandle({
       identity: handle,
       code: 404,
@@ -21,6 +34,23 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return await resolveDomainQuery(identity, platform, headers, pathname);
+  // Parse platform and identity
+  const [platform, identity] = resolvedId.split(",") as [Platform, string];
+
+  // Validate parsed values
+  if (!platform || !identity) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: platform || null,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Get headers and resolve domain
+  const headers = getUserHeaders(req.headers);
+  return resolveDomainQuery(identity, platform, headers, pathname);
 }
+
 export const runtime = "edge";

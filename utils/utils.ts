@@ -62,8 +62,8 @@ const cacheControl =
     ? "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200"
     : "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
 
-export const respondWithCache = (json: string) => {
-  return NextResponse.json(JSON.parse(json), {
+export const respondWithCache = (data: any) => {
+  return NextResponse.json(data, {
     status: 200,
     headers: {
       "Content-Type": "application/json",

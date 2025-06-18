@@ -414,5 +414,5 @@ export const resolveUniversalHandle = async (
     });
   }
 
-  return respondWithCache(JSON.stringify(res));
+  return respondWithCache(res);
 };

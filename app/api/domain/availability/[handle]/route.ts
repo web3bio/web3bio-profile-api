@@ -8,6 +8,29 @@ import {
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 
+interface DomainAvailabilityParams {
+  params: {
+    handle: string;
+  };
+}
+
+interface DomainAvailabilityResponse {
+  platform: string;
+  name: string;
+  expiredAt: string | null;
+  availability: boolean;
+  status: string;
+}
+
+interface GraphQLResponse {
+  data?: {
+    domainAvailableSearch: DomainAvailabilityResponse[];
+  };
+  errors?: unknown;
+  code?: number;
+  msg?: string;
+}
+
 const GET_AVAILABLE_DOMAINS = `
   query GET_AVAILABLE_DOMAINS($name: String!) {
     domainAvailableSearch(name: $name) {
@@ -20,62 +43,88 @@ const GET_AVAILABLE_DOMAINS = `
   }
 `;
 
-const queryDomains = async (handle: string, headers: AuthHeaders) => {
-  try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: GET_AVAILABLE_DOMAINS,
-        variables: {
-          name: handle,
-        },
-      }),
-    });
+const queryDomains = async (
+  handle: string,
+  headers: AuthHeaders,
+): Promise<GraphQLResponse> => {
+  const response = await fetch(IDENTITY_GRAPH_SERVER, {
+    method: "POST",
+    headers: {
+      ...headers,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: GET_AVAILABLE_DOMAINS,
+      variables: { name: handle },
+    }),
+  });
 
-    return await response.json();
-  } catch (e) {
-    return {
-      errors: e,
-    };
+  if (!response.ok) {
+    throw new Error(`GraphQL request failed: ${response.status}`);
   }
+
+  return response.json();
 };
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params }: DomainAvailabilityParams,
+): Promise<Response> {
   const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
-  const name = searchParams.get("handle");
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
-  if (!name)
+  // Validate handle parameter
+  if (!handle || typeof handle !== "string" || handle.trim().length === 0) {
     return errorHandle({
       identity: null,
       path: pathname,
       platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
-      code: 404,
+      code: 400,
     });
+  }
+
+  const trimmedHandle = handle.trim();
+
   try {
-    const json = await queryDomains(name, headers);
-    if (json.code) {
+    const result = await queryDomains(trimmedHandle, headers);
+
+    // Handle GraphQL errors
+    if (result.errors) {
       return errorHandle({
-        identity: name,
+        identity: trimmedHandle,
         platform: null,
         path: pathname,
-        message: json.msg || ErrorMessages.NOT_FOUND,
-        code: json.code,
+        message: "GraphQL query failed",
+        code: 500,
       });
     }
-    return respondWithCache(JSON.stringify(json));
-  } catch (e: unknown) {
+
+    // Handle API-level errors
+    if (result.code) {
+      return errorHandle({
+        identity: trimmedHandle,
+        platform: null,
+        path: pathname,
+        message: result.msg || ErrorMessages.NOT_FOUND,
+        code: result.code,
+      });
+    }
+
+    return respondWithCache(result);
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Unknown error occurred";
+    const errorCode =
+      error instanceof Error && error.cause ? Number(error.cause) : 500;
+
     return errorHandle({
-      identity: name,
+      identity: trimmedHandle,
       platform: null,
       path: pathname,
-      message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
-      code: e instanceof Error ? Number(e.cause) || 500 : 500,
+      message: errorMessage,
+      code: isNaN(errorCode) ? 500 : errorCode,
     });
   }
 }

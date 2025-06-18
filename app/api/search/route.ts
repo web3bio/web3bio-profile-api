@@ -57,7 +57,7 @@ export async function GET(req: NextRequest) {
 
     const result = await processJson(rawJson);
 
-    return respondWithCache(JSON.stringify(result));
+    return respondWithCache(result);
   } catch (e: unknown) {
     return errorHandle({
       identity: identity,

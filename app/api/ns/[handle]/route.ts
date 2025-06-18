@@ -5,28 +5,55 @@ import { resolveUniversalHandle } from "../../profile/[handle]/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
   const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
-  const platform = id?.split(",")[0] as Platform;
-  const identity = id?.split(",")[1];
+  const handle = searchParams.get("handle");
+
+  // Early validation
+  if (!handle) {
+    return errorHandle({
+      identity: "",
+      code: 400,
+      path: pathname,
+      platform: null,
+      message: "Missing handle parameter",
+    });
+  }
+
+  // Parse identity
+  const resolvedId = resolveIdentity(handle);
+  if (!resolvedId) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: null,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  const [platform, identity] = resolvedId.split(",", 2);
+
+  // Validate parsed data
   if (!platform || !identity) {
     return errorHandle({
       identity: handle,
       code: 404,
       path: pathname,
-      platform,
+      platform: platform as Platform,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
 
-  return await resolveUniversalHandle(
+  // Get headers and resolve
+  const headers = getUserHeaders(req.headers);
+
+  return resolveUniversalHandle(
     identity,
-    platform,
+    platform as Platform,
     headers,
-    true,
+    true, // ns = true
     pathname,
   );
 }
+
 export const runtime = "edge";

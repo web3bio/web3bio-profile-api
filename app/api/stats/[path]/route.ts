@@ -65,7 +65,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return respondWithCache(JSON.stringify(response.data));
+  return respondWithCache(response.data);
 }
 
 export const runtime = "edge";
