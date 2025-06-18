@@ -7,6 +7,7 @@ export const resolveDomainQuery = async (
   handle: string,
   platform: Platform,
   headers: AuthHeaders,
+  pathname: string,
 ) => {
   const response = await queryIdentityGraph(
     QueryType.GET_DOMAIN,
@@ -14,39 +15,56 @@ export const resolveDomainQuery = async (
     platform,
     headers,
   );
+
   const identity = response?.data?.identity;
   if (!identity) {
     return errorHandle({
       identity: handle,
-      platform: platform,
+      platform,
+      path: pathname,
       code: 404,
       message: ErrorMessages.NOT_FOUND,
     });
   }
-  const { profile, isPrimary, status, registeredAt, updatedAt, expiredAt } =
-    identity;
 
-  const ownerAddress = identity.ownerAddress[0]?.address ?? null;
-  const resolvedAddress = identity.resolvedAddress[0]?.address ?? null;
-  const managerAddress = identity.managerAddress[0]?.address ?? null;
+  // Destructure with defaults for cleaner code
+  const {
+    profile,
+    isPrimary,
+    status,
+    registeredAt,
+    updatedAt,
+    expiredAt,
+    ownerAddress = [],
+    resolvedAddress = [],
+    managerAddress = [],
+  } = identity;
 
-  const addresses = profile?.addresses
-    ? Object.fromEntries(
-        profile.addresses.map(
-          ({ network, address }: { network: string; address: string }) => [
-            network,
-            address,
-          ],
-        ),
-      )
-    : {};
+  // Extract addresses with null fallback
+  const ownerAddr = ownerAddress[0]?.address ?? null;
+  const resolvedAddr = resolvedAddress[0]?.address ?? null;
+  const managerAddr = managerAddress[0]?.address ?? null;
 
-  const json = {
+  // Build addresses object efficiently
+  const addresses =
+    profile?.addresses?.reduce(
+      (
+        acc: Record<string, string>,
+        { network, address }: { network: string; address: string },
+      ) => {
+        acc[network] = address;
+        return acc;
+      },
+      {},
+    ) ?? {};
+
+  // Build response object
+  const responseData = {
     identity: identity.identity,
     platform: identity.platform,
-    resolvedAddress,
-    ownerAddress,
-    managerAddress,
+    resolvedAddress: resolvedAddr,
+    ownerAddress: ownerAddr,
+    managerAddress: managerAddr,
     displayName: profile?.displayName ?? null,
     isPrimary,
     status,
@@ -58,5 +76,5 @@ export const resolveDomainQuery = async (
     addresses,
   };
 
-  return respondWithCache(JSON.stringify(json));
+  return respondWithCache(responseData);
 };

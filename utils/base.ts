@@ -172,6 +172,7 @@ export const resolveIdentityHandle = async (
   platform: Platform,
   headers: AuthHeaders,
   ns: boolean = false,
+  pathname: string,
 ) => {
   try {
     const response = await resolveIdentityResponse(
@@ -183,15 +184,17 @@ export const resolveIdentityHandle = async (
     if ("code" in response) {
       return errorHandle({
         identity: handle,
+        path: pathname,
         platform,
         code: response.code,
         message: response.message,
       });
     }
-    return respondWithCache(JSON.stringify(response));
+    return respondWithCache(response);
   } catch (e: unknown) {
     return errorHandle({
       identity: handle,
+      path: pathname,
       platform,
       code: e instanceof Error ? Number(e.cause) : 500,
       message: e instanceof Error ? e.message : ErrorMessages.UNKNOWN_ERROR,

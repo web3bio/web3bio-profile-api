@@ -11,14 +11,15 @@ import { processJson } from "./utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as Platform;
 
   if (!identity || !platform)
     return errorHandle({
       identity: identity,
-      platform: platform || "graph",
+      path: pathname,
+      platform: platform,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
@@ -33,7 +34,8 @@ export async function GET(req: NextRequest) {
     if (rawJson.code || rawJson.errors) {
       return errorHandle({
         identity: identity,
-        platform: platform || "graph",
+        path: pathname,
+        platform: platform,
         code: rawJson.code,
         message: rawJson.msg
           ? rawJson.msg
@@ -46,6 +48,7 @@ export async function GET(req: NextRequest) {
     if (isSingleWeb2Identity(rawJson.data.identity)) {
       return errorHandle({
         identity: identity,
+        path: pathname,
         platform: platform || "graph",
         code: 404,
         message: ErrorMessages.NOT_FOUND,
@@ -54,10 +57,11 @@ export async function GET(req: NextRequest) {
 
     const result = await processJson(rawJson);
 
-    return respondWithCache(JSON.stringify(result));
+    return respondWithCache(result);
   } catch (e: unknown) {
     return errorHandle({
       identity: identity,
+      path: pathname,
       platform: platform,
       message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
       code: e instanceof Error ? Number(e.cause) || 500 : 500,

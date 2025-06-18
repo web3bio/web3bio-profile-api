@@ -1,10 +1,6 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import {
-  getPlatform,
-  isValidEthereumAddress,
-  REGEX,
-} from "web3bio-profile-kit/utils";
+import { getPlatform, REGEX } from "web3bio-profile-kit/utils";
 import { Platform, PlatformSystem } from "web3bio-profile-kit/types";
 import { type AuthHeaders, errorHandleProps, IdentityRecord } from "./types";
 
@@ -30,17 +26,16 @@ export const getUserHeaders = (headers: Headers): AuthHeaders => {
 
 export const errorHandle = ({
   identity = "",
+  path,
   platform,
   message,
   code = 500,
   headers = {},
 }: errorHandleProps) => {
-  const isValidAddress = isValidEthereumAddress(identity || "");
-
   return NextResponse.json(
     {
-      address: isValidAddress ? identity : null,
-      identity: isValidAddress ? null : identity || null,
+      identity,
+      path,
       platform,
       error: message,
     },
@@ -59,8 +54,8 @@ const cacheControl =
     ? "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200"
     : "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
 
-export const respondWithCache = (json: string) => {
-  return NextResponse.json(JSON.parse(json), {
+export const respondWithCache = (data: any) => {
+  return NextResponse.json(data, {
     status: 200,
     headers: {
       "Content-Type": "application/json",

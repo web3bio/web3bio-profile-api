@@ -6,7 +6,7 @@ import { errorHandle, getUserHeaders } from "@/utils/utils";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+  const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle")?.toLowerCase() || "";
 
   if (
@@ -15,6 +15,7 @@ export async function GET(req: NextRequest) {
   ) {
     return errorHandle({
       identity: handle,
+      path: pathname,
       platform: Platform.unstoppableDomains,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
@@ -25,6 +26,7 @@ export async function GET(req: NextRequest) {
     Platform.unstoppableDomains,
     headers,
     true,
+    pathname,
   );
 }
 
