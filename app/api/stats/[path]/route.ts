@@ -10,7 +10,7 @@ enum StatsPath {
   basenames = "basenames",
   linea = "linea",
   web2 = "web2",
-  graph = "graph",
+  overview = "overview",
   sns = "sns",
   box = "box",
   clusters = "clusters",
