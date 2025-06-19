@@ -164,7 +164,6 @@ export const getResolvedProfileArray = (data: IdentityGraphQueryResponse) => {
     ownerAddress,
     registeredAt,
   } = resolvedRecord;
-
   const firstResolvedAddress = resolvedAddress?.[0]?.address;
   const firstOwnerAddress = ownerAddress?.[0]?.address;
   const defaultReturn = recordProfile
@@ -265,7 +264,8 @@ export const getResolvedProfileArray = (data: IdentityGraphQueryResponse) => {
         !INCLUSIVE_PLATFORMS.has(recordPlatform) &&
         ![Platform.ethereum, Platform.solana].includes(recordPlatform)
       )
-        return false;
+        return true;
+      return false;
     })();
 
     if (shouldAddDefault) {
