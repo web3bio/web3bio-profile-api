@@ -25,7 +25,10 @@ import {
 import { generateProfileStruct } from "@/utils/base";
 import { processJson } from "../../search/utils";
 
-// Constantsa
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
 const DEFAULT_PLATFORM_ORDER = [
   Platform.ens,
   Platform.basenames,
@@ -52,14 +55,262 @@ const VALID_PLATFORMS = new Set([
 ]);
 
 const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
+
 const INCLUSIVE_PLATFORMS = new Set([
   Platform.twitter,
   Platform.github,
   Platform.nextid,
 ]);
 
+// ============================================================================
+// UTILITY FUNCTIONS
+// ============================================================================
+
 const isPrimaryOrSocialPlatform = (identity: IdentityRecord) =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
+
+const isBadBasename = (
+  platform: Platform,
+  ownerAddress: string,
+  resolvedAddress: string,
+) => {
+  return platform === Platform.basenames && ownerAddress !== resolvedAddress;
+};
+
+const isValidENSOrPrimaryFarcaster = (vertex: IdentityRecord) => {
+  if (vertex.platform !== Platform.ens || vertex.isPrimaryFarcaster)
+    return true;
+
+  const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
+  const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
+  return vertexOwnerAddr === vertexResolvedAddr;
+};
+
+const isVertexMatchingAddress = (
+  vertex: IdentityRecord,
+  sourceAddr: string,
+  recordPlatform: Platform,
+) => {
+  if (!vertex.isPrimary && !SOCIAL_PLATFORMS.has(vertex.platform)) {
+    return false;
+  }
+
+  if (INCLUSIVE_PLATFORMS.has(recordPlatform)) {
+    return true;
+  }
+
+  if (vertex.platform === Platform.farcaster) {
+    return (
+      vertex.ownerAddress?.some((addr) =>
+        isSameAddress(addr.address, sourceAddr),
+      ) ?? false
+    );
+  }
+
+  if ([Platform.sns, Platform.solana].includes(recordPlatform)) {
+    return true;
+  }
+
+  return isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
+};
+
+// ============================================================================
+// DEFAULT PROFILE
+// ============================================================================
+
+const createDefaultProfile = (resolvedRecord: IdentityRecord) => {
+  const {
+    identity,
+    platform: recordPlatform,
+    profile: recordProfile,
+    isPrimary,
+    registeredAt,
+  } = resolvedRecord;
+
+  if (recordProfile) {
+    return { ...recordProfile, isPrimary, createdAt: registeredAt };
+  }
+
+  return {
+    address: isWeb3Address(identity) ? identity : null,
+    identity,
+    platform: recordPlatform,
+    displayName: isWeb3Address(identity) ? formatText(identity) : identity,
+    registeredAt,
+    isPrimary,
+  };
+};
+
+const shouldAddDefaultProfile = (recordPlatform: Platform, results: any[]) => {
+  if (
+    recordPlatform === Platform.ethereum &&
+    !results.some((x) => x.isPrimary && x.platform === Platform.ens)
+  ) {
+    return true;
+  }
+
+  if (
+    recordPlatform === Platform.solana &&
+    !results.some((x) => x.isPrimary && x.platform === Platform.sns)
+  ) {
+    return true;
+  }
+
+  if (
+    !INCLUSIVE_PLATFORMS.has(recordPlatform) &&
+    ![Platform.ethereum, Platform.solana].includes(recordPlatform)
+  ) {
+    return true;
+  }
+
+  return false;
+};
+
+// ============================================================================
+// FILTERING RESPONSE
+// ============================================================================
+
+const filterPrimaryVertices = (
+  vertices: IdentityRecord[],
+  resolvedRecord: IdentityRecord,
+) => {
+  return vertices
+    .filter((vertex) => {
+      if (
+        vertex.identity === resolvedRecord.identity &&
+        vertex.platform === resolvedRecord.platform
+      ) {
+        return false;
+      }
+
+      if (!isPrimaryOrSocialPlatform(vertex)) return false;
+
+      return isValidENSOrPrimaryFarcaster(vertex);
+    })
+    .map((vertex) => ({
+      ...vertex.profile,
+      isPrimary: vertex.isPrimary,
+      createdAt: vertex.registeredAt,
+    }));
+};
+
+const filterSecondaryVertices = (
+  vertices: IdentityRecord[],
+  resolvedRecord: IdentityRecord,
+) => {
+  const {
+    identity,
+    platform: recordPlatform,
+    resolvedAddress,
+  } = resolvedRecord;
+
+  const sourceAddr = [Platform.ethereum, Platform.solana].includes(
+    recordPlatform,
+  )
+    ? identity
+    : resolvedAddress?.[0]?.address;
+
+  return vertices
+    .filter((vertex) =>
+      isVertexMatchingAddress(vertex, sourceAddr, recordPlatform),
+    )
+    .map((vertex) => ({
+      ...vertex.profile,
+      isPrimary: vertex.isPrimary,
+      createdAt: vertex.registeredAt,
+    }));
+};
+
+const deduplicateAndFilter = (results: any[]) => {
+  return results
+    .filter((x) => isSupportedPlatform(x.platform))
+    .filter(
+      (item, index, self) =>
+        index ===
+        self.findIndex(
+          (i) => i.platform === item.platform && i.identity === item.identity,
+        ),
+    );
+};
+
+// ============================================================================
+// PROCESS RESULTS
+// ============================================================================
+
+const processPrimaryIdentity = (
+  resolvedRecord: IdentityRecord,
+  vertices: IdentityRecord[],
+) => {
+  const defaultReturn = createDefaultProfile(resolvedRecord);
+  const firstOwnerAddress = resolvedRecord.ownerAddress?.[0]?.address;
+  const firstResolvedAddress = resolvedRecord.resolvedAddress?.[0]?.address;
+
+  if (
+    isBadBasename(
+      resolvedRecord.platform,
+      firstOwnerAddress,
+      firstResolvedAddress,
+    )
+  ) {
+    return [defaultReturn];
+  }
+
+  let results = filterPrimaryVertices(vertices, resolvedRecord);
+
+  if (DEFAULT_PLATFORM_ORDER.includes(defaultReturn.platform)) {
+    return [...results, defaultReturn];
+  }
+
+  return results;
+};
+
+const processSecondaryIdentity = (
+  resolvedRecord: IdentityRecord,
+  vertices: IdentityRecord[],
+) => {
+  const defaultReturn = createDefaultProfile(resolvedRecord);
+  let results = filterSecondaryVertices(vertices, resolvedRecord);
+
+  if (shouldAddDefaultProfile(resolvedRecord.platform, results)) {
+    return [...results, defaultReturn];
+  }
+
+  return results;
+};
+
+// ============================================================================
+// CORE RESOLUTION FUNCTIONS
+// ============================================================================
+
+const getResolvedRecord = (identity: IdentityRecord) => {
+  if (!identity) return null;
+
+  const res = { ...identity };
+  const vertices = res.identityGraph?.vertices || [];
+
+  // Process Farcaster-ENS relationships
+  const farcasterEqualENSEntries = vertices
+    .filter((x) => x.platform === Platform.ens && !x.isPrimary)
+    .map((x) => {
+      if (
+        vertices.some(
+          (i) => i.platform === Platform.farcaster && i.identity === x.identity,
+        )
+      ) {
+        x.isPrimary = true;
+        x.isPrimaryFarcaster = true;
+        return x;
+      }
+      return null;
+    })
+    .filter(Boolean);
+
+  if (farcasterEqualENSEntries.length > 0) {
+    res.isPrimary = true;
+  }
+
+  return res;
+};
 
 const sortProfilesByPlatform = (
   responses: ProfileRecord[],
@@ -121,170 +372,26 @@ const sortProfilesByPlatform = (
   return [exactMatch, ...sortedResponses].filter(Boolean) as ProfileRecord[];
 };
 
-const getResolvedRecord = (identity: IdentityRecord) => {
-  if (!identity) return null;
+// ============================================================================
+// EXPORTED MAIN FUNCTIONS
+// ============================================================================
 
-  const res = { ...identity };
-  const vertices = res.identityGraph?.vertices || [];
-
-  // Process Farcaster-ENS relationships
-  const farcasterEqualENSEntries = vertices
-    .filter((x) => x.platform === Platform.ens && !x.isPrimary)
-    .map((x) => {
-      if (
-        vertices.some(
-          (i) => i.platform === Platform.farcaster && i.identity === x.identity,
-        )
-      ) {
-        x.isPrimary = true;
-        x.isPrimaryFarcaster = true;
-        return x;
-      }
-      return null;
-    })
-    .filter(Boolean);
-
-  if (farcasterEqualENSEntries.length > 0) {
-    res.isPrimary = true;
-  }
-
-  return res;
-};
-
-export const getResolvedProfileArray = (data: IdentityGraphQueryResponse) => {
+const getResolvedProfileArray = (data: IdentityGraphQueryResponse) => {
   const resolvedRecord = getResolvedRecord(data?.data?.identity);
   if (!resolvedRecord) return [];
-  const {
-    identity,
-    platform: recordPlatform,
-    resolvedAddress,
-    identityGraph,
-    profile: recordProfile,
-    isPrimary,
-    ownerAddress,
-    registeredAt,
-  } = resolvedRecord;
-  const firstResolvedAddress = resolvedAddress?.[0]?.address;
-  const firstOwnerAddress = ownerAddress?.[0]?.address;
-  const defaultReturn = recordProfile
-    ? { ...recordProfile, isPrimary, createdAt: registeredAt }
-    : {
-        address: isWeb3Address(identity) ? identity : null,
-        identity,
-        platform: recordPlatform,
-        displayName: isWeb3Address(identity) ? formatText(identity) : identity,
-        registeredAt,
-        isPrimary,
-      };
 
-  const vertices = identityGraph?.vertices || [];
-
+  const vertices = resolvedRecord.identityGraph?.vertices || [];
   let results = [];
-  const isBadBasename =
-    recordPlatform === Platform.basenames &&
-    firstOwnerAddress !== firstResolvedAddress;
-  // Primary identity case
-  if (isPrimaryOrSocialPlatform(resolvedRecord) && !isBadBasename) {
-    // Direct pass case
-    results = vertices
-      .filter((vertex) => {
-        if (
-          vertex.identity === resolvedRecord.identity &&
-          vertex.platform === resolvedRecord.platform
-        )
-          return false;
-        if (!isPrimaryOrSocialPlatform(vertex)) return false;
-        if (vertex.platform === Platform.ens && !vertex.isPrimaryFarcaster) {
-          const vertexOwnerAddr = vertex.ownerAddress?.[0]?.address;
-          const vertexResolvedAddr = vertex.resolvedAddress?.[0]?.address;
-          return vertexOwnerAddr === vertexResolvedAddr;
-        }
-        return true;
-      })
-      .map((vertex) => {
-        return {
-          ...vertex.profile,
-          isPrimary: vertex.isPrimary,
-          createdAt: vertex.registeredAt,
-        };
-      });
-    if (DEFAULT_PLATFORM_ORDER.includes(defaultReturn.platform)) {
-      results = [...results, defaultReturn];
-    }
-  } else if (VALID_PLATFORMS.has(recordPlatform)) {
-    // Get source address for comparison
-    const sourceAddr = [Platform.ethereum, Platform.solana].includes(
-      recordPlatform,
-    )
-      ? identity
-      : firstResolvedAddress;
-    // Filter vertices according to platform rules
-    results = vertices
-      .filter((vertex) => {
-        // Skip non-matching vertices quickly
-        if (!vertex.isPrimary && !SOCIAL_PLATFORMS.has(vertex.platform)) {
-          return false;
-        }
 
-        // For inclusive platforms, include everything primary or social
-        if (INCLUSIVE_PLATFORMS.has(recordPlatform)) {
-          return true;
-        }
-
-        // Address comparison logic
-        if (vertex.platform === Platform.farcaster) {
-          return (
-            vertex.ownerAddress?.some((addr) =>
-              isSameAddress(addr.address, sourceAddr),
-            ) ?? false
-          );
-        }
-        return [Platform.sns, Platform.solana].includes(recordPlatform)
-          ? true
-          : isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
-      })
-      .map((vertex) => ({
-        ...vertex.profile,
-        isPrimary: vertex.isPrimary,
-        createdAt: vertex.registeredAt,
-      }));
-
-    const shouldAddDefault = (() => {
-      if (
-        recordPlatform === Platform.ethereum &&
-        !results.some((x) => x.isPrimary && x.platform === Platform.ens)
-      )
-        return true;
-      if (
-        recordPlatform === Platform.solana &&
-        !results.some((x) => x.isPrimary && x.platform === Platform.sns)
-      )
-        return true;
-      if (
-        !INCLUSIVE_PLATFORMS.has(recordPlatform) &&
-        ![Platform.ethereum, Platform.solana].includes(recordPlatform)
-      )
-        return true;
-      return false;
-    })();
-
-    if (shouldAddDefault) {
-      results = [...results, defaultReturn];
-    }
+  if (isPrimaryOrSocialPlatform(resolvedRecord)) {
+    results = processPrimaryIdentity(resolvedRecord, vertices);
+  } else if (VALID_PLATFORMS.has(resolvedRecord.platform)) {
+    results = processSecondaryIdentity(resolvedRecord, vertices);
   } else {
-    results = [defaultReturn];
+    results = [createDefaultProfile(resolvedRecord)];
   }
 
-  // Filter duplicates and sort by primary status
-  return results
-    .filter((x) => isSupportedPlatform(x.platform))
-    .filter(
-      (item, index, self) =>
-        index ===
-        self.findIndex(
-          (i) => i.platform === item.platform && i.identity === item.identity,
-        ),
-    );
+  return deduplicateAndFilter(results);
 };
 
 export const resolveWithIdentityGraph = async ({

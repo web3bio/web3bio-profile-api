@@ -8,19 +8,8 @@ export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const handle = searchParams.get("handle");
 
-  // Early validation
-  if (!handle) {
-    return errorHandle({
-      identity: "",
-      code: 400,
-      path: pathname,
-      platform: null,
-      message: "Missing handle parameter",
-    });
-  }
-
   // Parse identity
-  const resolvedId = resolveIdentity(handle);
+  const resolvedId = resolveIdentity(handle!);
   if (!resolvedId) {
     return errorHandle({
       identity: handle,
@@ -31,7 +20,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const [platform, identity] = resolvedId.split(",", 2);
+  const [platform, identity] = resolvedId.split(",");
 
   // Validate parsed data
   if (!platform || !identity) {
