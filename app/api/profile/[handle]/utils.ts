@@ -47,6 +47,8 @@ const VALID_PLATFORMS = new Set([
   Platform.twitter,
   Platform.github,
   Platform.nextid,
+  Platform.sns,
+  Platform.solana,
 ]);
 
 const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
@@ -65,7 +67,10 @@ const sortProfilesByPlatform = (
   handle: string,
 ): ProfileRecord[] => {
   const order = [
-    targetPlatform,
+    targetPlatform === Platform.solana &&
+    !responses.some((x) => x.platform === Platform.solana)
+      ? Platform.sns
+      : targetPlatform,
     ...DEFAULT_PLATFORM_ORDER.filter((x) => x !== targetPlatform),
   ];
   const normalizedHandle = normalizeText(handle);
@@ -146,10 +151,7 @@ const getResolvedRecord = (identity: IdentityRecord) => {
   return res;
 };
 
-export const getResolvedProfileArray = (
-  data: IdentityGraphQueryResponse,
-  platform: Platform,
-) => {
+export const getResolvedProfileArray = (data: IdentityGraphQueryResponse) => {
   const resolvedRecord = getResolvedRecord(data?.data?.identity);
   if (!resolvedRecord) return [];
   const {
@@ -157,15 +159,16 @@ export const getResolvedProfileArray = (
     platform: recordPlatform,
     resolvedAddress,
     identityGraph,
-    profile,
+    profile: recordProfile,
     isPrimary,
     ownerAddress,
     registeredAt,
   } = resolvedRecord;
+
   const firstResolvedAddress = resolvedAddress?.[0]?.address;
   const firstOwnerAddress = ownerAddress?.[0]?.address;
-  const defaultReturn = profile
-    ? { ...profile, isPrimary, createdAt: registeredAt }
+  const defaultReturn = recordProfile
+    ? { ...recordProfile, isPrimary, createdAt: registeredAt }
     : {
         address: isWeb3Address(identity) ? identity : null,
         identity,
@@ -177,12 +180,11 @@ export const getResolvedProfileArray = (
 
   const vertices = identityGraph?.vertices || [];
 
-  // Process based on platform type
   let results = [];
   const isBadBasename =
     recordPlatform === Platform.basenames &&
     firstOwnerAddress !== firstResolvedAddress;
-
+  // Primary identity case
   if (isPrimaryOrSocialPlatform(resolvedRecord) && !isBadBasename) {
     // Direct pass case
     results = vertices
@@ -201,8 +203,6 @@ export const getResolvedProfileArray = (
         return true;
       })
       .map((vertex) => {
-        if (vertex.platform === Platform.farcaster) {
-        }
         return {
           ...vertex.profile,
           isPrimary: vertex.isPrimary,
@@ -214,9 +214,11 @@ export const getResolvedProfileArray = (
     }
   } else if (VALID_PLATFORMS.has(recordPlatform)) {
     // Get source address for comparison
-    const sourceAddr =
-      recordPlatform === Platform.ethereum ? identity : firstResolvedAddress;
-
+    const sourceAddr = [Platform.ethereum, Platform.solana].includes(
+      recordPlatform,
+    )
+      ? identity
+      : firstResolvedAddress;
     // Filter vertices according to platform rules
     results = vertices
       .filter((vertex) => {
@@ -238,7 +240,9 @@ export const getResolvedProfileArray = (
             ) ?? false
           );
         }
-        return isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
+        return [Platform.sns, Platform.solana].includes(recordPlatform)
+          ? true
+          : isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
       })
       .map((vertex) => ({
         ...vertex.profile,
@@ -246,13 +250,23 @@ export const getResolvedProfileArray = (
         createdAt: vertex.registeredAt,
       }));
 
-    const shouldAddDefault =
-      (recordPlatform === Platform.ethereum &&
-        !results.some((x) => x.isPrimary && x.platform === Platform.ens)) ||
-      !(
-        INCLUSIVE_PLATFORMS.has(recordPlatform) ||
-        recordPlatform === Platform.ethereum
-      );
+    const shouldAddDefault = (() => {
+      if (
+        recordPlatform === Platform.ethereum &&
+        !results.some((x) => x.isPrimary && x.platform === Platform.ens)
+      )
+        return true;
+      if (
+        recordPlatform === Platform.solana &&
+        !results.some((x) => x.isPrimary && x.platform === Platform.sns)
+      )
+        return true;
+      if (
+        !INCLUSIVE_PLATFORMS.has(recordPlatform) &&
+        ![Platform.ethereum, Platform.solana].includes(recordPlatform)
+      )
+        return false;
+    })();
 
     if (shouldAddDefault) {
       results = [...results, defaultReturn];
@@ -306,7 +320,6 @@ export const resolveWithIdentityGraph = async ({
   const resolvedResponse = await processJson(response);
   const profilesArray = getResolvedProfileArray(
     resolvedResponse,
-    platform,
   ) as ProfileRecord[];
   const sortedProfiles = sortProfilesByPlatform(
     profilesArray,
