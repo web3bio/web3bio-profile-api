@@ -28,11 +28,7 @@ import {
   SOCIAL_PLATFORMS,
 } from "@/utils/base";
 
-// ============================================================================
-// CONSTANTS
-// ============================================================================
-
-const DEFAULT_PLATFORM_ORDER = [
+const PLATFORM_PRIORITY_ORDER = [
   Platform.ens,
   Platform.basenames,
   Platform.linea,
@@ -43,7 +39,7 @@ const DEFAULT_PLATFORM_ORDER = [
   Platform.solana,
 ] as const;
 
-const VALID_PLATFORMS = new Set([
+const SUPPORTED_PLATFORMS = new Set([
   Platform.ethereum,
   Platform.ens,
   Platform.basenames,
@@ -52,322 +48,340 @@ const VALID_PLATFORMS = new Set([
   Platform.dotbit,
   Platform.twitter,
   Platform.github,
+  Platform.discord,
+  Platform.linkedin,
   Platform.nextid,
   Platform.sns,
   Platform.solana,
 ]);
 
-const INCLUSIVE_PLATFORMS = new Set([
+const SOCIAL_MEDIA_PLATFORMS = new Set([
   Platform.twitter,
   Platform.github,
+  Platform.discord,
+  Platform.linkedin,
   Platform.nextid,
 ]);
-const ADDRESS_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
-const SNS_PLATFORMS = new Set([Platform.sns, Platform.solana]);
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
+const WEB3_ADDRESS_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
+const SOLANA_ECOSYSTEM_PLATFORMS = new Set([Platform.sns, Platform.solana]);
+const PLATFORM_PRIORITY_MAP = new Map(
+  PLATFORM_PRIORITY_ORDER.map((platform, index) => [platform, index]),
+);
 
-const isPrimaryOrSocial = (identity: IdentityRecord): boolean =>
+const isPrimaryOrSocialProfile = (identity: IdentityRecord): boolean =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
 
-const isValidENS = (vertex: IdentityRecord): boolean => {
-  if (vertex.platform !== Platform.ens || vertex.isPrimaryFarcaster)
+const isValidEnsRecord = (record: IdentityRecord): boolean => {
+  if (record.platform !== Platform.ens || record.isPrimaryFarcaster) {
     return true;
+  }
 
-  const ownerAddr = vertex.ownerAddress?.[0]?.address;
-  const resolvedAddr = vertex.resolvedAddress?.[0]?.address;
-  return ownerAddr === resolvedAddr;
+  const ownerAddress = record.ownerAddress?.[0]?.address;
+  const resolvedAddress = record.resolvedAddress?.[0]?.address;
+  return ownerAddress === resolvedAddress;
 };
 
-const matchesAddress = (
-  vertex: IdentityRecord,
-  sourceAddr: string,
-  platform: Platform,
+const isAddressMatching = (
+  record: IdentityRecord,
+  sourceAddress: string,
+  sourcePlatform: Platform,
 ): boolean => {
-  if (!vertex.isPrimary && !SOCIAL_PLATFORMS.has(vertex.platform)) return false;
-  if (INCLUSIVE_PLATFORMS.has(platform)) return true;
-  if (SNS_PLATFORMS.has(platform)) return true;
+  if (!record.isPrimary && !SOCIAL_PLATFORMS.has(record.platform)) {
+    return false;
+  }
 
-  if (vertex.platform === Platform.farcaster) {
+  if (
+    SOCIAL_MEDIA_PLATFORMS.has(sourcePlatform) ||
+    SOLANA_ECOSYSTEM_PLATFORMS.has(sourcePlatform)
+  ) {
+    return true;
+  }
+
+  if (record.platform === Platform.farcaster) {
     return (
-      vertex.ownerAddress?.some((addr) =>
-        isSameAddress(addr.address, sourceAddr),
+      record.ownerAddress?.some((addr) =>
+        isSameAddress(addr.address, sourceAddress),
       ) ?? false
     );
   }
 
-  return isSameAddress(vertex.resolvedAddress?.[0]?.address, sourceAddr);
+  return isSameAddress(
+    record.resolvedAddress?.[0]?.address,
+    sourceAddress || "",
+  );
 };
 
-// ============================================================================
-// PROFILE CREATION
-// ============================================================================
-
-const createProfile = (record: IdentityRecord) => {
+const buildProfileFromRecord = (record: IdentityRecord): ProfileRecord => {
   const { identity, platform, profile, isPrimary, registeredAt } = record;
 
   if (profile) {
-    return { ...profile, isPrimary, createdAt: registeredAt };
+    return {
+      ...profile,
+      isPrimary,
+      createdAt: registeredAt,
+    };
   }
 
   return {
-    address: isWeb3Address(identity) ? identity : null,
+    address: isWeb3Address(identity) ? identity : "",
     identity,
     platform,
     displayName: isWeb3Address(identity) ? formatText(identity) : identity,
     registeredAt,
     isPrimary,
-  };
+    uid: "",
+    avatar: null,
+    contenthash: "",
+    description: "",
+    network: "",
+    social: {} as any,
+    texts: {},
+    addresses: [],
+  } as ProfileRecord;
 };
 
-const needsDefaultProfile = (platform: Platform, results: any[]): boolean => {
-  const hasPrimaryENS = results.some(
-    (x) => x.isPrimary && x.platform === Platform.ens,
-  );
-  const hasPrimarySNS = results.some(
-    (x) => x.isPrimary && x.platform === Platform.sns,
-  );
-
-  const isInclusive =
-    platform === Platform.twitter ||
-    platform === Platform.github ||
-    platform === Platform.nextid;
-  const isWeb3 = platform === Platform.ethereum || platform === Platform.solana;
-
-  return (
-    (platform === Platform.ethereum && !hasPrimaryENS) ||
-    (platform === Platform.solana && !hasPrimarySNS) ||
-    (!isInclusive && !isWeb3)
-  );
-};
-
-// ============================================================================
-// FILTERING AND PROCESSING
-// ============================================================================
-
-const filterVertices = (
-  vertices: IdentityRecord[],
-  resolvedRecord: IdentityRecord,
-  isPrimary: boolean,
-): any[] => {
-  const sourceAddr = ADDRESS_PLATFORMS.has(resolvedRecord.platform)
-    ? resolvedRecord.identity
-    : resolvedRecord.resolvedAddress?.[0]?.address;
-
-  return vertices
-    .filter((vertex) => {
-      // Skip self
-      if (
-        vertex.identity === resolvedRecord.identity &&
-        vertex.platform === resolvedRecord.platform
-      ) {
-        return false;
-      }
-
-      if (isPrimary) {
-        return isPrimaryOrSocial(vertex) && isValidENS(vertex);
-      }
-
-      return matchesAddress(vertex, sourceAddr, resolvedRecord.platform);
-    })
-    .map((vertex) => ({
-      ...vertex.profile,
-      isPrimary: vertex.isPrimary,
-      createdAt: vertex.registeredAt,
-    }));
-};
-
-const processIdentity = (
-  resolvedRecord: IdentityRecord,
-  vertices: IdentityRecord[],
-) => {
-  const defaultProfile = createProfile(resolvedRecord);
-
-  // Check for bad basename
-  const ownerAddr = resolvedRecord.ownerAddress?.[0]?.address;
-  const resolvedAddr = resolvedRecord.resolvedAddress?.[0]?.address;
-
-  if (
-    resolvedRecord.platform === Platform.basenames &&
-    ownerAddr !== resolvedAddr
-  ) {
-    return [defaultProfile];
+const shouldAddDefaultProfile = (
+  platform: Platform,
+  existingProfiles: ProfileRecord[],
+): boolean => {
+  if (platform === Platform.ethereum) {
+    return !existingProfiles.some(
+      (profile) => profile.isPrimary && profile.platform === Platform.ens,
+    );
   }
 
-  const isPrimaryFlow = isPrimaryOrSocial(resolvedRecord);
-  let results = filterVertices(vertices, resolvedRecord, isPrimaryFlow);
-
-  // Add default profile when needed
-  const isDefaultPlatform = DEFAULT_PLATFORM_ORDER.some(
-    (p) => p === defaultProfile.platform,
-  );
-
-  if (isPrimaryFlow && isDefaultPlatform) {
-    results.push(defaultProfile);
-  } else if (
-    !isPrimaryFlow &&
-    needsDefaultProfile(resolvedRecord.platform, results)
-  ) {
-    results.push(defaultProfile);
+  if (platform === Platform.solana) {
+    return !existingProfiles.some(
+      (profile) => profile.isPrimary && profile.platform === Platform.sns,
+    );
   }
 
-  return results;
+  const isSocialMedia = SOCIAL_MEDIA_PLATFORMS.has(platform);
+  const isWeb3Address = WEB3_ADDRESS_PLATFORMS.has(platform);
+
+  return !isSocialMedia && !isWeb3Address;
 };
 
-const deduplicateProfiles = (profiles: any[]) => {
-  const seen = new Set<string>();
-  return profiles.filter((profile) => {
-    if (!profile.platform) return false;
+const filterConnectedProfiles = (
+  allRecords: IdentityRecord[],
+  targetRecord: IdentityRecord,
+  usePrimaryFlow: boolean,
+): ProfileRecord[] => {
+  const sourceAddress = WEB3_ADDRESS_PLATFORMS.has(targetRecord.platform)
+    ? targetRecord.identity
+    : targetRecord.resolvedAddress?.[0]?.address;
 
-    // Type-safe platform check
-    const platformValues = Object.values(Platform);
-    if (!platformValues.includes(profile.platform)) return false;
+  const connectedProfiles: ProfileRecord[] = [];
 
-    try {
-      if (!isSupportedPlatform(profile.platform as any)) return false;
-    } catch {
-      return false;
+  for (const record of allRecords) {
+    if (
+      record.identity === targetRecord.identity &&
+      record.platform === targetRecord.platform
+    ) {
+      continue;
     }
 
-    const key = `${profile.platform}:${profile.identity}`;
-    if (seen.has(key)) return false;
+    const shouldInclude = usePrimaryFlow
+      ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
+      : isAddressMatching(record, sourceAddress, targetRecord.platform);
 
-    seen.add(key);
-    return true;
-  });
+    if (shouldInclude) {
+      connectedProfiles.push({
+        ...record.profile,
+        isPrimary: record.isPrimary,
+        createdAt: record.registeredAt,
+      });
+    }
+  }
+
+  return connectedProfiles;
 };
 
-// ============================================================================
-// CORE RESOLUTION
-// ============================================================================
+const processIdentityConnections = (
+  targetRecord: IdentityRecord,
+  allRecords: IdentityRecord[],
+): ProfileRecord[] => {
+  const defaultProfile = buildProfileFromRecord(targetRecord);
 
-const processResolvedRecord = (
+  // Handle invalid Basenames configuration
+  if (targetRecord.platform === Platform.basenames) {
+    const ownerAddress = targetRecord.ownerAddress?.[0]?.address;
+    const resolvedAddress = targetRecord.resolvedAddress?.[0]?.address;
+
+    if (ownerAddress !== resolvedAddress) {
+      return [defaultProfile];
+    }
+  }
+
+  const usePrimaryFlow = isPrimaryOrSocialProfile(targetRecord);
+  const connectedProfiles = filterConnectedProfiles(
+    allRecords,
+    targetRecord,
+    usePrimaryFlow,
+  );
+
+  // Add default profile when appropriate
+  const shouldAddDefault = usePrimaryFlow
+    ? PLATFORM_PRIORITY_MAP.has(defaultProfile.platform as any)
+    : shouldAddDefaultProfile(targetRecord.platform, connectedProfiles);
+
+  if (shouldAddDefault) {
+    connectedProfiles.push(defaultProfile);
+  }
+
+  return connectedProfiles;
+};
+
+const removeDuplicateProfiles = (
+  profiles: ProfileRecord[],
+): ProfileRecord[] => {
+  const uniqueProfilesMap = new Map<string, ProfileRecord>();
+  const validPlatforms = new Set(Object.values(Platform));
+
+  for (const profile of profiles) {
+    if (!profile.platform || !validPlatforms.has(profile.platform)) {
+      continue;
+    }
+
+    try {
+      if (!isSupportedPlatform(profile.platform as any)) {
+        continue;
+      }
+    } catch {
+      continue;
+    }
+
+    const profileKey = `${profile.platform}:${profile.identity}`;
+    if (!uniqueProfilesMap.has(profileKey)) {
+      uniqueProfilesMap.set(profileKey, profile);
+    }
+  }
+
+  return Array.from(uniqueProfilesMap.values());
+};
+
+const enrichWithFarcasterEnsRelations = (
   identity: IdentityRecord,
 ): IdentityRecord | null => {
   if (!identity) return null;
 
-  const record = { ...identity };
-  const vertices = record.identityGraph?.vertices || [];
+  const graphVertices = identity.identityGraph?.vertices;
+  if (!graphVertices) return identity;
 
-  // Handle Farcaster-ENS relationships
-  const farcasterENSEntries = vertices.filter(
+  // Find ENS entries linked to Farcaster profiles
+  const farcasterLinkedEnsEntries = graphVertices.filter(
     (vertex) =>
       vertex.platform === Platform.ens &&
       !vertex.isPrimary &&
-      vertices.some(
-        (v) =>
-          v.platform === Platform.farcaster && v.identity === vertex.identity,
+      graphVertices.some(
+        (otherVertex) =>
+          otherVertex.platform === Platform.farcaster &&
+          otherVertex.identity === vertex.identity,
       ),
   );
 
-  if (farcasterENSEntries.length > 0) {
-    farcasterENSEntries.forEach((entry) => {
+  if (farcasterLinkedEnsEntries.length > 0) {
+    // Mark ENS entries as primary when linked to Farcaster
+    farcasterLinkedEnsEntries.forEach((entry) => {
       entry.isPrimary = true;
       entry.isPrimaryFarcaster = true;
     });
-    record.isPrimary = true;
+    identity.isPrimary = true;
   }
 
-  return record;
+  return identity;
 };
 
-const sortProfiles = (
+const sortProfilesByPriority = (
   profiles: ProfileRecord[],
-  targetPlatform: Platform,
-  handle: string,
+  primaryPlatform: Platform,
+  targetHandle: string,
 ): ProfileRecord[] => {
-  const normalizedHandle = normalizeText(handle);
+  if (profiles.length === 0) return profiles;
 
-  // Find exact match
-  const exactMatch = profiles.find(
-    (p) => p.identity === normalizedHandle && p.platform === targetPlatform,
-  );
+  const normalizedHandle = normalizeText(targetHandle);
+  let exactMatchProfile: ProfileRecord | undefined;
 
-  // Group by platform
+  // Group profiles by platform and find exact match
   const platformGroups = new Map<Platform, ProfileRecord[]>();
 
-  profiles.forEach((profile) => {
+  for (const profile of profiles) {
     if (
       profile.identity === normalizedHandle &&
-      profile.platform === targetPlatform
+      profile.platform === primaryPlatform
     ) {
-      return; // Skip exact match as we handle it separately
+      exactMatchProfile = profile;
+      continue;
     }
 
-    if (!profile.platform) {
-      return;
+    if (
+      !profile.platform ||
+      !PLATFORM_PRIORITY_MAP.has(profile.platform as any)
+    ) {
+      continue;
     }
 
-    const platformIndex = DEFAULT_PLATFORM_ORDER.findIndex(
-      (p) => p === profile.platform,
-    );
-    if (platformIndex === -1) {
-      return;
+    const existingGroup = platformGroups.get(profile.platform);
+    if (existingGroup) {
+      existingGroup.push(profile);
+    } else {
+      platformGroups.set(profile.platform, [profile]);
     }
+  }
 
-    const platform = profile.platform;
-    if (!platformGroups.has(platform)) {
-      platformGroups.set(platform, []);
-    }
-    platformGroups.get(platform)!.push(profile);
-  });
-
-  // Sort each group
-  platformGroups.forEach((group) => {
-    group.sort((a, b) => {
-      if (a.isPrimary !== b.isPrimary) {
-        return a.isPrimary ? -1 : 1;
+  // Sort profiles within each platform group
+  for (const profileGroup of platformGroups.values()) {
+    profileGroup.sort((profileA, profileB) => {
+      if (profileA.isPrimary !== profileB.isPrimary) {
+        return profileA.isPrimary ? -1 : 1;
       }
 
-      const aTime = a.createdAt
-        ? new Date(a.createdAt).getTime()
+      const timeA = profileA.createdAt
+        ? new Date(profileA.createdAt).getTime()
         : Number.MAX_SAFE_INTEGER;
-      const bTime = b.createdAt
-        ? new Date(b.createdAt).getTime()
+      const timeB = profileB.createdAt
+        ? new Date(profileB.createdAt).getTime()
         : Number.MAX_SAFE_INTEGER;
-      return aTime - bTime;
+      return timeA - timeB;
     });
-  });
+  }
 
-  // Build ordered result
+  // Build final ordered result
   const platformOrder = [
-    targetPlatform === Platform.solana &&
-    !profiles.some((p) => p.platform === Platform.solana)
+    primaryPlatform === Platform.solana && !platformGroups.has(Platform.solana)
       ? Platform.sns
-      : targetPlatform,
-    ...DEFAULT_PLATFORM_ORDER.filter((p) => p !== targetPlatform),
+      : primaryPlatform,
+    ...PLATFORM_PRIORITY_ORDER.filter(
+      (platform) => platform !== primaryPlatform,
+    ),
   ];
 
   const sortedProfiles = platformOrder
-    .filter((platform) => platformGroups.has(platform))
-    .flatMap((platform) => platformGroups.get(platform)!);
+    .map((platform) => platformGroups.get(platform))
+    .filter((group): group is ProfileRecord[] => Boolean(group))
+    .flat();
 
-  return [exactMatch, ...sortedProfiles].filter(Boolean) as ProfileRecord[];
+  return exactMatchProfile
+    ? [exactMatchProfile, ...sortedProfiles]
+    : sortedProfiles;
 };
 
-// ============================================================================
-// MAIN FUNCTIONS
-// ============================================================================
+const extractProfilesFromGraph = (
+  data: IdentityGraphQueryResponse,
+): ProfileRecord[] => {
+  const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
+  if (!enrichedRecord) return [];
 
-const getProfileArray = (data: IdentityGraphQueryResponse): ProfileRecord[] => {
-  const resolvedRecord = processResolvedRecord(data?.data?.identity);
-  if (!resolvedRecord) return [];
+  const graphVertices = enrichedRecord.identityGraph?.vertices || [];
 
-  const vertices = resolvedRecord.identityGraph?.vertices || [];
+  const profileResults =
+    isPrimaryOrSocialProfile(enrichedRecord) ||
+    SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
+      ? processIdentityConnections(enrichedRecord, graphVertices)
+      : [buildProfileFromRecord(enrichedRecord)];
 
-  let results: any[];
-  if (
-    isPrimaryOrSocial(resolvedRecord) ||
-    VALID_PLATFORMS.has(resolvedRecord.platform)
-  ) {
-    results = processIdentity(resolvedRecord, vertices);
-  } else {
-    results = [createProfile(resolvedRecord)];
-  }
-
-  return deduplicateProfiles(results);
+  return removeDuplicateProfiles(profileResults);
 };
 
 export const resolveWithIdentityGraph = async ({
@@ -381,7 +395,7 @@ export const resolveWithIdentityGraph = async ({
   ns?: boolean;
   response: IdentityGraphQueryResponse;
 }) => {
-  // Handle errors
+  // Handle error responses early
   if (response.msg) {
     return {
       identity: handle,
@@ -401,21 +415,25 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
-  const profilesArray = getProfileArray(processedResponse);
-  const sortedProfiles = sortProfiles(profilesArray, platform, handle);
+  const extractedProfiles = extractProfilesFromGraph(processedResponse);
+  const sortedProfiles = sortProfilesByPriority(
+    extractedProfiles,
+    platform,
+    handle,
+  );
 
-  // Generate profile structs
-  const results = await Promise.allSettled(
-    sortedProfiles.map((profile) =>
-      generateProfileStruct(
-        profile as ProfileRecord,
-        ns,
-        response.data.identity.identityGraph?.edges,
-      ),
+  // Generate profile structures
+  const profileStructPromises = sortedProfiles.map((profile) =>
+    generateProfileStruct(
+      profile,
+      ns,
+      response.data.identity.identityGraph?.edges,
     ),
   );
 
-  const validResults = results
+  const profileResults = await Promise.allSettled(profileStructPromises);
+
+  const validProfiles = profileResults
     .filter(
       (
         result,
@@ -424,8 +442,8 @@ export const resolveWithIdentityGraph = async ({
     )
     .map((result) => result.value);
 
-  // Ethereum fallback
-  if (!validResults.length && platform === Platform.ethereum) {
+  // Add Ethereum fallback profile when needed
+  if (validProfiles.length === 0 && platform === Platform.ethereum) {
     const fallbackProfile = {
       address: handle,
       identity: handle,
@@ -435,24 +453,27 @@ export const resolveWithIdentityGraph = async ({
       description: null,
       ...(ns ? {} : { email: null, location: null, header: null, links: {} }),
     };
-    validResults.push(fallbackProfile as ProfileResponse | NSResponse);
+    validProfiles.push(fallbackProfile as ProfileResponse | NSResponse);
   }
 
-  // Remove duplicates
-  const uniqueResults = validResults.filter(
-    (item, index, self) =>
+  // Remove any remaining duplicates
+  const uniqueProfiles = validProfiles.filter(
+    (profile, index, allProfiles) =>
       index ===
-      self.findIndex(
-        (x) => x.platform === item.platform && x.identity === item.identity,
+      allProfiles.findIndex(
+        (otherProfile) =>
+          otherProfile.platform === profile.platform &&
+          otherProfile.identity === profile.identity,
       ),
   ) as ProfileResponse[];
 
-  return uniqueResults.length && !uniqueResults.every((x) => x?.error)
-    ? uniqueResults
+  return uniqueProfiles.length > 0 &&
+    !uniqueProfiles.every((profile) => profile?.error)
+    ? uniqueProfiles
     : {
         identity: handle,
         code: 404,
-        message: uniqueResults[0]?.error || ErrorMessages.NOT_FOUND,
+        message: uniqueProfiles[0]?.error || ErrorMessages.NOT_FOUND,
         platform,
       };
 };
@@ -471,22 +492,22 @@ export const resolveUniversalHandle = async (
     headers,
   );
 
-  const result = await resolveWithIdentityGraph({
+  const resolutionResult = await resolveWithIdentityGraph({
     handle,
     platform,
     ns,
     response,
   });
 
-  if ("message" in result) {
+  if ("message" in resolutionResult) {
     return errorHandle({
-      identity: result.identity,
+      identity: resolutionResult.identity,
       path: pathname,
-      platform: result.platform,
-      code: result.code,
-      message: result.message,
+      platform: resolutionResult.platform,
+      code: resolutionResult.code,
+      message: resolutionResult.message,
     });
   }
 
-  return respondWithCache(result);
+  return respondWithCache(resolutionResult);
 };

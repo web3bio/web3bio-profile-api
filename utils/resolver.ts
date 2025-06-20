@@ -13,7 +13,7 @@ export const resolveMediaURL = (url: string, id?: string): string | null => {
 
   // Handle Arweave URLs
   if (url.startsWith("ar://")) {
-    return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
+    return ARWEAVE_ASSET_PREFIX + url.slice(5);
   }
 
   // Handle IPFS URLs
@@ -42,7 +42,7 @@ export const resolveHandle = (
   // Handle YouTube platform
   if (platform === Platform.youtube) {
     const match = handle.match(/@([^\/]+)/);
-    return match ? match[0] : null;
+    return match?.[0] ?? null;
   }
 
   // Handle domain-like handles
@@ -52,7 +52,7 @@ export const resolveHandle = (
       ? segments[segments.length - 2]
       : segments[segments.length - 1];
 
-    return lastSegment?.replace(/^@/, "").split("?")[0].toLowerCase() || null;
+    return lastSegment?.replace(/^@/, "").split("?")[0].toLowerCase() ?? null;
   }
 
   // Default handle processing
@@ -122,15 +122,14 @@ export const resolveEipAssetURL = async (
     return resolveMediaURL(source);
   }
 
-  try {
-    const apiKey = process.env.OPENSEA_API_KEY;
-    if (!apiKey) {
-      console.warn(
-        "OPENSEA_API_KEY not configured, falling back to source URL",
-      );
-      return resolveMediaURL(source);
-    }
+  // Check API key availability early to avoid unnecessary processing
+  const apiKey = process.env.OPENSEA_API_KEY;
+  if (!apiKey) {
+    console.warn("OPENSEA_API_KEY not configured, falling back to source URL");
+    return resolveMediaURL(source);
+  }
 
+  try {
     const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
 
     const response = await fetch(fetchURL, {

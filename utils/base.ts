@@ -34,7 +34,6 @@ import type {
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
-// Cache platform-specific record lists to avoid recreating them
 const UD_ACCOUNTS_LIST = [
   Platform.twitter,
   Platform.discord,

@@ -7,7 +7,7 @@ import {
 } from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
-import { processJson } from "./utils";
+import { processJson } from "@/utils/base";
 
 export async function GET(req: NextRequest) {
   const headers = getUserHeaders(req.headers);
