@@ -20,7 +20,7 @@
     "react-dom": "^18.3.1",
     "sharp": "^0.34.2",
     "viem": "^2.30.5",
-    "web3bio-profile-kit": "^0.1.8"
+    "web3bio-profile-kit": "^0.1.9"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",

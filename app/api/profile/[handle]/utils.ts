@@ -22,8 +22,11 @@ import {
   normalizeText,
   respondWithCache,
 } from "@/utils/utils";
-import { generateProfileStruct } from "@/utils/base";
-import { processJson } from "../../search/utils";
+import {
+  generateProfileStruct,
+  processJson,
+  SOCIAL_PLATFORMS,
+} from "@/utils/base";
 
 // ============================================================================
 // CONSTANTS
@@ -54,7 +57,6 @@ const VALID_PLATFORMS = new Set([
   Platform.solana,
 ]);
 
-const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 const INCLUSIVE_PLATFORMS = new Set([
   Platform.twitter,
   Platform.github,

@@ -25,10 +25,12 @@ import {
   resolveEipAssetURL,
   resolveHandle,
 } from "@/utils/resolver";
-import {
-  type AuthHeaders,
-  type IdentityGraphEdge,
-  type ProfileRecord,
+import type {
+  AuthHeaders,
+  IdentityGraphEdge,
+  ProfileRecord,
+  IdentityGraphQueryResponse,
+  IdentityRecord,
 } from "@/utils/types";
 import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
@@ -53,8 +55,7 @@ const SNS_RECORDS_LIST = [
   "CNAME",
 ];
 
-// Create a Set for faster platform lookups
-const IDENTITY_BASED_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
+export const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 
 export const resolveIdentityResponse = async (
   handle: string,
@@ -202,6 +203,62 @@ export const resolveIdentityHandle = async (
   }
 };
 
+export const processJson = async (json: IdentityGraphQueryResponse) => {
+  const _json = structuredClone(json);
+  const identity = _json?.data?.identity;
+
+  if (!identity) return _json;
+
+  const promises: Promise<any>[] = [];
+
+  // Process main identity avatar
+  if (identity.profile) {
+    promises.push(
+      processProfileAvatar(identity.profile).then((processedAvatar) => {
+        identity.profile.avatar = processedAvatar;
+      }),
+    );
+  }
+
+  const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
+
+  if (vertices.length > 0) {
+    // Find current identity in vertices
+    const currentIndex = vertices.findIndex(
+      (vertex) =>
+        vertex.identity === identity.identity &&
+        vertex.platform === identity.platform,
+    );
+
+    // Ensure current identity is at the front
+    if (currentIndex === -1) {
+      // Current identity not in vertices, add it at the beginning
+      const currentIdentity = { ...identity };
+      delete currentIdentity.identityGraph;
+      vertices.unshift(currentIdentity);
+    } else if (currentIndex > 0) {
+      // Current identity exists but not at front, move it to front
+      const [currentIdentity] = vertices.splice(currentIndex, 1);
+      vertices.unshift(currentIdentity);
+    }
+
+    // Process avatars for all vertices with profiles
+    const avatarPromises = vertices
+      .filter((vertex) => vertex?.profile?.avatar)
+      .map(async (vertex) => {
+        const processedAvatar = await processProfileAvatar(vertex.profile);
+        vertex.profile.avatar = processedAvatar;
+      });
+
+    if (avatarPromises.length > 0) {
+      promises.push(Promise.allSettled(avatarPromises));
+    }
+  }
+
+  await Promise.allSettled(promises);
+  return _json;
+};
+
 const resolveContenthash = async (
   originalContenthash: string,
   platform: Platform,
@@ -267,7 +324,7 @@ export const generateSocialLinks = async (
     texts,
   );
 
-  if (!texts && !IDENTITY_BASED_PLATFORMS.has(platform)) {
+  if (!texts && !SOCIAL_PLATFORMS.has(platform)) {
     return { links, contenthash };
   }
 
@@ -478,4 +535,16 @@ const resolveLocation = (
   if (state && country) return `${state}, ${country}`;
 
   return city || state || country;
+};
+
+const processProfileAvatar = async (
+  profile: ProfileRecord,
+): Promise<string | null> => {
+  if (!profile?.avatar) return null;
+
+  try {
+    return await resolveEipAssetURL(profile.avatar);
+  } catch {
+    return null;
+  }
 };
