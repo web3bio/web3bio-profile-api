@@ -1,6 +1,6 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "packageManager": "pnpm@10.12.1",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
@@ -20,7 +20,7 @@
     "react-dom": "^18.3.1",
     "sharp": "^0.34.2",
     "viem": "^2.30.5",
-    "web3bio-profile-kit": "^0.1.7"
+    "web3bio-profile-kit": "^0.1.8"
   },
   "devDependencies": {
     "@types/jest": "^29.5.14",
