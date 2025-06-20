@@ -8,7 +8,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest --testPathIgnorePatterns=\"/__tests__/(ns|profile)/(ud|dotbit).test.js$\"",
+    "test": "jest --testPathIgnorePatterns=\"/__tests__/(ns|profile)/ud.test.js$\"",
     "test:all": "jest",
     "lint": "next lint"
   },
