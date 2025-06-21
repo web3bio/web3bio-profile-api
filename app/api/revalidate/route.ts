@@ -12,7 +12,17 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  revalidatePath(path);
-
-  return NextResponse.json({ path: path, revalidated: true, now: Date.now() });
+  try {
+    revalidatePath(path);
+    return NextResponse.json({
+      path,
+      revalidated: true,
+      now: Date.now(),
+    });
+  } catch (error) {
+    return NextResponse.json(
+      { message: "Failed to revalidate path" },
+      { status: 500 },
+    );
+  }
 }

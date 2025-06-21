@@ -4,10 +4,12 @@ import { isValidSolanaAddress, REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
   if (!REGEX.SNS.test(handle) && !isValidSolanaAddress(handle))
     return errorHandle({
@@ -17,6 +19,9 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
+
+  const headers = getUserHeaders(req.headers);
   return resolveIdentityHandle(handle, Platform.sns, headers, false, pathname);
 }
+
 export const runtime = "edge";

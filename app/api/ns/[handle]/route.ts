@@ -1,12 +1,15 @@
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveUniversalHandle } from "../../profile/[handle]/utils";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle");
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
   // Parse identity
   const resolvedId = resolveIdentity(handle!);
@@ -35,7 +38,6 @@ export async function GET(req: NextRequest) {
 
   // Get headers and resolve
   const headers = getUserHeaders(req.headers);
-
   return resolveUniversalHandle(
     identity,
     platform as Platform,

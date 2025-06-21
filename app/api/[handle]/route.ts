@@ -3,9 +3,12 @@ import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
-export async function GET(req: NextRequest) {
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
   // Early return for empty handle
   if (!handle) {
