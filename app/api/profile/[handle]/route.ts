@@ -1,26 +1,51 @@
 import type { NextRequest } from "next/server";
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveUniversalHandle } from "./utils";
+import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const handle = req.nextUrl.searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
-  if (!id) {
+  // Parse identity
+  const resolvedId = resolveIdentity(handle!);
+  if (!resolvedId) {
     return errorHandle({
       identity: handle,
       code: 404,
-      platform: "universal",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as Platform;
-  const identity = id.split(",")[1];
 
-  return resolveUniversalHandle(identity, platform, headers, false);
+  const [platform, identity] = resolvedId.split(",");
+
+  // Validate parsed data
+  if (!platform || !identity) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: platform as Platform,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Get headers and resolve
+  const headers = getUserHeaders(req.headers);
+
+  return resolveUniversalHandle(
+    identity,
+    platform as Platform,
+    headers,
+    false, // ns = false
+    pathname,
+  );
 }
 
 export const runtime = "edge";

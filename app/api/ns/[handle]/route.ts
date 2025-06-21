@@ -4,22 +4,47 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "../../profile/[handle]/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
-  if (!id) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
+
+  // Parse identity
+  const resolvedId = resolveIdentity(handle!);
+  if (!resolvedId) {
     return errorHandle({
       identity: handle,
       code: 404,
-      platform: "universal",
+      path: pathname,
+      platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const platform = id.split(",")[0] as Platform;
-  const identity = id.split(",")[1];
 
-  return await resolveUniversalHandle(identity, platform, headers, true);
+  const [platform, identity] = resolvedId.split(",");
+
+  // Validate parsed data
+  if (!platform || !identity) {
+    return errorHandle({
+      identity: handle,
+      code: 404,
+      path: pathname,
+      platform: platform as Platform,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Get headers and resolve
+  const headers = getUserHeaders(req.headers);
+  return resolveUniversalHandle(
+    identity,
+    platform as Platform,
+    headers,
+    true, // ns = true
+    pathname,
+  );
 }
+
 export const runtime = "edge";

@@ -4,27 +4,77 @@ import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { getUserHeaders } from "@/utils/utils";
 
 // e.g `https://api.web3.bio/revalidate/ens,sujiyan.eth`
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
-  const id = searchParams.get("id");
-  if (!id || !id.includes(",")) {
-    return NextResponse.json({ message: "Missing Params" }, { status: 400 });
-  }
-  const [platform, identity] = id.split(",");
-  const res = await queryIdentityGraph(
-    QueryType.GET_REFRESH_PROFILE,
-    identity,
-    platform as Platform,
-    headers,
-  );
-  const refreshed = res?.data?.identity;
-  if (!refreshed || res.errors)
-    return NextResponse.json({ error: res.errors }, { status: 500 });
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { id: string } },
+) {
+  try {
+    const { id } = params;
 
-  return NextResponse.json({
-    id,
-    status: refreshed.status,
-    now: new Date(),
-  });
+    // Validate id parameter
+    if (!id || typeof id !== "string") {
+      return NextResponse.json(
+        { message: "Missing or invalid id parameter" },
+        { status: 400 },
+      );
+    }
+
+    // Parse platform and identity from id
+    const parts = id.split(",");
+    if (parts.length !== 2) {
+      return NextResponse.json(
+        { message: "Invalid id format. Expected: platform,identity" },
+        { status: 400 },
+      );
+    }
+
+    const [platform, identity] = parts;
+
+    // Validate parsed data
+    if (!platform.trim() || !identity.trim()) {
+      return NextResponse.json(
+        { message: "Platform and identity cannot be empty" },
+        { status: 400 },
+      );
+    }
+
+    // Get user headers
+    const headers = getUserHeaders(req.headers);
+
+    // Query identity graph
+    const res = await queryIdentityGraph(
+      QueryType.GET_REFRESH_PROFILE,
+      identity.trim(),
+      platform.trim() as Platform,
+      headers,
+    );
+
+    // Handle response errors
+    if (res?.errors) {
+      return NextResponse.json({ error: res.errors }, { status: 500 });
+    }
+
+    const refreshed = res?.data?.identity;
+    if (!refreshed) {
+      return NextResponse.json(
+        { error: "Failed to refresh profile" },
+        { status: 500 },
+      );
+    }
+
+    // Return success response
+    return NextResponse.json({
+      id,
+      status: refreshed.status,
+      now: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Revalidate API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 },
+    );
+  }
 }
+
+export const runtime = "edge";

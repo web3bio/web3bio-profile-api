@@ -13,7 +13,8 @@ export interface errorHandleProps {
   identity: string | null;
   code: number;
   message: ErrorMessages | string;
-  platform: Platform | string;
+  path: string;
+  platform: Platform | null;
   headers?: HeadersInit;
 }
 

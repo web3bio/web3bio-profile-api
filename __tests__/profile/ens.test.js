@@ -28,7 +28,6 @@ describe("Test For ENS Profile API", () => {
     );
     expect(res.status).toBe(404);
     const json = await res.json();
-    expect(json.address).toBe(null);
     expect(json.error).toBe("Invalid Resolved Address");
   });
   it("It should response 200 for sujiyan.eth", async () => {

@@ -8,24 +8,37 @@ import {
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams } = req.nextUrl;
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const inputName = params.handle?.toLowerCase() || "";
+  const isEthAddress = isValidEthereumAddress(inputName);
 
-  const inputName = searchParams.get("handle")?.toLowerCase() || "";
-  const handle = isValidEthereumAddress(inputName)
+  const handle = isEthAddress
     ? inputName
     : uglify(inputName, Platform.basenames);
 
-  if (!REGEX.BASENAMES.test(handle) && !isValidEthereumAddress(handle))
+  // Skip regex validation for valid Ethereum addresses
+  if (!isEthAddress && !REGEX.BASENAMES.test(handle)) {
     return errorHandle({
       identity: handle,
+      path: pathname,
       platform: Platform.basenames,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
+  }
 
-  return resolveIdentityHandle(handle, Platform.basenames, headers, false);
+  const headers = getUserHeaders(req.headers);
+  return resolveIdentityHandle(
+    handle,
+    Platform.basenames,
+    headers,
+    false,
+    pathname,
+  );
 }
 
 export const runtime = "edge";
