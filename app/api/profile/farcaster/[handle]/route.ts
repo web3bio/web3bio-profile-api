@@ -8,21 +8,35 @@ import {
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
+  // Early return for empty handle
+  if (!handle) {
+    return errorHandle({
+      identity: "",
+      path: pathname,
+      platform: Platform.farcaster,
+      code: 404,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
+  // Normalize handle
   const resolvedHandle = REGEX.SOLANA_ADDRESS.test(handle)
     ? handle
     : handle.toLowerCase();
-  if (
-    ![
-      isValidEthereumAddress(resolvedHandle),
-      REGEX.SOLANA_ADDRESS.test(resolvedHandle),
-      REGEX.FARCASTER.test(resolvedHandle),
-    ].some((x) => !!x)
-  )
+
+  // Validate handle format
+  const isValidEth = isValidEthereumAddress(resolvedHandle);
+  const isValidSolana = REGEX.SOLANA_ADDRESS.test(resolvedHandle);
+  const isValidFarcaster = REGEX.FARCASTER.test(resolvedHandle);
+
+  if (!isValidEth && !isValidSolana && !isValidFarcaster) {
     return errorHandle({
       identity: resolvedHandle,
       path: pathname,
@@ -30,8 +44,11 @@ export async function GET(req: NextRequest) {
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
+  }
 
   const queryInput = prettify(resolvedHandle);
+  const headers = getUserHeaders(req.headers);
+
   return resolveIdentityHandle(
     queryInput,
     Platform.farcaster,

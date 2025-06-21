@@ -172,10 +172,10 @@ export const getThemeColor = (
   );
 
   // Tertiary color with hue shift
-  const hueShift = ((hash & 0xff) % 10) / 100;
+  const hueShift = ((hash & 0xff) % 5) / 100;
   const newHue = (h + hueShift) % 1.0;
-  const newSat = Math.max(0.15, s * 0.7);
-  const newLight = Math.min(0.75, l + 0.2 + (((hash >> 4) & 0xff) % 20) / 100);
+  const newSat = Math.max(0.1, s * 0.4);
+  const newLight = Math.min(0.92, 0.7 + (((hash >> 4) & 0xff) % 12) / 100);
 
   const [r3, g3, b3] = hslToRgb(newHue, newSat, newLight);
 

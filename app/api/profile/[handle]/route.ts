@@ -4,23 +4,15 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "./utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest) {
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle");
-
-  // Early validation
-  if (!handle) {
-    return errorHandle({
-      identity: "",
-      code: 400,
-      path: pathname,
-      platform: null,
-      message: "Missing handle parameter",
-    });
-  }
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { handle: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const handle = params.handle;
 
   // Parse identity
-  const resolvedId = resolveIdentity(handle);
+  const resolvedId = resolveIdentity(handle!);
   if (!resolvedId) {
     return errorHandle({
       identity: handle,
@@ -31,7 +23,7 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  const [platform, identity] = resolvedId.split(",", 2);
+  const [platform, identity] = resolvedId.split(",");
 
   // Validate parsed data
   if (!platform || !identity) {

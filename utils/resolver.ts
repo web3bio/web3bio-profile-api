@@ -5,14 +5,24 @@ import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
   if (!url) return null;
-  if (url.startsWith("data:") || url.startsWith("https://")) return url;
-  if (url.startsWith("ar://"))
-    return url.replace("ar://", ARWEAVE_ASSET_PREFIX);
-  if (url.startsWith("ipfs://") || isIPFS_Resource(url))
+
+  // Handle data URLs and HTTPS URLs directly
+  if (url.startsWith("data:") || url.startsWith("https://")) {
+    return url;
+  }
+
+  // Handle Arweave URLs
+  if (url.startsWith("ar://")) {
+    return ARWEAVE_ASSET_PREFIX + url.slice(5);
+  }
+
+  // Handle IPFS URLs
+  if (url.startsWith("ipfs://") || isIPFS_Resource(url)) {
     return resolveIPFS_URL(url) || url;
-  return !id
-    ? url
-    : `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}`;
+  }
+
+  // Default fallback
+  return id ? `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}` : url;
 };
 
 export const resolveHandle = (
@@ -20,29 +30,33 @@ export const resolveHandle = (
   platform?: Platform,
 ): string | null => {
   if (!handle) return null;
+
+  // Handle website platform
   if (platform === Platform.website) {
     return handle
       .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-      .replace(/\/+$/g, "")
+      .replace(/\/+$/, "")
       .toLowerCase();
   }
 
+  // Handle YouTube platform
   if (platform === Platform.youtube) {
-    const match = handle.match(/@(.*?)(?=[\/]|$)/);
-    return match ? match[0] : "";
+    const match = handle.match(/@([^\/]+)/);
+    return match?.[0] ?? null;
   }
 
+  // Handle domain-like handles
   if (REGEX.DOMAIN.test(handle)) {
-    const parts = handle.split("/");
-    return (
-      handle.endsWith("/") ? parts[parts.length - 2] : parts[parts.length - 1]
-    )
-      .replace(/@/g, "")
-      .split("?")[0]
-      .toLowerCase();
+    const segments = handle.split("/");
+    const lastSegment = handle.endsWith("/")
+      ? segments[segments.length - 2]
+      : segments[segments.length - 1];
+
+    return lastSegment?.replace(/^@/, "").split("?")[0].toLowerCase() ?? null;
   }
 
-  return handle.replace(/@/g, "").toLowerCase();
+  // Default handle processing
+  return handle.replace(/^@/, "").toLowerCase();
 };
 
 export const getSocialMediaLink = (
@@ -50,64 +64,93 @@ export const getSocialMediaLink = (
   type: Platform | string,
 ): string | null => {
   if (!url) return null;
+
   const normalizedUrl = url.toLowerCase().replace(/\?$/, "");
+
   return normalizedUrl.startsWith("http")
     ? normalizedUrl
-    : resolveSocialMediaLink(normalizedUrl, type);
+    : resolveSocialLink(normalizedUrl, type);
 };
 
-function resolveSocialMediaLink(name: string, type: Platform | string): string {
+const resolveSocialLink = (name: string, type: Platform | string): string => {
   if (!(type in Platform)) {
-    return `https://web3.bio/?s=${name}`;
+    return `https://web3.bio/?s=${encodeURIComponent(name)}`;
   }
 
-  switch (type) {
+  const platformType = type as Platform;
+
+  switch (platformType) {
     case Platform.url:
-      return name.toLowerCase();
+      return name;
+
     case Platform.website:
       return `https://${name}`;
+
     case Platform.discord:
       return name.includes("https://")
-        ? getPlatform(type).urlPrefix + name
+        ? getPlatform(platformType).urlPrefix + name
         : "";
+
     case Platform.lens:
       return getPlatform(Platform.lens).urlPrefix + name.replace(/\.lens$/, "");
-    default:
-      const prefix = getPlatform(type as Platform)?.urlPrefix;
-      return prefix ? prefix + name : "";
+
+    default: {
+      const platform = getPlatform(platformType);
+      return platform?.urlPrefix ? platform.urlPrefix + name : "";
+    }
   }
-}
+};
 
 export const resolveEipAssetURL = async (
   source: string | null,
 ): Promise<string | null> => {
   if (!source) return null;
 
-  const match = source.match(REGEX.EIP);
-  if (!match) return resolveMediaURL(source);
+  const eipMatch = source.match(REGEX.EIP);
+  if (!eipMatch) {
+    return resolveMediaURL(source);
+  }
 
-  const [full, chainId, protocol, contractAddress, tokenId] = match;
+  const [, chainId, , contractAddress, tokenId] = eipMatch;
 
-  if (!contractAddress || !tokenId) return resolveMediaURL(source);
+  if (!contractAddress || !tokenId) {
+    return resolveMediaURL(source);
+  }
 
   const network = getNetwork(Number(chainId))?.key;
-  if (!network) return resolveMediaURL(source);
+  if (!network) {
+    return resolveMediaURL(source);
+  }
+
+  // Check API key availability early to avoid unnecessary processing
+  const apiKey = process.env.OPENSEA_API_KEY;
+  if (!apiKey) {
+    console.warn("OPENSEA_API_KEY not configured, falling back to source URL");
+    return resolveMediaURL(source);
+  }
 
   try {
     const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
 
-    const res = await fetch(fetchURL, {
+    const response = await fetch(fetchURL, {
       headers: {
-        "x-api-key": process.env.OPENSEA_API_KEY || "",
+        "x-api-key": apiKey,
       },
     });
-    if (res.ok) {
-      const nft = (await res.json())?.nft;
-      return resolveMediaURL(nft?.image_url);
-    }
-  } catch (error) {
-    console.error("Failed to fetch NFT data:", error);
-  }
 
-  return resolveMediaURL(source);
+    if (!response.ok) {
+      console.warn(
+        `OpenSea API request failed: ${response.status} ${response.statusText}`,
+      );
+      return resolveMediaURL(source);
+    }
+
+    const data = await response.json();
+    const imageUrl = data?.nft?.image_url;
+
+    return imageUrl ? resolveMediaURL(imageUrl) : resolveMediaURL(source);
+  } catch (error) {
+    console.error("Failed to fetch NFT data from OpenSea:", error);
+    return resolveMediaURL(source);
+  }
 };

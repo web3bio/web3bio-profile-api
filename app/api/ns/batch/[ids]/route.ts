@@ -3,19 +3,53 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
 
-export async function GET(req: NextRequest) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: { ids: string } },
+) {
+  const { pathname } = req.nextUrl;
+  const idsParam = params.ids;
+
+  // Early validation for missing ids parameter
+  if (!idsParam) {
+    return errorHandle({
+      identity: "",
+      path: pathname,
+      platform: null,
+      code: 400,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
+
   const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
+
   try {
-    const ids = JSON.parse(searchParams.get("ids") || "");
+    // Decode URL-encoded JSON
+    const decodedIds = decodeURIComponent(idsParam);
+    const ids = JSON.parse(decodedIds);
+
+    // Validate that ids is an array
+    if (!Array.isArray(ids)) {
+      return errorHandle({
+        identity: idsParam,
+        path: pathname,
+        platform: null,
+        code: 400,
+        message: ErrorMessages.INVALID_IDENTITY,
+      });
+    }
+
     const resJson = await queryIdentityGraphBatch(ids, true, headers);
     return respondWithCache(resJson);
   } catch (e: unknown) {
+    // More specific error handling for JSON parsing vs other errors
+    const isParseError = e instanceof SyntaxError;
+
     return errorHandle({
-      identity: searchParams.get("ids"),
+      identity: idsParam,
       path: pathname,
       platform: null,
-      code: 404,
+      code: isParseError ? 400 : 404,
       message: e instanceof Error ? e.message : ErrorMessages.INVALID_IDENTITY,
     });
   }
