@@ -450,26 +450,7 @@ export const generateSocialLinks = async (
         }
       }
       break;
-
-    case Platform.dotbit:
-      if (!texts) break;
-
-      for (const [textKey, value] of Object.entries(texts)) {
-        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
-        );
-        if (platformKey) {
-          const resolvedHandle = resolveHandle(value, platformKey);
-          links[textKey] = {
-            link: getSocialMediaLink(value, platformKey)!,
-            handle: resolvedHandle,
-            sources: resolveVerifiedLink(
-              `${platformKey},${resolvedHandle}`,
-              edges,
-            ),
-          };
-        }
-      }
+    default:
       break;
   }
 
