@@ -45,7 +45,6 @@ const SUPPORTED_PLATFORMS = new Set([
   Platform.basenames,
   Platform.linea,
   Platform.unstoppableDomains,
-  Platform.dotbit,
   Platform.twitter,
   Platform.github,
   Platform.discord,

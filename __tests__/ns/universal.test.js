@@ -18,11 +18,6 @@ describe("Test For Universal NS API", () => {
     expect(json[0].identity).toBe("stani.lens");
   });
 
-  it("It should response 404 data for jeffx.bit", async () => {
-    const res = await queryClient("/ns/jeffx.bit");
-    expect(res.status).toBe(404);
-  });
-
   it("It should response 200 data for gamedb.eth", async () => {
     const res = await queryClient("/profile/gamedb.eth");
     expect(res.status).toBe(200);
