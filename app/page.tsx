@@ -2592,6 +2592,16 @@ export default function Home() {
               .
             </p>
             <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
+              June Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Change</span> Deprecated{" "}
+                <code>dotbit</code> platform support.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎨</span>{" "}
               March Update
             </h3>
