@@ -16,6 +16,7 @@ export enum QueryType {
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
+  GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
 }
 
 // Pre-compiled query strings as constants for better performance
@@ -266,6 +267,27 @@ const GET_BATCH = `
     }
   }
 `;
+const GET_BATCH_UNIVERSAL = `
+  query GET_BATCH_UNIVERSAL($ids: [String!]!) {
+    identitiesWithGraph(ids: $ids) {
+      identityGraph {
+        vertices {
+          identity
+          isPrimary
+          platform
+          profile {
+            address
+            avatar
+            displayName
+            description
+            identity
+            platform
+          }
+        }
+      }
+    }
+  }
+`;
 
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
@@ -361,6 +383,40 @@ export async function queryIdentityGraph(
     return {
       errors: error instanceof Error ? error.message : "Unknown error occurred",
     };
+  }
+}
+
+export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
+  try {
+    const queryIds = resolveIdentityBatch(ids);
+
+    if (queryIds.length === 0) {
+      return [];
+    }
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.GET_BATCH_UNIVERSAL),
+        variables: { ids: queryIds },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+
+    // Early return for error cases
+    if (!json?.data?.identitiesWithGraph) {
+      return json || [];
+    }
+  } catch (e) {
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }
 }
 
