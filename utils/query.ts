@@ -348,6 +348,7 @@ const GET_DOMAIN = `
         contenthash
         texts
         addresses {
+          address
           network
         }
       }
