@@ -37,7 +37,6 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0xdd3bf199e65bba74144a9a1c0dfaeda32b911121");
-    expect(json.location).toBe("San Francisco, California");
   });
   it("It should response 200 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");

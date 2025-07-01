@@ -24,7 +24,7 @@ describe("Test For Credentials API", () => {
     );
     expect(json[0].credentials.isRisky.sources[0].value).toBe("hacker");
   });
-  it("It should response 200 for jchip300.eth", async () => {
+  it("It should response 200 for supahmars.eth", async () => {
     const res = await queryClient("/credentials/supahmars.eth");
     expect(res.status).toBe(200);
     const json = await res.json();

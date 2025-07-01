@@ -1,12 +1,14 @@
 import {
   ErrorMessages,
   IdentityString,
+  NSResponse,
   type Platform,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
 import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
 import { ProfileRecord, type AuthHeaders } from "./types";
 import { generateProfileStruct, resolveIdentityBatch } from "./base";
+import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
@@ -16,9 +18,9 @@ export enum QueryType {
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
+  GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
 }
 
-// Pre-compiled query strings as constants for better performance
 const GET_CREDENTIALS_QUERY = `
   query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
@@ -267,6 +269,55 @@ const GET_BATCH = `
   }
 `;
 
+const GET_BATCH_UNIVERSAL = `
+  query GET_BATCH_UNIVERSAL($ids: [String!]!) {
+    identitiesWithGraph(ids: $ids) {
+      identity
+      platform
+      isPrimary
+      resolvedAddress {
+        network
+        address
+      }
+      ownerAddress {
+        network
+        address
+      }
+      profile {
+        address
+        avatar
+        displayName
+        description
+        identity
+        platform
+      }
+      identityGraph {
+        vertices {
+          identity
+          isPrimary
+          platform
+          resolvedAddress {
+            network
+            address
+          }
+          ownerAddress {
+            network
+            address
+          }
+          profile {
+            address
+            avatar
+            displayName
+            description
+            identity
+            platform
+          }
+        }
+      }
+    }
+  }
+`;
+
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
@@ -297,15 +348,14 @@ const GET_DOMAIN = `
         contenthash
         texts
         addresses {
-          network
           address
+          network
         }
       }
     }
   }
 `;
 
-// Use Map for O(1) lookup instead of object property access
 const QUERY_MAP = new Map([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_GRAPH_QUERY, GET_GRAPH_QUERY],
@@ -314,6 +364,7 @@ const QUERY_MAP = new Map([
   [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
   [QueryType.GET_BATCH, GET_BATCH],
+  [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
 ]);
 
 export function getQuery(type: QueryType): string {
@@ -364,6 +415,94 @@ export async function queryIdentityGraph(
   }
 }
 
+export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
+  try {
+    const queryIds = resolveIdentityBatch(ids);
+
+    if (queryIds.length === 0) {
+      return [];
+    }
+
+    const response = await fetch(IDENTITY_GRAPH_SERVER, {
+      method: "POST",
+      headers: {
+        ...headers,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.GET_BATCH_UNIVERSAL),
+        variables: { ids: queryIds },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const json = await response.json();
+    const identities = json?.data?.identitiesWithGraph;
+
+    if (!Boolean(identities) || !Array.isArray(identities)) {
+      return [];
+    }
+    const identityMap = new Map(
+      identities.map((identity) => [
+        `${identity.platform},${identity.identity}`,
+        identity,
+      ]),
+    );
+    const resolutionPromises = queryIds.map(async (id) => {
+      const matchingIdentity = identityMap.get(id);
+
+      if (!matchingIdentity) {
+        return {
+          id,
+          profiles: [],
+        };
+      }
+
+      const resolvedResult = await resolveWithIdentityGraph({
+        handle: matchingIdentity.identity,
+        platform: matchingIdentity.platform,
+        ns: true,
+        response: {
+          data: {
+            identity: matchingIdentity,
+          },
+        },
+      });
+
+      if ((resolvedResult as any).message) {
+        return {
+          id,
+          profiles: [],
+        };
+      }
+
+      return {
+        id,
+        profiles: resolvedResult ? [...(resolvedResult as NSResponse[])] : [],
+      };
+    });
+
+    const settledResults = await Promise.allSettled(resolutionPromises);
+    const results = settledResults.map((result, index) => {
+      if (result.status === "fulfilled") {
+        return result.value;
+      } else {
+        return {
+          id: queryIds[index],
+          profiles: [],
+        };
+      }
+    });
+
+    return results.filter((result) => result.profiles.length > 0);
+  } catch (e) {
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
+  }
+}
+
 export async function queryIdentityGraphBatch(
   ids: string[],
   ns: boolean,
@@ -394,12 +533,10 @@ export async function queryIdentityGraphBatch(
 
     const json = await response.json();
 
-    // Early return for error cases
     if (!json?.data?.identities) {
       return json || [];
     }
 
-    // Process identities concurrently with proper error handling
     const processedResults = await Promise.allSettled(
       json.data.identities.map(
         async (identity: {
@@ -428,7 +565,6 @@ export async function queryIdentityGraphBatch(
       ),
     );
 
-    // Extract successful results only
     const validResults = processedResults
       .filter(
         (result): result is PromiseFulfilledResult<any> =>
@@ -436,7 +572,6 @@ export async function queryIdentityGraphBatch(
       )
       .map((result) => result.value);
 
-    // Map query IDs to results with optimized lookup
     const resultMap = new Map(
       validResults.map((result) => [
         result.aliases?.find((alias: string) => queryIds.includes(alias)) ||
@@ -447,12 +582,10 @@ export async function queryIdentityGraphBatch(
 
     return queryIds
       .map((queryId) => {
-        // Direct lookup first
         if (resultMap.has(queryId)) {
           return resultMap.get(queryId);
         }
 
-        // Fallback to platform,identity matching
         const [platform, identity] = queryId.split(",");
         for (const result of validResults) {
           if (
@@ -466,7 +599,6 @@ export async function queryIdentityGraphBatch(
       })
       .filter(Boolean);
   } catch (error) {
-    console.error("Batch query failed:", error);
     throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }
 }
