@@ -69,7 +69,7 @@ describe("Test For Universal NS API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("planetable.sol");
+    expect(json[0].identity).toBe("v2ex.sol");
   });
   it("It should response 200 data for ens,planetable.eth", async () => {
     const res = await queryClient("/ns/ens,planetable.eth");
