@@ -69,8 +69,6 @@ export const resolveIdentityResponse = async (
     headers,
   );
 
-  console.log(res, "kkk");
-
   if (res.msg) {
     return {
       identity: handle,

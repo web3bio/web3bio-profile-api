@@ -448,7 +448,7 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
     const resolutionPromises = queryIds.map(async (id) => {
       const matchingIdentity = identities.find((identity) => {
         const identityString = `${identity.platform},${identity.identity}`;
-        return identityString === id || identity.identity === id;
+        return identityString === id;
       });
 
       if (!matchingIdentity) {
