@@ -445,11 +445,14 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
     if (!Boolean(identities) || !Array.isArray(identities)) {
       return [];
     }
+    const identityMap = new Map(
+      identities.map((identity) => [
+        `${identity.platform},${identity.identity}`,
+        identity,
+      ]),
+    );
     const resolutionPromises = queryIds.map(async (id) => {
-      const matchingIdentity = identities.find((identity) => {
-        const identityString = `${identity.platform},${identity.identity}`;
-        return identityString === id;
-      });
+      const matchingIdentity = identityMap.get(id);
 
       if (!matchingIdentity) {
         return {
