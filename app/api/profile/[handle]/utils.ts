@@ -490,7 +490,6 @@ export const resolveUniversalHandle = async (
     platform,
     headers,
   );
-
   const resolutionResult = await resolveWithIdentityGraph({
     handle,
     platform,
