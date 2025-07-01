@@ -23,6 +23,8 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
+    console.log(res, "kkk", identity, platform);
+
     // Early return if no identity data
     const vertices = res?.data?.identity?.identityGraph?.vertices;
     if (!vertices?.length) {
