@@ -1,6 +1,7 @@
 import {
   ErrorMessages,
   IdentityString,
+  NSResponse,
   type Platform,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
@@ -476,7 +477,7 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
 
       return {
         id,
-        profiles: resolvedResult ? [resolvedResult] : [],
+        profiles: resolvedResult ? [...(resolvedResult as NSResponse[])] : [],
       };
     });
 
