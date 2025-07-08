@@ -101,7 +101,7 @@ export async function GET(
       });
     }
 
-    return respondWithCache(result);
+    return respondWithCache(result, true);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";

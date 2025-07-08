@@ -32,7 +32,7 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
       return [];
     });
 
-  return respondWithCache(results);
+  return respondWithCache(results, true);
 }
 
 export const runtime = "edge";

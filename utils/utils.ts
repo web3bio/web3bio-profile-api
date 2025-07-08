@@ -13,12 +13,6 @@ export const BASE_URL =
 export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 
-// Cache control constants
-const CACHE_CONTROL_PROD =
-  "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200";
-const CACHE_CONTROL_DEV =
-  "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
-
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
   const userToken = headers?.get("x-api-key");
   return userToken && userToken.length > 0 ? { authorization: userToken } : {};
@@ -49,9 +43,16 @@ export const errorHandle = ({
   );
 };
 
-export const respondWithCache = (data: any) => {
-  const cacheControl =
-    process.env.NODE_ENV === "production"
+export const respondWithCache = (data: any, shortCache?: boolean) => {
+  const CACHE_CONTROL_SHORT =
+    "public, max-age=600, s-maxage=600, stale-while-revalidate=600";
+  const CACHE_CONTROL_PROD =
+    "public, max-age=21600, s-maxage=86400, stale-while-revalidate=43200";
+  const CACHE_CONTROL_DEV =
+    "public, max-age=60, s-maxage=300, stale-while-revalidate=600";
+  const cacheControl = shortCache
+    ? CACHE_CONTROL_SHORT
+    : process.env.NODE_ENV === "production"
       ? CACHE_CONTROL_PROD
       : CACHE_CONTROL_DEV;
 
