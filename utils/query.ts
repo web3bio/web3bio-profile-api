@@ -322,41 +322,77 @@ const GET_BATCH_UNIVERSAL = `
 
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-      platform
-      identity
-      registeredAt
-      updatedAt
-      expiredAt
-      status
-      isPrimary
-      resolver
-      managerAddress {
-        network
-        address
-      }
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      profile {
-        identity
+      identity(platform: $platform, identity: $identity) {
         platform
-        address
-        displayName
-        contenthash
-        texts
-        addresses {
-          address
+        identity
+        registeredAt
+        updatedAt
+        expiredAt
+        status
+        isPrimary
+        resolver
+      	identityGraph{
+          vertices{
+          platform
+        	identity
+        	registeredAt
+        	updatedAt
+        	expiredAt
+        	status
+        	isPrimary
+        	resolver
+          managerAddress {
+          	network
+          	address
+        	}
+        	resolvedAddress {
+          	network
+          	address
+        	}
+        	ownerAddress {
+          	network
+          	address
+        	}
+          profile {
+            identity
+            platform
+            address
+            displayName
+            contenthash
+            texts
+            addresses {
+              address
+              network
+            }
+          }
+        }
+        }
+        managerAddress {
           network
+          address
+        }
+        resolvedAddress {
+          network
+          address
+        }
+        ownerAddress {
+          network
+          address
+        }
+        profile {
+          identity
+          platform
+          address
+          displayName
+          contenthash
+          texts
+          addresses {
+            address
+            network
+          }
         }
       }
     }
-  }
 `;
 
 export const GET_SEARCH_SUGGEST = `
