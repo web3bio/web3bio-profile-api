@@ -1,5 +1,5 @@
+import type { IdentityRecord, AuthHeaders } from "@/utils/types";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { IdentityRecord, type AuthHeaders } from "@/utils/types";
 import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
