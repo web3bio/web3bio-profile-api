@@ -331,42 +331,30 @@ const GET_DOMAIN = `
       status
       isPrimary
       resolver
-      identityGraph{
-        vertices{
-        platform
-        identity
-        registeredAt
-        updatedAt
-        expiredAt
-        status
-        isPrimary
-        resolver
-        managerAddress {
-          network
-          address
-        }
-        resolvedAddress {
-          network
-          address
-        }
-        ownerAddress {
-          network
-          address
-        }
-        profile {
-          identity
+      identityGraph {
+        vertices {
           platform
-          address
-          displayName
-          contenthash
-          texts
-          addresses {
-            address
+          identity
+          registeredAt
+          updatedAt
+          expiredAt
+          status
+          isPrimary
+          resolver
+          managerAddress {
             network
+            address
+          }
+          resolvedAddress {
+            network
+            address
+          }
+          ownerAddress {
+            network
+            address
           }
         }
       }
-    }
       managerAddress {
         network
         address
@@ -403,6 +391,7 @@ export const GET_SEARCH_SUGGEST = `
     }
   }
 `;
+
 export const GET_AVAILABLE_DOMAINS = `
   query GET_AVAILABLE_DOMAINS($name: String!) {
     domainAvailableSearch(name: $name) {
@@ -415,7 +404,7 @@ export const GET_AVAILABLE_DOMAINS = `
   }
 `;
 
-const QUERY_MAP = new Map([
+const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_GRAPH_QUERY, GET_GRAPH_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
@@ -477,13 +466,12 @@ export async function queryIdentityGraph(
 }
 
 export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
+  const queryIds = resolveIdentityBatch(ids);
+  if (queryIds.length === 0) {
+    return [];
+  }
+
   try {
-    const queryIds = resolveIdentityBatch(ids);
-
-    if (queryIds.length === 0) {
-      return [];
-    }
-
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -503,64 +491,53 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
     const json = await response.json();
     const identities = json?.data?.identitiesWithGraph;
 
-    if (!Boolean(identities) || !Array.isArray(identities)) {
+    if (!Array.isArray(identities)) {
       return [];
     }
+
     const identityMap = new Map(
       identities.map((identity) => [
         `${identity.platform},${identity.identity}`,
         identity,
       ]),
     );
-    const resolutionPromises = queryIds.map(async (id) => {
-      const matchingIdentity = identityMap.get(id);
 
-      if (!matchingIdentity) {
-        return {
-          id,
-          profiles: [],
-        };
-      }
+    const results = await Promise.all(
+      queryIds.map(async (id) => {
+        const matchingIdentity = identityMap.get(id);
+        if (!matchingIdentity) {
+          return { id, profiles: [] };
+        }
 
-      const resolvedResult = await resolveWithIdentityGraph({
-        handle: matchingIdentity.identity,
-        platform: matchingIdentity.platform,
-        ns: true,
-        response: {
-          data: {
-            identity: matchingIdentity,
-          },
-        },
-      });
+        try {
+          const resolvedResult = await resolveWithIdentityGraph({
+            handle: matchingIdentity.identity,
+            platform: matchingIdentity.platform,
+            ns: true,
+            response: {
+              data: {
+                identity: matchingIdentity,
+              },
+            },
+          });
 
-      if ((resolvedResult as any).message) {
-        return {
-          id,
-          profiles: [],
-        };
-      }
+          if (resolvedResult && !(resolvedResult as any).message) {
+            return {
+              id,
+              profiles: [...(resolvedResult as NSResponse[])],
+            };
+          }
+        } catch (error) {
+          // Silent fail for individual identity resolution
+        }
 
-      return {
-        id,
-        profiles: resolvedResult ? [...(resolvedResult as NSResponse[])] : [],
-      };
-    });
-
-    const settledResults = await Promise.allSettled(resolutionPromises);
-    const results = settledResults.map((result, index) => {
-      if (result.status === "fulfilled") {
-        return result.value;
-      } else {
-        return {
-          id: queryIds[index],
-          profiles: [],
-        };
-      }
-    });
+        return { id, profiles: [] };
+      }),
+    );
 
     return results.filter((result) => result.profiles.length > 0);
   } catch (e) {
-    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
   }
 }
 
@@ -569,13 +546,12 @@ export async function queryIdentityGraphBatch(
   ns: boolean,
   headers: AuthHeaders,
 ) {
+  const queryIds = resolveIdentityBatch(ids);
+  if (queryIds.length === 0) {
+    return [];
+  }
+
   try {
-    const queryIds = resolveIdentityBatch(ids);
-
-    if (queryIds.length === 0) {
-      return [];
-    }
-
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
@@ -605,23 +581,18 @@ export async function queryIdentityGraphBatch(
           aliases: IdentityString[];
           registeredAt: number;
         }) => {
-          try {
-            const profileStruct = await generateProfileStruct(
-              {
-                ...identity.profile,
-                createdAt: identity.registeredAt,
-              },
-              ns,
-            );
+          const profileStruct = await generateProfileStruct(
+            {
+              ...identity.profile,
+              createdAt: identity.registeredAt,
+            },
+            ns,
+          );
 
-            return {
-              ...profileStruct,
-              aliases: identity.aliases,
-            };
-          } catch (error) {
-            console.warn("Failed to process identity:", error);
-            return null;
-          }
+          return {
+            ...profileStruct,
+            aliases: identity.aliases,
+          };
         },
       ),
     );
@@ -629,7 +600,7 @@ export async function queryIdentityGraphBatch(
     const validResults = processedResults
       .filter(
         (result): result is PromiseFulfilledResult<any> =>
-          result.status === "fulfilled" && result.value !== null,
+          result.status === "fulfilled",
       )
       .map((result) => result.value);
 
@@ -648,18 +619,16 @@ export async function queryIdentityGraphBatch(
         }
 
         const [platform, identity] = queryId.split(",");
-        for (const result of validResults) {
-          if (
-            result.platform === platform &&
-            normalizeText(result.identity) === normalizeText(identity)
-          ) {
-            return result;
-          }
-        }
-        return null;
+        return (
+          validResults.find(
+            (result) =>
+              result.platform === platform &&
+              normalizeText(result.identity) === normalizeText(identity),
+          ) || null
+        );
       })
       .filter(Boolean);
   } catch (error) {
-    throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
+    throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
   }
 }

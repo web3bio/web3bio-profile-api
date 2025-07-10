@@ -16,30 +16,28 @@ const generateResponseStruct = (identity: IdentityRecord) => {
     updatedAt,
     expiredAt,
     resolver,
-    ownerAddress,
-    resolvedAddress,
-    managerAddress,
   } = identity;
+
   return {
     identity: identity.identity,
     platform: identity.platform,
-    resolvedAddress: resolvedAddress?.[0]?.address ?? null,
-    ownerAddress: ownerAddress?.[0]?.address ?? null,
-    managerAddress: managerAddress?.[0]?.address ?? null,
-    resolverAddress: resolver || null,
-    displayName: profile?.displayName || null,
+    resolvedAddress: identity.resolvedAddress?.[0]?.address ?? null,
+    ownerAddress: identity.ownerAddress?.[0]?.address ?? null,
+    managerAddress: identity.managerAddress?.[0]?.address ?? null,
+    resolverAddress: resolver ?? null,
+    displayName: profile?.displayName ?? null,
     isPrimary,
     status,
     createdAt: registeredAt ? formatTimestamp(registeredAt) : null,
     updatedAt: updatedAt ? formatTimestamp(updatedAt) : null,
     expiredAt: expiredAt ? formatTimestamp(expiredAt) : null,
-    contenthash: profile?.contenthash || null,
+    contenthash: profile?.contenthash ?? null,
   };
 };
 
 const buildAddressesMap = (
   addresses?: Array<{ network: string; address: string }>,
-) => {
+): Record<string, string> => {
   if (!addresses?.length) return {};
 
   const result: Record<string, string> = {};
@@ -50,19 +48,21 @@ const buildAddressesMap = (
 };
 
 const buildDomainsArray = (
-  vertices: IdentityRecord[],
+  vertices: IdentityRecord[] = [],
   handle: string,
   platform: Platform,
-) => {
-  if (!DOMAIN_PLATFORMS.has(platform) || !vertices?.length) return [];
+): ReturnType<typeof generateResponseStruct>[] => {
+  if (!DOMAIN_PLATFORMS.has(platform) || !vertices.length) return [];
 
   const domains: ReturnType<typeof generateResponseStruct>[] = [];
 
   for (const vertex of vertices) {
+    const ownerAddr = vertex.ownerAddress?.[0]?.address;
+
     if (
       TARGET_PLATFORMS.has(vertex.platform) &&
-      vertex.ownerAddress?.[0]?.address &&
-      isSameAddress(vertex.ownerAddress[0].address, handle)
+      ownerAddr &&
+      isSameAddress(ownerAddr, handle)
     ) {
       domains.push(generateResponseStruct(vertex));
     }
@@ -97,13 +97,12 @@ export const resolveDomainQuery = async (
 
   const responseData = generateResponseStruct(identity);
   const { profile, identityGraph } = identity;
-
   const addresses = buildAddressesMap(profile?.addresses);
   const domains = buildDomainsArray(identityGraph?.vertices, handle, platform);
 
   return respondWithCache({
     ...responseData,
-    texts: profile?.texts,
+    texts: profile?.texts ?? null,
     addresses,
     domains,
   });

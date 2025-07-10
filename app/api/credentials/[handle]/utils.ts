@@ -23,67 +23,56 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    // Early return if no identity data
-    const vertices = res?.data?.identity?.identityGraph?.vertices;
+    const vertices = res?.data?.identity?.identityGraph?.vertices as
+      | CredentialRecord[]
+      | undefined;
     if (!vertices?.length) {
       return errorHandle({
-        identity: identity,
+        identity,
         code: 404,
         path: pathname,
-        platform: platform,
+        platform,
         message: ErrorMessages.NOT_FOUND,
       });
     }
 
-    // Filter and sort credentials in one pass
     const targetId = `${platform},${identity}`;
-    const credentials = (vertices as CredentialRecord[])
-      .filter((vertex) => vertex.credentials?.length > 0)
-      .sort((a, b) => {
-        if (a.id === targetId) return -1;
-        if (b.id === targetId) return 1;
-        return 0;
-      });
+    const credentials = vertices
+      .filter((v) => v.credentials?.length)
+      .sort((a, b) => (a.id === targetId ? -1 : b.id === targetId ? 1 : 0));
 
-    if (credentials.length === 0) {
+    if (!credentials.length) {
       return errorHandle({
-        identity: identity,
+        identity,
         code: 404,
         path: pathname,
-        platform: platform,
+        platform,
         message: ErrorMessages.NOT_FOUND,
       });
     }
 
-    const response = buildCredentialsResponse(credentials);
-    return respondWithCache(response);
-  } catch (error) {
+    return respondWithCache(buildCredentialsResponse(credentials));
+  } catch {
     return errorHandle({
-      identity: identity,
+      identity,
       code: 500,
       path: pathname,
-      platform: platform,
+      platform,
       message: ErrorMessages.NETWORK_ERROR,
     });
   }
 };
 
-// Optimized credential processing with better logic separation
 const buildCredentialsResponse = (
   records: CredentialRecord[],
-): CredentialsResponse[] => {
-  return records.map((record) => {
-    const credentialGroups = groupCredentialsByCategory(record.credentials);
-    const processedCredentials = processCredentialGroups(credentialGroups);
+): CredentialsResponse[] =>
+  records.map((record) => ({
+    id: record.id,
+    credentials: processCredentialGroups(
+      groupCredentialsByCategory(record.credentials),
+    ),
+  }));
 
-    return {
-      id: record.id,
-      credentials: processedCredentials,
-    };
-  });
-};
-
-// Group credentials by category for efficient processing
 const groupCredentialsByCategory = (
   credentials: CredentialRecordRaw[],
 ): Record<CredentialCategory, CredentialRecordRaw[]> => {
@@ -92,78 +81,38 @@ const groupCredentialsByCategory = (
     isRisky: [],
     isSpam: [],
   };
-
-  for (const credential of credentials) {
-    if (credential.category && groups[credential.category]) {
-      const { category, ...sourceData } = credential;
-      groups[credential.category].push(sourceData);
-    }
+  for (const c of credentials) {
+    if (c.category && groups[c.category]) groups[c.category].push(c);
   }
-
   return groups;
 };
 
-// Process each credential group with optimized logic
 const processCredentialGroups = (
   groups: Record<CredentialCategory, CredentialRecordRaw[]>,
 ): Record<
   CredentialCategory,
   { value: boolean; sources: CredentialRecordRaw[] } | null
-> => {
-  const result: Record<
-    CredentialCategory,
-    { value: boolean; sources: CredentialRecordRaw[] } | null
-  > = {
-    isHuman: null,
-    isRisky: null,
-    isSpam: null,
-  };
+> => ({
+  isHuman: groups.isHuman.length
+    ? { value: calculateHumanValue(groups.isHuman), sources: groups.isHuman }
+    : null,
+  isRisky: groups.isRisky.length
+    ? { value: true, sources: groups.isRisky }
+    : null,
+  isSpam: groups.isSpam.length
+    ? { value: calculateSpamValue(groups.isSpam), sources: groups.isSpam }
+    : null,
+});
 
-  // Process isHuman credentials
-  if (groups.isHuman.length > 0) {
-    result.isHuman = {
-      value: calculateHumanValue(groups.isHuman),
-      sources: groups.isHuman,
-    };
-  }
+const calculateHumanValue = (sources: CredentialRecordRaw[]): boolean =>
+  sources.some(
+    (s) => ["binance", "coinbase"].includes(s.dataSource) && s.value === "true",
+  ) || !!sources.length;
 
-  // Process isRisky credentials
-  if (groups.isRisky.length > 0) {
-    result.isRisky = {
-      value: true, // Any risky credential means risky
-      sources: groups.isRisky,
-    };
-  }
-
-  // Process isSpam credentials
-  if (groups.isSpam.length > 0) {
-    result.isSpam = {
-      value: calculateSpamValue(groups.isSpam),
-      sources: groups.isSpam,
-    };
-  }
-
-  return result;
-};
-
-// Optimized human value calculation
-const calculateHumanValue = (sources: CredentialRecordRaw[]): boolean => {
-  // Check for high-trust sources first
-  const hasTrustedSource = sources.some(
-    (source) =>
-      ["binance", "coinbase"].includes(source.dataSource) &&
-      source.value === "true",
+const calculateSpamValue = (sources: CredentialRecordRaw[]): boolean =>
+  sources.some(
+    (s) =>
+      s.dataSource === "warpcast" &&
+      s.type === "score" &&
+      Number(s.value) === 0,
   );
-
-  return hasTrustedSource || sources.length > 0;
-};
-
-// Optimized spam value calculation
-const calculateSpamValue = (sources: CredentialRecordRaw[]): boolean => {
-  return sources.some(
-    (source) =>
-      source.dataSource === "warpcast" &&
-      source.type === "score" &&
-      Number(source.value) === 0,
-  );
-};
