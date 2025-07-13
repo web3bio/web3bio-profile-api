@@ -52,9 +52,13 @@ export interface IdentityRecord {
   network: string;
   ownerAddress: AddressRecord[];
   resolvedAddress: AddressRecord[];
+  managerAddress: AddressRecord[];
   platform: Platform;
   primaryName: string | null;
   profile: ProfileRecord;
+  status: string;
+  updatedAt: number;
+  resolver: string;
   identityGraph?: {
     vertices: IdentityRecord[];
     edges: IdentityGraphEdge[];

@@ -1,3 +1,4 @@
+import { GET_AVAILABLE_DOMAINS } from "@/utils/query";
 import { type AuthHeaders } from "@/utils/types";
 import {
   IDENTITY_GRAPH_SERVER,
@@ -30,18 +31,6 @@ interface GraphQLResponse {
   code?: number;
   msg?: string;
 }
-
-const GET_AVAILABLE_DOMAINS = `
-  query GET_AVAILABLE_DOMAINS($name: String!) {
-    domainAvailableSearch(name: $name) {
-      platform
-      name
-      expiredAt
-      availability
-      status
-    }
-  }
-`;
 
 const queryDomains = async (
   handle: string,
@@ -112,7 +101,7 @@ export async function GET(
       });
     }
 
-    return respondWithCache(result);
+    return respondWithCache(result, true);
   } catch (error) {
     const errorMessage =
       error instanceof Error ? error.message : "Unknown error occurred";

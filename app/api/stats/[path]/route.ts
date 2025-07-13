@@ -13,7 +13,7 @@ enum StatsPath {
   graph = "graph",
   sns = "sns",
   box = "box",
-  clusters = "clusters",
+  others = "others",
 }
 
 function isValidStatsPath(path: string): path is StatsPath {
