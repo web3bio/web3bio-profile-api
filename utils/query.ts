@@ -342,6 +342,7 @@ const GET_DOMAIN = `
           isPrimary
           resolver
           profile {
+            displayName
             contenthash
           }
           managerAddress {
