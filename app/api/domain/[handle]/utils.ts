@@ -25,7 +25,6 @@ const generateResponseStruct = (identity: IdentityRecord) => {
     ownerAddress: identity.ownerAddress?.[0]?.address ?? null,
     managerAddress: identity.managerAddress?.[0]?.address ?? null,
     resolverAddress: resolver ?? null,
-    displayName: profile?.displayName ?? null,
     isPrimary,
     status,
     createdAt: registeredAt ? formatTimestamp(registeredAt) : null,
