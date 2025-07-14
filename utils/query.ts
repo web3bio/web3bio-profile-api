@@ -499,10 +499,12 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
     }
 
     const identityMap = new Map(
-      identities.map((identity) => [
-        `${identity.platform},${identity.identity}`,
-        identity,
-      ]),
+      identities
+        .filter((x) => !!x)
+        .map((identity) => [
+          `${identity.platform},${identity.identity}`,
+          identity,
+        ]),
     );
 
     const results = await Promise.all(
