@@ -341,6 +341,9 @@ const GET_DOMAIN = `
           status
           isPrimary
           resolver
+          profile {
+            contenthash
+          }
           managerAddress {
             network
             address
