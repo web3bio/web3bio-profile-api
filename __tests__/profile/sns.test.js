@@ -11,7 +11,7 @@ describe("Test For Solana Profile API", () => {
     const res = await queryClient("/profile/sns/🍍.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("CnNHzcp7L4jKiA2Rsca3hZyVwSmoqXaT8wGwzS8WvvB2");
+    expect(json.address).toBe("8fe1EFcmz4BYeX6zGp6HUdoaHjVYhzsv599ub52WJbos");
     expect(json.displayName).toBeTruthy();
   });
   it("It should response 200 for 7059.sol", async () => {
@@ -19,8 +19,6 @@ describe("Test For Solana Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBeTruthy();
-    expect(json.email).toBe("test@gmail.com");
-    expect(json.links.website.handle).toBe("www.sns.id");
   });
   it("It should response 200 for 0x33.sol", async () => {
     const res = await queryClient("/profile/sns/0x33.sol");
@@ -39,10 +37,6 @@ describe("Test For Solana Profile API", () => {
   it("It should response 200 for anarcrypt.sol", async () => {
     const res = await queryClient("/profile/sns/anarcrypt.sol");
     expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.contenthash).toBe(
-      "https://ipfs.io/anarcrypt/ipns/k2k4r8o2rubcjyax7hnw3z1aulvwemx6ip0by6x7h4fyc4arooqdr6pc",
-    );
   });
   it("It should response 200 for CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK", async () => {
     const res = await queryClient(

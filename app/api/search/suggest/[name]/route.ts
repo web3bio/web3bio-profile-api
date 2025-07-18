@@ -1,6 +1,12 @@
 import { GET_SEARCH_SUGGEST } from "@/utils/query";
 import { IDENTITY_GRAPH_SERVER, respondWithCache } from "@/utils/utils";
 import { NextRequest, NextResponse } from "next/server";
+import { Platform } from "web3bio-profile-kit/types";
+
+interface NameSuggest {
+  name: string;
+  platform: Platform;
+}
 
 export async function GET(req: NextRequest): Promise<NextResponse> {
   const { searchParams } = req.nextUrl;
@@ -26,7 +32,18 @@ export async function GET(req: NextRequest): Promise<NextResponse> {
         return [];
       }
 
-      return result.data?.nameSuggest || [];
+      return (
+        result.data?.nameSuggest.map((x: NameSuggest) => {
+          if (x.platform === Platform.box) {
+            return {
+              platform: Platform.ens,
+              name: x.name,
+            };
+          } else {
+            return x;
+          }
+        }) || []
+      );
     })
     .catch((e) => {
       return [];
