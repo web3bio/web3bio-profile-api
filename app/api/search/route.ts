@@ -1,4 +1,4 @@
-import { QueryType, queryIdentityGraph } from "@/utils/query";
+import { queryIdentityGraph } from "@/utils/query";
 import {
   errorHandle,
   getUserHeaders,
@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
     });
   try {
     let rawJson = await queryIdentityGraph(
-      QueryType.GET_GRAPH_QUERY,
+      "" as any,
       identity,
       platform,
       headers,

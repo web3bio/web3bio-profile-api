@@ -26,7 +26,6 @@ export const config = {
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
 function initHeaders(req: NextRequest) {
-  // init x-client-ip
   const userHeaders = new Headers(req.headers);
   let ip =
     userHeaders?.get("x-forwarded-for") ||
@@ -34,7 +33,6 @@ function initHeaders(req: NextRequest) {
     req.ip;
 
   if (ip && ip.includes(",")) {
-    // resolve ipv6 to ipv4
     ip = ip.split(",")[1].trim();
   }
   if (ip && ip.length > 0) {

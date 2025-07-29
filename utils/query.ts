@@ -12,7 +12,6 @@ import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
-  GET_GRAPH_QUERY = "GET_GRAPH_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
@@ -36,71 +35,6 @@ const GET_CREDENTIALS_QUERY = `
             link
             updatedAt
           }
-        }
-      }
-    }
-  }
-`;
-
-const GET_GRAPH_QUERY = `
-  query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-      identity
-      platform
-      isPrimary
-      expiredAt
-      registeredAt
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      profile {
-        identity
-        platform
-        address
-        displayName
-        avatar
-        description
-        social {
-          uid
-        }
-      }
-      identityGraph {
-        vertices {
-          identity
-          platform
-          isPrimary
-          expiredAt
-          registeredAt
-          resolvedAddress {
-            network
-            address
-          }
-          ownerAddress {
-            network
-            address
-          }
-          profile {
-            identity
-            platform
-            address
-            displayName
-            avatar
-            description
-            social {
-              uid
-            }
-          }
-        }
-        edges {
-          source
-          target
-          dataSource
-          edgeType
         }
       }
     }
@@ -385,7 +319,6 @@ const GET_DOMAIN = `
 
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
-  [QueryType.GET_GRAPH_QUERY, GET_GRAPH_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
