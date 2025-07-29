@@ -14,8 +14,14 @@ export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
+  const userIp = headers?.get("x-client-ip");
   const userToken = headers?.get("x-api-key");
-  return userToken && userToken.length > 0 ? { authorization: userToken } : {};
+  const res = {
+    "x-client-ip": userIp,
+  } as any;
+  return userToken && userToken.length > 0
+    ? { authorization: userToken, ...res }
+    : res;
 };
 
 export const errorHandle = ({
