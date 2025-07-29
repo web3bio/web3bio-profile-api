@@ -12,7 +12,7 @@ describe("Test For Domain API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.resolvedAddress).toBe(
-      "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+      "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
     );
   });
   it("It should response 200 for dwr.farcaster", async () => {

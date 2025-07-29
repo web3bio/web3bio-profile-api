@@ -5,7 +5,7 @@ describe("Test For Solana Profile API", () => {
     const res = await queryClient("/profile/sns/bonfida.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA");
+    expect(json.address).toBe("Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v");
   });
   it("It should response 200 for 🍍.sol", async () => {
     const res = await queryClient("/profile/sns/🍍.sol");
