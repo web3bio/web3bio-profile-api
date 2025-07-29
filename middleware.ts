@@ -41,17 +41,13 @@ function initHeaders(req: NextRequest) {
   return userHeaders;
 }
 
-function logWithInfo(req: NextRequest, token: string) {
-  const { pathname, search } = req.nextUrl;
+function logWithInfo(token: string) {
   const message: {
     key: string;
     params?: string;
   } = {
     key: token?.replace("Bearer ", ""),
   };
-  if (["/search"].includes(pathname)) {
-    message.params = search.replace("?", "");
-  }
   return console.log(JSON.stringify(message));
 }
 
@@ -81,7 +77,7 @@ export async function middleware(req: NextRequest) {
       { status: 403 },
     );
   } else {
-    logWithInfo(req, userToken);
+    logWithInfo(userToken);
     return NextResponse.next({
       request: {
         headers: userHeaders,
