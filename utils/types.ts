@@ -7,6 +7,7 @@ import type {
 
 export interface AuthHeaders {
   authorization?: string;
+  ["x-client-ip"]?: string;
 }
 
 export interface errorHandleProps {
