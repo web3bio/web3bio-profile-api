@@ -2,7 +2,7 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-import { resolveDomainQuery } from "./utils";
+import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
 
 export async function GET(
   req: NextRequest,
@@ -38,7 +38,7 @@ export async function GET(
   const [platform, identity] = resolvedId.split(",") as [Platform, string];
 
   // Validate parsed values
-  if (!platform || !identity) {
+  if (!platform || !identity || !VALID_DOMAIN_PLATFORMS.has(platform)) {
     return errorHandle({
       identity: handle,
       code: 404,
