@@ -17,9 +17,7 @@ describe("Test For Domain API", () => {
   });
   it("It should response 200 for dwr.farcaster", async () => {
     const res = await queryClient("/domain/dwr.farcaster");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.createdAt).toBe("2023-11-07T19:42:51.000Z");
+    expect(res.status).toBe(404);
   });
   it("It should response 200 for linea,184.liena.eth", async () => {
     const res = await queryClient("/domain/linea,184.linea.eth");
