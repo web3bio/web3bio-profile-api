@@ -1,8 +1,7 @@
 import { NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import { getPlatform, REGEX } from "web3bio-profile-kit/utils";
-import { PlatformSystem } from "web3bio-profile-kit/types";
-import { type AuthHeaders, errorHandleProps, IdentityRecord } from "./types";
+import { REGEX } from "web3bio-profile-kit/utils";
+import { type AuthHeaders, errorHandleProps } from "./types";
 
 export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
@@ -14,8 +13,14 @@ export const IDENTITY_GRAPH_SERVER =
   process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
 
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
+  const userIP = headers?.get("x-client-ip") || "";
   const userToken = headers?.get("x-api-key");
-  return userToken && userToken.length > 0 ? { authorization: userToken } : {};
+  const res = {
+    "x-client-ip": userIP,
+  } as AuthHeaders;
+  return userToken && userToken.length > 0
+    ? { authorization: userToken, ...res }
+    : res;
 };
 
 export const errorHandle = ({
@@ -96,14 +101,4 @@ export const normalizeText = (input?: string): string => {
 
 export const formatTimestamp = (timestamp: number): string => {
   return new Date(timestamp * 1000).toISOString();
-};
-
-export const isSingleWeb2Identity = (identity: IdentityRecord): boolean => {
-  if (!identity?.identityGraph) return true;
-
-  const platform = getPlatform(identity.platform);
-  if (platform?.system !== PlatformSystem.web2) return false;
-
-  const { vertices, edges } = identity.identityGraph;
-  return vertices.length === 1 && edges.length === 0;
 };

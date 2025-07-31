@@ -12,15 +12,12 @@ import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
-  GET_GRAPH_QUERY = "GET_GRAPH_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
   GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
-  GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
-  GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
 }
 
 const GET_CREDENTIALS_QUERY = `
@@ -38,71 +35,6 @@ const GET_CREDENTIALS_QUERY = `
             link
             updatedAt
           }
-        }
-      }
-    }
-  }
-`;
-
-const GET_GRAPH_QUERY = `
-  query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-      identity
-      platform
-      isPrimary
-      expiredAt
-      registeredAt
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      profile {
-        identity
-        platform
-        address
-        displayName
-        avatar
-        description
-        social {
-          uid
-        }
-      }
-      identityGraph {
-        vertices {
-          identity
-          platform
-          isPrimary
-          expiredAt
-          registeredAt
-          resolvedAddress {
-            network
-            address
-          }
-          ownerAddress {
-            network
-            address
-          }
-          profile {
-            identity
-            platform
-            address
-            displayName
-            avatar
-            description
-            social {
-              uid
-            }
-          }
-        }
-        edges {
-          source
-          target
-          dataSource
-          edgeType
         }
       }
     }
@@ -385,38 +317,14 @@ const GET_DOMAIN = `
   }
 `;
 
-export const GET_SEARCH_SUGGEST = `
-  query QUERY_SEARCH_SUGGEST($name: String!) {
-    nameSuggest(name: $name) {
-      platform
-      name
-    }
-  }
-`;
-
-export const GET_AVAILABLE_DOMAINS = `
-  query GET_AVAILABLE_DOMAINS($name: String!) {
-    domainAvailableSearch(name: $name) {
-      platform
-      name
-      expiredAt
-      availability
-      status
-    }
-  }
-`;
-
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
-  [QueryType.GET_GRAPH_QUERY, GET_GRAPH_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
-  [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
-  [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],
 ]);
 
 export function getQuery(type: QueryType): string {
