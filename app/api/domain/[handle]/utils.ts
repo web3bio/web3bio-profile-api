@@ -4,7 +4,15 @@ import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
-const DOMAIN_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
+export const VALID_DOMAIN_PLATFORMS = new Set([
+  Platform.ens,
+  Platform.ethereum,
+  Platform.sns,
+  Platform.solana,
+  Platform.basenames,
+  Platform.linea,
+]);
+const EXTEND_DOMAIN_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const TARGET_PLATFORMS = new Set([Platform.ens, Platform.sns]);
 
 const generateResponseStruct = (identity: IdentityRecord) => {
@@ -49,9 +57,8 @@ const buildAddressesMap = (
 const buildDomainsArray = (
   vertices: IdentityRecord[] = [],
   handle: string,
-  platform: Platform,
 ): ReturnType<typeof generateResponseStruct>[] => {
-  if (!DOMAIN_PLATFORMS.has(platform) || !vertices.length) return [];
+  if (!vertices.length) return [];
 
   const domains: ReturnType<typeof generateResponseStruct>[] = [];
 
@@ -77,7 +84,9 @@ export const resolveDomainQuery = async (
   pathname: string,
 ) => {
   const response = await queryIdentityGraph(
-    QueryType.GET_DOMAIN,
+    EXTEND_DOMAIN_PLATFORMS.has(platform)
+      ? QueryType.GET_DOMAIN
+      : QueryType.GET_DOMAIN_SINGLE,
     handle,
     platform,
     headers,
@@ -97,12 +106,13 @@ export const resolveDomainQuery = async (
   const responseData = generateResponseStruct(identity);
   const { profile, identityGraph } = identity;
   const addresses = buildAddressesMap(profile?.addresses);
-  const domains = buildDomainsArray(identityGraph?.vertices, handle, platform);
 
   return respondWithCache({
     ...responseData,
     texts: profile?.texts ?? null,
     addresses,
-    domains,
+    domains: Boolean(identityGraph?.vertices?.length)
+      ? buildDomainsArray(identityGraph?.vertices, handle)
+      : [],
   });
 };
