@@ -107,12 +107,15 @@ export const resolveDomainQuery = async (
   const { profile, identityGraph } = identity;
   const addresses = buildAddressesMap(profile?.addresses);
 
-  return respondWithCache({
-    ...responseData,
-    texts: profile?.texts ?? null,
-    addresses,
-    domains: Boolean(identityGraph?.vertices?.length)
-      ? buildDomainsArray(identityGraph?.vertices, handle)
-      : [],
-  });
+  return respondWithCache(
+    {
+      ...responseData,
+      texts: profile?.texts ?? null,
+      addresses,
+      domains: Boolean(identityGraph?.vertices?.length)
+        ? buildDomainsArray(identityGraph?.vertices, handle)
+        : [],
+    },
+    true,
+  );
 };
