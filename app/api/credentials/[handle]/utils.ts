@@ -26,6 +26,7 @@ export const resolveCredentialsHandle = async (
     const vertices = res?.data?.identity?.identityGraph?.vertices as
       | CredentialRecord[]
       | undefined;
+
     if (!vertices?.length) {
       return errorHandle({
         identity,
@@ -37,12 +38,18 @@ export const resolveCredentialsHandle = async (
     }
 
     const targetId = `${platform},${identity}`;
+
     const credentials = vertices
       .filter((v) => v.credentials?.length || v.id === targetId)
-      .sort((a, b) => (a.id === targetId ? -1 : b.id === targetId ? 1 : 0));
+      .sort((a, b) => {
+        if (a.id === targetId) return -1;
+        if (b.id === targetId) return 1;
+        return 0;
+      });
 
     return respondWithCache(buildCredentialsResponse(credentials));
-  } catch {
+  } catch (error) {
+    console.error("Error in resolveCredentialsHandle:", error);
     return errorHandle({
       identity,
       code: 500,
@@ -58,80 +65,67 @@ const buildCredentialsResponse = (
 ): CredentialsResponse[] =>
   records.map((record) => ({
     id: record.id,
-    credentials:
-      (record.credentials &&
-        processCredentialGroups(
-          groupCredentialsByCategory(record.credentials),
-        )) ||
-      null,
+    credentials: record.credentials
+      ? processCredentials(record.credentials)
+      : null,
   }));
 
-const groupCredentialsByCategory = (
+const processCredentials = (
   credentials: CredentialRecordRaw[],
-): Record<CredentialCategory, CredentialRecordRaw[]> => {
+): Record<
+  CredentialCategory,
+  { value: boolean; sources: CredentialRecordRaw[] } | null
+> => {
   const groups: Record<CredentialCategory, CredentialRecordRaw[]> = {
     isHuman: [],
     isRisky: [],
     isSpam: [],
   };
-  for (const c of credentials) {
-    if (c.category && groups[c.category]) groups[c.category].push(c);
+
+  for (const credential of credentials) {
+    if (credential.category && groups[credential.category]) {
+      groups[credential.category].push(credential);
+    }
   }
-  return groups;
+
+  return {
+    isHuman:
+      groups.isHuman.length === 0
+        ? null
+        : {
+            value: checkIsHuman(groups.isHuman),
+            sources: groups.isHuman,
+          },
+    isRisky:
+      groups.isRisky.length === 0
+        ? null
+        : {
+            value: checkIsRisky(groups.isRisky),
+            sources: groups.isRisky,
+          },
+    isSpam:
+      groups.isSpam.length === 0
+        ? null
+        : {
+            value: checkIsSpam(groups.isSpam),
+            sources: groups.isSpam,
+          },
+  };
 };
 
-const processCredentialGroups = (
-  groups: Record<CredentialCategory, CredentialRecordRaw[]>,
-): Record<
-  CredentialCategory,
-  { value: boolean; sources: CredentialRecordRaw[] } | null
-> => ({
-  isHuman: !groups.isHuman.length
-    ? null
-    : {
-        value: Boolean(resolveIsHuman(groups.isHuman).length),
-        sources: resolveIsHuman(groups.isHuman),
-      },
-  isRisky: !groups.isRisky.length
-    ? null
-    : {
-        value: Boolean(resolveIsRisky(groups.isRisky).length),
-        sources: resolveIsRisky(groups.isRisky),
-      },
-  isSpam: !groups.isSpam.length
-    ? null
-    : {
-        value: Boolean(resolveIsSpam(groups.isSpam).length),
-        sources: resolveIsSpam(groups.isSpam),
-      },
-});
-
-const resolveIsHuman = (
-  sources: CredentialRecordRaw[],
-): CredentialRecordRaw[] => {
-  return sources.filter((x) => x.value === "true");
+const checkIsHuman = (sources: CredentialRecordRaw[]): boolean => {
+  return sources.some((source) => source.value === "true");
 };
 
-const resolveIsRisky = (
-  sources: CredentialRecordRaw[],
-): CredentialRecordRaw[] => {
-  return sources;
+const checkIsRisky = (sources: CredentialRecordRaw[]): boolean => {
+  return Boolean(sources.length);
 };
 
-const resolveIsSpam = (
-  sources: CredentialRecordRaw[],
-): CredentialRecordRaw[] => {
-  return sources
-    .map((x) => {
-      if (x.dataSource === "warpcast") {
-        if (x.type === "score" && Number(x.value) === 0) {
-          return x;
-        } else {
-          return null;
-        }
-      } else {
-        return x;
-      }
-    })
-    .filter(Boolean) as CredentialRecordRaw[];
+const checkIsSpam = (sources: CredentialRecordRaw[]): boolean => {
+  return sources.some(
+    (source) =>
+      source.dataSource === "warpcast" &&
+      source.type === "score" &&
+      Number(source.value) === 0,
+  );
 };

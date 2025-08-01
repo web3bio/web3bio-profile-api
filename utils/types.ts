@@ -103,9 +103,11 @@ export interface CredentialRecord extends CredentialRecordRaw {
 }
 export interface CredentialsResponse {
   id: string;
-  credentials: {
-    [K in CredentialCategory]: CredentialsResponseItem | null;
-  };
+  credentials:
+    | {
+        [K in CredentialCategory]: CredentialsResponseItem | null;
+      }
+    | null;
 }
 
 interface CredentialsResponseItem {
