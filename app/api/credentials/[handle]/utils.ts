@@ -38,18 +38,8 @@ export const resolveCredentialsHandle = async (
 
     const targetId = `${platform},${identity}`;
     const credentials = vertices
-      .filter((v) => v.credentials?.length)
+      .filter((v) => v.credentials?.length || v.id === targetId)
       .sort((a, b) => (a.id === targetId ? -1 : b.id === targetId ? 1 : 0));
-
-    if (!credentials.length) {
-      return errorHandle({
-        identity,
-        code: 404,
-        path: pathname,
-        platform,
-        message: ErrorMessages.NOT_FOUND,
-      });
-    }
 
     return respondWithCache(buildCredentialsResponse(credentials));
   } catch {
@@ -68,9 +58,12 @@ const buildCredentialsResponse = (
 ): CredentialsResponse[] =>
   records.map((record) => ({
     id: record.id,
-    credentials: processCredentialGroups(
-      groupCredentialsByCategory(record.credentials),
-    ),
+    credentials:
+      (record.credentials &&
+        processCredentialGroups(
+          groupCredentialsByCategory(record.credentials),
+        )) ||
+      null,
   }));
 
 const groupCredentialsByCategory = (
@@ -93,26 +86,40 @@ const processCredentialGroups = (
   CredentialCategory,
   { value: boolean; sources: CredentialRecordRaw[] } | null
 > => ({
-  isHuman: groups.isHuman.length
-    ? { value: calculateHumanValue(groups.isHuman), sources: groups.isHuman }
-    : null,
-  isRisky: groups.isRisky.length
-    ? { value: true, sources: groups.isRisky }
-    : null,
-  isSpam: groups.isSpam.length
-    ? { value: calculateSpamValue(groups.isSpam), sources: groups.isSpam }
-    : null,
+  isHuman: !groups.isHuman.length
+    ? null
+    : {
+        value: Boolean(resolveIsHuman(groups.isHuman).length),
+        sources: resolveIsHuman(groups.isHuman),
+      },
+  isRisky: !groups.isRisky.length
+    ? null
+    : {
+        value: Boolean(resolveIsRisky(groups.isRisky).length),
+        sources: resolveIsRisky(groups.isRisky),
+      },
+  isSpam: !groups.isSpam.length
+    ? null
+    : {
+        value: Boolean(resolveIsSpam(groups.isSpam).length),
+        sources: resolveIsSpam(groups.isSpam),
+      },
 });
 
-const calculateHumanValue = (sources: CredentialRecordRaw[]): boolean =>
-  sources.some(
-    (s) => ["binance", "coinbase"].includes(s.dataSource) && s.value === "true",
-  ) || !!sources.length;
+const resolveIsHuman = (
+  sources: CredentialRecordRaw[],
+): CredentialRecordRaw[] => {
+  return sources.filter((x) => x.value === "true");
+};
 
-const calculateSpamValue = (sources: CredentialRecordRaw[]): boolean =>
-  sources.some(
-    (s) =>
-      s.dataSource === "warpcast" &&
-      s.type === "score" &&
-      Number(s.value) === 0,
-  );
+const resolveIsRisky = (
+  sources: CredentialRecordRaw[],
+): CredentialRecordRaw[] => {
+  return sources;
+};
+
+const resolveIsSpam = (
+  sources: CredentialRecordRaw[],
+): CredentialRecordRaw[] => {
+  return sources.filter((x) => x.type === "score" && Number(x.value) === 0);
+};
