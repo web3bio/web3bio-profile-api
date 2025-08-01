@@ -121,5 +121,17 @@ const resolveIsRisky = (
 const resolveIsSpam = (
   sources: CredentialRecordRaw[],
 ): CredentialRecordRaw[] => {
-  return sources.filter((x) => x.type === "score" && Number(x.value) === 0);
+  return sources
+    .map((x) => {
+      if (x.dataSource === "warpcast") {
+        if (x.type === "score" && Number(x.value) === 0) {
+          return x;
+        } else {
+          return null;
+        }
+      } else {
+        return x;
+      }
+    })
+    .filter(Boolean) as CredentialRecordRaw[];
 };
