@@ -35,6 +35,7 @@ const GET_CREDENTIALS_QUERY = `
             dataSource
             link
             updatedAt
+            expiredAt
           }
         }
       }
