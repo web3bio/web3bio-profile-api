@@ -94,6 +94,7 @@ export interface CredentialRecordRaw {
   dataSource: string;
   link: string;
   updatedAt: number;
+  expiredAt: number;
   category?: CredentialCategory;
 }
 
