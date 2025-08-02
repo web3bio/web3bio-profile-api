@@ -26,6 +26,7 @@ export const resolveCredentialsHandle = async (
     const vertices = res?.data?.identity?.identityGraph?.vertices as
       | CredentialRecord[]
       | undefined;
+
     if (!vertices?.length) {
       return errorHandle({
         identity,
@@ -37,22 +38,18 @@ export const resolveCredentialsHandle = async (
     }
 
     const targetId = `${platform},${identity}`;
-    const credentials = vertices
-      .filter((v) => v.credentials?.length)
-      .sort((a, b) => (a.id === targetId ? -1 : b.id === targetId ? 1 : 0));
 
-    if (!credentials.length) {
-      return errorHandle({
-        identity,
-        code: 404,
-        path: pathname,
-        platform,
-        message: ErrorMessages.NOT_FOUND,
+    const credentials = vertices
+      .filter((v) => v.credentials?.length || v.id === targetId)
+      .sort((a, b) => {
+        if (a.id === targetId) return -1;
+        if (b.id === targetId) return 1;
+        return 0;
       });
-    }
 
     return respondWithCache(buildCredentialsResponse(credentials));
-  } catch {
+  } catch (error) {
+    console.error("Error in resolveCredentialsHandle:", error);
     return errorHandle({
       identity,
       code: 500,
@@ -68,51 +65,67 @@ const buildCredentialsResponse = (
 ): CredentialsResponse[] =>
   records.map((record) => ({
     id: record.id,
-    credentials: processCredentialGroups(
-      groupCredentialsByCategory(record.credentials),
-    ),
+    credentials: record.credentials
+      ? processCredentials(record.credentials)
+      : null,
   }));
 
-const groupCredentialsByCategory = (
+const processCredentials = (
   credentials: CredentialRecordRaw[],
-): Record<CredentialCategory, CredentialRecordRaw[]> => {
+): Record<
+  CredentialCategory,
+  { value: boolean; sources: CredentialRecordRaw[] } | null
+> => {
   const groups: Record<CredentialCategory, CredentialRecordRaw[]> = {
     isHuman: [],
     isRisky: [],
     isSpam: [],
   };
-  for (const c of credentials) {
-    if (c.category && groups[c.category]) groups[c.category].push(c);
+
+  for (const credential of credentials) {
+    if (credential.category && groups[credential.category]) {
+      groups[credential.category].push(credential);
+    }
   }
-  return groups;
+
+  return {
+    isHuman:
+      groups.isHuman.length === 0
+        ? null
+        : {
+            value: checkIsHuman(groups.isHuman),
+            sources: groups.isHuman,
+          },
+    isRisky:
+      groups.isRisky.length === 0
+        ? null
+        : {
+            value: checkIsRisky(groups.isRisky),
+            sources: groups.isRisky,
+          },
+    isSpam:
+      groups.isSpam.length === 0
+        ? null
+        : {
+            value: checkIsSpam(groups.isSpam),
+            sources: groups.isSpam,
+          },
+  };
 };
 
-const processCredentialGroups = (
-  groups: Record<CredentialCategory, CredentialRecordRaw[]>,
-): Record<
-  CredentialCategory,
-  { value: boolean; sources: CredentialRecordRaw[] } | null
-> => ({
-  isHuman: groups.isHuman.length
-    ? { value: calculateHumanValue(groups.isHuman), sources: groups.isHuman }
-    : null,
-  isRisky: groups.isRisky.length
-    ? { value: true, sources: groups.isRisky }
-    : null,
-  isSpam: groups.isSpam.length
-    ? { value: calculateSpamValue(groups.isSpam), sources: groups.isSpam }
-    : null,
-});
+const checkIsHuman = (sources: CredentialRecordRaw[]): boolean => {
+  return sources.some((source) => source.value === "true");
+};
 
-const calculateHumanValue = (sources: CredentialRecordRaw[]): boolean =>
-  sources.some(
-    (s) => ["binance", "coinbase"].includes(s.dataSource) && s.value === "true",
-  ) || !!sources.length;
+const checkIsRisky = (sources: CredentialRecordRaw[]): boolean => {
+  return Boolean(sources.length);
+};
 
-const calculateSpamValue = (sources: CredentialRecordRaw[]): boolean =>
-  sources.some(
-    (s) =>
-      s.dataSource === "warpcast" &&
-      s.type === "score" &&
-      Number(s.value) === 0,
+const checkIsSpam = (sources: CredentialRecordRaw[]): boolean => {
+  return sources.some(
+    (source) =>
+      source.dataSource === "warpcast" &&
+      source.type === "score" &&
+      Number(source.value) === 0,
   );
+};
