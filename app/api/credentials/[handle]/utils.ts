@@ -114,7 +114,13 @@ const processCredentials = (
 };
 
 const checkIsHuman = (sources: CredentialRecordRaw[]): boolean => {
-  return sources.some((source) => source.value === "true");
+  return (
+    sources.some((source) => source.value === "true") ||
+    sources.some(
+      (source) =>
+        source.dataSource === "human-passport" && Number(source.value) >= 20,
+    )
+  );
 };
 
 const checkIsRisky = (sources: CredentialRecordRaw[]): boolean => {

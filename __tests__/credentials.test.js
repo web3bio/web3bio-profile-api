@@ -35,7 +35,7 @@ describe("Test For Credentials API", () => {
     const res = await queryClient("/credentials/0xhelena.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[1].credentials.isSpam.value).toBe(false);
+    expect(json[0].credentials.isHuman.value).toBe(true);
   });
   it("It should response 200 for 0x54503eeded1fc55b94330bf82092ad41a76a8683", async () => {
     const res = await queryClient(
