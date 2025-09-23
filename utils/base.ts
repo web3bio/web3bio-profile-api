@@ -157,13 +157,18 @@ export async function generateProfileStruct(
       : null,
     contenthash: socialData.contenthash || null,
     links: (socialData.links as SocialLinks) || {},
-    social: data.social
-      ? {
-          uid: data.social.uid ? Number(data.social.uid) : null,
-          follower: Number(data.social.follower),
-          following: Number(data.social.following),
-        }
-      : {},
+    social:
+      data.social || data.uid
+        ? {
+            uid: Number(data.social?.uid || data.uid) || null,
+            follower: data.social?.follower
+              ? Number(data.social?.follower)
+              : null,
+            following: data.social?.following
+              ? Number(data.social?.following)
+              : null,
+          }
+        : {},
   };
 }
 
