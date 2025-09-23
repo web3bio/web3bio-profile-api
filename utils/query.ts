@@ -111,6 +111,7 @@ const GET_PROFILES = `
         address
       }
       profile {
+        uid
         identity
         platform
         address
@@ -141,6 +142,7 @@ const GET_PROFILES = `
             address
           }
           profile {
+            uid
             identity
             platform
             address
@@ -220,6 +222,7 @@ const GET_BATCH_UNIVERSAL = `
         address
       }
       profile {
+        uid
         address
         avatar
         displayName
@@ -241,6 +244,7 @@ const GET_BATCH_UNIVERSAL = `
             address
           }
           profile {
+            uid
             address
             avatar
             displayName
@@ -277,6 +281,7 @@ const GET_DOMAIN_SINGLE = `
         address
       }
       profile {
+        uid
         identity
         platform
         address
@@ -340,6 +345,7 @@ const GET_DOMAIN = `
         address
       }
       profile {
+        uid
         identity
         platform
         address
