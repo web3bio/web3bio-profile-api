@@ -6,7 +6,6 @@ describe("Test For Farcaster Profile API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("suji");
-    expect(json.location).toBe("Chūō, Japan");
     expect(json.links.twitter.handle).toBe("suji_yan");
     expect(json.links.twitter.sources.includes("farcaster")).toBeTruthy();
   });

@@ -403,7 +403,6 @@ export const resolveWithIdentityGraph = async ({
       code: response.code || 500,
     };
   }
-
   if (!response?.data?.identity || response?.errors) {
     return {
       identity: handle,
@@ -431,7 +430,6 @@ export const resolveWithIdentityGraph = async ({
   );
 
   const profileResults = await Promise.allSettled(profileStructPromises);
-
   const validProfiles = profileResults
     .filter(
       (
