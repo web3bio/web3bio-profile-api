@@ -30,8 +30,8 @@ importers:
         specifier: ^2.30.5
         version: 2.31.0(typescript@5.8.3)
       web3bio-profile-kit:
-        specifier: ^0.1.11
-        version: 0.1.11(@tanstack/react-query@5.80.6(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ^0.1.18
+        version: 0.1.18(@tanstack/react-query@5.80.6(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/jest':
         specifier: ^29.5.14
@@ -3416,8 +3416,8 @@ packages:
   web-vitals@0.2.4:
     resolution: {integrity: sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==}
 
-  web3bio-profile-kit@0.1.11:
-    resolution: {integrity: sha512-ZEqBqm5rPJo32KbuAD7L7WgOg6l89m25aovmxpn3CY2UdXTQ4/GVJc5tib7jr/JVIgPqcRh3r7e19BaMDpsKYQ==}
+  web3bio-profile-kit@0.1.18:
+    resolution: {integrity: sha512-zSy+A8eXPlitY98gCk+gTqpsp+dGAutTDartfoZPdFWPjh+xUnoE2hDvp2HlHnI2D4gz+f7qjJF4SV8W6HV2NQ==}
     peerDependencies:
       '@tanstack/react-query': ^4.0.0 || ^5.0.0
       react: '>=16.8.0'
@@ -7420,7 +7420,7 @@ snapshots:
 
   web-vitals@0.2.4: {}
 
-  web3bio-profile-kit@0.1.11(@tanstack/react-query@5.80.6(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  web3bio-profile-kit@0.1.18(@tanstack/react-query@5.80.6(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@tanstack/react-query': 5.80.6(react@18.3.1)
       react: 18.3.1
