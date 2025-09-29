@@ -15,6 +15,7 @@ async function verifyAuth(token: string) {
 
 export const config = {
   matcher: [
+    "/avatar/:path*",
     "/stats/:path*",
     "/domain/:path*",
     "/ns/:path*",
