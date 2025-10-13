@@ -270,11 +270,38 @@ export const respondWithSVG = async (
     : "#000";
 
   const colors = getThemeColor(name, themecolorbase);
-  const { renderToString } = await import("react-dom/server");
+  const pixelColors = generateColors(name, colors);
+  const maskID = String(hashCode(name));
 
-  const svg = renderToString(
-    <AvatarPixel colors={colors} title={name} size={size} />,
-  );
+  const svg = `
+    <svg
+      viewBox="0 0 ${SIZE} ${SIZE}"
+      fill="none"
+      role="img"
+      xmlns="http://www.w3.org/2000/svg"
+      width="${size}"
+      height="${size}"
+    >
+      <mask
+        id="${maskID}"
+        maskUnits="userSpaceOnUse"
+        x="0"
+        y="0"
+        width="${SIZE}"
+        height="${SIZE}"
+      >
+        <rect width="${SIZE}" height="${SIZE}" fill="#FFFFFF" />
+      </mask>
+      <g mask="url(#${maskID})">
+        <rect width="${SIZE}" height="${SIZE}" fill="${colors[0]}" />
+        ${Array.from({ length: ELEMENTS }, (_, index) => {
+          const row = Math.floor(index / ITEMS);
+          const col = index % ITEMS;
+          return `<rect x="${col * UNIT}" y="${row * UNIT}" width="${UNIT}" height="${UNIT}" fill="${pixelColors[index]}" />`;
+        }).join("")}
+      </g>
+    </svg>
+  `.trim();
 
   return new Response(svg, {
     headers: {
