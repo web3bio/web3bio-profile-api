@@ -3,10 +3,8 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { queryBatchUniversal } from "@/utils/query";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { ids: string } },
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ ids: string }> }) {
+  const params = await props.params;
   const { pathname } = req.nextUrl;
   const idsParam = params.ids;
 

@@ -4,10 +4,8 @@ import { isValidEthereumAddress, REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { handle: string } },
-) {
+export async function GET(req: NextRequest, props: { params: Promise<{ handle: string }> }) {
+  const params = await props.params;
   const { pathname } = req.nextUrl;
   const handle = params.handle?.toLowerCase() || "";
 
