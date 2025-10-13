@@ -10,9 +10,14 @@
     "start": "next start",
     "test": "jest --testPathIgnorePatterns=\"/__tests__/(ns|profile)/ud.test.js$\"",
     "test:all": "jest",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "staging": "opennextjs-cloudflare build && wrangler versions upload",
+    "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
+    "@opennextjs/cloudflare": "^1.6.2",
     "graphql": "^16.11.0",
     "jose": "^5.10.0",
     "next": "15.5.4",
@@ -23,6 +28,7 @@
     "web3bio-profile-kit": "^0.1.18"
   },
   "devDependencies": {
+    "wrangler": "^4.27.0",
     "@eslint/eslintrc": "^3.3.1",
     "@types/jest": "^29.5.14",
     "@types/node": "20.12.8",
