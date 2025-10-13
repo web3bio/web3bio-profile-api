@@ -1,7 +1,10 @@
 import { type NextRequest } from "next/server";
 import { respondWithSVG } from "./utils";
 
-export async function GET(req: NextRequest, props: { params: Promise<{ handle: string }> }) {
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
   const params = await props.params;
   const handle = params.handle;
 
@@ -21,5 +24,3 @@ export async function GET(req: NextRequest, props: { params: Promise<{ handle: s
 
   return respondWithSVG(handle, 240);
 }
-
-export const runtime = "edge";

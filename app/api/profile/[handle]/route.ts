@@ -4,7 +4,10 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "./utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(req: NextRequest, props: { params: Promise<{ handle: string }> }) {
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
   const params = await props.params;
   const { pathname } = req.nextUrl;
   const handle = params.handle;
@@ -45,5 +48,3 @@ export async function GET(req: NextRequest, props: { params: Promise<{ handle: s
     pathname,
   );
 }
-
-export const runtime = "edge";

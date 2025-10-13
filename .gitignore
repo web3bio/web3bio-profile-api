@@ -38,3 +38,7 @@ next-env.d.ts
 # ide
 .vscode
 .codegpt
+
+# OpenNext
+/.open-next
+.wrangler

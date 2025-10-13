@@ -81,5 +81,3 @@ export async function GET(req: NextRequest) {
     return respondWithSVG(id, 240);
   }
 }
-
-export const runtime = "edge";

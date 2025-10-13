@@ -3,7 +3,10 @@ import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
-export async function GET(req: NextRequest, props: { params: Promise<{ handle: string }> }) {
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
   const params = await props.params;
   const { pathname } = req.nextUrl;
   const handle = params.handle;
@@ -41,5 +44,3 @@ export async function GET(req: NextRequest, props: { params: Promise<{ handle: s
 
   return respondWithCache(responseData);
 }
-
-export const runtime = "edge";

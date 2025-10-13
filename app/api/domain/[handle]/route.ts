@@ -4,7 +4,10 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
 
-export async function GET(req: NextRequest, props: { params: Promise<{ handle: string }> }) {
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
   const params = await props.params;
   const { pathname } = req.nextUrl;
   const handle = params.handle;
@@ -50,5 +53,3 @@ export async function GET(req: NextRequest, props: { params: Promise<{ handle: s
   const headers = getUserHeaders(req.headers);
   return resolveDomainQuery(identity, platform, headers, pathname);
 }
-
-export const runtime = "edge";
