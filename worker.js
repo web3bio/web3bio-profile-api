@@ -1,6 +1,6 @@
 import openNextHandler from "./.open-next/worker.js";
 
-export default {
+const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
@@ -66,3 +66,4 @@ export default {
     return response;
   },
 };
+export default workerConfig;
