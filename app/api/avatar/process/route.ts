@@ -1,83 +1,36 @@
 import { type NextRequest } from "next/server";
 
-const FETCH_TIMEOUT = 10000; // 10 seconds
+export async function GET(req: NextRequest) {
+  const url = req.nextUrl.searchParams.get("url");
 
-async function fetchWithTimeout(
-  url: string,
-  timeout: number,
-): Promise<Response> {
+  if (!url) {
+    return Response.json({ error: "URL required" }, { status: 400 });
+  }
+
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), timeout);
+  setTimeout(() => controller.abort(), 10000);
 
   try {
-    const response = await fetch(url, {
+    const res = await fetch(url, {
       signal: controller.signal,
-      headers: {
-        "User-Agent": "Web3.bio/1.0",
-      },
+      headers: { "User-Agent": "Web3.bio/1.0" },
       cf: {
-        image: {
-          width: 480,
-          quality: 88,
-          format: "jpeg",
-          fit: "scale-down",
-          metadata: "none",
-        },
-        cacheEverything: true,
+        image: { width: 480, quality: 88, format: "jpeg", fit: "scale-down" },
         cacheTtl: 86400,
       },
     } as RequestInit);
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (!res.ok || !res.headers.get("content-type")?.startsWith("image/")) {
+      throw new Error();
     }
 
-    return response;
-  } finally {
-    clearTimeout(timeoutId);
-  }
-}
-
-export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const urlParam = searchParams.get("url");
-
-  if (!urlParam) {
-    return new Response(
-      JSON.stringify({ error: "URL parameter is required" }),
-      {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      },
-    );
-  }
-
-  try {
-    const response = await fetchWithTimeout(urlParam, FETCH_TIMEOUT);
-
-    const contentType = response.headers.get("content-type");
-    if (!contentType?.startsWith("image/")) {
-      return new Response(JSON.stringify({ error: "error format" }), {
-        status: 400,
-        headers: { "Content-Type": "application/json" },
-      });
-    }
-
-    const imageBuffer = await response.arrayBuffer();
-
-    return new Response(imageBuffer, {
+    return new Response(res.body, {
       headers: {
         "Content-Type": "image/jpeg",
-        "Cache-Control":
-          "public, max-age=43200, s-maxage=604800, stale-while-revalidate=86400",
-        "Content-Length": imageBuffer.byteLength.toString(),
-        "CDN-Cache-Control": "max-age=604800",
+        "Cache-Control": "public, max-age=43200, s-maxage=604800",
       },
     });
-  } catch (error) {
-    return new Response(JSON.stringify({ error: "Image processing failed" }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+  } catch {
+    return Response.json({ error: "Failed" }, { status: 500 });
   }
 }
