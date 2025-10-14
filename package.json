@@ -23,7 +23,6 @@
     "next": "15.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "sharp": "^0.34.2",
     "viem": "^2.30.5",
     "web3bio-profile-kit": "^0.1.18"
   },
@@ -41,11 +40,5 @@
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
-  },
-  "pnpm": {
-    "overrides": {
-      "@types/react": "19.2.2",
-      "@types/react-dom": "19.2.1"
-    }
   }
 }
