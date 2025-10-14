@@ -4,9 +4,13 @@ import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveCredentialsHandle } from "./utils";
 
-export async function GET(req: NextRequest) {
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
+  const { pathname } = req.nextUrl;
+  const params = await props.params;
+  const handle = params.handle;
 
   // Early validation for empty handle
   if (!handle.trim()) {
