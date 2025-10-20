@@ -8,13 +8,15 @@ import {
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(
-  req: NextRequest,
-  props: { params: Promise<{ handle: string }> },
-) {
-  const params = await props.params;
+type RouteParams = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { handle } = await params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle?.toLowerCase() || "";
 
   if (!REGEX.LENS.test(handle) && !isValidEthereumAddress(handle)) {
     return errorHandle({
