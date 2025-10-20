@@ -24,7 +24,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "viem": "^2.30.5",
-    "web3bio-profile-kit": "^0.1.18"
+    "web3bio-profile-kit": "^0.1.21"
   },
   "devDependencies": {
     "wrangler": "^4.27.0",
