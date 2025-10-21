@@ -1,8 +1,8 @@
-import type {
-  AddressRecord,
-  ErrorMessages,
-  Platform,
-  SocialRecord,
+import {
+  type AddressRecord,
+  type ErrorMessages,
+  type Platform,
+  type SocialRecord,
 } from "web3bio-profile-kit/types";
 
 export interface AuthHeaders {
@@ -83,35 +83,4 @@ export interface ProfileRecord {
   isPrimary: boolean;
   aliases?: string[];
   createdAt?: number;
-}
-
-export type CredentialCategory = "isHuman" | "isRisky" | "isSpam";
-
-export interface CredentialRecordRaw {
-  value: string;
-  type: string;
-  platform: Platform;
-  dataSource: string;
-  link: string;
-  updatedAt: number;
-  expiredAt: number;
-  category?: CredentialCategory;
-}
-
-export interface CredentialRecord extends CredentialRecordRaw {
-  id: string;
-  credentials: CredentialRecordRaw[];
-}
-export interface CredentialsResponse {
-  id: string;
-  credentials:
-    | {
-        [K in CredentialCategory]: CredentialsResponseItem | null;
-      }
-    | null;
-}
-
-interface CredentialsResponseItem {
-  value: boolean;
-  sources: CredentialRecordRaw[];
 }
