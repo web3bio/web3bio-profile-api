@@ -1,12 +1,6 @@
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import type {
-  AuthHeaders,
-  CredentialCategory,
-  CredentialRecord,
-  CredentialRecordRaw,
-  CredentialsResponse,
-} from "@/utils/types";
+import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
 
 export const resolveCredentialsHandle = async (
@@ -23,9 +17,7 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    const vertices = res?.data?.identity?.identityGraph?.vertices as
-      | CredentialRecord[]
-      | undefined;
+    const vertices = res?.data?.identity?.identityGraph?.vertices as any[];
 
     if (!vertices?.length) {
       return errorHandle({
@@ -38,7 +30,6 @@ export const resolveCredentialsHandle = async (
     }
 
     const targetId = `${platform},${identity}`;
-
     const credentials = vertices
       .filter((v) => v.credentials?.length || v.id === targetId)
       .sort((a, b) => {
@@ -46,7 +37,6 @@ export const resolveCredentialsHandle = async (
         if (b.id === targetId) return 1;
         return 0;
       });
-
     return respondWithCache(buildCredentialsResponse(credentials));
   } catch (error) {
     console.error("Error in resolveCredentialsHandle:", error);
