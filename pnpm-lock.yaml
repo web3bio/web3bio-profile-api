@@ -30,8 +30,8 @@ importers:
         specifier: ^2.30.5
         version: 2.38.3(typescript@5.9.3)
       web3bio-profile-kit:
-        specifier: ./web3bio-profile-kit-0.1.23.tgz
-        version: file:web3bio-profile-kit-0.1.23.tgz(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: ./web3bio-profile-kit-0.1.22.tgz
+        version: file:web3bio-profile-kit-0.1.22.tgz(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@types/jest':
         specifier: ^29.5.14
@@ -3418,8 +3418,8 @@ packages:
   web-vitals@0.2.4:
     resolution: {integrity: sha512-6BjspCO9VriYy12z356nL6JBS0GYeEcA457YyRzD+dD6XYCQ75NKhcOHUMHentOE7OcVCIXXDvOm0jKFfQG2Gg==}
 
-  web3bio-profile-kit@file:web3bio-profile-kit-0.1.23.tgz:
-    resolution: {integrity: sha512-VQE8UKeh4GYRb6UHdXpS0H197tEcZQTlg6Ty0d/YDgMdDCmolmHsJ1xE16O3GL/ggKbEpYI2lRxUl0o9SCZhgw==, tarball: file:web3bio-profile-kit-0.1.23.tgz}
+  web3bio-profile-kit@file:web3bio-profile-kit-0.1.22.tgz:
+    resolution: {integrity: sha512-6Yf70o4gW4AcHUC9NS6DvrpPQwM45cW7VARyTe7nxArTyUj+M23ipLDl/gFbRkaY7ketkwz8Kin+T2QATs/0ow==, tarball: file:web3bio-profile-kit-0.1.22.tgz}
     version: 0.1.22
     peerDependencies:
       '@tanstack/react-query': ^4.0.0 || ^5.0.0
@@ -7420,7 +7420,7 @@ snapshots:
 
   web-vitals@0.2.4: {}
 
-  web3bio-profile-kit@file:web3bio-profile-kit-0.1.23.tgz(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  web3bio-profile-kit@file:web3bio-profile-kit-0.1.22.tgz(@tanstack/react-query@5.90.5(react@18.3.1))(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       '@tanstack/react-query': 5.90.5(react@18.3.1)
       react: 18.3.1

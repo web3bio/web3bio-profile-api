@@ -1,7 +1,13 @@
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import {
+  CredentialsData,
+  CredentialsResponse,
+  ErrorMessages,
+  Platform,
+} from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
+import { CREDENTIALS_INFO } from "@/utils/credentials";
 
 export const resolveCredentialsHandle = async (
   identity: string,
@@ -28,18 +34,15 @@ export const resolveCredentialsHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
-
-    const targetId = `${platform},${identity}`;
-    const credentials = vertices
-      .filter((v) => v.credentials?.length || v.id === targetId)
-      .sort((a, b) => {
-        if (a.id === targetId) return -1;
-        if (b.id === targetId) return 1;
-        return 0;
-      });
-    return respondWithCache(buildCredentialsResponse(credentials));
+    const credentials = vertices.flatMap(
+      (v) =>
+        v.credentials?.map((x: any) => ({
+          ...x,
+          id: v.id,
+        })) || [],
+    );
+    return respondWithCache(processCredentials(credentials));
   } catch (error) {
-    console.error("Error in resolveCredentialsHandle:", error);
     return errorHandle({
       identity,
       code: 500,
@@ -50,23 +53,10 @@ export const resolveCredentialsHandle = async (
   }
 };
 
-const buildCredentialsResponse = (
-  records: CredentialRecord[],
-): CredentialsResponse[] =>
-  records.map((record) => ({
-    id: record.id,
-    credentials: record.credentials
-      ? processCredentials(record.credentials)
-      : null,
-  }));
-
 const processCredentials = (
-  credentials: CredentialRecordRaw[],
-): Record<
-  CredentialCategory,
-  { value: boolean; sources: CredentialRecordRaw[] } | null
-> => {
-  const groups: Record<CredentialCategory, CredentialRecordRaw[]> = {
+  credentials: CredentialsData[],
+): CredentialsResponse => {
+  const groups: any = {
     isHuman: [],
     isRisky: [],
     isSpam: [],
@@ -74,54 +64,22 @@ const processCredentials = (
 
   for (const credential of credentials) {
     if (credential.category && groups[credential.category]) {
-      groups[credential.category].push(credential);
+      const metadata = CREDENTIALS_INFO[credential.dataSource];
+      groups[credential.category].push({
+        id: credential.id,
+        category: credential.category,
+        dataSource: credential.dataSource,
+        description: metadata?.description || "",
+        expiredAt: (credential as any).expiredAt,
+        icon: metadata?.icon || "",
+        label: metadata?.label || "",
+        link: credential.link,
+        platform: metadata?.platform,
+        type: credential.type,
+        updatedAt: credential.updatedAt,
+        value: credential.value,
+      });
     }
   }
-
-  return {
-    isHuman:
-      groups.isHuman.length === 0
-        ? null
-        : {
-            value: checkIsHuman(groups.isHuman),
-            sources: groups.isHuman,
-          },
-    isRisky:
-      groups.isRisky.length === 0
-        ? null
-        : {
-            value: checkIsRisky(groups.isRisky),
-            sources: groups.isRisky,
-          },
-    isSpam:
-      groups.isSpam.length === 0
-        ? null
-        : {
-            value: checkIsSpam(groups.isSpam),
-            sources: groups.isSpam,
-          },
-  };
-};
-
-const checkIsHuman = (sources: CredentialRecordRaw[]): boolean => {
-  return (
-    sources.some((source) => source.value === "true") ||
-    sources.some(
-      (source) =>
-        source.dataSource === "human-passport" && Number(source.value) >= 20,
-    )
-  );
-};
-
-const checkIsRisky = (sources: CredentialRecordRaw[]): boolean => {
-  return Boolean(sources.length);
-};
-
-const checkIsSpam = (sources: CredentialRecordRaw[]): boolean => {
-  return sources.some(
-    (source) =>
-      source.dataSource === "warpcast" &&
-      source.type === "score" &&
-      Number(source.value) === 0,
-  );
+  return groups;
 };
