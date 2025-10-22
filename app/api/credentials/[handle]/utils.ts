@@ -9,6 +9,11 @@ import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
 import { CREDENTIALS_INFO } from "@/utils/credentials";
 
+interface CredentialVertice {
+  id: string;
+  credentials: CredentialData[];
+}
+
 export const resolveCredentialsHandle = async (
   identity: string,
   platform: Platform,
@@ -23,7 +28,8 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    const vertices = res?.data?.identity?.identityGraph?.vertices as any[];
+    const vertices = res?.data?.identity?.identityGraph
+      ?.vertices as CredentialVertice[];
 
     if (!vertices?.length) {
       return errorHandle({
@@ -36,7 +42,7 @@ export const resolveCredentialsHandle = async (
     }
     const credentials = vertices.flatMap(
       (v) =>
-        v.credentials?.map((x: any) => ({
+        v.credentials?.map((x) => ({
           ...x,
           id: v.id,
         })) || [],
