@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
       })
       .toBuffer();
 
-    return new Response(processedBuffer, {
+    return new Response(processedBuffer as any, {
       headers: {
         "Content-Type": "image/jpeg",
         "Cache-Control":

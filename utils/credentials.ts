@@ -93,6 +93,13 @@ export const CREDENTIALS_INFO: Readonly<
     description:
       "This profile is in violation of the DMCA (Digital Millennium Copyright Act). It contains copyrighted material without proper authorization. Please refrain from interacting with or sharing any content associated with this profile.",
   },
+  [CredentialSource.google]: {
+    icon: "⚠️",
+    label: "Google Violation",
+    description:
+      "Flagged as dangerous by Google. Exercise caution when interacting.",
+  },
+  // isSpam
   [CredentialSource.warpcast]: {
     icon: "🤖",
     label: "Spam",
