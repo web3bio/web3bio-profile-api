@@ -1,6 +1,6 @@
 import {
-  CredentialsData,
-  CredentialsResponse,
+  CredentialData,
+  CredentialResponse,
   ErrorMessages,
   Platform,
 } from "web3bio-profile-kit/types";
@@ -54,9 +54,9 @@ export const resolveCredentialsHandle = async (
 };
 
 const processCredentials = (
-  credentials: CredentialsData[],
-): CredentialsResponse => {
-  const groups: any = {
+  credentials: CredentialData[],
+): CredentialResponse => {
+  const groups: CredentialResponse = {
     isHuman: [],
     isRisky: [],
     isSpam: [],
@@ -65,12 +65,12 @@ const processCredentials = (
   for (const credential of credentials) {
     if (credential.category && groups[credential.category]) {
       const metadata = CREDENTIALS_INFO[credential.dataSource];
-      groups[credential.category].push({
+      groups[credential.category]?.push({
         id: credential.id,
         category: credential.category,
         dataSource: credential.dataSource,
         description: metadata?.description || "",
-        expiredAt: (credential as any).expiredAt,
+        expiredAt: credential.expiredAt,
         icon: metadata?.icon || "",
         label: metadata?.label || "",
         link: credential.link,

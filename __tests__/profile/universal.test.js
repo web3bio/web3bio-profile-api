@@ -9,7 +9,7 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
     expect(json[0].displayName).toBe("sujiyan.eth");
-    expect(json[1].platform).toBe("basenames");
+    expect(json[1].platform).toBe("farcaster");
   });
   it("It should response 200 data for lilgho.lens", async () => {
     const res = await queryClient("/profile/lilgho.lens");
@@ -154,7 +154,7 @@ describe("Test For Universal Profile API", () => {
   it("It should response 200 for alexgrover.base.eth", async () => {
     const res = await queryClient("/profile/alexgrover.base");
     const json = await res.json();
-    expect(json.some((x) => x.platform === "ens")).toBe(true);
+    expect(json.some((x) => x.platform === "basenames")).toBe(true);
   });
   it("It should response 200 for suji_yan.twitter", async () => {
     const res = await queryClient("/profile/twitter,suji_yan");

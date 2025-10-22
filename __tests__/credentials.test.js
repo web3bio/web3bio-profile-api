@@ -6,12 +6,9 @@ describe("Test For Credentials API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
 
-    expect(json[0].id).toBe("farcaster,ggmonster");
-    expect(json[0].credentials.isRisky.sources[0].value).toBe("dmca");
-    expect(json[0].credentials.isRisky.sources[0].link).toBe(
-      "https://web3.bio/p/dmca-notice-policy",
-    );
-    expect(json[0].credentials.isSpam.value).toBeTruthy();
+    expect(json.isRisky[0].id).toBe("farcaster,ggmonster");
+    expect(json.isHuman[0].dataSource).toBe("human-passport");
+    expect(json.isSpam[0].link).toBe("https://github.com/warpcast/labels");
   });
   it("It should response 200 for 0xb6a5426b885172fb73d3c8fcf9612610612df707", async () => {
     const res = await queryClient(
@@ -19,23 +16,25 @@ describe("Test For Credentials API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].id).toBe(
+    expect(json.isRisky[0].id).toBe(
       "ethereum,0xb6a5426b885172fb73d3c8fcf9612610612df707",
     );
-    expect(json[0].credentials.isRisky.sources[0].value).toBe("hacker");
+    expect(json.isRisky[0].value).toBe("hacker");
+    expect(json.isRisky[0].dataSource).toBe("slowmist");
   });
   it("It should response 200 for supahmars.eth", async () => {
     const res = await queryClient("/credentials/supahmars.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].id).toBe("ens,supahmars.eth");
-    expect(json[0].credentials.isHuman.sources[0].value).toBe("true");
+    expect(json.isHuman[0].id).toBe("ens,supahmars.eth");
+    expect(json.isHuman[0].label).toBe("Humanity Verified");
+    expect(json.isHuman[0].platform).toBe("dentity");
   });
   it("It should response 200 for 0xhelena.eth", async () => {
     const res = await queryClient("/credentials/0xhelena.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].credentials.isHuman.value).toBe(true);
+    expect(json.isHuman[0].value).toBe("true");
   });
   it("It should response 200 for 0x54503eeded1fc55b94330bf82092ad41a76a8683", async () => {
     const res = await queryClient(
@@ -43,8 +42,7 @@ describe("Test For Credentials API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].credentials.isHuman.value).toBe(true);
-    expect(json[0].credentials.isHuman.sources[0].dataSource).toBe("binance");
-    expect(json[0].credentials.isHuman.sources[1].dataSource).toBe("coinbase");
+    expect(json.isHuman.some((x) => x.dataSource === "binance")).toBe(true);
+    expect(json.isHuman.some((x) => x.dataSource === "coinbase")).toBe(true);
   });
 });
