@@ -62,10 +62,22 @@ const processCredentials = (
     isSpam: [],
   };
 
+  const categoryChecks = {
+    isHuman: checkIsHuman,
+    isRisky: checkIsRisky,
+    isSpam: checkIsSpam,
+  };
+
   for (const credential of credentials) {
-    if (credential.category && groups[credential.category]) {
+    const category = credential.category as keyof typeof categoryChecks;
+
+    if (
+      category &&
+      groups[category] &&
+      categoryChecks[category]?.(credential)
+    ) {
       const metadata = CREDENTIALS_INFO[credential.dataSource];
-      groups[credential.category]?.push({
+      groups[category]?.push({
         id: credential.id,
         category: credential.category,
         dataSource: credential.dataSource,
@@ -82,4 +94,23 @@ const processCredentials = (
     }
   }
   return groups;
+};
+
+const checkIsHuman = (item: CredentialData): boolean => {
+  return (
+    item.value === "true" ||
+    (item.dataSource === "human-passport" && Number(item.value) >= 20)
+  );
+};
+
+const checkIsRisky = (item: CredentialData): boolean => {
+  return !!item.id;
+};
+
+const checkIsSpam = (item: CredentialData): boolean => {
+  return (
+    item.dataSource === "warpcast" &&
+    item.type === "score" &&
+    Number(item.value) === 0
+  );
 };

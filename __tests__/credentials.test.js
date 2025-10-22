@@ -7,7 +7,7 @@ describe("Test For Credentials API", () => {
     const json = await res.json();
 
     expect(json.isRisky[0].id).toBe("farcaster,ggmonster");
-    expect(json.isHuman[0].dataSource).toBe("human-passport");
+    expect(json.isHuman.length).toBe(0);
     expect(json.isSpam[0].link).toBe("https://github.com/warpcast/labels");
   });
   it("It should response 200 for 0xb6a5426b885172fb73d3c8fcf9612610612df707", async () => {
