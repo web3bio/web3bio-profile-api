@@ -3,12 +3,15 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { ids: string } },
-) {
+type RouteParams = {
+  params: Promise<{
+    ids: string;
+  }>;
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { ids: idsParam } = await params;
   const { pathname } = req.nextUrl;
-  const idsParam = params.ids;
 
   // Early validation for missing ids parameter
   if (!idsParam) {
@@ -54,5 +57,3 @@ export async function GET(
     });
   }
 }
-
-export const runtime = "edge";
