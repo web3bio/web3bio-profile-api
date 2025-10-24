@@ -4,12 +4,15 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "../../profile/[handle]/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { handle: string } },
-) {
+type RouteParams = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { handle } = await params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle;
 
   // Parse identity
   const resolvedId = resolveIdentity(handle!);
@@ -46,5 +49,3 @@ export async function GET(
     pathname,
   );
 }
-
-export const runtime = "edge";

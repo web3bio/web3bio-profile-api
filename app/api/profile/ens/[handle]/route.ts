@@ -4,12 +4,15 @@ import { isValidEthereumAddress, REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { handle: string } },
-) {
+type RouteParams = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { handle } = await params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle?.toLowerCase() || "";
 
   // Early validation - combine regex and address validation
   if (!handle || (!REGEX.ENS.test(handle) && !isValidEthereumAddress(handle))) {
@@ -25,5 +28,3 @@ export async function GET(
   const headers = getUserHeaders(req.headers);
   return resolveIdentityHandle(handle, Platform.ens, headers, false, pathname);
 }
-
-export const runtime = "edge";

@@ -7,13 +7,14 @@ import {
 } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { handle: string } },
-) {
+type RouteParams = {
+  params: Promise<{
+    handle: string;
+  }>;
+};
+export async function GET(req: NextRequest, { params }: RouteParams) {
+  const { handle } = await params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle;
 
   // Early return for empty handle
   if (!handle) {
@@ -57,5 +58,3 @@ export async function GET(
     pathname,
   );
 }
-
-export const runtime = "edge";

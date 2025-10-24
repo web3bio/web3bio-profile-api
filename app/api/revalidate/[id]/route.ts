@@ -6,8 +6,9 @@ import { getUserHeaders } from "@/utils/utils";
 // e.g `https://api.web3.bio/revalidate/ens,sujiyan.eth`
 export async function GET(
   req: NextRequest,
-  { params }: { params: { id: string } },
+  props: { params: Promise<{ id: string }> },
 ) {
+  const params = await props.params;
   try {
     const { id } = params;
 
@@ -76,5 +77,3 @@ export async function GET(
     );
   }
 }
-
-export const runtime = "edge";
