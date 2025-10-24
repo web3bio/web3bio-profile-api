@@ -33,7 +33,7 @@ const workerConfig = {
       const cachedBody = await cached.clone().text();
       if (cachedBody?.trim()) {
         const response = new Response(cachedBody, cached);
-        response.headers.set("X-Cache-Hit", "Cache API");
+        response.headers.set("X-CACHE-HIT", "Cache API");
         response.headers.set("X-MATCH-PATH", url.pathname);
         return response;
       }
@@ -56,12 +56,12 @@ const workerConfig = {
           .catch((err) => console.error("[Cache]", err)),
       );
 
-      finalResponse.headers.set("X-Cache-Hit", "Miss");
+      finalResponse.headers.set("X-CACHE-HIT", "MISS");
       finalResponse.headers.set("X-MATCH-PATH", url.pathname);
       return finalResponse;
     }
 
-    response.headers.set("X-Cache-Hit", "Miss");
+    response.headers.set("X-CACHE-HIT", "MISS");
     response.headers.set("X-MATCH-PATH", url.pathname);
     return response;
   },
