@@ -39,6 +39,6 @@ next-env.d.ts
 .vscode
 .codegpt
 
-# OpenNext
-/.open-next
+# Cluodflare
+.open-next
 .wrangler
