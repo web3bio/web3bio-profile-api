@@ -1,5 +1,16 @@
 import openNextHandler from "./.open-next/worker.js";
 
+const CACHEABLE_PATHS = [
+  "/avatar/",
+  "/domain/",
+  "/ns/",
+  "/profile/",
+  "/credentials/",
+];
+
+function isCacheablePath(pathname) {
+  return CACHEABLE_PATHS.some((path) => pathname.startsWith(path));
+}
 const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -12,8 +23,7 @@ const workerConfig = {
         return response;
       }
     }
-
-    if (!url.pathname.startsWith("/api/")) {
+    if (!isCacheablePath(url.pathname)) {
       return openNextHandler.fetch(request, env, ctx);
     }
 
