@@ -17,17 +17,16 @@
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.6.2",
+    "@opennextjs/cloudflare": "^1.11.0",
     "graphql": "^16.11.0",
     "jose": "^5.10.0",
     "next": "15.5.4",
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "viem": "^2.30.5",
-    "web3bio-profile-kit": "^0.1.21"
+    "web3bio-profile-kit": "^0.1.25"
   },
   "devDependencies": {
-    "wrangler": "^4.27.0",
     "@eslint/eslintrc": "^3.3.1",
     "@types/jest": "^29.5.14",
     "@types/node": "20.12.8",
@@ -39,6 +38,7 @@
     "sass": "^1.89.1",
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.8.3",
+    "wrangler": "^4.45.0"
   }
 }
