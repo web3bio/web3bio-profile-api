@@ -43,7 +43,7 @@ const workerConfig = {
       const cachedBody = await cached.clone().text();
       if (cachedBody?.trim()) {
         const response = new Response(cachedBody, cached);
-        response.headers.set("X-CACHE-HIT", "Cache API");
+        response.headers.set("X-CACHE-HIT", "HIT");
         response.headers.set("X-MATCH-PATH", url.pathname);
         return response;
       }
