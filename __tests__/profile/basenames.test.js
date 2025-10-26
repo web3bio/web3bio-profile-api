@@ -12,7 +12,7 @@ describe("Test For BaseNames Profile API", () => {
     const res = await queryClient("/profile/basenames/tony.base.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.links.twitter.handle).toBe("tonmfer");
+    expect(json.links.twitter.handle).toBe("tonymfer");
   });
   it("It should response 200 for alexgrover", async () => {
     const res = await queryClient("/profile/basenames/alexgrover");

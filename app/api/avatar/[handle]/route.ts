@@ -37,20 +37,26 @@ function isValidUrl(url: string): boolean {
   }
 }
 
-export async function GET(req: NextRequest) {
-  const headers = getUserHeaders(req.headers);
-  const { searchParams, pathname } = req.nextUrl;
-  const handle = searchParams.get("handle") || "";
-  const id = resolveIdentity(handle);
+export async function GET(
+  req: NextRequest,
+  props: { params: Promise<{ handle: string }> },
+) {
+  const params = await props.params;
+
+  const id = resolveIdentity(params.handle);
+  const { pathname } = req.nextUrl;
+
   if (!id) {
     return errorHandle({
-      identity: handle,
+      identity: params.handle,
       code: 404,
       path: pathname,
       platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
+  const headers = getUserHeaders(req.headers);
+
   const [platform, identity] = id.split(",") as [Platform, string];
   if (!isSupportedPlatform(platform)) return respondWithSVG(id, 240);
   try {
@@ -81,5 +87,3 @@ export async function GET(req: NextRequest) {
     return respondWithSVG(id, 240);
   }
 }
-
-export const runtime = "edge";

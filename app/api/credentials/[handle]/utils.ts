@@ -1,13 +1,18 @@
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import {
+  CredentialData,
+  CredentialResponse,
+  ErrorMessages,
+  Platform,
+} from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import type {
-  AuthHeaders,
-  CredentialCategory,
-  CredentialRecord,
-  CredentialRecordRaw,
-  CredentialsResponse,
-} from "@/utils/types";
+import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
+import { CREDENTIALS_INFO } from "@/utils/credentials";
+
+interface CredentialVertice {
+  id: string;
+  credentials: CredentialData[];
+}
 
 export const resolveCredentialsHandle = async (
   identity: string,
@@ -23,9 +28,8 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    const vertices = res?.data?.identity?.identityGraph?.vertices as
-      | CredentialRecord[]
-      | undefined;
+    const vertices = res?.data?.identity?.identityGraph
+      ?.vertices as CredentialVertice[];
 
     if (!vertices?.length) {
       return errorHandle({
@@ -36,20 +40,15 @@ export const resolveCredentialsHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
-
-    const targetId = `${platform},${identity}`;
-
-    const credentials = vertices
-      .filter((v) => v.credentials?.length || v.id === targetId)
-      .sort((a, b) => {
-        if (a.id === targetId) return -1;
-        if (b.id === targetId) return 1;
-        return 0;
-      });
-
-    return respondWithCache(buildCredentialsResponse(credentials));
+    const credentials = vertices.flatMap(
+      (v) =>
+        v.credentials?.map((x) => ({
+          ...x,
+          id: v.id,
+        })) || [],
+    );
+    return respondWithCache(processCredentials(credentials));
   } catch (error) {
-    console.error("Error in resolveCredentialsHandle:", error);
     return errorHandle({
       identity,
       code: 500,
@@ -60,78 +59,64 @@ export const resolveCredentialsHandle = async (
   }
 };
 
-const buildCredentialsResponse = (
-  records: CredentialRecord[],
-): CredentialsResponse[] =>
-  records.map((record) => ({
-    id: record.id,
-    credentials: record.credentials
-      ? processCredentials(record.credentials)
-      : null,
-  }));
-
 const processCredentials = (
-  credentials: CredentialRecordRaw[],
-): Record<
-  CredentialCategory,
-  { value: boolean; sources: CredentialRecordRaw[] } | null
-> => {
-  const groups: Record<CredentialCategory, CredentialRecordRaw[]> = {
+  credentials: CredentialData[],
+): CredentialResponse => {
+  const groups: CredentialResponse = {
     isHuman: [],
     isRisky: [],
     isSpam: [],
   };
 
+  const categoryChecks = {
+    isHuman: checkIsHuman,
+    isRisky: checkIsRisky,
+    isSpam: checkIsSpam,
+  };
+
   for (const credential of credentials) {
-    if (credential.category && groups[credential.category]) {
-      groups[credential.category].push(credential);
+    const category = credential.category as keyof typeof categoryChecks;
+
+    if (
+      category &&
+      groups[category] &&
+      categoryChecks[category]?.(credential)
+    ) {
+      const metadata = CREDENTIALS_INFO[credential.dataSource];
+      groups[category]?.push({
+        id: credential.id,
+        category: credential.category,
+        dataSource: credential.dataSource,
+        description: metadata?.description || "",
+        expiredAt: credential.expiredAt,
+        icon: metadata?.icon || "",
+        label: metadata?.label || "",
+        link: credential.link,
+        platform: metadata?.platform,
+        type: credential.type,
+        updatedAt: credential.updatedAt,
+        value: credential.value,
+      });
     }
   }
-
-  return {
-    isHuman:
-      groups.isHuman.length === 0
-        ? null
-        : {
-            value: checkIsHuman(groups.isHuman),
-            sources: groups.isHuman,
-          },
-    isRisky:
-      groups.isRisky.length === 0
-        ? null
-        : {
-            value: checkIsRisky(groups.isRisky),
-            sources: groups.isRisky,
-          },
-    isSpam:
-      groups.isSpam.length === 0
-        ? null
-        : {
-            value: checkIsSpam(groups.isSpam),
-            sources: groups.isSpam,
-          },
-  };
+  return groups;
 };
 
-const checkIsHuman = (sources: CredentialRecordRaw[]): boolean => {
+const checkIsHuman = (item: CredentialData): boolean => {
   return (
-    sources.some((source) => source.value === "true") ||
-    sources.some(
-      (source) =>
-        source.dataSource === "human-passport" && Number(source.value) >= 20,
-    )
+    item.value === "true" ||
+    (item.dataSource === "human-passport" && Number(item.value) >= 20)
   );
 };
 
-const checkIsRisky = (sources: CredentialRecordRaw[]): boolean => {
-  return Boolean(sources.length);
+const checkIsRisky = (item: CredentialData): boolean => {
+  return !!item.id;
 };
 
-const checkIsSpam = (sources: CredentialRecordRaw[]): boolean => {
-  return sources.some(
-    (source) =>
-      source.dataSource === "warpcast" &&
-      source.type === "score" &&
-      Number(source.value) === 0,
+const checkIsSpam = (item: CredentialData): boolean => {
+  return (
+    item.dataSource === "warpcast" &&
+    item.type === "score" &&
+    Number(item.value) === 0
   );
 };

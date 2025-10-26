@@ -71,7 +71,7 @@ export const respondWithCache = (data: any, shortCache?: boolean) => {
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": cacheControl,
-      "CDN-Cache-Contro": cdnCacheControl,
+      "CDN-Cache-Control": cdnCacheControl,
     },
   });
 };

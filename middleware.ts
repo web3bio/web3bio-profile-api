@@ -27,10 +27,7 @@ const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
 function initHeaders(req: NextRequest) {
   const userHeaders = new Headers(req.headers);
-  let ip =
-    userHeaders?.get("x-forwarded-for") ||
-    userHeaders?.get("x-real-ip") ||
-    req.ip;
+  let ip = userHeaders?.get("x-forwarded-for") || userHeaders?.get("x-real-ip");
 
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[1].trim();
