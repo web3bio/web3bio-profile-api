@@ -12,7 +12,8 @@
     "mode": "smart",
   },
   "vars": {
-    "NODE_ENV": "staging",
+    "ENVIRONMENT": "staging",
+    "GRAPHQL_SERVER": "https://graph-staging.web3.bio/graphql",
   },
   "assets": {
     "directory": ".open-next/assets",
