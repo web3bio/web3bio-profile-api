@@ -23,7 +23,7 @@
     "staging": {
       "vars": {
         "ENVIRONMENT": "staging",
-        "PROFILE_ENDPOINT": "https://api.web3.bio",
+        "PROFILE_ENDPOINT": "https://api-staging.web3.bio",
         "GRAPHQL_SERVER": "https://graph-staging.web3.bio/graphql",
       },
       "route": "api-staging.web3.bio/*",
@@ -31,7 +31,7 @@
     "production": {
       "vars": {
         "ENVIRONMENT": "production",
-        "PROFILE_ENDPOINT": "https://api-staging.web3.bio",
+        "PROFILE_ENDPOINT": "https://api.web3.bio",
         "GRAPHQL_SERVER": "https://graph.web3.bio/graphql",
       },
       "route": "api.web3.bio/*",
