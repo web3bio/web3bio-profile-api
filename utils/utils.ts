@@ -7,10 +7,8 @@ export const LENS_PROTOCOL_PROFILE_CONTRACT_ADDRESS =
   "0xDb46d1Dc155634FbC732f92E853b10B288AD5a1d";
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const OPENSEA_API_ENDPOINT = "https://api.opensea.io";
-export const BASE_URL =
-  process.env.NEXT_PUBLIC_PROFILE_END_POINT || "https://api.web3.bio";
-export const IDENTITY_GRAPH_SERVER =
-  process.env.NEXT_PUBLIC_GRAPHQL_SERVER || "";
+export const BASE_URL = process.env.PROFILE_ENDPOINT || "https://api.web3.bio";
+export const IDENTITY_GRAPH_SERVER = process.env.GRAPHQL_SERVER || "";
 
 export const getUserHeaders = (headers: Headers): AuthHeaders => {
   const userIP = headers?.get("x-client-ip") || "";

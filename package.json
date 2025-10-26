@@ -1,6 +1,6 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.1.8",
+  "version": "0.2.0",
   "packageManager": "pnpm@10.14.0",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
@@ -13,7 +13,7 @@
     "lint": "eslint .",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
-    "staging": "opennextjs-cloudflare build && wrangler versions upload",
+    "staging": "opennextjs-cloudflare build && wrangler versions upload --env staging",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
