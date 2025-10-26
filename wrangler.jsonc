@@ -34,7 +34,7 @@
         "PROFILE_ENDPOINT": "https://api-staging.web3.bio",
         "GRAPHQL_SERVER": "https://graph.web3.bio/graphql",
       },
-      "routes": "api.web3.bio/*",
+      "route": "api.web3.bio/*",
     },
   },
 }
