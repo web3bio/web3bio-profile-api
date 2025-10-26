@@ -23,7 +23,7 @@
     "production": {
       "name": "profile-api-production",
       "route": {
-        "pattern": "api-production.web3.bio/*",
+        "pattern": "api.web3.bio/*",
         "custom_domain": true,
       },
     },
