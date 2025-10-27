@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "web3bio-profile-api",
+  "name": "profile-api",
   "main": "worker.js",
   "compatibility_date": "2025-07-30",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
@@ -11,21 +11,5 @@
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
-  },
-  "env": {
-    "staging": {
-      "name": "profile-api-staging",
-      "route": {
-        "pattern": "api-staging.web3.bio/*",
-        "custom_domain": true,
-      },
-    },
-    "production": {
-      "name": "profile-api-production",
-      "route": {
-        "pattern": "api.web3.bio/*",
-        "custom_domain": true,
-      },
-    },
   },
 }
