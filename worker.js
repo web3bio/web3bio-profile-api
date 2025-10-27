@@ -8,21 +8,37 @@ const CACHEABLE_PATHS = [
   "/credentials/",
 ];
 
+const STATIC_ASSET_PATTERNS = [
+  /^\/_next\/static\//,
+  /^\/icons\//,
+  /\.(css|js|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/i,
+];
+
+function isStaticAsset(pathname) {
+  return STATIC_ASSET_PATTERNS.some((pattern) => pattern.test(pathname));
+}
+
 function isCacheablePath(pathname) {
   return CACHEABLE_PATHS.some((path) => pathname.startsWith(path));
 }
+
 const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
 
-    if (url.pathname.startsWith("/icons/")) {
+    if (isStaticAsset(url.pathname)) {
       const asset = await env.ASSETS.fetch(request);
       if (asset.status === 200) {
         const response = new Response(asset.body, asset);
-        response.headers.set("Cache-Control", "public, max-age=31536000");
+        response.headers.set(
+          "Cache-Control",
+          "public, max-age=31536000, immutable",
+        );
         return response;
       }
+      return openNextHandler.fetch(request, env, ctx);
     }
+
     if (!isCacheablePath(url.pathname)) {
       return openNextHandler.fetch(request, env, ctx);
     }
@@ -76,4 +92,5 @@ const workerConfig = {
     return response;
   },
 };
+
 export default workerConfig;

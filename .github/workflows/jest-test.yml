@@ -28,7 +28,7 @@ jobs:
         id: url
         run: |
           if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "value=https://api.web3.bio" >> $GITHUB_OUTPUT
+            echo "value=https://api-production.web3.bio" >> $GITHUB_OUTPUT
           else
             BRANCH="${{ github.head_ref || github.ref_name }}"
             CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
