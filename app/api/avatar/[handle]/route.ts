@@ -80,7 +80,7 @@ export async function GET(
     const isWebP = await isWebPUrl(avatarUrl);
     return NextResponse.redirect(
       isWebP
-        ? `${BASE_URL}/avatar/process?url=${encodeURIComponent(avatarUrl)}`
+        ? `https://api.web3.bio/avatar/process?url=${encodeURIComponent(avatarUrl)}`
         : avatarUrl,
     );
   } catch {

@@ -6,7 +6,21 @@ on:
   pull_request:
 
 jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    outputs:
+      deployment-url: ${{ steps.deploy.outputs.deployment-url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy to Cloudflare Workers
+        id: deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
   run_tests:
+    needs: deploy
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -24,20 +38,11 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Set deployment URL
-        id: url
-        run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
-            echo "value=https://api.web3.bio" >> $GITHUB_OUTPUT
-          else
-            BRANCH="${{ github.head_ref || github.ref_name }}"
-            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
-            echo "value=https://${CLEAN_BRANCH}-profile-api.web3bio.workers.dev" >> $GITHUB_OUTPUT
-          fi
-
       - name: Wait for deployment
         run: |
-          URL="${{ steps.url.outputs.value }}"
+          URL="${{ needs.deploy.outputs.deployment-url }}"
+          echo "Testing URL: $URL"
+
           MAX_ATTEMPTS=10
           SLEEP_TIME=20
 
@@ -46,15 +51,19 @@ jobs:
               echo "Deployment ready"
               exit 0
             fi
-
             if [ $i -lt $MAX_ATTEMPTS ]; then
               sleep $SLEEP_TIME
             fi
           done
 
-          echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s, proceeding anyway"
+          echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s"
 
-      - run: pnpm test
+      - name: Run tests
+        run: |
+          echo "================================================"
+          echo "🚀 Starting tests against: $BASE_URL"
+          echo "================================================"
+          pnpm test
         env:
-          BASE_URL: ${{ steps.url.outputs.value }}
+          BASE_URL: ${{ needs.deploy.outputs.deployment-url }}
           GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
