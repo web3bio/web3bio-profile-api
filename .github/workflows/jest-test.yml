@@ -1,20 +1,24 @@
 name: Profile API Test Cases
 
 on:
-  deployment_status:
+  issue_comment:
+    types: [created]
 
 jobs:
   run_tests:
     if: |
-      github.event.deployment_status.state == 'success'
+      github.event.comment.user.login == 'cloudflare-workers-and-pages[bot]' &&
+      contains(github.event.comment.body, 'Deployment successful')
 
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.issue.number }}/merge
 
-      - name: Setup pnpm 10.7.1
+      - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 10.7.1
@@ -29,11 +33,23 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Log deployment URL
-        run: echo "Running tests against ${{ github.event.deployment_status.target_url }}"
+      - name: Extract deployment URL
+        id: url
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const comment = context.payload.comment.body;
+            const match = comment.match(/\[(?:Branch|Commit) Preview URL\]\((https:\/\/[^\)]+)\)/);
+            if (match && match[1]) {
+              core.setOutput('value', match[1]);
+            } else {
+              core.setFailed('Could not extract URL from comment');
+            }
 
-      - name: Run tests against deployed URL
-        id: run_tests
+      - name: Log deployment URL
+        run: echo "Running tests against ${{ steps.url.outputs.value }}"
+
+      - name: Run tests
         run: pnpm test
         env:
-          BASE_URL: ${{ github.event.deployment_status.target_url }}
+          BASE_URL: ${{ steps.url.outputs.value }}
