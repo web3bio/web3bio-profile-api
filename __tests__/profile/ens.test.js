@@ -3,6 +3,7 @@ import { queryClient } from "../../utils/test-utils";
 describe("Test For ENS Profile API", () => {
   it("It should response 200 for brantly.eth", async () => {
     const res = await queryClient("/profile/ens/brantly.eth");
+    console.log(res.status, "kkk");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBeTruthy();
