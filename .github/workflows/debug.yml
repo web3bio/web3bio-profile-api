@@ -1,0 +1,16 @@
+name: Debug Check Runs
+
+on:
+  check_run:
+    types: [completed]
+  check_suite:
+    types: [completed]
+
+jobs:
+  debug:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Dump event info
+        run: |
+          echo "Event: ${{ github.event_name }}"
+          echo '${{ toJSON(github.event) }}'
