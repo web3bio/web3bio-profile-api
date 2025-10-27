@@ -1,22 +1,18 @@
 name: Profile API Test Cases
 
 on:
-  check_run:
-    types: [completed]
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
   run_tests:
-    if: |
-      github.event.check_run.name == 'Workers Builds: profile-api' &&
-      github.event.check_run.conclusion == 'success'
-
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.check_run.head_sha }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
@@ -33,33 +29,72 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Determine deployment URL
+      - name: Set deployment URL
         id: url
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const branch = '${{ github.event.check_run.head_branch }}';
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "value=https://api.web3.bio" >> $GITHUB_OUTPUT
+            echo "environment=production" >> $GITHUB_OUTPUT
+          else
+            BRANCH="${{ github.head_ref || github.ref_name }}"
+            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
+            echo "value=https://${CLEAN_BRANCH}.web3bio.workers.dev" >> $GITHUB_OUTPUT
+            echo "environment=preview" >> $GITHUB_OUTPUT
+          fi
 
-            if (branch === 'main') {
-              core.setOutput('value', 'https://api.web3.bio');
-              console.log('Production deployment: https://api.web3.bio');
-              return;
-            }
+      - name: Log deployment info
+        run: |
+          echo "🌍 Environment: ${{ steps.url.outputs.environment }}"
+          echo "🔗 Testing URL: ${{ steps.url.outputs.value }}"
 
-            const output = `${{ github.event.check_run.output.text }}`;
-            const match = output.match(/Preview URL: (https:\/\/[^\s]+)/);
+      - name: Wait for deployment to be ready
+        run: |
+          URL="${{ steps.url.outputs.value }}"
+          echo "⏳ Waiting for deployment to be ready at $URL"
 
-            if (match && match[1]) {
-              core.setOutput('value', match[1]);
-              console.log('Preview deployment:', match[1]);
-            } else {
-              core.setFailed('Could not extract Preview URL');
-            }
+          MAX_ATTEMPTS=30
+          SLEEP_TIME=5
 
-      - name: Log deployment URL
-        run: echo "Running tests against ${{ steps.url.outputs.value }}"
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            echo "Attempt $i/$MAX_ATTEMPTS..."
+
+            if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
+              echo "✅ Deployment is ready!"
+              exit 0
+            fi
+
+            if [ $i -lt $MAX_ATTEMPTS ]; then
+              echo "Not ready yet, waiting ${SLEEP_TIME}s..."
+              sleep $SLEEP_TIME
+            fi
+          done
+
+          echo "❌ Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME)) seconds"
+          echo "⚠️  Proceeding anyway, tests may fail if deployment is not ready"
 
       - name: Run tests
+        id: run_tests
         run: pnpm test
         env:
           BASE_URL: ${{ steps.url.outputs.value }}
+          ENVIRONMENT: ${{ steps.url.outputs.environment }}
+
+      - name: Test Summary
+        if: always()
+        run: |
+          echo "## 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Environment**: ${{ steps.url.outputs.environment }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **URL**: ${{ steps.url.outputs.value }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **Status**: ${{ steps.run_tests.outcome }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-${{ github.run_id }}
+          path: |
+            coverage/
+            test-results/
+          retention-days: 7
+          if-no-files-found: ignore
