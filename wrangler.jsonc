@@ -7,9 +7,45 @@
   "observability": {
     "enabled": true,
   },
-  "placement": { "mode": "smart" },
+  "workers_dev": false,
+  "placement": {
+    "mode": "smart",
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
+  },
+  // ===== Production =====
+  "env": {
+    "production": {
+      "name": "profile-api-prod",
+      "routes": [
+        {
+          "pattern": "api-pro.web3.bio/*",
+          "zone_name": "web3.bio",
+        },
+      ],
+      "vars": {
+        "ENVIRONMENT": "production",
+        "GRAPHQL_SERVER": "https://graph.web3.bio/graphql",
+      },
+      "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS",
+      },
+    },
+
+    // ===== Staging =====
+    "staging": {
+      "name": "profile-api-staging",
+      "vars": {
+        "ENVIRONMENT": "staging",
+        "GRAPHQL_SERVER": "https://graph-staging.web3.bio/graphql",
+      },
+      "assets": {
+        "directory": ".open-next/assets",
+        "binding": "ASSETS",
+      },
+    },
   },
 }

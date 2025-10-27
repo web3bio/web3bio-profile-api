@@ -22,7 +22,9 @@ export const resolveMediaURL = (url: string, id?: string): string | null => {
   }
 
   // Default fallback
-  return id ? `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}` : url;
+  return id
+    ? `https://api-production.web3.bio/avatar/svg/${encodeURIComponent(id)}`
+    : url;
 };
 
 export const resolveHandle = (

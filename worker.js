@@ -1,6 +1,6 @@
 import openNextHandler from "./.open-next/worker.js";
 
-const CACHEABLE_PATHS = [
+const CACHEABLE_API_PATHS = [
   "/avatar/",
   "/domain/",
   "/ns/",
@@ -8,22 +8,18 @@ const CACHEABLE_PATHS = [
   "/credentials/",
 ];
 
-function isCacheablePath(pathname) {
-  return CACHEABLE_PATHS.some((path) => pathname.startsWith(path));
+function isCacheableApiPath(pathname) {
+  return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
+
 const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
-    if (url.pathname.startsWith("/icons/")) {
-      const asset = await env.ASSETS.fetch(request);
-      if (asset.status === 200) {
-        const response = new Response(asset.body, asset);
-        response.headers.set("Cache-Control", "public, max-age=31536000");
-        return response;
-      }
-    }
-    if (!isCacheablePath(url.pathname)) {
+    if (
+      url.pathname.startsWith("/_next/") ||
+      url.pathname.startsWith("/icons/") ||
+      !isCacheableApiPath(url.pathname)
+    ) {
       return openNextHandler.fetch(request, env, ctx);
     }
 
@@ -37,8 +33,8 @@ const workerConfig = {
     }
 
     const cacheKey = new Request(url.toString());
-
     const cached = await caches.default.match(cacheKey);
+
     if (cached) {
       const cachedBody = await cached.clone().text();
       if (cachedBody?.trim()) {
@@ -76,4 +72,5 @@ const workerConfig = {
     return response;
   },
 };
+
 export default workerConfig;

@@ -1,39 +1,60 @@
 name: Profile API Test Cases
 
 on:
-  deployment_status:
+  push:
+    branches: [main, staging]
+  pull_request:
 
 jobs:
   run_tests:
-    if: |
-      github.event.deployment_status.state == 'success'
-
     runs-on: ubuntu-latest
-
+    timeout-minutes: 15
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm 10.7.1
-        uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v3
         with:
           version: 10.7.1
           run_install: false
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      - run: pnpm install --frozen-lockfile
 
-      - name: Log deployment URL
-        run: echo "Running tests against ${{ github.event.deployment_status.target_url }}"
+      - name: Set deployment URL
+        id: url
+        run: |
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            echo "value=https://api-production.web3.bio" >> $GITHUB_OUTPUT
+          else
+            BRANCH="${{ github.head_ref || github.ref_name }}"
+            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
+            echo "value=https://${CLEAN_BRANCH}-profile-api.web3bio.workers.dev" >> $GITHUB_OUTPUT
+          fi
 
-      - name: Run tests against deployed URL
-        id: run_tests
-        run: pnpm test
+      - name: Wait for deployment
+        run: |
+          URL="${{ steps.url.outputs.value }}"
+          MAX_ATTEMPTS=10
+          SLEEP_TIME=20
+
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
+              echo "Deployment ready"
+              exit 0
+            fi
+
+            if [ $i -lt $MAX_ATTEMPTS ]; then
+              sleep $SLEEP_TIME
+            fi
+          done
+
+          echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s, proceeding anyway"
+
+      - run: pnpm test
         env:
-          BASE_URL: ${{ github.event.deployment_status.target_url }}
+          BASE_URL: ${{ steps.url.outputs.value }}
+          GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
