@@ -19,6 +19,7 @@
       "routes": [
         {
           "pattern": "api.web3.bio/*",
+          "zone_name": "web3.bio",
         },
       ],
       "vars": {
