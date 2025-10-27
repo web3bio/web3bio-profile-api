@@ -38,12 +38,21 @@ jobs:
       - name: Wait for deployment
         run: |
           URL="${{ steps.url.outputs.value }}"
-          for i in $(seq 1 10); do
+          MAX_ATTEMPTS=10
+          SLEEP_TIME=20
+
+          for i in $(seq 1 $MAX_ATTEMPTS); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
+              echo "Deployment ready"
               exit 0
             fi
-            sleep 20
+
+            if [ $i -lt $MAX_ATTEMPTS ]; then
+              sleep $SLEEP_TIME
+            fi
           done
+
+          echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s, proceeding anyway"
 
       - run: pnpm test
         env:
