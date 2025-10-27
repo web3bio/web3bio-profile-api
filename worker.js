@@ -1,6 +1,6 @@
 import openNextHandler from "./.open-next/worker.js";
 
-const CACHEABLE_PATHS = [
+const CACHEABLE_API_PATHS = [
   "/avatar/",
   "/domain/",
   "/ns/",
@@ -8,38 +8,18 @@ const CACHEABLE_PATHS = [
   "/credentials/",
 ];
 
-const STATIC_ASSET_PATTERNS = [
-  /^\/_next\/static\//,
-  /^\/icons\//,
-  /\.(css|js|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/i,
-];
-
-function isStaticAsset(pathname) {
-  return STATIC_ASSET_PATTERNS.some((pattern) => pattern.test(pathname));
-}
-
-function isCacheablePath(pathname) {
-  return CACHEABLE_PATHS.some((path) => pathname.startsWith(path));
+function isCacheableApiPath(pathname) {
+  return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
 const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
-
-    if (isStaticAsset(url.pathname)) {
-      const asset = await env.ASSETS.fetch(request);
-      if (asset.status === 200) {
-        const response = new Response(asset.body, asset);
-        response.headers.set(
-          "Cache-Control",
-          "public, max-age=31536000, immutable",
-        );
-        return response;
-      }
-      return openNextHandler.fetch(request, env, ctx);
-    }
-
-    if (!isCacheablePath(url.pathname)) {
+    if (
+      url.pathname.startsWith("/_next/") ||
+      url.pathname.startsWith("/icons/") ||
+      !isCacheableApiPath(url.pathname)
+    ) {
       return openNextHandler.fetch(request, env, ctx);
     }
 
@@ -53,8 +33,8 @@ const workerConfig = {
     }
 
     const cacheKey = new Request(url.toString());
-
     const cached = await caches.default.match(cacheKey);
+
     if (cached) {
       const cachedBody = await cached.clone().text();
       if (cachedBody?.trim()) {
