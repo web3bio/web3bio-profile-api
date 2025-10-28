@@ -36,46 +36,39 @@ jobs:
               return;
             }
 
-            const maxAttempts = 30;
-            const sleepTime = 10000;
+            const maxAttempts = 20;
+            const sleepTime = 15000;
 
             for (let i = 0; i < maxAttempts; i++) {
-              let comments;
+              const comments = context.eventName === 'pull_request'
+                ? await github.rest.issues.listComments({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    issue_number: context.issue.number,
+                  })
+                : await github.rest.repos.listCommentsForCommit({
+                    owner: context.repo.owner,
+                    repo: context.repo.repo,
+                    commit_sha: context.sha,
+                  });
 
-              if (context.eventName === 'pull_request') {
-                comments = await github.rest.issues.listComments({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  issue_number: context.issue.number,
-                });
-              } else {
-                comments = await github.rest.repos.listCommentsForCommit({
-                  owner: context.repo.owner,
-                  repo: context.repo.repo,
-                  commit_sha: context.sha,
-                });
-              }
-
-              const cloudflareComment = comments.data.find(comment =>
-                comment.user.login === 'cloudflare-workers-and-pages[bot]' ||
-                comment.user.type === 'Bot'
+              const cloudflareComment = comments.data.find(c =>
+                c.user.login === 'cloudflare-workers-and-pages[bot]'
               );
 
               if (cloudflareComment) {
                 const urlMatch = cloudflareComment.body.match(/https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/);
-
                 if (urlMatch) {
-                  const deploymentUrl = urlMatch[0];
-                  core.setOutput('value', deploymentUrl);
+                  core.setOutput('value', urlMatch[0]);
                   core.setOutput('environment', 'staging');
                   core.setOutput('graphql_server', 'https://graph-staging.web3.bio/graphql');
-                  console.log('Found deployment URL:', deploymentUrl);
+                  console.log('Found deployment URL:', urlMatch[0]);
                   return;
                 }
               }
 
               if (i < maxAttempts - 1) {
-                console.log(`Waiting for Cloudflare deployment... (${i + 1}/${maxAttempts})`);
+                console.log(`Waiting for deployment... (${i + 1}/${maxAttempts})`);
                 await new Promise(resolve => setTimeout(resolve, sleepTime));
               }
             }
@@ -85,17 +78,13 @@ jobs:
       - name: Wait for deployment ready
         run: |
           URL="${{ steps.url.outputs.value }}"
-          MAX_ATTEMPTS=10
-          SLEEP_TIME=10
-
-          for i in $(seq 1 $MAX_ATTEMPTS); do
+          for i in $(seq 1 6); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
               echo "Deployment ready"
               exit 0
             fi
-            [ $i -lt $MAX_ATTEMPTS ] && sleep $SLEEP_TIME
+            [ $i -lt 6 ] && sleep 15
           done
-
           echo "Warning: Deployment not ready"
 
       - name: Print test environment
