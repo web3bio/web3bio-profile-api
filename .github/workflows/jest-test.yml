@@ -1,11 +1,12 @@
 name: Profile API Test Cases
 
 on:
-  deployment_status:
+  push:
+    branches: [main, staging]
+  pull_request:
 
 jobs:
   run_tests:
-    if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -23,20 +24,79 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Set environment variables
+      - name: Wait for Cloudflare deployment and extract URL
         id: url
-        run: |
-          DEPLOYMENT_URL="${{ github.event.deployment_status.target_url }}"
+        uses: actions/github-script@v7
+        with:
+          script: |
+            if (context.ref === 'refs/heads/main') {
+              core.setOutput('value', 'https://api-production.web3.bio');
+              core.setOutput('environment', 'production');
+              core.setOutput('graphql_server', 'https://graph.web3.bio/graphql');
+              return;
+            }
 
-          if [ "${{ github.event.deployment.environment }}" == "production" ]; then
-            echo "value=https://api-production.web3.bio" >> $GITHUB_OUTPUT
-            echo "environment=production" >> $GITHUB_OUTPUT
-            echo "graphql_server=https://graph.web3.bio/graphql" >> $GITHUB_OUTPUT
-          else
-            echo "value=${DEPLOYMENT_URL}" >> $GITHUB_OUTPUT
-            echo "environment=staging" >> $GITHUB_OUTPUT
-            echo "graphql_server=https://graph-staging.web3.bio/graphql" >> $GITHUB_OUTPUT
-          fi
+            const maxAttempts = 30;
+            const sleepTime = 10000;
+
+            for (let i = 0; i < maxAttempts; i++) {
+              let comments;
+
+              if (context.eventName === 'pull_request') {
+                comments = await github.rest.issues.listComments({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  issue_number: context.issue.number,
+                });
+              } else {
+                comments = await github.rest.repos.listCommentsForCommit({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  commit_sha: context.sha,
+                });
+              }
+
+              const cloudflareComment = comments.data.find(comment =>
+                comment.user.login === 'cloudflare-workers-and-pages[bot]' ||
+                comment.user.type === 'Bot'
+              );
+
+              if (cloudflareComment) {
+                const urlMatch = cloudflareComment.body.match(/https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/);
+
+                if (urlMatch) {
+                  const deploymentUrl = urlMatch[0];
+                  core.setOutput('value', deploymentUrl);
+                  core.setOutput('environment', 'staging');
+                  core.setOutput('graphql_server', 'https://graph-staging.web3.bio/graphql');
+                  console.log('Found deployment URL:', deploymentUrl);
+                  return;
+                }
+              }
+
+              if (i < maxAttempts - 1) {
+                console.log(`Waiting for Cloudflare deployment... (${i + 1}/${maxAttempts})`);
+                await new Promise(resolve => setTimeout(resolve, sleepTime));
+              }
+            }
+
+            core.setFailed('Could not find Cloudflare deployment URL');
+
+      - name: Wait for deployment ready
+        run: |
+          URL="${{ steps.url.outputs.value }}"
+          MAX_ATTEMPTS=10
+          SLEEP_TIME=10
+
+          for i in $(seq 1 $MAX_ATTEMPTS); do
+            if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
+              echo "Deployment ready"
+              exit 0
+            fi
+            [ $i -lt $MAX_ATTEMPTS ] && sleep $SLEEP_TIME
+          done
+
+          echo "Warning: Deployment not ready"
 
       - name: Print test environment
         run: |
