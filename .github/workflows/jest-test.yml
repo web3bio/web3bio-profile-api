@@ -15,31 +15,20 @@ jobs:
       - uses: pnpm/action-setup@v3
         with:
           version: 10.7.1
-          run_install: false
 
       - uses: actions/setup-node@v4
         with:
           node-version: 22
           cache: pnpm
 
-      - run: pnpm install --frozen-lockfile
-
-      - name: Wait for Cloudflare deployment and extract URL
+      - name: Get deployment URL
         id: url
         uses: actions/github-script@v7
         with:
           script: |
-            if (context.ref === 'refs/heads/main') {
-              core.setOutput('value', 'https://api-production.web3.bio');
-              core.setOutput('environment', 'production');
-              core.setOutput('graphql_server', 'https://graph.web3.bio/graphql');
-              return;
-            }
+            const isMain = context.ref === 'refs/heads/main';
 
-            const maxAttempts = 20;
-            const sleepTime = 15000;
-
-            for (let i = 0; i < maxAttempts; i++) {
+            for (let i = 0; i < 20; i++) {
               const comments = context.eventName === 'pull_request'
                 ? await github.rest.issues.listComments({
                     owner: context.repo.owner,
@@ -56,46 +45,37 @@ jobs:
                 c.user.login === 'cloudflare-workers-and-pages[bot]'
               );
 
-              if (cloudflareComment) {
-                const urlMatch = cloudflareComment.body.match(/https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/);
-                if (urlMatch) {
-                  core.setOutput('value', urlMatch[0]);
-                  core.setOutput('environment', 'staging');
-                  core.setOutput('graphql_server', 'https://graph-staging.web3.bio/graphql');
-                  console.log('Found deployment URL:', urlMatch[0]);
-                  return;
-                }
+              const urlMatch = cloudflareComment?.body.match(/https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/);
+              if (urlMatch) {
+                core.setOutput('value', urlMatch[0]);
+                core.setOutput('environment', isMain ? 'production' : 'staging');
+                core.setOutput('graphql_server', isMain
+                  ? 'https://graph.web3.bio/graphql'
+                  : 'https://graph-staging.web3.bio/graphql');
+                return;
               }
 
-              if (i < maxAttempts - 1) {
-                console.log(`Waiting for deployment... (${i + 1}/${maxAttempts})`);
-                await new Promise(resolve => setTimeout(resolve, sleepTime));
-              }
+              if (i < 19) await new Promise(r => setTimeout(r, 15000));
             }
 
-            core.setFailed('Could not find Cloudflare deployment URL');
+            core.setFailed('Deployment URL not found');
 
-      - name: Wait for deployment ready
+      - name: Wait and test
         run: |
           URL="${{ steps.url.outputs.value }}"
+          echo "Testing: $URL (ENV: ${{ steps.url.outputs.environment }})"
+
           for i in $(seq 1 6); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
-              echo "Deployment ready"
+              echo "Deployment ready, running tests..."
+              pnpm test
               exit 0
             fi
             [ $i -lt 6 ] && sleep 15
           done
-          echo "Warning: Deployment not ready"
 
-      - name: Print test environment
-        run: |
-          echo "=========================================="
-          echo "BASE_URL: ${{ steps.url.outputs.value }}"
-          echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
-          echo "GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}"
-          echo "=========================================="
-
-      - run: pnpm test
+          echo "Error: Deployment not ready"
+          exit 1
         env:
           BASE_URL: ${{ steps.url.outputs.value }}
           ENVIRONMENT: ${{ steps.url.outputs.environment }}
