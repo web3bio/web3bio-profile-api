@@ -1,6 +1,7 @@
 import {
   CredentialData,
   CredentialResponse,
+  CredentialSource,
   ErrorMessages,
   Platform,
 } from "web3bio-profile-kit/types";
@@ -110,7 +111,7 @@ const checkIsHuman = (item: CredentialData): boolean => {
 };
 
 const checkIsRisky = (item: CredentialData): boolean => {
-  return !!item.id;
+  return Boolean(CREDENTIALS_INFO[item.value as CredentialSource]);
 };
 
 const checkIsSpam = (item: CredentialData): boolean => {

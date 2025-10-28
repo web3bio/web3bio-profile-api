@@ -21,7 +21,7 @@
       "name": "profile-api-prod",
       "routes": [
         {
-          "pattern": "api-pro.web3.bio/*",
+          "pattern": "api-production.web3.bio/*",
           "zone_name": "web3.bio",
         },
       ],
