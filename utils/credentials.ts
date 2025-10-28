@@ -4,7 +4,9 @@ import {
   Platform,
 } from "web3bio-profile-kit/types";
 
-export const CREDENTIALS_INFO: any = {
+export const CREDENTIALS_INFO: Readonly<
+  Record<CredentialSource, CredentialMetaData>
+> = {
   // isHuman
   [CredentialSource.talent]: {
     icon: "🪪",
@@ -90,6 +92,12 @@ export const CREDENTIALS_INFO: any = {
     label: "Copyright Violation",
     description:
       "This profile is in violation of the DMCA (Digital Millennium Copyright Act). It contains copyrighted material without proper authorization. Please refrain from interacting with or sharing any content associated with this profile.",
+  },
+  [CredentialSource.google]: {
+    icon: "⚠️",
+    label: "Google Violation",
+    description:
+      "Flagged as dangerous by Google. Exercise caution when interacting.",
   },
   // isSpam
   [CredentialSource.warpcast]: {
