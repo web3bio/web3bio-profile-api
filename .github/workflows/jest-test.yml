@@ -31,15 +31,11 @@ jobs:
             echo "value=https://api-production.web3.bio" >> $GITHUB_OUTPUT
             echo "environment=production" >> $GITHUB_OUTPUT
             echo "graphql_server=https://graph.web3.bio/graphql" >> $GITHUB_OUTPUT
-          elif [ "${{ github.ref }}" == "refs/heads/staging" ]; then
-            echo "value=https://staging-profile-api.web3bio.workers.dev" >> $GITHUB_OUTPUT
-            echo "environment=staging" >> $GITHUB_OUTPUT
-            echo "graphql_server=https://graph-staging.web3.bio/graphql" >> $GITHUB_OUTPUT
           else
             BRANCH="${{ github.head_ref || github.ref_name }}"
             CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
             echo "value=https://${CLEAN_BRANCH}-profile-api.web3bio.workers.dev" >> $GITHUB_OUTPUT
-            echo "environment=preview" >> $GITHUB_OUTPUT
+            echo "environment=staging" >> $GITHUB_OUTPUT
             echo "graphql_server=https://graph-staging.web3.bio/graphql" >> $GITHUB_OUTPUT
           fi
 
@@ -54,18 +50,13 @@ jobs:
               echo "Deployment ready"
               exit 0
             fi
-
-            if [ $i -lt $MAX_ATTEMPTS ]; then
-              sleep $SLEEP_TIME
-            fi
+            [ $i -lt $MAX_ATTEMPTS ] && sleep $SLEEP_TIME
           done
 
           echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s, proceeding anyway"
 
       - name: Print test environment
         run: |
-          echo "=========================================="
-          echo "Test Environment Configuration"
           echo "=========================================="
           echo "BASE_URL: ${{ steps.url.outputs.value }}"
           echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
