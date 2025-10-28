@@ -1,12 +1,11 @@
 name: Profile API Test Cases
 
 on:
-  push:
-    branches: [main, staging]
-  pull_request:
+  deployment_status:
 
 jobs:
   run_tests:
+    if: github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -24,36 +23,20 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
-      - name: Set deployment URL and environment
+      - name: Set environment variables
         id: url
         run: |
-          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+          DEPLOYMENT_URL="${{ github.event.deployment_status.target_url }}"
+
+          if [ "${{ github.event.deployment.environment }}" == "production" ]; then
             echo "value=https://api-production.web3.bio" >> $GITHUB_OUTPUT
             echo "environment=production" >> $GITHUB_OUTPUT
             echo "graphql_server=https://graph.web3.bio/graphql" >> $GITHUB_OUTPUT
           else
-            BRANCH="${{ github.head_ref || github.ref_name }}"
-            CLEAN_BRANCH=$(echo "$BRANCH" | sed 's/[^a-zA-Z0-9-]/-/g' | tr '[:upper:]' '[:lower:]')
-            echo "value=https://${CLEAN_BRANCH}-profile-api.web3bio.workers.dev" >> $GITHUB_OUTPUT
+            echo "value=${DEPLOYMENT_URL}" >> $GITHUB_OUTPUT
             echo "environment=staging" >> $GITHUB_OUTPUT
             echo "graphql_server=https://graph-staging.web3.bio/graphql" >> $GITHUB_OUTPUT
           fi
-
-      - name: Wait for deployment
-        run: |
-          URL="${{ steps.url.outputs.value }}"
-          MAX_ATTEMPTS=10
-          SLEEP_TIME=20
-
-          for i in $(seq 1 $MAX_ATTEMPTS); do
-            if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
-              echo "Deployment ready"
-              exit 0
-            fi
-            [ $i -lt $MAX_ATTEMPTS ] && sleep $SLEEP_TIME
-          done
-
-          echo "Warning: Deployment not ready after $((MAX_ATTEMPTS * SLEEP_TIME))s, proceeding anyway"
 
       - name: Print test environment
         run: |
