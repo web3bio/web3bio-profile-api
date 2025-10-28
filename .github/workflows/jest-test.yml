@@ -2,6 +2,7 @@ name: Profile API Test Cases
 
 on:
   push:
+    branches: [main, staging]
   pull_request:
 
 jobs:
