@@ -4,9 +4,7 @@ import {
   Platform,
 } from "web3bio-profile-kit/types";
 
-export const CREDENTIALS_INFO: Readonly<
-  Record<Partial<CredentialSource>, CredentialMetaData>
-> = {
+export const CREDENTIALS_INFO: any = {
   // isHuman
   [CredentialSource.talent]: {
     icon: "🪪",
