@@ -61,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function Home() {
   const headersList = await headers();
-  const host = headersList?.get("host") || "api-production.web3.bio";
+  const host = headersList?.get("host") || "api.web3.bio";
   const protocol = host.includes("localhost") ? "http" : "https";
   const BASE_URL = `${protocol}://${host}`;
   const endpointItem = {
