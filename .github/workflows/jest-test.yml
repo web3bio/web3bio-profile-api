@@ -111,9 +111,7 @@ jobs:
                   if (url) {
                     core.setOutput('value', url);
                     core.setOutput('environment', isMain ? 'production' : 'staging');
-                    core.setOutput('graphql_server', isMain
-                      ? 'https://graph.web3.bio/graphql'
-                      : 'https://graph-staging.web3.bio/graphql');
+                    core.setOutput('graphql_server', 'https://graph.web3.bio/graphql');
                     core.info(`Target branch: ${baseBranch}`);
                     core.info(`Cloudflare URL found: ${url}`);
                     return;
