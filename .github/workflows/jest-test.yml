@@ -1,14 +1,27 @@
 name: Profile API Test Cases
 
 on:
-  push:
-    branches: [main, staging]
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: read
+  pull-requests: read
+  checks: read
+  statuses: read
+
+concurrency:
+  group: tests-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run_tests:
+    name: Wait for CF deploy and run Jest
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
+    if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
 
@@ -29,46 +42,100 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const targetBranch = context.eventName === 'pull_request'
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const isPR = context.eventName === 'pull_request';
+            const baseBranch = isPR
               ? context.payload.pull_request.base.ref
               : context.ref.replace('refs/heads/', '');
+            const refSha = isPR
+              ? context.payload.pull_request.head.sha
+              : context.sha;
 
-            const isMain = targetBranch === 'main';
+            const isMain = baseBranch === 'main';
 
-            for (let i = 0; i < 20; i++) {
-              const comments = context.eventName === 'pull_request'
-                ? await github.rest.issues.listComments({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    issue_number: context.issue.number,
-                  })
-                : await github.rest.repos.listCommentsForCommit({
-                    owner: context.repo.owner,
-                    repo: context.repo.repo,
-                    commit_sha: context.sha,
-                  });
+            const urlRegex = /https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/;
 
-              const cloudflareComment = comments.data.find(c =>
-                c.user.login === 'cloudflare-workers-and-pages[bot]'
-              );
-
-              const urlMatch = cloudflareComment?.body.match(/https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/);
-              if (urlMatch) {
-                core.setOutput('value', urlMatch[0]);
-                core.setOutput('environment', isMain ? 'production' : 'staging');
-                core.setOutput('graphql_server', isMain
-                  ? 'https://graph.web3.bio/graphql'
-                  : 'https://graph-staging.web3.bio/graphql');
-                console.log(`Target: ${targetBranch}, URL: ${urlMatch[0]}`);
-                return;
+            async function findFromComments() {
+              if (isPR) {
+                const { data } = await github.rest.issues.listComments({ owner, repo, issue_number: context.issue.number });
+                const comment = data.find(c => c.user?.login === 'cloudflare-workers-and-pages[bot]' && urlRegex.test(c.body || ''));
+                const match = comment?.body?.match(urlRegex);
+                return match?.[0] || null;
+              } else {
+                const { data } = await github.rest.repos.listCommentsForCommit({ owner, repo, commit_sha: refSha });
+                const comment = data.find(c => c.user?.login === 'cloudflare-workers-and-pages[bot]' && urlRegex.test(c.body || ''));
+                const match = comment?.body?.match(urlRegex);
+                return match?.[0] || null;
               }
-
-              if (i < 19) await new Promise(r => setTimeout(r, 15000));
             }
 
-            core.setFailed('Deployment URL not found');
+            async function findFromChecks() {
+              try {
+                const { data } = await github.rest.checks.listForRef({ owner, repo, ref: refSha });
+                for (const run of data.check_runs || []) {
+                  if (/cloudflare/i.test(run.name || '') || /cloudflare/i.test(run.app?.name || '')) {
+                    const text = [run.details_url, run.output?.summary, run.output?.text].filter(Boolean).join('\n');
+                    const match = text.match(urlRegex);
+                    if (match) return match[0];
+                  }
+                }
+              } catch (e) {
+                core.info(`checks.listForRef failed: ${e.message}`);
+              }
+              return null;
+            }
+
+            async function findFromStatuses() {
+              try {
+                const { data } = await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: refSha });
+                for (const status of data.statuses || []) {
+                  if (/cloudflare/i.test(status.context || '')) {
+                    const text = `${status.target_url || ''} ${status.description || ''}`;
+                    const match = text.match(urlRegex);
+                    if (match) return match[0];
+                  }
+                }
+              } catch (e) {
+                core.info(`repos.getCombinedStatusForRef failed: ${e.message}`);
+              }
+              return null;
+            }
+
+            const maxAttempts = 30; // up to ~5 minutes with 10s sleep
+            for (let i = 1; i <= maxAttempts; i++) {
+              const sources = [findFromComments, findFromChecks, findFromStatuses];
+              for (const fn of sources) {
+                try {
+                  const url = await fn();
+                  if (url) {
+                    core.setOutput('value', url);
+                    core.setOutput('environment', isMain ? 'production' : 'staging');
+                    core.setOutput('graphql_server', isMain
+                      ? 'https://graph.web3.bio/graphql'
+                      : 'https://graph-staging.web3.bio/graphql');
+                    core.info(`Target branch: ${baseBranch}`);
+                    core.info(`Cloudflare URL found: ${url}`);
+                    return;
+                  }
+                } catch (e) {
+                  core.info(`Lookup error: ${e.message}`);
+                }
+              }
+              if (i < maxAttempts) {
+                core.info(`Cloudflare URL not found yet (attempt ${i}/${maxAttempts}). Retrying in 10s...`);
+                await new Promise(r => setTimeout(r, 10000));
+              }
+            }
+
+            core.setFailed('Deployment URL not found after polling comments, checks, and statuses.');
 
       - name: Wait and test
+        env:
+          BASE_URL: ${{ steps.url.outputs.value }}
+          ENVIRONMENT: ${{ steps.url.outputs.environment }}
+          GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}
+          GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
         run: |
           URL="${{ steps.url.outputs.value }}"
 
@@ -76,21 +143,23 @@ jobs:
           echo "BASE_URL: $URL"
           echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
           echo "GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}"
+          if [ -z "${GENERAL_IDENTITY_GRAPH_API_KEY}" ]; then
+            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (not set)"
+          else
+            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (provided)"
+          fi
           echo "=========================================="
 
-          for i in $(seq 1 6); do
+          # Wait up to ~3 minutes for the preview to become healthy
+          for i in $(seq 1 12); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
               echo "Deployment ready, running tests..."
               pnpm test
               exit 0
             fi
-            [ $i -lt 6 ] && sleep 15
+            echo "Attempt $i/12: Not ready yet; sleeping 15s..."
+            [ $i -lt 12 ] && sleep 15
           done
 
           echo "Error: Deployment not ready"
           exit 1
-        env:
-          BASE_URL: ${{ steps.url.outputs.value }}
-          ENVIRONMENT: ${{ steps.url.outputs.environment }}
-          GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}
-          GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
