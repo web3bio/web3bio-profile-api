@@ -1,6 +1,6 @@
 import { getPlatform, getNetwork, REGEX } from "web3bio-profile-kit/utils";
 import { Platform } from "web3bio-profile-kit/types";
-import { ARWEAVE_ASSET_PREFIX, OPENSEA_API_ENDPOINT } from "./utils";
+import { ARWEAVE_ASSET_PREFIX, BASE_URL, OPENSEA_API_ENDPOINT } from "./utils";
 import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
 
 export const resolveMediaURL = (url: string, id?: string): string | null => {
@@ -22,7 +22,7 @@ export const resolveMediaURL = (url: string, id?: string): string | null => {
   }
 
   // Default fallback
-  return id ? `https://api.web3.bio/avatar/svg/${encodeURIComponent(id)}` : url;
+  return id ? `${BASE_URL}/avatar/svg/${encodeURIComponent(id)}` : url;
 };
 
 export const resolveHandle = (

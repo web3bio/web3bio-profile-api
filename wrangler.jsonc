@@ -7,7 +7,10 @@
   "observability": {
     "enabled": true,
   },
-  "placement": { "mode": "smart" },
+  "workers_dev": false,
+  "placement": {
+    "mode": "smart",
+  },
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",

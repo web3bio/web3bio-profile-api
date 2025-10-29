@@ -1,8 +1,10 @@
+import { headers } from "next/headers";
+import { Metadata } from "next";
 import Image from "next/image";
 import Script from "next/script";
 import { BASE_URL } from "../utils/utils";
 
-export async function generateMetadata() {
+export async function generateMetadata(): Promise<Metadata> {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
   const description =
     "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and more into their apps.";
@@ -57,7 +59,11 @@ export async function generateMetadata() {
   };
 }
 
-export default function Home() {
+export default async function Home() {
+  const headersList = await headers();
+  const host = headersList?.get("host") || "api.web3.bio";
+  const protocol = host.includes("localhost") ? "http" : "https";
+  const BASE_URL = `${protocol}://${host}`;
   const endpointItem = {
       alignItems: "center",
       FlexWrap: "wrap",
@@ -508,8 +514,7 @@ export default function Home() {
             <h2 className="text-bold h4">API Endpoints</h2>
             <p>
               The main public API endpoint domain for Web3.bio Profile API is{" "}
-              <span className="label">api.web3.bio</span>, and the staging
-              domain is <span className="label">api-staging.web3.bio</span>.
+              <span className="label">{host}</span>
             </p>
             <a
               href="#universal-profile-api"
@@ -561,8 +566,8 @@ export default function Home() {
 
             <p>
               Web3.bio Profile API also provides basic profiles for name service
-              resolution under <span className="label">api.web3.bio/ns</span>{" "}
-              (Replace <span className="label">profile</span> with{" "}
+              resolution under <span className="label">{host}/ns</span> (Replace{" "}
+              <span className="label">profile</span> with{" "}
               <span className="label">ns</span>).
             </p>
           </section>
