@@ -16,6 +16,8 @@ interface CredentialVertice {
   credentials: CredentialData[];
 }
 
+type CredentialCategory = keyof CredentialResponse;
+
 export const resolveCredentialsHandle = async (
   identity: string,
   platform: Platform,
@@ -30,10 +32,12 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    const vertices = res?.data?.identity?.identityGraph
-      ?.vertices as CredentialVertice[];
+    const rawVertices = res?.data?.identity?.identityGraph?.vertices;
+    const vertices = Array.isArray(rawVertices)
+      ? (rawVertices as CredentialVertice[])
+      : [];
 
-    if (!vertices?.length) {
+    if (!vertices.length) {
       return errorHandle({
         identity,
         code: 404,
@@ -42,14 +46,24 @@ export const resolveCredentialsHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
-    const credentials = vertices.flatMap(
-      (v) =>
-        v.credentials?.map((x) => ({
-          ...x,
-          id: v.id,
-          platform: v.platform,
-        })) || [],
-    );
+    const credentials: CredentialData[] = [];
+    for (const {
+      id: vertexId,
+      platform: vertexPlatform,
+      credentials: vertexCredentials,
+    } of vertices) {
+      if (!vertexCredentials?.length) {
+        continue;
+      }
+
+      for (const credential of vertexCredentials) {
+        credentials.push({
+          ...credential,
+          id: vertexId,
+          platform: vertexPlatform,
+        });
+      }
+    }
     return respondWithCache(processCredentials(credentials));
   } catch (error) {
     return errorHandle({
@@ -78,29 +92,41 @@ const processCredentials = (
   };
 
   for (const credential of credentials) {
-    const category = credential.category as keyof typeof categoryChecks;
+    const category = credential.category as CredentialCategory;
 
-    if (
-      category &&
-      groups[category] &&
-      categoryChecks[category]?.(credential)
-    ) {
-      const metadata = CREDENTIALS_INFO[credential.dataSource];
-      groups[category]?.push({
-        id: credential.id,
-        platform: metadata?.platform || credential.platform,
-        category: credential.category,
-        dataSource: credential.dataSource,
-        label: metadata?.label || "",
-        description: metadata?.description || "",
-        icon: metadata?.icon || "",
-        type: credential.type,
-        value: credential.value,
-        link: credential.link,
-        updatedAt: credential.updatedAt,
-        expiredAt: credential.expiredAt,
-      });
+    if (!category) {
+      continue;
     }
+
+    const group = groups[category];
+    const evaluate = categoryChecks[category];
+
+    if (!group || !evaluate?.(credential)) {
+      continue;
+    }
+
+    const metadata = CREDENTIALS_INFO[credential.dataSource];
+    const {
+      label = "",
+      description = "",
+      icon = "",
+      platform: metadataPlatform,
+    } = metadata ?? {};
+
+    group.push({
+      id: credential.id,
+      platform: metadataPlatform ?? credential.platform,
+      category: credential.category,
+      dataSource: credential.dataSource,
+      label,
+      description,
+      icon,
+      type: credential.type,
+      value: credential.value,
+      link: credential.link,
+      updatedAt: credential.updatedAt,
+      expiredAt: credential.expiredAt,
+    });
   }
   return groups;
 };
