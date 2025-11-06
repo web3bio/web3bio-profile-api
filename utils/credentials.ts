@@ -96,8 +96,8 @@ export const CREDENTIALS_INFO: Readonly<
   // isSpam
   [CredentialSource.farcasterSpam]: {
     icon: "🤖",
-    label: "Spam",
     platform: Platform.farcaster,
+    label: "Spam",
     description:
       "This profile may exhibit spam-like behavior. Data source: Farcaster.",
   },

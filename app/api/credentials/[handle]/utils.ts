@@ -12,6 +12,7 @@ import { CREDENTIALS_INFO } from "@/utils/credentials";
 
 interface CredentialVertice {
   id: string;
+  platform: Platform;
   credentials: CredentialData[];
 }
 
@@ -46,6 +47,7 @@ export const resolveCredentialsHandle = async (
         v.credentials?.map((x) => ({
           ...x,
           id: v.id,
+          platform: v.platform,
         })) || [],
     );
     return respondWithCache(processCredentials(credentials));
@@ -86,17 +88,17 @@ const processCredentials = (
       const metadata = CREDENTIALS_INFO[credential.dataSource];
       groups[category]?.push({
         id: credential.id,
+        platform: metadata?.platform || credential.platform,
         category: credential.category,
         dataSource: credential.dataSource,
-        description: metadata?.description || "",
-        expiredAt: credential.expiredAt,
-        icon: metadata?.icon || "",
         label: metadata?.label || "",
-        link: credential.link,
-        platform: metadata?.platform,
+        description: metadata?.description || "",
+        icon: metadata?.icon || "",
         type: credential.type,
-        updatedAt: credential.updatedAt,
         value: credential.value,
+        link: credential.link,
+        updatedAt: credential.updatedAt,
+        expiredAt: credential.expiredAt,
       });
     }
   }
