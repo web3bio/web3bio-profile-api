@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import Image from "next/image";
 import Script from "next/script";
 import { BASE_URL } from "../utils/utils";
+import CodeBlock from "@/components/CodeBlock";
 
 export async function generateMetadata(): Promise<Metadata> {
   const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
@@ -604,24 +605,20 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Examples
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// Shell`}</span>
-                <br />
-                {`curl -H "X-API-KEY: Bearer YOUR_API_KEY" ${BASE_URL}/profile/vitalik.eth`}
-                <br />
-                <br />
-                <span className="text-gray">{`// Javascript`}</span>
-                <br />
-                {`fetch("${BASE_URL}/profile/vitalik.eth", {
-  headers: {
-    "X-API-KEY": "Bearer YOUR_API_KEY"
-  }
-})
-                `}
-                <br />
-              </code>
-            </pre>
+            <CodeBlock
+              language="bash"
+              code={`
+                # Shell
+                curl -H "X-API-KEY: Bearer YOUR_API_KEY" ${BASE_URL}/profile/vitalik.eth
+
+                # Javascript
+                fetch("${BASE_URL}/profile/vitalik.eth", {
+                  headers: {
+                    "X-API-KEY": "Bearer YOUR_API_KEY"
+                  }
+                })
+              `}
+            />
           </section>
 
           <section
@@ -753,137 +750,129 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/vitalik.eth`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati",
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
-        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
-        "links": {
-            "website": {
-                "link": "https://vitalik.ca",
-                "handle": "vitalik.ca",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/vbuterin",
-                "handle": "vbuterin",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/VitalikButerin",
-                "handle": "VitalikButerin",
-                "sources": []
-            }
-        },
-        "social": {
-            "uid": null,
-            "follower": 4449,
-            "following": 10
-        }
-    },
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "farcaster",
-        "displayName": "Vitalik Buterin",
-        "avatar": "https://i.imgur.com/IzJxuId.jpg",
-        "description": "hullo",
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "farcaster": {
-                "link": "https://farcaster.xyz/vitalik.eth",
-                "handle": "vitalik.eth",
-                "sources": [
-                    "farcaster"
-                ]
-            }
-        },
-        "social": {
-            "uid": 5650,
-            "follower": 396461,
-            "following": 73
-        }
-    },
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.lens",
-        "platform": "lens",
-        "displayName": "vitalik.lens",
-        "avatar": "https://api.hey.xyz/avatar?id=100275",
-        "description": null,
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "lens": {
-                "link": "https://www.lensfrens.xyz/vitalik",
-                "handle": "vitalik",
-                "sources": [
-                    "lens"
-                ]
-            }
-        },
-        "social": {
-            "uid": null,
-            "follower": 42267,
-            "following": 7
-        }
-    }
-]`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/vitalik.eth`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati"
-    },
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "farcaster",
-        "displayName": "Vitalik Buterin",
-        "avatar": "https://i.imgur.com/IzJxuId.jpg",
-        "description": "hullo"
-    },
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.lens",
-        "platform": "lens",
-        "displayName": "vitalik.lens",
-        "avatar": "https://api.hey.xyz/avatar?id=100275",
-        "description": null
-    }
-]`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+            // ${BASE_URL}/profile/vitalik.eth
+            [
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "ens",
+                "displayName": "vitalik.eth",
+                "avatar": "https://euc.li/vitalik.eth",
+                "description": "mi pinxe lo crino tcati",
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+                "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
+                "links": {
+                  "website": {
+                    "link": "https://vitalik.ca",
+                    "handle": "vitalik.ca",
+                    "sources": []
+                  },
+                  "github": {
+                    "link": "https://github.com/vbuterin",
+                    "handle": "vbuterin",
+                    "sources": []
+                  },
+                  "twitter": {
+                    "link": "https://x.com/VitalikButerin",
+                    "handle": "VitalikButerin",
+                    "sources": []
+                  }
+                },
+                "social": {
+                  "uid": null,
+                  "follower": 4449,
+                  "following": 10
+                }
+              },
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "farcaster",
+                "displayName": "Vitalik Buterin",
+                "avatar": "https://i.imgur.com/IzJxuId.jpg",
+                "description": "hullo",
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": null,
+                "contenthash": null,
+                "links": {
+                  "farcaster": {
+                    "link": "https://farcaster.xyz/vitalik.eth",
+                    "handle": "vitalik.eth",
+                    "sources": ["farcaster"]
+                  }
+                },
+                "social": {
+                  "uid": 5650,
+                  "follower": 396461,
+                  "following": 73
+                }
+              },
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.lens",
+                "platform": "lens",
+                "displayName": "vitalik.lens",
+                "avatar": "https://api.hey.xyz/avatar?id=100275",
+                "description": null,
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": null,
+                "contenthash": null,
+                "links": {
+                  "lens": {
+                    "link": "https://www.lensfrens.xyz/vitalik",
+                    "handle": "vitalik",
+                    "sources": ["lens"]
+                  }
+                },
+                "social": {
+                  "uid": null,
+                  "follower": 42267,
+                  "following": 7
+                }
+              }
+            ]
+
+            // ${BASE_URL}/ns/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+            // ${BASE_URL}/ns/vitalik.eth
+            [
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "ens",
+                "displayName": "vitalik.eth",
+                "avatar": "https://euc.li/vitalik.eth",
+                "description": "mi pinxe lo crino tcati"
+              },
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "farcaster",
+                "displayName": "Vitalik Buterin",
+                "avatar": "https://i.imgur.com/IzJxuId.jpg",
+                "description": "hullo"
+              },
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.lens",
+                "platform": "lens",
+                "displayName": "vitalik.lens",
+                "avatar": "https://api.hey.xyz/avatar?id=100275",
+                "description": null
+              }
+            ]
+              `}
+            />
           </section>
 
           <section
@@ -1102,67 +1091,55 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/ens/vitalik.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-    "identity": "vitalik.eth",
-    "platform": "ens",
-    "displayName": "vitalik.eth",
-    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-    "description": null,
-    "status": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
-    "links": {
-        "website": {
-            "link": "https://vitalik.ca",
-            "handle": "vitalik.ca",
-            "sources": []
-        },
-        "github": {
-            "link": "https://github.com/vbuterin",
-            "handle": "vbuterin",
-            "sources": []
-        },
-        "twitter": {
-            "link": "https://x.com/VitalikButerin",
-            "handle": "VitalikButerin",
-            "sources": []
-        }
-    },
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/ens/vitalik.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-    "identity": "vitalik.eth",
-    "platform": "ens",
-    "displayName": "vitalik.eth",
-    "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-    "description": null
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+            // ${BASE_URL}/profile/ens/vitalik.eth
+            {
+              "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+              "identity": "vitalik.eth",
+              "platform": "ens",
+              "displayName": "vitalik.eth",
+              "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+              "description": null,
+              "status": null,
+              "email": null,
+              "location": null,
+              "header": null,
+              "contenthash": "ipfs://bafybeifkprcu4gotrr7tftkdlnmhgi6cxz5rj3mmawzujez2hixqmx52vi",
+              "links": {
+                "website": {
+                  "link": "https://vitalik.ca",
+                  "handle": "vitalik.ca",
+                  "sources": []
+                },
+                "github": {
+                  "link": "https://github.com/vbuterin",
+                  "handle": "vbuterin",
+                  "sources": []
+                },
+                "twitter": {
+                  "link": "https://x.com/VitalikButerin",
+                  "handle": "VitalikButerin",
+                  "sources": []
+                }
+              },
+              "social": {}
+            }
+
+            // ${BASE_URL}/ns/ens/0xd8da6bf26964af9d7eed9e03e53415d37aa96045
+            // ${BASE_URL}/ns/ens/vitalik.eth
+            {
+              "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+              "identity": "vitalik.eth",
+              "platform": "ens",
+              "displayName": "vitalik.eth",
+              "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
+              "description": null
+            }
+              `}
+            />
           </section>
 
           <section
@@ -1262,72 +1239,60 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/basenames/tony.base.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-    "identity": "tony.base.eth",
-    "platform": "basenames",
-    "displayName": "tony.base.eth",
-    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-    "description": "mfer building on base",
-    "status": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {
-      "website": {
-        "link": "https://mint.club",
-        "handle": "mint.club",
-        "sources": []
-      },
-      "github": {
-        "link": "https://github.com/tonymfer",
-        "handle": "tonymfer",
-        "sources": []
-      },
-      "twitter": {
-        "link": "https://x.com/tonmfer",
-        "handle": "tonmfer",
-        "sources": []
-      },
-      "farcaster": {
-        "link": "https://farcaster.xyz/to",
-        "handle": "to",
-        "sources": []
-      }
-    },
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/basenames/tony.base.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-    "identity": "tony.base.eth",
-    "platform": "basenames",
-    "displayName": "tony.base.eth",
-    "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-    "description": "mfer building on base"
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4
+            // ${BASE_URL}/profile/basenames/tony.base.eth
+            {
+              "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+              "identity": "tony.base.eth",
+              "platform": "basenames",
+              "displayName": "tony.base.eth",
+              "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+              "description": "mfer building on base",
+              "status": null,
+              "email": null,
+              "location": null,
+              "header": null,
+              "contenthash": null,
+              "links": {
+                "website": {
+                  "link": "https://mint.club",
+                  "handle": "mint.club",
+                  "sources": []
+                },
+                "github": {
+                  "link": "https://github.com/tonymfer",
+                  "handle": "tonymfer",
+                  "sources": []
+                },
+                "twitter": {
+                  "link": "https://x.com/tonmfer",
+                  "handle": "tonmfer",
+                  "sources": []
+                },
+                "farcaster": {
+                  "link": "https://farcaster.xyz/to",
+                  "handle": "to",
+                  "sources": []
+                }
+              },
+              "social": {}
+            }
+
+            // ${BASE_URL}/ns/basenames/0x041be0b39a80388364fe223dcd2b733d5a1144c4
+            // ${BASE_URL}/ns/basenames/tony.base.eth
+            {
+              "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+              "identity": "tony.base.eth",
+              "platform": "basenames",
+              "displayName": "tony.base.eth",
+              "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+              "description": "mfer building on base"
+            }
+              `}
+            />
           </section>
 
           <section
@@ -1424,51 +1389,39 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/profile/linea/name.linea.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
-    "identity": "name.linea.eth",
-    "platform": "linea",
-    "displayName": "name.linea.eth",
-    "avatar": null,
-    "description": null,
-    "status": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {},
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47`}{" "}
-                </span>
-                <br />
-                <span className="text-gray">
-                  {`// ${BASE_URL}/ns/linea/name.linea.eth`}{" "}
-                </span>
-                <br />
-                {`{
-    "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
-    "identity": "name.linea.eth",
-    "platform": "linea",
-    "displayName": "name.linea.eth",
-    "avatar": null,
-    "description": null
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/linea/0xa4d421e743cb9279bfebc008930ce87785940e47
+            // ${BASE_URL}/profile/linea/name.linea.eth
+            {
+              "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+              "identity": "name.linea.eth",
+              "platform": "linea",
+              "displayName": "name.linea.eth",
+              "avatar": null,
+              "description": null,
+              "status": null,
+              "email": null,
+              "location": null,
+              "header": null,
+              "contenthash": null,
+              "links": {},
+              "social": {}
+            }
+
+            // ${BASE_URL}/ns/linea/0xa4d421e743cb9279bfebc008930ce87785940e47
+            // ${BASE_URL}/ns/linea/name.linea.eth
+            {
+              "address": "0xa4d421e743cb9279bfebc008930ce87785940e47",
+              "identity": "name.linea.eth",
+              "platform": "linea",
+              "displayName": "name.linea.eth",
+              "avatar": null,
+              "description": null
+            }
+              `}
+            />
           </section>
 
           <section
@@ -1579,59 +1532,51 @@ export default async function Home() {
                 </a>
               </li>
             </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/dwr.eth`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/farcaster/farcaster%2C%233`}</span>
-                <br />
-                {`{
-    "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-    "identity": "dwr.eth",
-    "platform": "farcaster",
-    "displayName": "Dan Romero",
-    "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-    "description": "Working on Farcaster",
-    "status": null,
-    "email": null,
-    "location": "Los Angeles, California",
-    "header": null,
-    "contenthash": null,
-    "links": {
-        "farcaster": {
-            "link": "https://farcaster.xyz/dwr.eth",
-            "handle": "dwr.eth",
-            "sources": [
-                "farcaster"
-            ]
-        }
-    },
-    "social": {
-        "uid": 3,
-        "follower": 493153,
-        "following": 3534
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/dwr.eth`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/farcaster/farcaster%2C%233`}</span>
-                <br />
-                {`{
-    "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
-    "identity": "dwr.eth",
-    "platform": "farcaster",
-    "displayName": "Dan Romero",
-    "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
-    "description": "Working on Farcaster and Warpcast."
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
+            // ${BASE_URL}/profile/farcaster/dwr.eth
+            // ${BASE_URL}/profile/farcaster/farcaster%2C%233
+            {
+              "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+              "identity": "dwr.eth",
+              "platform": "farcaster",
+              "displayName": "Dan Romero",
+              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+              "description": "Working on Farcaster",
+              "status": null,
+              "email": null,
+              "location": "Los Angeles, California",
+              "header": null,
+              "contenthash": null,
+              "links": {
+                "farcaster": {
+                  "link": "https://farcaster.xyz/dwr.eth",
+                  "handle": "dwr.eth",
+                  "sources": ["farcaster"]
+                }
+              },
+              "social": {
+                "uid": 3,
+                "follower": 493153,
+                "following": 3534
+              }
+            }
+
+            // ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
+            // ${BASE_URL}/ns/farcaster/dwr.eth
+            // ${BASE_URL}/ns/farcaster/farcaster%2C%233
+            {
+              "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
+              "identity": "dwr.eth",
+              "platform": "farcaster",
+              "displayName": "Dan Romero",
+              "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
+              "description": "Working on Farcaster and Warpcast."
+            }
+              `}
+            />
           </section>
 
           <section
@@ -1722,56 +1667,49 @@ export default async function Home() {
                 </a>
               </li>
             </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/lens/stani.lens`}</span>
-                <br />
-                {`{
-    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-    "identity": "stani.lens",
-    "platform": "lens",
-    "displayName": "Stani",
-    "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-    "email": null,
-    "description": "@Avara (@Aave @Lens @Family)",
-    "status": null,
-    "email": null,
-    "location": null,
-    "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
-    "contenthash": null,
-    "links": {
-        "lens": {
-            "link": "https://www.lensfrens.xyz/stani",
-            "handle": "stani",
-            "sources": [
-                "lens"
-            ]
-        }
-    },
-    "social": {
-        "uid": null,
-        "follower": 115084,
-        "following": 1265
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/lens/stani.lens`}</span>
-                <br />
-                {`{
-    "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-    "identity": "stani.lens",
-    "platform": "lens",
-    "displayName": "Stani",
-    "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-    "description": "@Avara (@Aave @Lens @Family)"
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
+            // ${BASE_URL}/profile/lens/stani.lens
+            {
+              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+              "identity": "stani.lens",
+              "platform": "lens",
+              "displayName": "Stani",
+              "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+              "email": null,
+              "description": "@Avara (@Aave @Lens @Family)",
+              "status": null,
+              "location": null,
+              "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
+              "contenthash": null,
+              "links": {
+                "lens": {
+                  "link": "https://www.lensfrens.xyz/stani",
+                  "handle": "stani",
+                  "sources": ["lens"]
+                }
+              },
+              "social": {
+                "uid": null,
+                "follower": 115084,
+                "following": 1265
+              }
+            }
+
+            // ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
+            // ${BASE_URL}/ns/lens/stani.lens
+            {
+              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+              "identity": "stani.lens",
+              "platform": "lens",
+              "displayName": "Stani",
+              "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
+              "description": "@Avara (@Aave @Lens @Family)"
+            }
+              `}
+            />
           </section>
 
           <section
@@ -1868,63 +1806,59 @@ export default async function Home() {
                 </a>
               </li>
             </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/unstoppabledomains/sandy.nft`}</span>
-                <br />
-                {`{
-    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-    "identity": "sandy.nft",
-    "platform": "unstoppabledomains",
-    "displayName": "Pink Mamba",
-    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
-    "status": null,
-    "email": null,
-    "location": "Metaverse",
-    "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
-    "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
-    "links": {
-        "twitter": {
-            "link": "https://x.com/Sandy_carter",
-            "handle": "Sandy_carter",
-            "sources": []
-        },
-        "telegram": {
-            "link": "https://t.me/sandycarter",
-            "handle": "sandycarter",
-            "sources": []
-        },
-        "youtube": {
-            "link": "https://www.youtube.com/@sandycarter3993",
-            "handle": "@sandycarter3993",
-            "sources": []
-        }
-    },
-    "social": {
-        "uid": "sandy.nft",
-        "follower": 137,
-        "following": 0
-    }
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/unstoppabledomains/sandy.nft`}</span>
-                <br />
-                {`{
-    "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-    "identity": "sandy.nft",
-    "platform": "unstoppabledomains",
-    "displayName": "Pink Mamba",
-    "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-    "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
+            // ${BASE_URL}/profile/unstoppabledomains/sandy.nft
+            {
+              "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+              "identity": "sandy.nft",
+              "platform": "unstoppabledomains",
+              "displayName": "Pink Mamba",
+              "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
+              "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
+              "status": null,
+              "email": null,
+              "location": "Metaverse",
+              "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
+              "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
+              "links": {
+                "twitter": {
+                  "link": "https://x.com/Sandy_carter",
+                  "handle": "Sandy_carter",
+                  "sources": []
+                },
+                "telegram": {
+                  "link": "https://t.me/sandycarter",
+                  "handle": "sandycarter",
+                  "sources": []
+                },
+                "youtube": {
+                  "link": "https://www.youtube.com/@sandycarter3993",
+                  "handle": "@sandycarter3993",
+                  "sources": []
+                }
+              },
+              "social": {
+                "uid": "sandy.nft",
+                "follower": 137,
+                "following": 0
+              }
+            }
+
+            // ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
+            // ${BASE_URL}/ns/unstoppabledomains/sandy.nft
+            {
+              "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
+              "identity": "sandy.nft",
+              "platform": "unstoppabledomains",
+              "displayName": "Pink Mamba",
+              "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
+              "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
+            }
+              `}
+            />
           </section>
 
           <section
@@ -2017,43 +1951,39 @@ export default async function Home() {
                 </a>
               </li>
             </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/profile/solana/bonfida.sol`}</span>
-                <br />
-                {`{
-    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
-    "identity": "bonfida.sol",
-    "platform": "sns",
-    "displayName": "bonfida.sol",
-    "avatar": null,
-    "description": null,
-    "status": null,
-    "email": null,
-    "location": null,
-    "header": null,
-    "contenthash": null,
-    "links": {},
-    "social": {}
-}`}
-                <br />
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA`}</span>
-                <br />
-                <span className="text-gray">{`// ${BASE_URL}/ns/solana/bonfida.sol`}</span>
-                <br />
-                {`{
-    "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
-    "identity": "bonfida.sol",
-    "platform": "sns",
-    "displayName": "bonfida.sol",
-    "avatar": null,
-    "description": null,
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA
+            // ${BASE_URL}/profile/solana/bonfida.sol
+            {
+              "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+              "identity": "bonfida.sol",
+              "platform": "sns",
+              "displayName": "bonfida.sol",
+              "avatar": null,
+              "description": null,
+              "status": null,
+              "email": null,
+              "location": null,
+              "header": null,
+              "contenthash": null,
+              "links": {},
+              "social": {}
+            }
+
+            // ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA
+            // ${BASE_URL}/ns/solana/bonfida.sol
+            {
+              "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+              "identity": "bonfida.sol",
+              "platform": "sns",
+              "displayName": "bonfida.sol",
+              "avatar": null,
+              "description": null
+            }
+              `}
+            />
           </section>
 
           <section
@@ -2117,18 +2047,19 @@ export default async function Home() {
                 Service, Farcaster and Lens.
               </li>
             </ul>
-            <pre className="code" data-lang="JSON">
-              <code>
-                {`[
-    "ens,vitalik.eth",
-    "lens,stani.lens",
-    "farcaster,dwr.eth",
-    "basenames,tony.base.eth",
-    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-    "linea,name.linea.eth",
-]`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            [
+              "ens,vitalik.eth",
+              "lens,stani.lens",
+              "farcaster,dwr.eth",
+              "basenames,tony.base.eth",
+              "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+              "linea,name.linea.eth"
+            ]
+              `}
+            />
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Examples
             </h3>
@@ -2263,279 +2194,271 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span
-                  className="text-gray"
-                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/profile/batch/${encodeURIComponent(
-                  JSON.stringify([
-                    "ens,vitalik.eth",
-                    "lens,stani.lens",
-                    "farcaster,dwr.eth",
-                    "basenames,tony.base.eth",
-                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ]),
-                )}`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati",
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
-        "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
-        "links": {
-            "website": {
-                "link": "https://vitalik.ca",
-                "handle": "vitalik.ca",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/vbuterin",
-                "handle": "vbuterin",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/VitalikButerin",
-                "handle": "VitalikButerin",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "ens,vitalik.eth",
-            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-        ]
-    },
-    {
-        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-        "identity": "stani.lens",
-        "platform": "lens",
-        "displayName": "Stani",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-        "description": "@Avara (@Aave @Lens @Family)",
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
-        "contenthash": null,
-        "links": {
-            "lens": {
-                "link": "https://www.lensfrens.xyz/stani",
-                "handle": "stani",
-                "sources": []
-            }
-        },
-        "social": {
-            "uid": null,
-            "following": 1265,
-            "follower": 115084
-        },
-        "aliases": [
-            "lens,stani.lens",
-            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
-        ]
-    },
-    {
-        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-        "identity": "dwr.eth",
-        "platform": "farcaster",
-        "displayName": "Dan Romero",
-        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-        "description": "Working on Farcaster and Warpcast.",
-        "status": null,
-        "email": null,
-        "location": "Los Angeles, California",
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "farcaster": {
-                "link": "https://farcaster.xyz/dwr.eth",
-                "handle": "dwr.eth",
-                "sources": []
-            }
-        },
-        "social": {
-            "uid": 3,
-            "following": 3534,
-            "follower": 493153
-        },
-        "aliases": [
-            "farcaster,#3",
-            "farcaster,dwr",
-            "farcaster,dwr.eth",
-            "farcaster,danromero.eth",
-            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
-        ]
-    },
-    {
-        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-        "identity": "tony.base.eth",
-        "platform": "basenames",
-        "displayName": "tony.base.eth",
-        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-        "description": "mfer building on base",
-        "status": null,
-        "email": null,
-        "location": null,
-        "header": null,
-        "contenthash": null,
-        "links": {
-            "website": {
-                "link": "https://mint.club",
-                "handle": "mint.club",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/tonymfer",
-                "handle": "tonymfer",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/tonmfer",
-                "handle": "tonmfer",
-                "sources": []
-            },
-            "farcaster": {
-                "link": "https://farcaster.xyz/to",
-                "handle": "to",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "basenames,tony.base.eth",
-            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
-        ]
-    },
-    {
-        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-        "identity": "sujiyan.eth",
-        "platform": "ens",
-        "displayName": "sujiyan.eth",
-        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
-        "description": null,
-        "status": null,
-        "email": "suji.yan@dimension.im",
-        "location": null,
-        "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
-        "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
-        "links": {
-            "website": {
-                "link": "https://mask.io",
-                "handle": "mask.io",
-                "sources": []
-            },
-            "github": {
-                "link": "https://github.com/tedko",
-                "handle": "tedko",
-                "sources": []
-            },
-            "twitter": {
-                "link": "https://x.com/suji_yan",
-                "handle": "suji_yan",
-                "sources": []
-            },
-            "instagram": {
-                "link": "https://www.instagram.com/suji_yan_",
-                "handle": "suji_yan_",
-                "sources": []
-            }
-        },
-        "social": {},
-        "aliases": [
-            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
-        ]
-    }
-]`}
-                <br />
-                <br />
-                <span
-                  className="text-gray"
-                  style={{ whiteSpace: "normal", wordBreak: "break-all" }}
-                >{`// ${BASE_URL}/ns/batch/${encodeURIComponent(
-                  JSON.stringify([
-                    "ens,vitalik.eth",
-                    "lens,stani.lens",
-                    "farcaster,dwr.eth",
-                    "basenames,tony.base.eth",
-                    "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
-                  ]),
-                )}`}</span>
-                <br />
-                {`[
-    {
-        "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-        "identity": "vitalik.eth",
-        "platform": "ens",
-        "displayName": "vitalik.eth",
-        "avatar": "https://euc.li/vitalik.eth",
-        "description": "mi pinxe lo crino tcati",
-        "aliases": [
-            "ens,vitalik.eth",
-            "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
-        ]
-    },
-    {
-        "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-        "identity": "stani.lens",
-        "platform": "lens",
-        "displayName": "Stani",
-        "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-        "description": "@Avara (@Aave @Lens @Family)",
-        "aliases": [
-            "lens,stani.lens",
-            "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
-        ]
-    },
-    {
-        "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-        "identity": "dwr.eth",
-        "platform": "farcaster",
-        "displayName": "Dan Romero",
-        "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-        "description": "Working on Farcaster and Warpcast.",
-        "aliases": [
-            "farcaster,#3",
-            "farcaster,dwr",
-            "farcaster,dwr.eth",
-            "farcaster,danromero.eth",
-            "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
-        ]
-    },
-    {
-        "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
-        "identity": "tony.base.eth",
-        "platform": "basenames",
-        "displayName": "tony.base.eth",
-        "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-        "description": "mfer building on base",
-        "aliases": [
-            "basenames,tony.base.eth",
-            "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
-        ]
-    },
-    {
-        "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
-        "identity": "sujiyan.eth",
-        "platform": "ens",
-        "displayName": "sujiyan.eth",
-        "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
-        "description": null,
-        "aliases": [
-            "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
-        ]
-    }
-]`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/batch/${encodeURIComponent(
+              JSON.stringify([
+                "ens,vitalik.eth",
+                "lens,stani.lens",
+                "farcaster,dwr.eth",
+                "basenames,tony.base.eth",
+                "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+              ]),
+            )}
+            [
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "ens",
+                "displayName": "vitalik.eth",
+                "avatar": "https://euc.li/vitalik.eth",
+                "description": "mi pinxe lo crino tcati",
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+                "contenthash": "ipfs://bafybeie734kfgfk66fm2uiygvretlr6nzyf2fdlstzezrqxciwden6zai4",
+                "links": {
+                  "website": {
+                    "link": "https://vitalik.ca",
+                    "handle": "vitalik.ca",
+                    "sources": []
+                  },
+                  "github": {
+                    "link": "https://github.com/vbuterin",
+                    "handle": "vbuterin",
+                    "sources": []
+                  },
+                  "twitter": {
+                    "link": "https://x.com/VitalikButerin",
+                    "handle": "VitalikButerin",
+                    "sources": []
+                  }
+                },
+                "social": {},
+                "aliases": [
+                  "ens,vitalik.eth",
+                  "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                ]
+              },
+              {
+                "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+                "identity": "stani.lens",
+                "platform": "lens",
+                "displayName": "Stani",
+                "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+                "description": "@Avara (@Aave @Lens @Family)",
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
+                "contenthash": null,
+                "links": {
+                  "lens": {
+                    "link": "https://www.lensfrens.xyz/stani",
+                    "handle": "stani",
+                    "sources": []
+                  }
+                },
+                "social": {
+                  "uid": null,
+                  "following": 1265,
+                  "follower": 115084
+                },
+                "aliases": [
+                  "lens,stani.lens",
+                  "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+                ]
+              },
+              {
+                "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+                "identity": "dwr.eth",
+                "platform": "farcaster",
+                "displayName": "Dan Romero",
+                "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+                "description": "Working on Farcaster and Warpcast.",
+                "status": null,
+                "email": null,
+                "location": "Los Angeles, California",
+                "header": null,
+                "contenthash": null,
+                "links": {
+                  "farcaster": {
+                    "link": "https://farcaster.xyz/dwr.eth",
+                    "handle": "dwr.eth",
+                    "sources": []
+                  }
+                },
+                "social": {
+                  "uid": 3,
+                  "following": 3534,
+                  "follower": 493153
+                },
+                "aliases": [
+                  "farcaster,#3",
+                  "farcaster,dwr",
+                  "farcaster,dwr.eth",
+                  "farcaster,danromero.eth",
+                  "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                ]
+              },
+              {
+                "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+                "identity": "tony.base.eth",
+                "platform": "basenames",
+                "displayName": "tony.base.eth",
+                "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+                "description": "mfer building on base",
+                "status": null,
+                "email": null,
+                "location": null,
+                "header": null,
+                "contenthash": null,
+                "links": {
+                  "website": {
+                    "link": "https://mint.club",
+                    "handle": "mint.club",
+                    "sources": []
+                  },
+                  "github": {
+                    "link": "https://github.com/tonymfer",
+                    "handle": "tonymfer",
+                    "sources": []
+                  },
+                  "twitter": {
+                    "link": "https://x.com/tonmfer",
+                    "handle": "tonmfer",
+                    "sources": []
+                  },
+                  "farcaster": {
+                    "link": "https://farcaster.xyz/to",
+                    "handle": "to",
+                    "sources": []
+                  }
+                },
+                "social": {},
+                "aliases": [
+                  "basenames,tony.base.eth",
+                  "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+                ]
+              },
+              {
+                "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "identity": "sujiyan.eth",
+                "platform": "ens",
+                "displayName": "sujiyan.eth",
+                "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+                "description": null,
+                "status": null,
+                "email": "suji.yan@dimension.im",
+                "location": null,
+                "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
+                "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
+                "links": {
+                  "website": {
+                    "link": "https://mask.io",
+                    "handle": "mask.io",
+                    "sources": []
+                  },
+                  "github": {
+                    "link": "https://github.com/tedko",
+                    "handle": "tedko",
+                    "sources": []
+                  },
+                  "twitter": {
+                    "link": "https://x.com/suji_yan",
+                    "handle": "suji_yan",
+                    "sources": []
+                  },
+                  "instagram": {
+                    "link": "https://www.instagram.com/suji_yan_",
+                    "handle": "suji_yan_",
+                    "sources": []
+                  }
+                },
+                "social": {},
+                "aliases": [
+                  "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                ]
+              }
+            ]
+
+            // ${BASE_URL}/ns/batch/${encodeURIComponent(
+              JSON.stringify([
+                "ens,vitalik.eth",
+                "lens,stani.lens",
+                "farcaster,dwr.eth",
+                "basenames,tony.base.eth",
+                "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+              ]),
+            )}
+            [
+              {
+                "address": "0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
+                "identity": "vitalik.eth",
+                "platform": "ens",
+                "displayName": "vitalik.eth",
+                "avatar": "https://euc.li/vitalik.eth",
+                "description": "mi pinxe lo crino tcati",
+                "aliases": [
+                  "ens,vitalik.eth",
+                  "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
+                ]
+              },
+              {
+                "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+                "identity": "stani.lens",
+                "platform": "lens",
+                "displayName": "Stani",
+                "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+                "description": "@Avara (@Aave @Lens @Family)",
+                "aliases": [
+                  "lens,stani.lens",
+                  "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
+                ]
+              },
+              {
+                "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+                "identity": "dwr.eth",
+                "platform": "farcaster",
+                "displayName": "Dan Romero",
+                "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+                "description": "Working on Farcaster and Warpcast.",
+                "aliases": [
+                  "farcaster,#3",
+                  "farcaster,dwr",
+                  "farcaster,dwr.eth",
+                  "farcaster,danromero.eth",
+                  "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                ]
+              },
+              {
+                "address": "0x041be0b39a80388364fe223dcd2b733d5a1144c4",
+                "identity": "tony.base.eth",
+                "platform": "basenames",
+                "displayName": "tony.base.eth",
+                "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+                "description": "mfer building on base",
+                "aliases": [
+                  "basenames,tony.base.eth",
+                  "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+                ]
+              },
+              {
+                "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "identity": "sujiyan.eth",
+                "platform": "ens",
+                "displayName": "sujiyan.eth",
+                "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+                "description": null,
+                "aliases": [
+                  "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                ]
+              }
+            ]
+              `}
+            />
           </section>
 
           <section
@@ -2554,18 +2477,18 @@ export default async function Home() {
               responses contain an <code>error</code> node indicating a
               human-readable description of the error.
             </p>
-            <pre className="code" data-lang="JSON">
-              <code>
-                <span className="text-gray">{`// ${BASE_URL}/profile/web3bio_example.eth`}</span>
-                <br />
-                {`{
-    "address": null,
-    "identity": "web3bio_example.eth",
-    "platform": "ens",
-    "error": "Not Found"
-}`}
-              </code>
-            </pre>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/web3bio_example.eth
+            {
+              "address": null,
+              "identity": "web3bio_example.eth",
+              "platform": "ens",
+              "error": "Not Found"
+            }
+              `}
+            />
           </section>
 
           <section

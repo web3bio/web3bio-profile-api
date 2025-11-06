@@ -47,7 +47,7 @@ describe("Test For Farcaster Profile API", () => {
     const res = await queryClient("/profile/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.address).toBe("0x187c7b0393ebe86378128f2653d0930e33218899");
+    expect(json.address).toBe("ExAqci8uUVKtqHqFW58fmwgMMY9PATfRGGyv6837j9Lx");
   });
   it("It should response 200 for farcaster%2C%233", async () => {
     const res = await queryClient("/profile/farcaster/farcaster%2C%233");

@@ -27,11 +27,11 @@ const GET_CREDENTIALS_QUERY = `
       identityGraph {
         vertices {
           id
+          platform
           credentials {
             category
             type
             value
-            platform
             dataSource
             link
             updatedAt

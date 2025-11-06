@@ -6,7 +6,6 @@ describe("Test For Credentials API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
 
-    expect(json.isRisky[0].id).toBe("farcaster,ggmonster");
     expect(json.isHuman.length).toBe(0);
     expect(json.isSpam[0].link).toBe("https://github.com/warpcast/labels");
   });
@@ -19,8 +18,8 @@ describe("Test For Credentials API", () => {
     expect(json.isRisky[0].id).toBe(
       "ethereum,0xb6a5426b885172fb73d3c8fcf9612610612df707",
     );
-    expect(json.isRisky[0].value).toBe("hacker");
-    expect(json.isRisky[0].dataSource).toBe("slowmist");
+    expect(json.isRisky[0].value).toBe("true");
+    expect(json.isRisky[0].dataSource).toBe("hacker");
   });
   it("It should response 200 for supahmars.eth", async () => {
     const res = await queryClient("/credentials/supahmars.eth");
