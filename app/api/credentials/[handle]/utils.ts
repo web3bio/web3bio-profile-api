@@ -12,8 +12,11 @@ import { CREDENTIALS_INFO } from "@/utils/credentials";
 
 interface CredentialVertice {
   id: string;
+  platform: Platform;
   credentials: CredentialData[];
 }
+
+type CredentialCategory = keyof CredentialResponse;
 
 export const resolveCredentialsHandle = async (
   identity: string,
@@ -29,10 +32,12 @@ export const resolveCredentialsHandle = async (
       headers,
     );
 
-    const vertices = res?.data?.identity?.identityGraph
-      ?.vertices as CredentialVertice[];
+    const rawVertices = res?.data?.identity?.identityGraph?.vertices;
+    const vertices = Array.isArray(rawVertices)
+      ? (rawVertices as CredentialVertice[])
+      : [];
 
-    if (!vertices?.length) {
+    if (!vertices.length) {
       return errorHandle({
         identity,
         code: 404,
@@ -41,13 +46,24 @@ export const resolveCredentialsHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
-    const credentials = vertices.flatMap(
-      (v) =>
-        v.credentials?.map((x) => ({
-          ...x,
-          id: v.id,
-        })) || [],
-    );
+    const credentials: CredentialData[] = [];
+    for (const {
+      id: vertexId,
+      platform: vertexPlatform,
+      credentials: vertexCredentials,
+    } of vertices) {
+      if (!vertexCredentials?.length) {
+        continue;
+      }
+
+      for (const credential of vertexCredentials) {
+        credentials.push({
+          ...credential,
+          id: vertexId,
+          platform: vertexPlatform,
+        });
+      }
+    }
     return respondWithCache(processCredentials(credentials));
   } catch (error) {
     return errorHandle({
@@ -76,29 +92,41 @@ const processCredentials = (
   };
 
   for (const credential of credentials) {
-    const category = credential.category as keyof typeof categoryChecks;
+    const category = credential.category as CredentialCategory;
 
-    if (
-      category &&
-      groups[category] &&
-      categoryChecks[category]?.(credential)
-    ) {
-      const metadata = CREDENTIALS_INFO[credential.dataSource];
-      groups[category]?.push({
-        id: credential.id,
-        category: credential.category,
-        dataSource: credential.dataSource,
-        description: metadata?.description || "",
-        expiredAt: credential.expiredAt,
-        icon: metadata?.icon || "",
-        label: metadata?.label || "",
-        link: credential.link,
-        platform: metadata?.platform,
-        type: credential.type,
-        updatedAt: credential.updatedAt,
-        value: credential.value,
-      });
+    if (!category) {
+      continue;
     }
+
+    const group = groups[category];
+    const evaluate = categoryChecks[category];
+
+    if (!group || !evaluate?.(credential)) {
+      continue;
+    }
+
+    const metadata = CREDENTIALS_INFO[credential.dataSource];
+    const {
+      label = "",
+      description = "",
+      icon = "",
+      platform: metadataPlatform,
+    } = metadata ?? {};
+
+    group.push({
+      id: credential.id,
+      platform: metadataPlatform ?? credential.platform,
+      category: credential.category,
+      dataSource: credential.dataSource,
+      label,
+      description,
+      icon,
+      type: credential.type,
+      value: credential.value,
+      link: credential.link,
+      updatedAt: credential.updatedAt,
+      expiredAt: credential.expiredAt,
+    });
   }
   return groups;
 };
@@ -106,17 +134,18 @@ const processCredentials = (
 const checkIsHuman = (item: CredentialData): boolean => {
   return (
     item.value === "true" ||
-    (item.dataSource === "human-passport" && Number(item.value) >= 20)
+    (item.dataSource === CredentialSource.humanPassport &&
+      Number(item.value) >= 20)
   );
 };
 
 const checkIsRisky = (item: CredentialData): boolean => {
-  return Boolean(CREDENTIALS_INFO[item.value as CredentialSource]);
+  return Boolean(CREDENTIALS_INFO[item.dataSource]) && item.value === "true";
 };
 
 const checkIsSpam = (item: CredentialData): boolean => {
   return (
-    item.dataSource === "warpcast" &&
+    item.dataSource === CredentialSource.farcasterSpam &&
     item.type === "score" &&
     Number(item.value) === 0
   );

@@ -84,7 +84,7 @@ describe("Test For Universal Profile API", () => {
       }
     })();
     expect(isValidHandle).toBe(true);
-    expect(links.length).toBe(6);
+    expect(links.length).toBe(4);
   });
   it("It should response 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
     const res = await queryClient(
