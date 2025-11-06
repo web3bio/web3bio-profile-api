@@ -116,7 +116,7 @@ const checkIsRisky = (item: CredentialData): boolean => {
 
 const checkIsSpam = (item: CredentialData): boolean => {
   return (
-    item.dataSource === "warpcast" &&
+    item.dataSource === "farcaster-spam" &&
     item.type === "score" &&
     Number(item.value) === 0
   );
