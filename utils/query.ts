@@ -31,7 +31,6 @@ const GET_CREDENTIALS_QUERY = `
             category
             type
             value
-            platform
             dataSource
             link
             updatedAt

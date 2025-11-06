@@ -106,17 +106,18 @@ const processCredentials = (
 const checkIsHuman = (item: CredentialData): boolean => {
   return (
     item.value === "true" ||
-    (item.dataSource === "human-passport" && Number(item.value) >= 20)
+    (item.dataSource === CredentialSource.humanPassport &&
+      Number(item.value) >= 20)
   );
 };
 
 const checkIsRisky = (item: CredentialData): boolean => {
-  return Boolean(CREDENTIALS_INFO[item.value as CredentialSource]);
+  return Boolean(CREDENTIALS_INFO[item.dataSource]) && item.value === "true";
 };
 
 const checkIsSpam = (item: CredentialData): boolean => {
   return (
-    item.dataSource === "farcaster-spam" &&
+    item.dataSource === CredentialSource.farcasterSpam &&
     item.type === "score" &&
     Number(item.value) === 0
   );
