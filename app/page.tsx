@@ -894,7 +894,7 @@ export default async function Home() {
               style={endpointItem}
             >
               <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>a
+                <div className="label label-primary p-2 mr-2">GET</div>
                 <div className="mr-2">ENS Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
