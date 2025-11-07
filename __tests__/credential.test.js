@@ -37,7 +37,7 @@ describe("Test For Credential API", () => {
   });
   it("It should response 200 for 0x54503eeded1fc55b94330bf82092ad41a76a8683", async () => {
     const res = await queryClient(
-      "/credentials/0x54503eeded1fc55b94330bf82092ad41a76a8683",
+      "/credential/0x54503eeded1fc55b94330bf82092ad41a76a8683",
     );
     expect(res.status).toBe(200);
     const json = await res.json();

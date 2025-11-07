@@ -8,7 +8,7 @@ import {
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
-import { CREDENTIAL_INFO } from "@/utils/credentials";
+import { CREDENTIAL_INFO } from "@/utils/credential";
 
 interface CredentialVertice {
   id: string;
