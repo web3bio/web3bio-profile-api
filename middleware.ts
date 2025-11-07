@@ -19,7 +19,7 @@ export const config = {
     "/domain/:path*",
     "/ns/:path*",
     "/profile/:path*",
-    "/credentials/:path*",
+    "/credential/:path*",
   ],
 };
 

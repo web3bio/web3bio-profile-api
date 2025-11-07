@@ -8,7 +8,7 @@ import {
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
-import { CREDENTIALS_INFO } from "@/utils/credentials";
+import { CREDENTIAL_INFO } from "@/utils/credentials";
 
 interface CredentialVertice {
   id: string;
@@ -18,7 +18,7 @@ interface CredentialVertice {
 
 type CredentialCategory = keyof CredentialResponse;
 
-export const resolveCredentialsHandle = async (
+export const resolveCredentialHandle = async (
   identity: string,
   platform: Platform,
   headers: AuthHeaders,
@@ -105,7 +105,7 @@ const processCredentials = (
       continue;
     }
 
-    const metadata = CREDENTIALS_INFO[credential.dataSource];
+    const metadata = CREDENTIAL_INFO[credential.dataSource];
     const {
       label = "",
       description = "",
@@ -140,7 +140,7 @@ const checkIsHuman = (item: CredentialData): boolean => {
 };
 
 const checkIsRisky = (item: CredentialData): boolean => {
-  return Boolean(CREDENTIALS_INFO[item.dataSource]) && item.value === "true";
+  return Boolean(CREDENTIAL_INFO[item.dataSource]) && item.value === "true";
 };
 
 const checkIsSpam = (item: CredentialData): boolean => {
