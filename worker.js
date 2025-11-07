@@ -5,7 +5,7 @@ const CACHEABLE_API_PATHS = [
   "/domain/",
   "/ns/",
   "/profile/",
-  "/credentials/",
+  "/credential/",
 ];
 
 function isCacheableApiPath(pathname) {

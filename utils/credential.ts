@@ -4,7 +4,7 @@ import {
   Platform,
 } from "web3bio-profile-kit/types";
 
-export const CREDENTIALS_INFO: Readonly<
+export const CREDENTIAL_INFO: Readonly<
   Record<CredentialSource, CredentialMetaData>
 > = {
   // isHuman

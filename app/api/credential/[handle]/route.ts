@@ -2,7 +2,7 @@ import { errorHandle, getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { resolveCredentialsHandle } from "./utils";
+import { resolveCredentialHandle } from "./utils";
 
 export async function GET(
   req: NextRequest,
@@ -52,7 +52,7 @@ export async function GET(
   // Get headers only after validation passes
   const headers = getUserHeaders(req.headers);
 
-  return resolveCredentialsHandle(
+  return resolveCredentialHandle(
     identity,
     platform as Platform,
     headers,

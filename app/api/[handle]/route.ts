@@ -38,7 +38,7 @@ export async function GET(
     ns: `${BASE_URL}/ns/${handle}`,
     profile: `${BASE_URL}/profile/${handle}`,
     domain: `${BASE_URL}/domain/${handle}`,
-    credentials: `${BASE_URL}/credentials/${handle}`,
+    credential: `${BASE_URL}/credential/${handle}`,
     avatar: `${BASE_URL}/avatar/${handle}`,
   };
 
