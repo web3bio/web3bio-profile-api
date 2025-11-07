@@ -9,6 +9,7 @@ import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type { AuthHeaders } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
+import { isSameAddress } from "web3bio-profile-kit/utils";
 
 interface CredentialVertice {
   id: string;
@@ -31,11 +32,15 @@ export const resolveCredentialHandle = async (
       platform,
       headers,
     );
-
+    const queryId = `${platform},${identity}`;
+    const address = res.data?.identity?.profile?.address || "";
     const rawVertices = res?.data?.identity?.identityGraph?.vertices;
-    const vertices = Array.isArray(rawVertices)
-      ? (rawVertices as CredentialVertice[])
-      : [];
+
+    const vertices =
+      rawVertices?.filter((x: any) => {
+        const [_platform, _identity] = x.id?.split(",");
+        return x.id === queryId || isSameAddress(address, _identity);
+      }) || [];
 
     if (!vertices.length) {
       return errorHandle({
