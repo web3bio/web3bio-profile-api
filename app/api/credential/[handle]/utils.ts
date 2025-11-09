@@ -1,12 +1,12 @@
 import {
-  CredentialData,
+  CredentialType,
   CredentialResponse,
   CredentialSource,
   ErrorMessages,
   Platform,
 } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import type { AuthHeaders } from "@/utils/types";
+import type { AuthHeaders, CredentialRecord } from "@/utils/types";
 import { errorHandle, respondWithCache } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
 import { isSameAddress } from "web3bio-profile-kit/utils";
@@ -14,7 +14,7 @@ import { isSameAddress } from "web3bio-profile-kit/utils";
 interface CredentialVertice {
   id: string;
   platform: Platform;
-  credentials: CredentialData[];
+  credentials: CredentialType[];
 }
 
 type CredentialCategory = keyof CredentialResponse;
@@ -37,9 +37,12 @@ export const resolveCredentialHandle = async (
     const rawVertices = res?.data?.identity?.identityGraph?.vertices;
 
     const vertices =
-      rawVertices?.filter((x: any) => {
-        const [_platform, _identity] = x.id?.split(",");
-        return x.id === queryId || isSameAddress(address, _identity);
+      rawVertices?.filter((x: CredentialVertice) => {
+        if (x.id === queryId) return true;
+        if (!address) return false;
+        const parts = x.id?.split(",");
+        const _identity = parts?.[1];
+        return _identity ? isSameAddress(address, _identity) : false;
       }) || [];
 
     if (!vertices.length) {
@@ -51,7 +54,7 @@ export const resolveCredentialHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
-    const credentials: CredentialData[] = [];
+    const credentials: CredentialRecord[] = [];
     for (const {
       id: vertexId,
       platform: vertexPlatform,
@@ -82,7 +85,7 @@ export const resolveCredentialHandle = async (
 };
 
 const processCredentials = (
-  credentials: CredentialData[],
+  credentials: CredentialRecord[],
 ): CredentialResponse => {
   const groups: CredentialResponse = {
     isHuman: [],
@@ -110,11 +113,11 @@ const processCredentials = (
       continue;
     }
 
-    const metadata = CREDENTIAL_INFO[credential.dataSource];
+    const source = credential.dataSource as CredentialSource | undefined;
+    const metadata = source ? CREDENTIAL_INFO[source] : undefined;
     const {
       label = "",
       description = "",
-      icon = "",
       platform: metadataPlatform,
     } = metadata ?? {};
 
@@ -122,12 +125,11 @@ const processCredentials = (
       id: credential.id,
       platform: metadataPlatform ?? credential.platform,
       category: credential.category,
-      dataSource: credential.dataSource,
+      credentialSource: credential.dataSource as CredentialSource,
+      credentialType: credential.type,
+      credentialValue: credential.value,
       label,
       description,
-      icon,
-      type: credential.type,
-      value: credential.value,
       link: credential.link,
       updatedAt: credential.updatedAt,
       expiredAt: credential.expiredAt,
@@ -136,7 +138,7 @@ const processCredentials = (
   return groups;
 };
 
-const checkIsHuman = (item: CredentialData): boolean => {
+const checkIsHuman = (item: CredentialRecord): boolean => {
   return (
     item.value === "true" ||
     (item.dataSource === CredentialSource.humanPassport &&
@@ -144,11 +146,14 @@ const checkIsHuman = (item: CredentialData): boolean => {
   );
 };
 
-const checkIsRisky = (item: CredentialData): boolean => {
-  return Boolean(CREDENTIAL_INFO[item.dataSource]) && item.value === "true";
+const checkIsRisky = (item: CredentialRecord): boolean => {
+  return (
+    Boolean(CREDENTIAL_INFO[item.dataSource as CredentialSource]) &&
+    item.value === "true"
+  );
 };
 
-const checkIsSpam = (item: CredentialData): boolean => {
+const checkIsSpam = (item: CredentialRecord): boolean => {
   return (
     item.dataSource === CredentialSource.farcasterSpam &&
     item.type === "score" &&

@@ -1,5 +1,6 @@
 import {
   type AddressRecord,
+  type CredentialCategory,
   type ErrorMessages,
   type Platform,
   type SocialRecord,
@@ -83,4 +84,16 @@ export interface ProfileRecord {
   isPrimary: boolean;
   aliases?: string[];
   createdAt?: number;
+}
+
+export interface CredentialRecord {
+  id: string;
+  platform: Platform;
+  category: CredentialCategory;
+  dataSource: string;
+  type: string;
+  value: string;
+  link: string | null;
+  updatedAt: number | null;
+  expiredAt: number | null;
 }

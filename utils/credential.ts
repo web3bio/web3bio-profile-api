@@ -1,8 +1,11 @@
-import {
-  CredentialSource,
-  CredentialMetaData,
-  Platform,
-} from "web3bio-profile-kit/types";
+import { CredentialSource, Platform } from "web3bio-profile-kit/types";
+
+interface CredentialMetaData {
+  icon?: string;
+  platform?: Platform;
+  label: string;
+  description: string;
+}
 
 export const CREDENTIAL_INFO: Readonly<
   Record<CredentialSource, CredentialMetaData>
