@@ -24,6 +24,9 @@ export enum QueryType {
 const GET_CREDENTIALS_QUERY = `
   query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
+      profile {
+        address
+      }
       identityGraph {
         vertices {
           id
