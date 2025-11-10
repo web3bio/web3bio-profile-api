@@ -25,7 +25,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "viem": "^2.30.5",
-    "web3bio-profile-kit": "0.1.28"
+    "web3bio-profile-kit": "^0.1.30"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

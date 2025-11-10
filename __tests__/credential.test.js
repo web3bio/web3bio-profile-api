@@ -19,7 +19,7 @@ describe("Test For Credential API", () => {
     expect(json.isRisky[0].id).toBe(
       "ethereum,0xb6a5426b885172fb73d3c8fcf9612610612df707",
     );
-    expect(json.isRisky[0].credentialValue).toBe("true");
+    expect(json.isRisky[0].value).toBe("true");
     expect(json.isRisky[0].credentialSource).toBe("hacker");
   });
   it("It should response 200 for supahmars.eth", async () => {
@@ -34,7 +34,7 @@ describe("Test For Credential API", () => {
     const res = await queryClient("/credential/0xhelena.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.isHuman[0].credentialValue).toBe("true");
+    expect(json.isHuman[0].value).toBe("true");
   });
   it("It should response 200 for 0x54503eeded1fc55b94330bf82092ad41a76a8683", async () => {
     const res = await queryClient(

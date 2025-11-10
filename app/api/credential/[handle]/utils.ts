@@ -78,8 +78,8 @@ const processCredentials = (
         platform: metadataPlatform ?? credential.platform,
         category: credential.category,
         credentialSource: credential.dataSource as CredentialSource,
-        credentialType: credential.type,
-        credentialValue: credential.value,
+        type: credential.type,
+        value: credential.value,
         label,
         description,
         link: credential.link,
@@ -132,7 +132,11 @@ export const resolveCredentialHandle = async (
       });
     }
     const credentials = vertices.flatMap(
-      ({ id: vertexId, platform: vertexPlatform, credentials: vertexCredentials }) =>
+      ({
+        id: vertexId,
+        platform: vertexPlatform,
+        credentials: vertexCredentials,
+      }) =>
         (vertexCredentials as CredentialType[])?.map((credential) => ({
           ...credential,
           id: vertexId,
