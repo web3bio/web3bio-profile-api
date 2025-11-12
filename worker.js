@@ -9,6 +9,10 @@ const CACHEABLE_API_PATHS = [
 ];
 
 function isCacheableApiPath(pathname) {
+  // set no worker cache for webp process
+  if (pathname.startsWith("/avatar/process")) {
+    return false;
+  }
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
