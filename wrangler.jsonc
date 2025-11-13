@@ -10,6 +10,10 @@
       "enabled": true,
       "destinations": ["axiom-logs"],
     },
+    "traces": {
+      "enabled": true,
+      "destinations": ["axiom-traces"],
+    },
   },
   "workers_dev": true,
   "placement": {
