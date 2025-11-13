@@ -565,6 +565,22 @@ export default async function Home() {
               </div>
             </a>
 
+            <a
+              href="#credential"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Credential Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
             <p>
               Web3.bio Profile API also provides basic profiles for name service
               resolution under <span className="label">{host}/ns</span> (Replace{" "}
@@ -2467,7 +2483,7 @@ export default async function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Credential Query</h2>
-            <p>Fetch formatted credential infomation using a query ID</p>
+            <p>Fetch formatted credential information using a query ID</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2494,8 +2510,7 @@ export default async function Home() {
               <li>
                 <strong>id</strong> <span className="label">string</span> <br />
                 A string is formatted as{" "}
-                <span className="label">platform,identity</span>, encoded using{" "}
-                <span className="label">encodeURIComponent</span>
+                <span className="label">platform,identity</span>
               </li>
             </ul>
 
