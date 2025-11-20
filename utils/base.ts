@@ -6,6 +6,8 @@ import {
   type SocialLinks,
   type SocialLinksItem,
   ErrorMessages,
+  AddressRecord,
+  Network,
 } from "web3bio-profile-kit/types";
 import {
   PLATFORM_DATA,
@@ -69,6 +71,8 @@ export const resolveIdentityResponse = async (
     headers,
   );
 
+  console.log(res, "kkk");
+
   if (res.msg) {
     return {
       identity: handle,
@@ -127,8 +131,12 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
+
   const nsObj: NSResponse = {
-    address: data.address,
+    address:
+      data.platform !== Platform.farcaster
+        ? data.address
+        : checkoutFarcasterAddress(data.addresses),
     identity: data.identity,
     platform: data.platform,
     displayName:
@@ -532,4 +540,16 @@ const processProfileAvatar = async (
   } catch {
     return null;
   }
+};
+
+const checkoutFarcasterAddress = (addresses: any[]) => {
+  if (!addresses.length) return null;
+  const primaryAddress =
+    addresses.find((x) => x.network === Network.ethereum && x.isPrimary) ||
+    addresses.find((x) => x.isPrimary);
+  return (
+    primaryAddress?.address ||
+    addresses.find((x) => x.network === Network.ethereum)?.address ||
+    addresses[0].address
+  );
 };

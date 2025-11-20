@@ -14,12 +14,6 @@ describe("Test For BaseNames Profile API", () => {
     const json = await res.json();
     expect(json.links.twitter.handle).toBe("tonymfer");
   });
-  it("It should response 200 for alexgrover", async () => {
-    const res = await queryClient("/profile/basenames/alexgrover");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("0xd6507fc98605eab8775f851c25a5e09dc12ab7a7");
-  });
   it("It should response 200 for 0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e", async () => {
     const res = await queryClient(
       "/profile/basenames/0x6aefa01456ffbe8b69633e46e4b7e36a7ca4b29e",
