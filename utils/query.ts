@@ -325,11 +325,6 @@ const GET_DOMAIN_SINGLE = `
         address
         contenthash
         texts
-        addresses {
-          address
-          network
-          isPrimary
-        }
       }
     }
   }`;
@@ -390,11 +385,6 @@ const GET_DOMAIN = `
         address
         contenthash
         texts
-        addresses {
-          address
-          network
-          isPrimary
-        }
       }
     }
   }
