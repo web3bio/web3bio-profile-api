@@ -540,7 +540,7 @@ const processProfileAvatar = async (
   }
 };
 
-const checkoutFarcasterAddress = (addresses: any[]) => {
+const checkoutFarcasterAddress = (addresses: AddressRecord[]) => {
   if (!addresses.length) return null;
   const primaryAddress =
     addresses.find((x) => x.network === Network.ethereum && x.isPrimary) ||

@@ -33,8 +33,8 @@ importers:
         specifier: ^2.30.5
         version: 2.31.0(typescript@5.8.3)(zod@3.22.3)
       web3bio-profile-kit:
-        specifier: ^0.1.30
-        version: 0.1.30(@tanstack/react-query@5.90.7(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
+        specifier: ^0.1.32
+        version: 0.1.32(@tanstack/react-query@5.90.7(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.1
@@ -4363,8 +4363,8 @@ packages:
     resolution: {integrity: sha512-QW95TCTaHmsYfHDybGMwO5IJIM93I/6vTRk+daHTWFPhwh+C8Cg7j7XyKrwrj8Ib6vYXe0ocYNrmzY4xAAN6ug==}
     engines: {node: '>= 14'}
 
-  web3bio-profile-kit@0.1.30:
-    resolution: {integrity: sha512-++Di35339PqVoNCY49pHQWUYOS8+J9q9AT5BYX7ZoNUqfJypVd0PmaxxIKvUpjz8KvTa19I7flxz8s9SyCbz+A==}
+  web3bio-profile-kit@0.1.32:
+    resolution: {integrity: sha512-dNyQFW4hVoX8gvXi3GVyiT0Q5tLYrTHAy0FGNhK8qbG6F5q3kNPnUxodOuhISLZi4EjE8l/QZaiqwrNfqlem+A==}
     peerDependencies:
       '@tanstack/react-query': ^4.0.0 || ^5.0.0
       react: '>=16.8.0'
@@ -10162,7 +10162,7 @@ snapshots:
 
   web-streams-polyfill@4.0.0-beta.3: {}
 
-  web3bio-profile-kit@0.1.30(@tanstack/react-query@5.90.7(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
+  web3bio-profile-kit@0.1.32(@tanstack/react-query@5.90.7(react@19.2.0))(react-dom@19.2.0(react@19.2.0))(react@19.2.0):
     dependencies:
       '@tanstack/react-query': 5.90.7(react@19.2.0)
       react: 19.2.0
