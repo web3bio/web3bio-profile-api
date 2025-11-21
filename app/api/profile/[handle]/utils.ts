@@ -52,6 +52,14 @@ const SUPPORTED_PLATFORMS = new Set([
   Platform.nextid,
   Platform.sns,
   Platform.solana,
+  Platform.instagram,
+  Platform.reddit,
+  Platform.keybase,
+  Platform.linkedin,
+  Platform.facebook,
+  Platform.telegram,
+  Platform.nostr,
+  Platform.bluesky,
 ]);
 
 const SOCIAL_MEDIA_PLATFORMS = new Set([
@@ -59,6 +67,13 @@ const SOCIAL_MEDIA_PLATFORMS = new Set([
   Platform.github,
   Platform.discord,
   Platform.linkedin,
+  Platform.instagram,
+  Platform.facebook,
+  Platform.telegram,
+  Platform.reddit,
+  Platform.bluesky,
+  Platform.keybase,
+  Platform.nostr,
   Platform.nextid,
 ]);
 
@@ -202,7 +217,6 @@ const processIdentityConnections = (
   allRecords: IdentityRecord[],
 ): ProfileRecord[] => {
   const defaultProfile = buildProfileFromRecord(targetRecord);
-
   // Handle invalid Basenames configuration
   if (targetRecord.platform === Platform.basenames) {
     const ownerAddress = targetRecord.ownerAddress?.[0]?.address;
@@ -371,7 +385,6 @@ const extractProfilesFromGraph = (
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
-
   const graphVertices = enrichedRecord.identityGraph?.vertices || [];
 
   const profileResults =
@@ -379,7 +392,6 @@ const extractProfilesFromGraph = (
     SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
       ? processIdentityConnections(enrichedRecord, graphVertices)
       : [buildProfileFromRecord(enrichedRecord)];
-
   return removeDuplicateProfiles(profileResults);
 };
 
@@ -413,6 +425,7 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
+
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
   const sortedProfiles = sortProfilesByPriority(
     extractedProfiles,
