@@ -66,7 +66,7 @@ const workerConfig = {
     ) {
       const finalResponse = new Response(bodyText, response);
 
-    // Cache successful GET responses
+      // Cache successful GET responses
       ctx.waitUntil(
         caches.default
           .put(cacheKey, finalResponse.clone())

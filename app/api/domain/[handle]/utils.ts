@@ -46,7 +46,9 @@ const buildAddressesMap = (
   addresses?: Array<{ network: string; address: string }>,
 ): Record<string, string> => {
   if (!addresses?.length) return {};
-  return Object.fromEntries(addresses.map(({ network, address }) => [network, address]));
+  return Object.fromEntries(
+    addresses.map(({ network, address }) => [network, address]),
+  );
 };
 
 const buildDomainsArray = (
@@ -55,9 +57,13 @@ const buildDomainsArray = (
 ): ReturnType<typeof generateResponseStruct>[] => {
   if (!vertices.length) return [];
   return vertices
-    .filter(vertex => {
+    .filter((vertex) => {
       const ownerAddr = vertex.ownerAddress?.[0]?.address;
-      return TARGET_PLATFORMS.has(vertex.platform) && ownerAddr && isSameAddress(ownerAddr, handle);
+      return (
+        TARGET_PLATFORMS.has(vertex.platform) &&
+        ownerAddr &&
+        isSameAddress(ownerAddr, handle)
+      );
     })
     .map(generateResponseStruct);
 };

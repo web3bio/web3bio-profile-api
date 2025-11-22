@@ -2577,7 +2577,10 @@ export default async function Home() {
               </li>
               <li>
                 <span className="label">Basenames</span>{" "}
-                <a href={`${BASE_URL}/credential/tony.base`} target="_blank">
+                <a
+                  href={`${BASE_URL}/credential/tony.base.eth`}
+                  target="_blank"
+                >
                   basenames,tony.base.eth
                 </a>
               </li>

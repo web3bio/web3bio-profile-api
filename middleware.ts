@@ -33,7 +33,6 @@ function getClientIP(req: NextRequest): string {
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[1].trim();
   }
-  console.log("IP: ", ip);
   return ip || "unknown";
 }
 

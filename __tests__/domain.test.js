@@ -19,13 +19,13 @@ describe("Test For Domain API", () => {
     const res = await queryClient("/domain/dwr.farcaster");
     expect(res.status).toBe(404);
   });
-  it("It should response 200 for linea,184.liena.eth", async () => {
+  it("It should response 200 for linea,184.linea.eth", async () => {
     const res = await queryClient("/domain/linea,184.linea.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
   });
-  it("It should response 200 for linea,184.liena.eth", async () => {
+  it("It should response 200 for linea,184.linea.eth", async () => {
     const res = await queryClient("/domain/linea,184.linea.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
