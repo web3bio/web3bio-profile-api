@@ -9,8 +9,7 @@ export async function GET(
   props: { params: Promise<{ handle: string }> },
 ) {
   const { pathname } = req.nextUrl;
-  const params = await props.params;
-  const handle = params.handle;
+  const { handle } = await props.params;
 
   // Early validation for empty handle
   if (!handle.trim()) {
@@ -44,7 +43,7 @@ export async function GET(
       identity: handle,
       code: 404,
       path: pathname,
-      platform: (platform as Platform) || null,
+      platform: platform as Platform,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }

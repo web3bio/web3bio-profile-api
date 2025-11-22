@@ -46,12 +46,7 @@ const buildAddressesMap = (
   addresses?: Array<{ network: string; address: string }>,
 ): Record<string, string> => {
   if (!addresses?.length) return {};
-
-  const result: Record<string, string> = {};
-  for (const { network, address } of addresses) {
-    result[network] = address;
-  }
-  return result;
+  return Object.fromEntries(addresses.map(({ network, address }) => [network, address]));
 };
 
 const buildDomainsArray = (
@@ -59,22 +54,12 @@ const buildDomainsArray = (
   handle: string,
 ): ReturnType<typeof generateResponseStruct>[] => {
   if (!vertices.length) return [];
-
-  const domains: ReturnType<typeof generateResponseStruct>[] = [];
-
-  for (const vertex of vertices) {
-    const ownerAddr = vertex.ownerAddress?.[0]?.address;
-
-    if (
-      TARGET_PLATFORMS.has(vertex.platform) &&
-      ownerAddr &&
-      isSameAddress(ownerAddr, handle)
-    ) {
-      domains.push(generateResponseStruct(vertex));
-    }
-  }
-
-  return domains;
+  return vertices
+    .filter(vertex => {
+      const ownerAddr = vertex.ownerAddress?.[0]?.address;
+      return TARGET_PLATFORMS.has(vertex.platform) && ownerAddr && isSameAddress(ownerAddr, handle);
+    })
+    .map(generateResponseStruct);
 };
 
 export const resolveDomainQuery = async (
@@ -112,9 +97,7 @@ export const resolveDomainQuery = async (
       ...responseData,
       texts: profile?.texts ?? null,
       addresses,
-      domains: Boolean(identityGraph?.vertices?.length)
-        ? buildDomainsArray(identityGraph?.vertices, handle)
-        : [],
+      domains: buildDomainsArray(identityGraph?.vertices || [], handle),
     },
     true,
   );

@@ -7,16 +7,14 @@ import {
 } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
-type RouteParams = {
-  params: Promise<{
-    handle: string;
-  }>;
-};
-export async function GET(req: NextRequest, { params }: RouteParams) {
+
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ handle: string }> },
+) {
   const { handle } = await params;
   const { pathname } = req.nextUrl;
 
-  // Early return for empty handle
   if (!handle) {
     return errorHandle({
       identity: "",
@@ -27,12 +25,10 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     });
   }
 
-  // Normalize handle
   const resolvedHandle = REGEX.SOLANA_ADDRESS.test(handle)
     ? handle
     : handle.toLowerCase();
 
-  // Validate handle format
   const isValidEth = isValidEthereumAddress(resolvedHandle);
   const isValidSolana = REGEX.SOLANA_ADDRESS.test(resolvedHandle);
   const isValidFarcaster = REGEX.FARCASTER.test(resolvedHandle);

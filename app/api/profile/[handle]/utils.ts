@@ -186,30 +186,24 @@ const filterConnectedProfiles = (
     ? targetRecord.identity
     : targetRecord.resolvedAddress?.[0]?.address;
 
-  const connectedProfiles: ProfileRecord[] = [];
+  return allRecords
+    .filter((record) => {
+      if (
+        record.identity === targetRecord.identity &&
+        record.platform === targetRecord.platform
+      ) {
+        return false;
+      }
 
-  for (const record of allRecords) {
-    if (
-      record.identity === targetRecord.identity &&
-      record.platform === targetRecord.platform
-    ) {
-      continue;
-    }
-
-    const shouldInclude = usePrimaryFlow
-      ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
-      : isAddressMatching(record, sourceAddress, targetRecord.platform);
-
-    if (shouldInclude) {
-      connectedProfiles.push({
-        ...record.profile,
-        isPrimary: record.isPrimary,
-        createdAt: record.registeredAt,
-      });
-    }
-  }
-
-  return connectedProfiles;
+      return usePrimaryFlow
+        ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
+        : isAddressMatching(record, sourceAddress, targetRecord.platform);
+    })
+    .map((record) => ({
+      ...record.profile,
+      isPrimary: record.isPrimary,
+      createdAt: record.registeredAt,
+    }));
 };
 
 const processIdentityConnections = (
@@ -257,11 +251,7 @@ const removeDuplicateProfiles = (
       continue;
     }
 
-    try {
-      if (!isSupportedPlatform(profile.platform as any)) {
-        continue;
-      }
-    } catch {
+    if (!isSupportedPlatform(profile.platform as any)) {
       continue;
     }
 

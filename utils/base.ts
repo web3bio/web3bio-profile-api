@@ -478,23 +478,22 @@ export const resolveVerifiedLink = (
   const isWebSite = [Platform.website, Platform.dns].includes(
     platform as Platform,
   );
-  const sourceSet = new Set<Source>();
 
-  for (const edge of edges) {
-    if (isWebSite) {
-      const [, targetIdentity] = edge.target.split(",");
-      if (
-        targetIdentity === identity &&
-        [Source.ens, Source.keybase].includes(edge.dataSource as Source)
-      ) {
-        sourceSet.add(edge.dataSource as Source);
+  const sources = edges
+    .filter((edge) => {
+      if (isWebSite) {
+        const [, targetIdentity] = edge.target.split(",");
+        return (
+          targetIdentity === identity &&
+          [Source.ens, Source.keybase].includes(edge.dataSource as Source)
+        );
+      } else {
+        return edge.target === key;
       }
-    } else if (edge.target === key) {
-      sourceSet.add(edge.dataSource as Source);
-    }
-  }
+    })
+    .map((edge) => edge.dataSource as Source);
 
-  return Array.from(sourceSet);
+  return Array.from(new Set(sources));
 };
 
 export const resolveIdentityBatch = (input: string[]): string[] => {
