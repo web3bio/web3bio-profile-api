@@ -79,7 +79,15 @@ export async function middleware(req: NextRequest, env?: any) {
   if (env && env.API_RATE_LIMIT) {
     const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
     if (!success) {
-      return new Response("429 Too Many Requests", { status: 429 });
+      return NextResponse.json(
+        {
+          address: null,
+          identity: null,
+          platform: null,
+          error: "429 Too Many Requests",
+        },
+        { status: 429 },
+      );
     }
   }
 

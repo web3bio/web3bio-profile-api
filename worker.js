@@ -45,22 +45,37 @@ const workerConfig = {
 
     // Return cached response if available
     if (cached) {
-      const response = cached.clone();
-      response.headers.set("X-CACHE-HIT", "HIT");
-      response.headers.set("X-MATCH-PATH", pathname);
-      return response;
+      const cachedBody = await cached.clone().text();
+      if (cachedBody?.trim()) {
+        const response = new Response(cachedBody, cached);
+        response.headers.set("X-CACHE-HIT", "HIT");
+        response.headers.set("X-MATCH-PATH", pathname);
+        return response;
+      }
+      ctx.waitUntil(caches.default.delete(cacheKey));
     }
 
     // Fetch from origin
     const response = await openNextHandler.fetch(request, env, ctx);
+    const bodyText = await response.clone().text();
+
+    if (
+      response.status === 200 &&
+      request.method === "GET" &&
+      bodyText?.trim()
+    ) {
+      const finalResponse = new Response(bodyText, response);
 
     // Cache successful GET responses
-    if (response.status === 200 && request.method === "GET") {
       ctx.waitUntil(
         caches.default
-          .put(cacheKey, response.clone())
+          .put(cacheKey, finalResponse.clone())
           .catch((err) => console.error("[Cache]", err)),
       );
+
+      finalResponse.headers.set("X-CACHE-HIT", "MISS");
+      finalResponse.headers.set("X-MATCH-PATH", pathname);
+      return finalResponse;
     }
 
     response.headers.set("X-CACHE-HIT", "MISS");
