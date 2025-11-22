@@ -9,7 +9,7 @@ const CACHEABLE_API_PATHS = [
 ];
 
 function isCacheableApiPath(pathname) {
-  // set no worker cache for webp process
+  // Exclude webp process from caching
   if (pathname.startsWith("/avatar/process")) {
     return false;
   }
@@ -19,37 +19,43 @@ function isCacheableApiPath(pathname) {
 const workerConfig = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    const pathname = url.pathname;
+
+    // Bypass caching for non-cacheable paths
     if (
-      url.pathname.startsWith("/_next/") ||
-      url.pathname.startsWith("/icons/") ||
-      !isCacheableApiPath(url.pathname)
+      pathname.startsWith("/_next/") ||
+      pathname.startsWith("/icons/") ||
+      !isCacheableApiPath(pathname)
     ) {
       return openNextHandler.fetch(request, env, ctx);
     }
 
+    // Bypass cache if no-cache requested
     if (
       request.headers.get("cache-control") === "no-cache" ||
       url.searchParams.has("nocache")
     ) {
       const response = await openNextHandler.fetch(request, env, ctx);
-      response.headers.set("X-MATCH-PATH", url.pathname);
+      response.headers.set("X-MATCH-PATH", pathname);
       return response;
     }
 
     const cacheKey = new Request(url.toString());
     const cached = await caches.default.match(cacheKey);
 
+    // Return cached response if available
     if (cached) {
       const cachedBody = await cached.clone().text();
       if (cachedBody?.trim()) {
         const response = new Response(cachedBody, cached);
         response.headers.set("X-CACHE-HIT", "HIT");
-        response.headers.set("X-MATCH-PATH", url.pathname);
+        response.headers.set("X-MATCH-PATH", pathname);
         return response;
       }
       ctx.waitUntil(caches.default.delete(cacheKey));
     }
 
+    // Fetch from origin
     const response = await openNextHandler.fetch(request, env, ctx);
     const bodyText = await response.clone().text();
 
@@ -60,6 +66,7 @@ const workerConfig = {
     ) {
       const finalResponse = new Response(bodyText, response);
 
+    // Cache successful GET responses
       ctx.waitUntil(
         caches.default
           .put(cacheKey, finalResponse.clone())
@@ -67,12 +74,12 @@ const workerConfig = {
       );
 
       finalResponse.headers.set("X-CACHE-HIT", "MISS");
-      finalResponse.headers.set("X-MATCH-PATH", url.pathname);
+      finalResponse.headers.set("X-MATCH-PATH", pathname);
       return finalResponse;
     }
 
     response.headers.set("X-CACHE-HIT", "MISS");
-    response.headers.set("X-MATCH-PATH", url.pathname);
+    response.headers.set("X-MATCH-PATH", pathname);
     return response;
   },
 };
