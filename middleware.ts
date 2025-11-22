@@ -25,14 +25,18 @@ export const config = {
 
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
-function initHeaders(req: NextRequest) {
-  const userHeaders = new Headers(req.headers);
-  let ip = userHeaders?.get("x-forwarded-for") || userHeaders?.get("x-real-ip");
-
+function getClientIP(req: NextRequest): string {
+  let ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip");
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[1].trim();
   }
-  if (ip && ip.length > 0) {
+  return ip || "unknown";
+}
+
+function initHeaders(req: NextRequest) {
+  const userHeaders = new Headers(req.headers);
+  const ip = getClientIP(req);
+  if (ip && ip !== "unknown") {
     userHeaders.set("x-client-ip", ip);
   }
   return userHeaders;
@@ -67,13 +71,9 @@ export async function middleware(req: NextRequest, env?: any) {
   }
 
   // Rate limiting for unauthenticated or invalid API key
-  const ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip");
-  let clientIP = ip;
-  if (clientIP && clientIP.includes(",")) {
-    clientIP = clientIP.split(",")[1].trim();
-  }
+  const clientIP = getClientIP(req);
   if (env && env.API_RATE_LIMIT) {
-    const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP || "unknown" });
+    const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
     if (!success) {
       return new Response("429 Too Many Requests", { status: 429 });
     }
