@@ -565,6 +565,22 @@ export default async function Home() {
               </div>
             </a>
 
+            <a
+              href="#credential"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Credential Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
             <p>
               Web3.bio Profile API also provides basic profiles for name service
               resolution under <span className="label">{host}/ns</span> (Replace{" "}
@@ -2457,6 +2473,215 @@ export default async function Home() {
                 ]
               }
             ]
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="credential"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Credential Query</h2>
+            <p>Fetch formatted credential information using a query ID</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  credential
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}id{"}"}
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>id</strong> <span className="label">string</span> <br />
+                A string is formatted as{" "}
+                <span className="label">platform,identity</span>
+              </li>
+            </ul>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  target="_blank"
+                >
+                  ethereum,0xd8da...6045
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/credential/ens,0x934b510d4c9103e6a87aef13b816fb080286d649`}
+                  target="_blank"
+                >
+                  ens,0x934b...d649
+                </a>
+              </li>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/ens,0xhelena.eth`}
+                  target="_blank"
+                >
+                  ens,0xhelena.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/farcaster,ggmonster`}
+                  target="_blank"
+                >
+                  farcaster,ggmonster
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/credential/farcaster,0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  target="_blank"
+                >
+                  farcaster,0xd8da...6045
+                </a>
+              </li>
+              <li>
+                <span className="label">Lens</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/lens,sujiyan.lens`}
+                  target="_blank"
+                >
+                  lens,sujiyan.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/credential/lens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045`}
+                  target="_blank"
+                >
+                  lens,0xd8da...6045
+                </a>
+              </li>
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/tony.base.eth`}
+                  target="_blank"
+                >
+                  basenames,tony.base.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Linea Name Service</span>{" "}
+                <a
+                  href={`${BASE_URL}/credential/name.linea.eth`}
+                  target="_blank"
+                >
+                  name.linea.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <CodeBlock
+              language="json"
+              code={`
+                // isHuman - ${BASE_URL}/credential/ens,0xhelena.eth
+                {
+                  "isHuman": [
+                    {
+                      "id": "ens,0xhelena.eth",
+                      "platform": "dentity",
+                      "category": "isHuman",
+                      "credentialSource": "dentity",
+                      "type": "boolean",
+                      "value": "true",
+                      "label": "Dentity Humanity Verified",
+                      "description": "Personhood Verified by Dentity",
+                      "link": null,
+                      "updatedAt": 1762956888,
+                      "expiredAt": null
+                    },
+                    {
+                      "id": "ethereum,0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1",
+                      "platform": "galxe",
+                      "category": "isHuman",
+                      "credentialSource": "galxe-passport",
+                      "type": "boolean",
+                      "value": "true",
+                      "label": "Galxe KYC Verified",
+                      "description": "Proof of KYC by Galxe",
+                      "link": "https://app.galxe.com/passport",
+                      "updatedAt": 1734404558,
+                      "expiredAt": null
+                    },
+                    {
+                      "id": "ethereum,0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1",
+                      "platform": "humanpassport",
+                      "category": "isHuman",
+                      "credentialSource": "human-passport",
+                      "type": "score",
+                      "value": "47.8",
+                      "label": "Passport Humanity Verified",
+                      "description": "Proof of Personhood by Human Passport",
+                      "link": "https://app.passport.xyz",
+                      "updatedAt": 1762546524,
+                      "expiredAt": null
+                    }
+                  ],
+                  "isRisky": [],
+                  "isSpam": []
+                }
+
+                // isRisky & isSpam - ${BASE_URL}/credential/farcaster,ggmonster
+                {
+                  "isHuman": [],
+                  "isRisky": [
+                    {
+                      "id": "farcaster,ggmonster",
+                      "platform": "farcaster",
+                      "category": "isRisky",
+                      "credentialSource": "dmca",
+                      "type": "boolean",
+                      "value": "true",
+                      "label": "Copyright Violation",
+                      "description": "This profile is in violation of the DMCA (Digital Millennium Copyright Act). It contains copyrighted material without proper authorization. Please refrain from interacting with or sharing any content associated with this profile.",
+                      "link": "https://web3.bio/p/dmca-notice-policy",
+                      "updatedAt": 1744387615,
+                      "expiredAt": null
+                    }
+                  ],
+                  "isSpam": [
+                    {
+                      "id": "farcaster,ggmonster",
+                      "platform": "farcaster",
+                      "category": "isSpam",
+                      "credentialSource": "farcaster-spam",
+                      "type": "score",
+                      "value": "0",
+                      "label": "Spam",
+                      "description": "This profile may exhibit spam-like behavior. Data source: Farcaster.",
+                      "link": "https://github.com/warpcast/labels",
+                      "updatedAt": 1752037220,
+                      "expiredAt": null
+                    }
+                  ]
+                }
+
               `}
             />
           </section>

@@ -11,7 +11,6 @@ export async function GET(
   const { pathname } = req.nextUrl;
   const handle = params.handle;
 
-  // Early return for empty handle
   if (!handle) {
     return errorHandle({
       identity: "",
@@ -22,8 +21,7 @@ export async function GET(
     });
   }
 
-  const id = resolveIdentity(handle);
-  if (!id) {
+  if (!resolveIdentity(handle)) {
     return errorHandle({
       identity: handle,
       code: 404,
@@ -33,7 +31,6 @@ export async function GET(
     });
   }
 
-  // Build response object directly
   const responseData = {
     ns: `${BASE_URL}/ns/${handle}`,
     profile: `${BASE_URL}/profile/${handle}`,

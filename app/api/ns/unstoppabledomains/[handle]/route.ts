@@ -4,13 +4,10 @@ import { isValidEthereumAddress, REGEX } from "web3bio-profile-kit/utils";
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-type RouteParams = {
-  params: Promise<{
-    handle: string;
-  }>;
-};
-
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ handle: string }> },
+) {
   const { handle } = await params;
   const { pathname } = req.nextUrl;
 

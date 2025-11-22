@@ -52,6 +52,14 @@ const SUPPORTED_PLATFORMS = new Set([
   Platform.nextid,
   Platform.sns,
   Platform.solana,
+  Platform.instagram,
+  Platform.reddit,
+  Platform.keybase,
+  Platform.linkedin,
+  Platform.facebook,
+  Platform.telegram,
+  Platform.nostr,
+  Platform.bluesky,
 ]);
 
 const SOCIAL_MEDIA_PLATFORMS = new Set([
@@ -59,6 +67,13 @@ const SOCIAL_MEDIA_PLATFORMS = new Set([
   Platform.github,
   Platform.discord,
   Platform.linkedin,
+  Platform.instagram,
+  Platform.facebook,
+  Platform.telegram,
+  Platform.reddit,
+  Platform.bluesky,
+  Platform.keybase,
+  Platform.nostr,
   Platform.nextid,
 ]);
 
@@ -171,30 +186,24 @@ const filterConnectedProfiles = (
     ? targetRecord.identity
     : targetRecord.resolvedAddress?.[0]?.address;
 
-  const connectedProfiles: ProfileRecord[] = [];
+  return allRecords
+    .filter((record) => {
+      if (
+        record.identity === targetRecord.identity &&
+        record.platform === targetRecord.platform
+      ) {
+        return false;
+      }
 
-  for (const record of allRecords) {
-    if (
-      record.identity === targetRecord.identity &&
-      record.platform === targetRecord.platform
-    ) {
-      continue;
-    }
-
-    const shouldInclude = usePrimaryFlow
-      ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
-      : isAddressMatching(record, sourceAddress, targetRecord.platform);
-
-    if (shouldInclude) {
-      connectedProfiles.push({
-        ...record.profile,
-        isPrimary: record.isPrimary,
-        createdAt: record.registeredAt,
-      });
-    }
-  }
-
-  return connectedProfiles;
+      return usePrimaryFlow
+        ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
+        : isAddressMatching(record, sourceAddress, targetRecord.platform);
+    })
+    .map((record) => ({
+      ...record.profile,
+      isPrimary: record.isPrimary,
+      createdAt: record.registeredAt,
+    }));
 };
 
 const processIdentityConnections = (
@@ -202,7 +211,6 @@ const processIdentityConnections = (
   allRecords: IdentityRecord[],
 ): ProfileRecord[] => {
   const defaultProfile = buildProfileFromRecord(targetRecord);
-
   // Handle invalid Basenames configuration
   if (targetRecord.platform === Platform.basenames) {
     const ownerAddress = targetRecord.ownerAddress?.[0]?.address;
@@ -243,11 +251,7 @@ const removeDuplicateProfiles = (
       continue;
     }
 
-    try {
-      if (!isSupportedPlatform(profile.platform as any)) {
-        continue;
-      }
-    } catch {
+    if (!isSupportedPlatform(profile.platform as any)) {
       continue;
     }
 
@@ -371,7 +375,6 @@ const extractProfilesFromGraph = (
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
-
   const graphVertices = enrichedRecord.identityGraph?.vertices || [];
 
   const profileResults =
@@ -379,7 +382,6 @@ const extractProfilesFromGraph = (
     SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
       ? processIdentityConnections(enrichedRecord, graphVertices)
       : [buildProfileFromRecord(enrichedRecord)];
-
   return removeDuplicateProfiles(profileResults);
 };
 
@@ -413,6 +415,7 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
+
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
   const sortedProfiles = sortProfilesByPriority(
     extractedProfiles,

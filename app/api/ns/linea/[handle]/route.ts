@@ -8,13 +8,10 @@ import {
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-type RouteParams = {
-  params: Promise<{
-    handle: string;
-  }>;
-};
-
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ handle: string }> },
+) {
   const { handle: inputName } = await params;
   const { pathname } = req.nextUrl;
   const isEthAddress = isValidEthereumAddress(inputName);
