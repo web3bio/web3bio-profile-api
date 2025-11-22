@@ -26,10 +26,14 @@ export const config = {
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
 function getClientIP(req: NextRequest): string {
-  let ip = req.headers.get("x-forwarded-for") || req.headers.get("x-real-ip") || req.headers.get("cf-connecting-ip");
+  let ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip");
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[1].trim();
   }
+  console.log("IP: ", ip);
   return ip || "unknown";
 }
 
