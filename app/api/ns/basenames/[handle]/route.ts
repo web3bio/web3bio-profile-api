@@ -8,12 +8,10 @@ import {
 import { resolveIdentityHandle } from "@/utils/base";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
-type RouteParams = {
-  params: Promise<{
-    handle: string;
-  }>;
-};
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ handle: string }> },
+) {
   const { handle: inputName } = await params;
   const { pathname } = req.nextUrl;
   const isEthAddress = isValidEthereumAddress(inputName);
@@ -22,7 +20,6 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     ? inputName
     : uglify(inputName, Platform.basenames);
 
-  // Skip regex validation for valid Ethereum addresses
   if (!isEthAddress && !REGEX.BASENAMES.test(handle)) {
     return errorHandle({
       identity: handle,

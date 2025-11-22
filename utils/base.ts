@@ -6,6 +6,8 @@ import {
   type SocialLinks,
   type SocialLinksItem,
   ErrorMessages,
+  AddressRecord,
+  Network,
 } from "web3bio-profile-kit/types";
 import {
   PLATFORM_DATA,
@@ -127,8 +129,12 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
+
   const nsObj: NSResponse = {
-    address: data.address,
+    address:
+      data.platform !== Platform.farcaster
+        ? data.address
+        : checkoutFarcasterAddress(data.addresses),
     identity: data.identity,
     platform: data.platform,
     displayName:
@@ -472,23 +478,22 @@ export const resolveVerifiedLink = (
   const isWebSite = [Platform.website, Platform.dns].includes(
     platform as Platform,
   );
-  const sourceSet = new Set<Source>();
 
-  for (const edge of edges) {
-    if (isWebSite) {
-      const [, targetIdentity] = edge.target.split(",");
-      if (
-        targetIdentity === identity &&
-        [Source.ens, Source.keybase].includes(edge.dataSource as Source)
-      ) {
-        sourceSet.add(edge.dataSource as Source);
+  const sources = edges
+    .filter((edge) => {
+      if (isWebSite) {
+        const [, targetIdentity] = edge.target.split(",");
+        return (
+          targetIdentity === identity &&
+          [Source.ens, Source.keybase].includes(edge.dataSource as Source)
+        );
+      } else {
+        return edge.target === key;
       }
-    } else if (edge.target === key) {
-      sourceSet.add(edge.dataSource as Source);
-    }
-  }
+    })
+    .map((edge) => edge.dataSource as Source);
 
-  return Array.from(sourceSet);
+  return Array.from(new Set(sources));
 };
 
 export const resolveIdentityBatch = (input: string[]): string[] => {
@@ -532,4 +537,16 @@ const processProfileAvatar = async (
   } catch {
     return null;
   }
+};
+
+const checkoutFarcasterAddress = (addresses: AddressRecord[]) => {
+  if (!addresses.length) return null;
+  const primaryAddress =
+    addresses.find((x) => x.network === Network.ethereum && x.isPrimary) ||
+    addresses.find((x) => x.isPrimary);
+  return (
+    primaryAddress?.address ||
+    addresses.find((x) => x.network === Network.ethereum)?.address ||
+    addresses[0].address
+  );
 };

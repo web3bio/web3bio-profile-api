@@ -68,6 +68,11 @@ const GET_PROFILES_NS = `
         displayName
         avatar
         description
+        addresses {
+          address
+          network
+          isPrimary
+        }
       }
       identityGraph {
         vertices {
@@ -87,6 +92,11 @@ const GET_PROFILES_NS = `
             identity
             platform
             address
+            addresses {
+              address
+              network
+              isPrimary
+            }
             displayName
             avatar
             description
@@ -123,6 +133,11 @@ const GET_PROFILES = `
         description
         contenthash
         texts
+        addresses {
+          address
+          network
+          isPrimary
+        }
         social {
           uid
           follower
@@ -154,6 +169,11 @@ const GET_PROFILES = `
             description
             contenthash
             texts
+            addresses {
+              address
+              network
+              isPrimary
+            }
             social {
               uid
               follower
@@ -199,6 +219,11 @@ const GET_BATCH = `
         platform
         texts
         uid
+        addresses {
+          address
+          network
+          isPrimary
+        }
         social {
           follower
           following
@@ -232,6 +257,11 @@ const GET_BATCH_UNIVERSAL = `
         description
         identity
         platform
+        addresses {
+          address
+          network
+          isPrimary
+        }
       }
       identityGraph {
         vertices {
@@ -254,6 +284,11 @@ const GET_BATCH_UNIVERSAL = `
             description
             identity
             platform
+            addresses {
+              address
+              network
+              isPrimary
+            }
           }
         }
       }
@@ -293,6 +328,7 @@ const GET_DOMAIN_SINGLE = `
         addresses {
           address
           network
+          isPrimary
         }
       }
     }
@@ -357,6 +393,7 @@ const GET_DOMAIN = `
         addresses {
           address
           network
+          isPrimary
         }
       }
     }
