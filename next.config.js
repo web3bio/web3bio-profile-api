@@ -1,12 +1,8 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Enable React Strict Mode for better development experience
   reactStrictMode: true,
-  // Disable trailing slashes for cleaner URLs
   trailingSlash: false,
-  // Hide Next.js from the response headers
   poweredByHeader: false,
-  // Enable compression
   compress: true,
 
   // Rewrite all paths to /api/ for API routing
@@ -64,4 +60,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+module.exports = nextConfig;
