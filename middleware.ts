@@ -15,11 +15,11 @@ async function verifyAuth(token: string) {
 
 export const config = {
   matcher: [
+    "/profile/:path*",
     "/avatar/:path*",
+    "/credential/:path*",
     "/domain/:path*",
     "/ns/:path*",
-    "/profile/:path*",
-    "/credential/:path*",
   ],
 };
 
@@ -33,6 +33,9 @@ function getClientIP(req: NextRequest): string {
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[1].trim();
   }
+  console.log(
+    `IP: ${req.headers.get("x-forwarded-for")} ${req.headers.get("x-real-ip")} ${req.headers.get("cf-connecting-ip")}`,
+  );
   return ip || "unknown";
 }
 
@@ -57,7 +60,7 @@ function logWithInfo(token: string) {
 
 export async function middleware(req: NextRequest, env?: any) {
   const userToken = req.headers.get("x-api-key");
-
+  console.log(env.API_RATE_LIMIT);
   if (userToken) {
     const verifiedToken = await verifyAuth(userToken.replace("Bearer ", ""));
     if (verifiedToken) {
@@ -75,8 +78,10 @@ export async function middleware(req: NextRequest, env?: any) {
 
   // Rate limiting for unauthenticated or invalid API key
   const clientIP = getClientIP(req);
+
   if (env && env.API_RATE_LIMIT) {
     const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
+
     if (!success) {
       return NextResponse.json(
         {
