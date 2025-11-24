@@ -1,7 +1,7 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.2.1",
-  "packageManager": "pnpm@10.20.0",
+  "version": "0.3.0",
+  "packageManager": "pnpm@10.23.0",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
   "scripts": {
@@ -12,20 +12,20 @@
     "test:all": "jest",
     "lint": "eslint .",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --remote --port 3000",
     "staging": "opennextjs-cloudflare build && wrangler versions upload",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.11.0",
+    "@opennextjs/cloudflare": "^1.13.1",
     "graphql": "^16.11.0",
     "highlight.js": "11.11.1",
     "jose": "^5.10.0",
     "next": "15.5.6",
     "react": "19.2.0",
     "react-dom": "19.2.0",
-    "viem": "^2.30.5",
-    "web3bio-profile-kit": "^0.1.30"
+    "viem": "^2.39.3",
+    "web3bio-profile-kit": "^0.1.33"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
@@ -40,6 +40,6 @@
     "ts-jest": "^29.3.4",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3",
-    "wrangler": "^4.45.0"
+    "wrangler": "^4.50.0"
   }
 }

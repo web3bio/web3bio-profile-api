@@ -3,17 +3,13 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
 
-type RouteParams = {
-  params: Promise<{
-    ids: string;
-  }>;
-};
-
-export async function GET(req: NextRequest, { params }: RouteParams) {
+export async function GET(
+  req: NextRequest,
+  { params }: { params: Promise<{ ids: string }> },
+) {
   const { ids: idsParam } = await params;
   const { pathname } = req.nextUrl;
 
-  // Early validation for missing ids parameter
   if (!idsParam) {
     return errorHandle({
       identity: "",
@@ -27,11 +23,9 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const headers = getUserHeaders(req.headers);
 
   try {
-    // Decode URL-encoded JSON
     const decodedIds = decodeURIComponent(idsParam);
     const ids = JSON.parse(decodedIds);
 
-    // Validate that ids is an array
     if (!Array.isArray(ids)) {
       return errorHandle({
         identity: idsParam,
@@ -45,7 +39,6 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const resJson = await queryIdentityGraphBatch(ids, false, headers);
     return respondWithCache(resJson);
   } catch (e: unknown) {
-    // More specific error handling for JSON parsing vs other errors
     const isParseError = e instanceof SyntaxError;
 
     return errorHandle({
