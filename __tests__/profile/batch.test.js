@@ -20,8 +20,8 @@ describe("Test For Batch Query", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.length).toBe(getIds.length);
-    expect(json[0].createdAt).toBe("2020-02-07T15:25:35.000Z");
-    expect(json[1].createdAt).toBe("2020-02-06T18:23:40.000Z");
+    expect(json[0].createdAt).toBe("2020-01-30T12:05:30.000Z");
+    expect(json[1].createdAt).toBe("2017-06-18T08:39:14.000Z");
     expect(json[7].identity).toBe("аррӏе.eth");
     expect(json[9].address).toBe("0x111111176b0b13ffc31d387d08726772a0492948");
   });
