@@ -9,7 +9,7 @@ describe("Test For ENS Profile API", () => {
     expect(json.status).toBe(
       "building an onchain social graph for ethereum accounts",
     );
-    expect(json.createdAt).toBe("2020-02-04T02:23:59.000Z");
+    expect(json.createdAt).toBe("2017-06-15T02:40:38.000Z");
     expect(json.links.twitter.handle).toBe("brantlymillegan");
     expect(json.links.twitter.link).toBe("https://x.com/brantlymillegan");
   });
