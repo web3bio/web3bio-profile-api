@@ -428,7 +428,6 @@ export async function queryIdentityGraph(
   if (!platform) {
     return { errors: `Unable to detect platform for handle: ${handle}` };
   }
-
   try {
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
@@ -448,6 +447,7 @@ export async function queryIdentityGraph(
     if (!response.ok) {
       return {
         errors: `HTTP ${response.status}: ${response.statusText}`,
+        code: response.status,
       };
     }
 
