@@ -1,5 +1,5 @@
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { BASE_URL, errorHandle, getUserHeaders } from "@/utils/utils";
+import { errorHandle, getUserHeaders, IMAGE_API_ENDPOINT } from "@/utils/utils";
 import { type NextRequest, NextResponse } from "next/server";
 import {
   type Platform,
@@ -80,7 +80,7 @@ export async function GET(
     const isWebP = await isWebPUrl(avatarUrl);
     return NextResponse.redirect(
       isWebP
-        ? `${BASE_URL}/avatar/process?url=${encodeURIComponent(avatarUrl)}`
+        ? `${IMAGE_API_ENDPOINT}/?url=${encodeURIComponent(avatarUrl)}&og`
         : avatarUrl,
     );
   } catch {

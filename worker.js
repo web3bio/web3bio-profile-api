@@ -9,10 +9,6 @@ const CACHEABLE_API_PATHS = [
 ];
 
 function isCacheableApiPath(pathname) {
-  // Exclude webp process from caching
-  if (pathname.startsWith("/avatar/process")) {
-    return false;
-  }
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
