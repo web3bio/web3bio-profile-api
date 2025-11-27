@@ -1,4 +1,6 @@
+import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
+import { getClientIP } from "./utils/utils.js";
 
 const CACHEABLE_API_PATHS = [
   "/avatar/",
@@ -10,6 +12,25 @@ const CACHEABLE_API_PATHS = [
 
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
+}
+
+async function verifyAuth(token, env) {
+  try {
+    const { payload } = await jwtVerify(
+      token,
+      new TextEncoder().encode(env.JWT_KEY),
+    );
+    return payload;
+  } catch {
+    return null;
+  }
+}
+
+function logWithInfo(token) {
+  const message = {
+    key: token?.replace("Bearer ", ""),
+  };
+  return console.log(JSON.stringify(message));
 }
 
 const workerConfig = {
@@ -24,6 +45,53 @@ const workerConfig = {
       !isCacheableApiPath(pathname)
     ) {
       return openNextHandler.fetch(request, env, ctx);
+    }
+
+    // Verify API key
+    const userToken = request.headers.get("x-api-key");
+    let isValidApiKey = false;
+
+    if (userToken) {
+      const verifiedToken = await verifyAuth(
+        userToken.replace("Bearer ", ""),
+        env,
+      );
+
+      if (verifiedToken) {
+        // Valid API key, skip rate limiting
+        isValidApiKey = true;
+        logWithInfo(userToken);
+      } else {
+        // Invalid API key
+        return new Response(
+          JSON.stringify({
+            address: null,
+            identity: null,
+            platform: null,
+            error: "Invalid API Token",
+          }),
+          { status: 403 },
+        );
+      }
+    }
+
+    // Rate limiting for unauthenticated or invalid API key
+    if (!isValidApiKey) {
+      const clientIP = getClientIP(request);
+      if (env && env.API_RATE_LIMIT) {
+        const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
+        if (!success) {
+          return new Response(
+            JSON.stringify({
+              address: null,
+              identity: null,
+              platform: null,
+              error: "429 Too Many Requests",
+            }),
+            { status: 429 },
+          );
+        }
+      }
     }
 
     // Bypass cache if no-cache requested

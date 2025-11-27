@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { normalize } from "viem/ens";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, errorHandleProps } from "./types";
@@ -105,3 +105,14 @@ export const normalizeText = (input?: string): string => {
 export const formatTimestamp = (timestamp: number): string => {
   return new Date(timestamp * 1000).toISOString();
 };
+
+export function getClientIP(req: NextRequest): string {
+  let ip =
+    req.headers.get("x-forwarded-for") ||
+    req.headers.get("x-real-ip") ||
+    req.headers.get("cf-connecting-ip");
+  if (ip && ip.includes(",")) {
+    ip = ip.split(",")[1].trim();
+  }
+  return ip || "unknown";
+}
