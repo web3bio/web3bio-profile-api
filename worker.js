@@ -76,23 +76,23 @@ const workerConfig = {
     }
 
     // Rate limiting for unauthenticated or invalid API key
-    if (!isValidApiKey) {
-      const clientIP = getClientIP(request);
-      if (env && env.API_RATE_LIMIT) {
-        const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
-        if (!success) {
-          return new Response(
-            JSON.stringify({
-              address: null,
-              identity: null,
-              platform: null,
-              error: "429 Too Many Requests",
-            }),
-            { status: 429 },
-          );
-        }
-      }
-    }
+    // if (!isValidApiKey) {
+    //   const clientIP = getClientIP(request);
+    //   if (env && env.API_RATE_LIMIT) {
+    //     const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
+    //     if (!success) {
+    //       return new Response(
+    //         JSON.stringify({
+    //           address: null,
+    //           identity: null,
+    //           platform: null,
+    //           error: "429 Too Many Requests",
+    //         }),
+    //         { status: 429 },
+    //       );
+    //     }
+    //   }
+    // }
 
     // Bypass cache if no-cache requested
     if (
