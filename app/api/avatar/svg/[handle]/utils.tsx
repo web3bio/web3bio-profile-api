@@ -310,7 +310,7 @@ export const respondWithSVG = async (
           filter="url(#filter_${maskID})"
           d="M32.414 59.35L50.376 70.5H72.5v-71H33.728L26.5 13.381l19.057 27.08L32.414 59.35z"
           fill="${properties[1].color}"
-          transform="translate(${properties[1].translateX} ${properties[1].translateY}) rotate(${properties[1].rotate} ${SIZE / 2} ${SIZE / 2}) scale(${properties[2].scale})"
+          transform="translate(${properties[1].translateX} ${properties[1].translateY}) rotate(${properties[1].rotate} ${SIZE / 2} ${SIZE / 2}) scale(${properties[1].scale})"
         />
         <path
           filter="url(#filter_${maskID})"
