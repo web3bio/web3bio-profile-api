@@ -1,29 +1,11 @@
-import { getPlatform, getNetwork, REGEX } from "web3bio-profile-kit/utils";
+import {
+  getPlatform,
+  getNetwork,
+  REGEX,
+  resolveMediaURL,
+} from "web3bio-profile-kit/utils";
 import { Platform } from "web3bio-profile-kit/types";
-import { ARWEAVE_ASSET_PREFIX, BASE_URL, OPENSEA_API_ENDPOINT } from "./utils";
-import { isIPFS_Resource, resolveIPFS_URL } from "./ipfs";
-
-export const resolveMediaURL = (url: string, id?: string): string | null => {
-  if (!url) return null;
-
-  // Handle data URLs and HTTPS URLs directly
-  if (url.startsWith("data:") || url.startsWith("https://")) {
-    return url;
-  }
-
-  // Handle Arweave URLs
-  if (url.startsWith("ar://")) {
-    return ARWEAVE_ASSET_PREFIX + url.slice(5);
-  }
-
-  // Handle IPFS URLs
-  if (url.startsWith("ipfs://") || isIPFS_Resource(url)) {
-    return resolveIPFS_URL(url) || url;
-  }
-
-  // Default fallback
-  return id ? `${BASE_URL}/avatar/svg/${encodeURIComponent(id)}` : url;
-};
+import { OPENSEA_API_ENDPOINT } from "./utils";
 
 export const resolveHandle = (
   handle: string,

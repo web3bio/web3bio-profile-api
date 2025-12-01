@@ -1,89 +1,101 @@
 import { getPlatform, resolveIdentity } from "web3bio-profile-kit/utils";
 import type { Platform } from "web3bio-profile-kit/types";
 
-const ITEMS = 12;
-const SIZE = 480;
-const ELEMENTS = 144;
-const UNIT = 40;
+const SIZE = 80;
+const ELEMENTS = 3;
 
-type AvatarPixelProps = {
-  colors: string[];
-  title: string;
-  size: number;
+// Utility functions for avatar
+const getDigit = (number: number, ntn: number): number => {
+  return Math.floor((number / Math.pow(10, ntn)) % 10);
 };
 
-const AvatarPixel = ({ colors, title, size }: AvatarPixelProps) => {
-  const pixelColors = generateColors(title, colors);
-  const maskID = String(hashCode(title));
-
-  return (
-    <svg
-      viewBox={`0 0 ${SIZE} ${SIZE}`}
-      fill="none"
-      role="img"
-      xmlns="http://www.w3.org/2000/svg"
-      width={size}
-      height={size}
-    >
-      <mask
-        id={maskID}
-        maskUnits="userSpaceOnUse"
-        x={0}
-        y={0}
-        width={SIZE}
-        height={SIZE}
-      >
-        <rect width={SIZE} height={SIZE} fill="#FFFFFF" />
-      </mask>
-      <g mask={`url(#${maskID})`}>
-        <rect width={SIZE} height={SIZE} fill={colors[0]} />
-        {Array.from({ length: ELEMENTS }, (_, index) => {
-          const row = Math.floor(index / ITEMS);
-          const col = index % ITEMS;
-          return (
-            <rect
-              key={index}
-              x={col * UNIT}
-              y={row * UNIT}
-              width={UNIT}
-              height={UNIT}
-              fill={pixelColors[index]}
-            />
-          );
-        })}
-      </g>
-    </svg>
-  );
+const getUnit = (number: number, range: number, index?: number): number => {
+  const value = number % range;
+  if (index && getDigit(number, index) % 2 === 0) {
+    return -value;
+  }
+  return value;
 };
 
-function generateColors(name: string, colors: string[]): string[] {
-  const numFromName = hashCode(name);
-  const validColors = colors?.length
-    ? colors
-    : ["#92A1C6", "#146A7C", "#F0AB3D", "#C271B4"];
+const getRandomColor = (
+  number: number,
+  colors: string[],
+  range: number,
+): string => {
+  return colors[number % range];
+};
 
-  return Array.from({ length: ELEMENTS }, (_, i) => {
-    const hash = (numFromName % (i + 1)) * (i + 11);
-    const baseColorIndex = Math.abs(hash) % validColors.length;
-    const baseColor = validColors[baseColorIndex];
+function generateRandomColors(
+  name: string,
+  platformColor: string,
+  count: number = 5,
+): string[] {
+  const hash = hashCode(name);
+  const colors: string[] = [];
 
-    // Only process hex colors
-    if (!/^#[A-Fa-f0-9]{6}$/.test(baseColor)) {
-      return baseColor;
+  // Parse platform color to HSL
+  let platformHSL = [0, 0.7, 0.65];
+  if (platformColor.startsWith("#")) {
+    const r = parseInt(platformColor.slice(1, 3), 16) / 255;
+    const g = parseInt(platformColor.slice(3, 5), 16) / 255;
+    const b = parseInt(platformColor.slice(5, 7), 16) / 255;
+    platformHSL = rgbToHsl(r * 255, g * 255, b * 255);
+  }
+
+  const baseHue = platformHSL[0] * 360;
+  const baseSat = platformHSL[1];
+
+  for (let i = 0; i < count; i++) {
+    const seed = hash * (i + 1) + i * 137;
+    let h, s, l;
+
+    if (i === 0) {
+      // Primary: Very close to platform color (slight brightening only)
+      h = baseHue;
+      s = Math.min(0.9, baseSat) * 100; // Use platform saturation (max 90%)
+      l = Math.min(85, Math.max(65, platformHSL[2] * 100 + 5)); // Close to platform lightness, but ensure bright
+    } else if (i === 1) {
+      // Analogous: Close hue neighbor (+/- 30 degrees)
+      const shift = (seed % 2 === 0 ? 1 : -1) * (20 + (seed % 30));
+      h = (baseHue + shift + 360) % 360;
+      s = Math.min(0.8, baseSat + 0.05) * 100;
+      l = 68 + ((seed >> 8) % 17); // 68-85%
+    } else if (i === 2) {
+      // Complementary or split-complementary
+      const shift = 150 + ((seed >> 4) % 60); // 150-210 degrees
+      h = (baseHue + shift) % 360;
+      s = Math.min(0.75, baseSat) * 100;
+      l = 65 + ((seed >> 12) % 20); // 65-85%
+    } else {
+      // Triadic or additional harmony
+      const shift = i === 3 ? 120 : 240;
+      h = (baseHue + shift + ((seed >> 6) % 30)) % 360;
+      s = Math.min(0.75, baseSat + 0.05) * 100;
+      l = 67 + ((seed >> 10) % 18); // 67-85%
     }
 
-    const r = parseInt(baseColor.slice(1, 3), 16);
-    const g = parseInt(baseColor.slice(3, 5), 16);
-    const b = parseInt(baseColor.slice(5, 7), 16);
+    const hue = h / 360;
+    const sat = s / 100;
+    const light = l / 100;
 
-    const variationFactor = 1 + 0.25 * (((hash & 0xff) / 255) * 2 - 1);
+    const [r, g, b] = hslToRgb(hue, sat, light);
+    colors.push(rgbToHex(Math.round(r), Math.round(g), Math.round(b)));
+  }
 
-    const newR = Math.min(255, Math.max(0, Math.round(r * variationFactor)));
-    const newG = Math.min(255, Math.max(0, Math.round(g * variationFactor)));
-    const newB = Math.min(255, Math.max(0, Math.round(b * variationFactor)));
+  return colors;
+}
 
-    return `#${newR.toString(16).padStart(2, "0")}${newG.toString(16).padStart(2, "0")}${newB.toString(16).padStart(2, "0")}`;
-  });
+function generateProperties(name: string, colors: string[]) {
+  const numFromName = hashCode(name);
+  const range = colors?.length || 3;
+
+  return Array.from({ length: ELEMENTS }, (_, i) => ({
+    color: getRandomColor(numFromName + i, colors, range),
+    translateX: getUnit(numFromName * (i + 1), SIZE / 10, 1),
+    translateY: getUnit(numFromName * (i + 1), SIZE / 10, 2),
+    scale: 1.2 + getUnit(numFromName * (i + 1), SIZE / 20) / 10,
+    rotate: getUnit(numFromName * (i + 1), 360, 1),
+  }));
 }
 
 const hashCode = (name: string): number => {
@@ -265,12 +277,12 @@ export const respondWithSVG = async (
 ): Promise<Response> => {
   const id = resolveIdentity(name);
   const platform = id?.split(",")[0] as Platform;
-  const themecolorbase = platform
-    ? getPlatform(platform).color || "#000"
-    : "#000";
+  const platformColor = platform
+    ? getPlatform(platform).color || "#7c66ff"
+    : "#7c66ff";
 
-  const colors = getThemeColor(name, themecolorbase);
-  const pixelColors = generateColors(name, colors);
+  const colors = generateRandomColors(name, platformColor, 5);
+  const properties = generateProperties(name, colors);
   const maskID = String(hashCode(name));
 
   const svg = `
@@ -290,16 +302,35 @@ export const respondWithSVG = async (
         width="${SIZE}"
         height="${SIZE}"
       >
-        <rect width="${SIZE}" height="${SIZE}" fill="#FFFFFF" />
+        <rect width="${SIZE}" height="${SIZE}" rx="${SIZE * 2}" fill="#FFFFFF" />
       </mask>
       <g mask="url(#${maskID})">
-        <rect width="${SIZE}" height="${SIZE}" fill="${colors[0]}" />
-        ${Array.from({ length: ELEMENTS }, (_, index) => {
-          const row = Math.floor(index / ITEMS);
-          const col = index % ITEMS;
-          return `<rect x="${col * UNIT}" y="${row * UNIT}" width="${UNIT}" height="${UNIT}" fill="${pixelColors[index]}" />`;
-        }).join("")}
+        <rect width="${SIZE}" height="${SIZE}" fill="${properties[0].color}" />
+        <path
+          filter="url(#filter_${maskID})"
+          d="M32.414 59.35L50.376 70.5H72.5v-71H33.728L26.5 13.381l19.057 27.08L32.414 59.35z"
+          fill="${properties[1].color}"
+          transform="translate(${properties[1].translateX} ${properties[1].translateY}) rotate(${properties[1].rotate} ${SIZE / 2} ${SIZE / 2}) scale(${properties[2].scale})"
+        />
+        <path
+          filter="url(#filter_${maskID})"
+          style="mix-blend-mode: overlay"
+          d="M22.216 24L0 46.75l14.108 38.129L78 86l-3.081-59.276-22.378 4.005 12.972 20.186-23.35 27.395L22.215 24z"
+          fill="${properties[2].color}"
+          transform="translate(${properties[2].translateX} ${properties[2].translateY}) rotate(${properties[2].rotate} ${SIZE / 2} ${SIZE / 2}) scale(${properties[2].scale})"
+        />
       </g>
+      <defs>
+        <filter
+          id="filter_${maskID}"
+          filterUnits="userSpaceOnUse"
+          color-interpolation-filters="sRGB"
+        >
+          <feFlood flood-opacity="0" result="BackgroundImageFix" />
+          <feBlend in="SourceGraphic" in2="BackgroundImageFix" result="shape" />
+          <feGaussianBlur stdDeviation="7" result="effect1_foregroundBlur" />
+        </filter>
+      </defs>
     </svg>
   `.trim();
 

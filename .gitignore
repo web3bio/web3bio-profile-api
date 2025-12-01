@@ -42,3 +42,4 @@ next-env.d.ts
 # Cluodflare
 .open-next
 .wrangler
+.dev.vars

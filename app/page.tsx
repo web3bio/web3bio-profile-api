@@ -6,7 +6,7 @@ import { BASE_URL } from "../utils/utils";
 import CodeBlock from "@/components/CodeBlock";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Web3.bio Profile API - Web3 Identity and Domain Resolver API";
+  const title = "Web3.bio Profile API - ENS, Farcaster and Lens Resolver API";
   const description =
     "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and more into their apps.";
 
@@ -2744,6 +2744,36 @@ export default async function Home() {
               </a>
               .
             </p>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
+              Sept Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added the
+                new <code>credential</code> endpoint and data.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
+              Aug Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-primary">Feature</span> Added the
+                new <code>Profile Kit</code> (
+                <a
+                  href="https://www.npmjs.com/package/web3bio-profile-kit"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title="web3bio-profile-kit"
+                  className="text-underline"
+                >
+                  Link
+                </a>
+                ) for React projects.
+              </li>
+            </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
               June Update
