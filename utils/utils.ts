@@ -112,7 +112,7 @@ export function getClientIP(req: NextRequest): string {
     req.headers.get("x-real-ip") ||
     req.headers.get("cf-connecting-ip");
   if (ip && ip.includes(",")) {
-    ip = ip.split(",")[1].trim();
+    ip = ip.split(",")[0].trim();
   }
   return ip || "unknown";
 }
