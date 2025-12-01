@@ -410,7 +410,7 @@ export const resolveWithIdentityGraph = async ({
       identity: handle,
       platform,
       message: response.errors || ErrorMessages.NOT_FOUND,
-      code: response.errors ? 500 : 404,
+      code: response.code ? response.code : response.errors ? 500 : 404,
     };
   }
 
@@ -491,6 +491,7 @@ export const resolveUniversalHandle = async (
     platform,
     headers,
   );
+
   const resolutionResult = await resolveWithIdentityGraph({
     handle,
     platform,

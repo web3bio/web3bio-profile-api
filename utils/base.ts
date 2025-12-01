@@ -14,6 +14,8 @@ import {
   isValidEthereumAddress,
   isWeb3Address,
   resolveIdentity,
+  isIPFS,
+  resolveIPFS_CID,
 } from "web3bio-profile-kit/utils";
 import {
   errorHandle,
@@ -34,7 +36,6 @@ import type {
   IdentityGraphQueryResponse,
   IdentityRecord,
 } from "@/utils/types";
-import { isIPFS_Resource, resolveIPFS_CID } from "./ipfs";
 
 const UD_ACCOUNTS_LIST = [
   Platform.twitter,
@@ -285,7 +286,7 @@ const resolveContenthash = async (
   // UD
   if (platform === Platform.unstoppableDomains) {
     if (!originalContenthash) return null;
-    return isIPFS_Resource(originalContenthash)
+    return isIPFS(originalContenthash)
       ? `ipfs://${originalContenthash}`
       : originalContenthash;
   }
@@ -302,9 +303,7 @@ const resolveContenthash = async (
 
   if (ipfsHash) {
     if (/^(https?:\/\/|ipfs:\/\/)/i.test(ipfsHash)) return ipfsHash;
-    return isIPFS_Resource(ipfsHash)
-      ? `ipfs://${resolveIPFS_CID(ipfsHash)}`
-      : null;
+    return isIPFS(ipfsHash) ? `ipfs://${resolveIPFS_CID(ipfsHash)}` : null;
   }
 
   if (originalContenthash) {
@@ -312,7 +311,7 @@ const resolveContenthash = async (
     if (ipnsMatch?.[1]) {
       return `ipns://${ipnsMatch[1]}`;
     }
-    if (isIPFS_Resource(originalContenthash)) {
+    if (isIPFS(originalContenthash)) {
       return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
     }
   }
