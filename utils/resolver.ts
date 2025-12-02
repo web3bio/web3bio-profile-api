@@ -135,6 +135,6 @@ export const resolveEipAssetURL = async (
 
 export const getAlchemyBaseUrl = (network: Network) => {
   if (network === Network.ethereum) return "eth";
-  if (network === Network.optimism) return "op";
+  if (network === Network.optimism) return "opt";
   return network;
 };
