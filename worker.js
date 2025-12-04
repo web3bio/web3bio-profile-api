@@ -1,6 +1,6 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
-import { getClientIP } from "./utils/utils.js";
+import { withLogging } from "./utils/logger.ts";
 
 const CACHEABLE_API_PATHS = [
   "/avatar/",
@@ -26,14 +26,7 @@ async function verifyAuth(token, env) {
   }
 }
 
-function logWithInfo(token) {
-  const message = {
-    key: token?.replace("Bearer ", ""),
-  };
-  return console.log(JSON.stringify(message));
-}
-
-const workerConfig = {
+const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
@@ -60,7 +53,7 @@ const workerConfig = {
       if (verifiedToken) {
         // Valid API key, skip rate limiting
         isValidApiKey = true;
-        logWithInfo(userToken);
+        console.log("[Auth]", userToken);
       } else {
         // Invalid API key
         return new Response(
@@ -148,4 +141,4 @@ const workerConfig = {
   },
 };
 
-export default workerConfig;
+export default withLogging(handler);
