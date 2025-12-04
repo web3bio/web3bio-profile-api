@@ -4,17 +4,6 @@
   "main": "worker.js",
   "compatibility_date": "2025-07-30",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
-  "observability": {
-    "enabled": true,
-    "logs": {
-      "enabled": true,
-      "destinations": ["axiom-logs"],
-    },
-    "traces": {
-      "enabled": true,
-      "destinations": ["axiom-traces"],
-    },
-  },
   "workers_dev": true,
   "placement": {
     "mode": "smart",
@@ -28,8 +17,8 @@
       "name": "API_RATE_LIMIT",
       "namespace_id": "1001",
       "simple": {
-        "limit": 2,
-        "period": 10,
+        "limit": 30,
+        "period": 60,
       },
     },
   ],

@@ -1,12 +1,14 @@
-export const withLogging = (handler: any) => {
+const LOG_PATHS = ["/avatar/", "/domain/", "/ns/", "/profile/", "/credential/"];
+
+export const withLogging = (handler) => {
   return {
-    async fetch(request: Request, env: any, ctx: any) {
+    async fetch(request, env, ctx) {
       const url = new URL(request.url);
       const startTime = Date.now();
 
       const response = await handler.fetch(request, env, ctx);
-
-      if (url.pathname.startsWith("/api/")) {
+      console.log(url, "kkk");
+      if (LOG_PATHS.some((path) => url.pathname.startsWith(path))) {
         const duration = Date.now() - startTime;
         const pathParts = url.pathname.split("/");
         const endpoint = pathParts[2] || "unknown";
@@ -32,8 +34,8 @@ export const withLogging = (handler: any) => {
             request.headers.get("x-real-ip") ||
             request.headers.get("cf-connecting-ip") ||
             "unknown",
-          country: (request as any).cf?.country || "unknown",
-          city: (request as any).cf?.city || "unknown",
+          country: request.cf?.country || "unknown",
+          city: request.cf?.city || "unknown",
           cache_hit: response.headers.get("X-CACHE-HIT") || "none",
           cache_age: response.headers.get("X-Cache-Age") || "0",
           content_length: response.headers.get("content-length") || "0",
@@ -46,7 +48,7 @@ export const withLogging = (handler: any) => {
                 ? "client_error"
                 : "none",
         };
-
+        console.log(logData, "kkk");
         ctx.waitUntil(
           fetch(
             `https://api.axiom.co/v1/datasets/${env.AXIOM_DATASET}/ingest`,

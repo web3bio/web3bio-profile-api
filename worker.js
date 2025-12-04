@@ -1,6 +1,6 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
-import { withLogging } from "./utils/logger.ts";
+import { withLogging } from "./utils/logger.js";
 
 const CACHEABLE_API_PATHS = [
   "/avatar/",
