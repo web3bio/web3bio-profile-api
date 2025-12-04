@@ -30,7 +30,6 @@ const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
-
     // Bypass caching for non-cacheable paths
     if (
       pathname.startsWith("/_next/") ||
@@ -53,7 +52,6 @@ const handler = {
       if (verifiedToken) {
         // Valid API key, skip rate limiting
         isValidApiKey = true;
-        console.log("[Auth]", userToken);
       } else {
         // Invalid API key
         return new Response(

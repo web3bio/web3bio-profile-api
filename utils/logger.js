@@ -7,7 +7,6 @@ export const withLogging = (handler) => {
       const startTime = Date.now();
 
       const response = await handler.fetch(request, env, ctx);
-      console.log(url, "kkk");
       if (LOG_PATHS.some((path) => url.pathname.startsWith(path))) {
         const duration = Date.now() - startTime;
         const pathParts = url.pathname.split("/");
@@ -48,7 +47,6 @@ export const withLogging = (handler) => {
                 ? "client_error"
                 : "none",
         };
-        console.log(logData, "kkk");
         ctx.waitUntil(
           fetch(
             `https://api.axiom.co/v1/datasets/${env.AXIOM_DATASET}/ingest`,
