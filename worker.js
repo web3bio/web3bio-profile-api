@@ -10,10 +10,35 @@ const CACHEABLE_API_PATHS = [
   "/credential/",
 ];
 
+const TRUSTED_DOMAINS = ["https://web3.bio", "https://staging.web3.bio"];
+
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
+function isTrustedOrigin(request) {
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+  const secFetchSite = request.headers.get("sec-fetch-site");
+
+  if (!secFetchSite) {
+    return false;
+  }
+
+  if (secFetchSite !== "same-site" && secFetchSite !== "same-origin") {
+    return false;
+  }
+
+  const isFromTrusted = TRUSTED_DOMAINS.some(
+    (domain) => origin?.startsWith(domain) || referer?.startsWith(domain),
+  );
+
+  if (!isFromTrusted) {
+    return false;
+  }
+
+  return true;
+}
 async function verifyAuth(token, env) {
   try {
     const { payload } = await jwtVerify(
@@ -67,23 +92,23 @@ const handler = {
     }
 
     // Rate limiting for unauthenticated or invalid API key
-    // if (!isValidApiKey) {
-    //   const clientIP = getClientIP(request);
-    //   if (env && env.API_RATE_LIMIT) {
-    //     const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
-    //     if (!success) {
-    //       return new Response(
-    //         JSON.stringify({
-    //           address: null,
-    //           identity: null,
-    //           platform: null,
-    //           error: "429 Too Many Requests",
-    //         }),
-    //         { status: 429 },
-    //       );
-    //     }
-    //   }
-    // }
+    if (!isValidApiKey && !isTrustedOrigin(request)) {
+      const clientIP = request.headers.get("cf-connecting-ip") || "unknown";
+      if (env && env.API_RATE_LIMIT) {
+        const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
+        if (!success) {
+          return new Response(
+            JSON.stringify({
+              address: null,
+              identity: null,
+              platform: null,
+              error: "429 Too Many Requests",
+            }),
+            { status: 429 },
+          );
+        }
+      }
+    }
 
     // Bypass cache if no-cache requested
     if (
