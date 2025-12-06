@@ -103,38 +103,57 @@ export const resolveEipAssetURL = async (
     return resolveMediaURL(source);
   }
 
-  // Check API key availability early to avoid unnecessary processing
-  const apiKey = process.env.ALCHEMY_NFT_API_KEY;
-  if (!apiKey) {
-    console.warn(
-      "ALCHEMY_NFT_API_KEY not configured, falling back to source URL",
-    );
-    return resolveMediaURL(source);
-  }
-  const alchemyBase = getAlchemyBaseUrl(network as Network);
-  try {
-    const fetchURL = `https://${alchemyBase}-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_NFT_API_KEY}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`;
-    const response = await fetch(fetchURL);
-    if (!response.ok) {
-      console.warn(
-        `OpenSea API request failed: ${response.status} ${response.statusText}`,
-      );
-      return resolveMediaURL(source);
+  // Try OpenSea first
+  const openseaApiKey = process.env.OPENSEA_API_KEY;
+  if (openseaApiKey) {
+    try {
+      const fetchURL = `https://api.opensea.io/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
+      const response = await fetch(fetchURL, {
+        headers: { "x-api-key": openseaApiKey },
+      });
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl = data?.nft?.image_url;
+        if (imageUrl) {
+          return resolveMediaURL(imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch NFT data from OpenSea:", error);
     }
-
-    const data = await response.json();
-    const imageUrl =
-      data?.image?.cachedUrl || data?.image?.pngUrl || data?.image?.originalUrl;
-
-    return imageUrl ? resolveMediaURL(imageUrl) : resolveMediaURL(source);
-  } catch (error) {
-    console.error("Failed to fetch NFT data from Alchemy:", error);
-    return resolveMediaURL(source);
   }
+
+  // Fallback to Alchemy
+  const alchemyApiKey = process.env.ALCHEMY_NFT_API_KEY;
+  if (alchemyApiKey) {
+    const alchemyBase = getAlchemyBaseUrl(network as Network);
+    try {
+      const fetchURL = `https://${alchemyBase}-mainnet.g.alchemy.com/nft/v3/${alchemyApiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`;
+      const response = await fetch(fetchURL);
+      if (response.ok) {
+        const data = await response.json();
+        const imageUrl =
+          data?.image?.cachedUrl ||
+          data?.image?.pngUrl ||
+          data?.image?.originalUrl;
+        if (imageUrl) {
+          return resolveMediaURL(imageUrl);
+        }
+      }
+    } catch (error) {
+      console.error("Failed to fetch NFT data from Alchemy:", error);
+    }
+  }
+
+  // Final fallback
+  return resolveMediaURL(source);
 };
 
 export const getAlchemyBaseUrl = (network: Network) => {
   if (network === Network.ethereum) return "eth";
   if (network === Network.optimism) return "opt";
+  if (network === Network.polygon) return "polygon";
+  if (network === Network.arbitrum) return "arb";
+  if (network === Network.base) return "base";
   return network;
 };

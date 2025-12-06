@@ -90,7 +90,11 @@ const handler = {
     }
 
     // Rate limiting for unauthenticated or invalid API key
-    if (!isValidApiKey && !isTrustedOrigin(request)) {
+    if (
+      !isValidApiKey &&
+      !isTrustedOrigin(request) &&
+      !pathname.startsWith("/avatar/")
+    ) {
       const clientIP = getClientIP(request);
       if (env && env.API_RATE_LIMIT) {
         const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
@@ -107,14 +111,11 @@ const handler = {
     }
 
     // Bypass cache if no-cache requested
-    if (
-      request.headers.get("cache-control") === "no-cache" ||
-      url.searchParams.has("nocache")
-    ) {
-      const response = await openNextHandler.fetch(request, env, ctx);
-      response.headers.set("X-MATCH-PATH", pathname);
-      return response;
-    }
+    // if (request.headers.get("cache-control") === "no-cache") {
+    //   const response = await openNextHandler.fetch(request, env, ctx);
+    //   response.headers.set("X-MATCH-PATH", pathname);
+    //   return response;
+    // }
 
     const cacheKey = new Request(url.toString());
     const cached = await caches.default.match(cacheKey);
