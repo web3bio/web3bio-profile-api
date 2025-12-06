@@ -52,19 +52,23 @@ export const withLogging = (handler) => {
                 ? "client_error"
                 : "none",
         };
-        ctx.waitUntil(
-          fetch(
-            `https://api.axiom.co/v1/datasets/${env.AXIOM_DATASET}/ingest`,
-            {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${env.AXIOM_API_TOKEN}`,
-                "Content-Type": "application/json",
+        if (!env.AXIOM_DATASET || !env.AXIOM_API_TOKEN) {
+          console.warn("Axiom logging skipped: AXIOM_DATASET or AXIOM_API_TOKEN is not defined.");
+        } else {
+          ctx.waitUntil(
+            fetch(
+              `https://api.axiom.co/v1/datasets/${env.AXIOM_DATASET}/ingest`,
+              {
+                method: "POST",
+                headers: {
+                  Authorization: `Bearer ${env.AXIOM_API_TOKEN}`,
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify([logData]),
               },
-              body: JSON.stringify([logData]),
-            },
-          ).catch((err) => console.error("Axiom log error:", err)),
-        );
+            ).catch((err) => console.error("Axiom log error:", err)),
+          );
+        }
       }
 
       return response;
