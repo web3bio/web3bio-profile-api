@@ -1,5 +1,6 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
+import { withLogging } from "./utils/logger.js";
 import { getClientIP } from "./utils/utils.js";
 
 const CACHEABLE_API_PATHS = [
@@ -10,8 +11,33 @@ const CACHEABLE_API_PATHS = [
   "/credential/",
 ];
 
+const TRUSTED_HOSTS = new Set(["web3.bio"]);
+
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
+}
+
+function isHostTrusted(host) {
+  if (!host) return false;
+  return (
+    TRUSTED_HOSTS.has(host) ||
+    Array.from(TRUSTED_HOSTS).some((th) => host.endsWith("." + th))
+  );
+}
+
+function isTrustedOrigin(request) {
+  const origin = request.headers.get("origin");
+  const referer = request.headers.get("referer");
+
+  if (!origin && !referer) return false;
+
+  try {
+    const originHost = origin ? new URL(origin).host : null;
+    const refererHost = referer ? new URL(referer).host : null;
+    return isHostTrusted(originHost) || isHostTrusted(refererHost);
+  } catch {
+    return false;
+  }
 }
 
 async function verifyAuth(token, env) {
@@ -26,18 +52,10 @@ async function verifyAuth(token, env) {
   }
 }
 
-function logWithInfo(token) {
-  const message = {
-    key: token?.replace("Bearer ", ""),
-  };
-  return console.log(JSON.stringify(message));
-}
-
-const workerConfig = {
+const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
-
     // Bypass caching for non-cacheable paths
     if (
       pathname.startsWith("/_next/") ||
@@ -60,14 +78,10 @@ const workerConfig = {
       if (verifiedToken) {
         // Valid API key, skip rate limiting
         isValidApiKey = true;
-        logWithInfo(userToken);
       } else {
         // Invalid API key
         return new Response(
           JSON.stringify({
-            address: null,
-            identity: null,
-            platform: null,
             error: "Invalid API Token",
           }),
           { status: 403 },
@@ -76,23 +90,21 @@ const workerConfig = {
     }
 
     // Rate limiting for unauthenticated or invalid API key
-    // if (!isValidApiKey) {
-    //   const clientIP = getClientIP(request);
-    //   if (env && env.API_RATE_LIMIT) {
-    //     const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
-    //     if (!success) {
-    //       return new Response(
-    //         JSON.stringify({
-    //           address: null,
-    //           identity: null,
-    //           platform: null,
-    //           error: "429 Too Many Requests",
-    //         }),
-    //         { status: 429 },
-    //       );
-    //     }
-    //   }
-    // }
+    if (!isValidApiKey && !isTrustedOrigin(request)) {
+      const clientIP = getClientIP(request);
+      if (env && env.API_RATE_LIMIT) {
+        const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
+        if (!success) {
+          return new Response(
+            JSON.stringify({
+              error:
+                "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
+            }),
+            { status: 429 },
+          );
+        }
+      }
+    }
 
     // Bypass cache if no-cache requested
     if (
@@ -148,4 +160,4 @@ const workerConfig = {
   },
 };
 
-export default workerConfig;
+export default withLogging(handler);
