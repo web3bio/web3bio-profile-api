@@ -4,8 +4,7 @@ import {
   REGEX,
   resolveMediaURL,
 } from "web3bio-profile-kit/utils";
-import { Platform } from "web3bio-profile-kit/types";
-import { OPENSEA_API_ENDPOINT } from "./utils";
+import { Network, Platform } from "web3bio-profile-kit/types";
 
 export const resolveHandle = (
   handle: string,
@@ -105,21 +104,17 @@ export const resolveEipAssetURL = async (
   }
 
   // Check API key availability early to avoid unnecessary processing
-  const apiKey = process.env.OPENSEA_API_KEY;
+  const apiKey = process.env.ALCHEMY_NFT_API_KEY;
   if (!apiKey) {
-    console.warn("OPENSEA_API_KEY not configured, falling back to source URL");
+    console.warn(
+      "ALCHEMY_NFT_API_KEY not configured, falling back to source URL",
+    );
     return resolveMediaURL(source);
   }
-
+  const alchemyBase = getAlchemyBaseUrl(network as Network);
   try {
-    const fetchURL = `${OPENSEA_API_ENDPOINT}/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
-
-    const response = await fetch(fetchURL, {
-      headers: {
-        "x-api-key": apiKey,
-      },
-    });
-
+    const fetchURL = `https://${alchemyBase}-mainnet.g.alchemy.com/nft/v3/${process.env.ALCHEMY_NFT_API_KEY}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`;
+    const response = await fetch(fetchURL);
     if (!response.ok) {
       console.warn(
         `OpenSea API request failed: ${response.status} ${response.statusText}`,
@@ -128,11 +123,18 @@ export const resolveEipAssetURL = async (
     }
 
     const data = await response.json();
-    const imageUrl = data?.nft?.image_url;
+    const imageUrl =
+      data?.image?.cachedUrl || data?.image?.pngUrl || data?.image?.originalUrl;
 
     return imageUrl ? resolveMediaURL(imageUrl) : resolveMediaURL(source);
   } catch (error) {
-    console.error("Failed to fetch NFT data from OpenSea:", error);
+    console.error("Failed to fetch NFT data from Alchemy:", error);
     return resolveMediaURL(source);
   }
+};
+
+export const getAlchemyBaseUrl = (network: Network) => {
+  if (network === Network.ethereum) return "eth";
+  if (network === Network.optimism) return "opt";
+  return network;
 };

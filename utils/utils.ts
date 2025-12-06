@@ -4,7 +4,6 @@ import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, errorHandleProps } from "./types";
 
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
-export const OPENSEA_API_ENDPOINT = "https://api.opensea.io";
 export const BASE_URL = process.env.PROFILE_ENDPOINT || "https://api.web3.bio";
 export const IMAGE_API_ENDPOINT = "https://images.web3.bio";
 export const IDENTITY_GRAPH_SERVER = process.env.GRAPHQL_SERVER || "";
@@ -108,9 +107,9 @@ export const formatTimestamp = (timestamp: number): string => {
 
 export function getClientIP(req: NextRequest): string {
   let ip =
+    req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-forwarded-for") ||
-    req.headers.get("x-real-ip") ||
-    req.headers.get("cf-connecting-ip");
+    req.headers.get("x-real-ip");
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[0].trim();
   }

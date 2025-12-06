@@ -58,7 +58,7 @@ export async function GET(
     const refreshed = res?.data?.identity;
     if (!refreshed) {
       return NextResponse.json(
-        { error: "Failed to refresh profile" },
+        { error: "Failed to refresh profile data" },
         { status: 500 },
       );
     }
