@@ -12,6 +12,10 @@ export const withLogging = (handler) => {
         const pathParts = url.pathname.split("/");
         const endpoint = pathParts[2] || "unknown";
         const identity = pathParts[pathParts.length - 1] || "unknown";
+        const apiKey = (request.headers.get("x-api-key") || "none").replace(
+          "Bearer ",
+          "",
+        );
 
         const logData = {
           _time: new Date().toISOString(),
@@ -28,6 +32,7 @@ export const withLogging = (handler) => {
           duration_ms: duration,
           user_agent: request.headers.get("user-agent") || "unknown",
           content_type: request.headers.get("content-type") || "none",
+          apiKey,
           ip:
             request.headers.get("x-forwarded-for") ||
             request.headers.get("x-real-ip") ||

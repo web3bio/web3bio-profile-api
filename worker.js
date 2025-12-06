@@ -1,6 +1,7 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger.js";
+import { getClientIP } from "./utils/utils.js";
 
 const CACHEABLE_API_PATHS = [
   "/avatar/",
@@ -10,35 +11,35 @@ const CACHEABLE_API_PATHS = [
   "/credential/",
 ];
 
-const TRUSTED_DOMAINS = ["https://web3.bio", "https://staging.web3.bio"];
+const TRUSTED_HOSTS = new Set(["web3.bio"]);
 
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
+function isHostTrusted(host) {
+  if (!host) return false;
+  return (
+    TRUSTED_HOSTS.has(host) ||
+    Array.from(TRUSTED_HOSTS).some((th) => host.endsWith("." + th))
+  );
+}
+
 function isTrustedOrigin(request) {
   const origin = request.headers.get("origin");
   const referer = request.headers.get("referer");
-  const secFetchSite = request.headers.get("sec-fetch-site");
 
-  if (!secFetchSite) {
+  if (!origin && !referer) return false;
+
+  try {
+    const originHost = origin ? new URL(origin).host : null;
+    const refererHost = referer ? new URL(referer).host : null;
+    return isHostTrusted(originHost) || isHostTrusted(refererHost);
+  } catch {
     return false;
   }
-
-  if (secFetchSite !== "same-site" && secFetchSite !== "same-origin") {
-    return false;
-  }
-
-  const isFromTrusted = TRUSTED_DOMAINS.some(
-    (domain) => origin?.startsWith(domain) || referer?.startsWith(domain),
-  );
-
-  if (!isFromTrusted) {
-    return false;
-  }
-
-  return true;
 }
+
 async function verifyAuth(token, env) {
   try {
     const { payload } = await jwtVerify(
@@ -81,9 +82,6 @@ const handler = {
         // Invalid API key
         return new Response(
           JSON.stringify({
-            address: null,
-            identity: null,
-            platform: null,
             error: "Invalid API Token",
           }),
           { status: 403 },
@@ -93,16 +91,14 @@ const handler = {
 
     // Rate limiting for unauthenticated or invalid API key
     if (!isValidApiKey && !isTrustedOrigin(request)) {
-      const clientIP = request.headers.get("cf-connecting-ip") || "unknown";
+      const clientIP = getClientIP(request);
       if (env && env.API_RATE_LIMIT) {
         const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
         if (!success) {
           return new Response(
             JSON.stringify({
-              address: null,
-              identity: null,
-              platform: null,
-              error: "429 Too Many Requests",
+              error:
+                "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
             }),
             { status: 429 },
           );
