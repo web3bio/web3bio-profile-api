@@ -10,7 +10,7 @@ export const withLogging = (handler) => {
       if (LOG_PATHS.some((path) => url.pathname.startsWith(path))) {
         const duration = Date.now() - startTime;
         const pathParts = url.pathname.split("/");
-        const endpoint = pathParts[2] || "unknown";
+        const endpoint = pathParts.slice(0, -1).join("/") || "unknown";
         const identity = pathParts[pathParts.length - 1] || "unknown";
         const apiKey = (request.headers.get("x-api-key") || "none").replace(
           "Bearer ",

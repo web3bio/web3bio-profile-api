@@ -107,9 +107,9 @@ export const formatTimestamp = (timestamp: number): string => {
 
 export function getClientIP(req: NextRequest): string {
   let ip =
+    req.headers.get("cf-connecting-ip") ||
     req.headers.get("x-forwarded-for") ||
-    req.headers.get("x-real-ip") ||
-    req.headers.get("cf-connecting-ip");
+    req.headers.get("x-real-ip");
   if (ip && ip.includes(",")) {
     ip = ip.split(",")[0].trim();
   }
