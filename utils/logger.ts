@@ -1,8 +1,8 @@
 const LOG_PATHS = ["/avatar/", "/domain/", "/ns/", "/profile/", "/credential/"];
 
-export const withLogging = (handler) => {
+export const withLogging = (handler: any) => {
   return {
-    async fetch(request, env, ctx) {
+    async fetch(request: Request, env: any, ctx: any) {
       const url = new URL(request.url);
       const startTime = Date.now();
 
@@ -10,12 +10,15 @@ export const withLogging = (handler) => {
       if (LOG_PATHS.some((path) => url.pathname.startsWith(path))) {
         const duration = Date.now() - startTime;
         const pathParts = url.pathname.split("/");
-        const endpoint = pathParts.slice(0, -1).join("/") || "unknown";
+        const endpoint = pathParts.slice(1, -1).join("/") || "unknown";
         const identity = pathParts[pathParts.length - 1] || "unknown";
-        const apiKey = (request.headers.get("x-api-key") || "none").replace(
-          "Bearer ",
-          "",
-        );
+        const apiKey = (() => {
+          const key = (request.headers.get("x-api-key") || "none").replace(
+            "Bearer ",
+            "",
+          );
+          return key.includes(".") ? key.split(".").pop() : "none";
+        })();
 
         const logData = {
           _time: new Date().toISOString(),
@@ -30,16 +33,16 @@ export const withLogging = (handler) => {
           referer: request.headers.get("referer") || "none",
           success: response.ok,
           duration_ms: duration,
-          user_agent: request.headers.get("user-agent") || "unknown",
+          user_agent: request.headers.get("user-agent"),
           content_type: request.headers.get("content-type") || "none",
           apiKey,
           ip:
+            request.headers.get("cf-connecting-ip") ||
             request.headers.get("x-forwarded-for") ||
             request.headers.get("x-real-ip") ||
-            request.headers.get("cf-connecting-ip") ||
             "unknown",
-          country: request.cf?.country || "unknown",
-          city: request.cf?.city || "unknown",
+          country: (request as any).cf?.country || "unknown",
+          city: (request as any).cf?.city || "unknown",
           cache_hit: response.headers.get("X-CACHE-HIT") || "none",
           cache_age: response.headers.get("X-Cache-Age") || "0",
           content_length: response.headers.get("content-length") || "0",
@@ -53,7 +56,9 @@ export const withLogging = (handler) => {
                 : "none",
         };
         if (!env.AXIOM_DATASET || !env.AXIOM_API_TOKEN) {
-          console.warn("Axiom logging skipped: AXIOM_DATASET or AXIOM_API_TOKEN is not defined.");
+          console.warn(
+            "Axiom logging skipped: AXIOM_DATASET or AXIOM_API_TOKEN is not defined.",
+          );
         } else {
           ctx.waitUntil(
             fetch(
