@@ -499,7 +499,7 @@ export default async function Home() {
                   className="btn btn-sm pt-4 pb-4 ml-2"
                   title="Web3.bio Web3 Identity Graph Search and Link-in-bio Profile Service"
                 >
-                  Release Notes
+                  Release Notes 0.4.1
                 </a>
               </div>
             </div>
