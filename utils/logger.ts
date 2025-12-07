@@ -33,9 +33,9 @@ export const withLogging = (handler: any) => {
           referer: request.headers.get("referer") || "none",
           success: response.ok,
           duration_ms: duration,
-          user_agent: request.headers.get("user-agent"),
+          user_agent: request.headers.get("user-agent") || "unknown",
           content_type: request.headers.get("content-type") || "none",
-          apiKey,
+          api_key: apiKey,
           ip:
             request.headers.get("cf-connecting-ip") ||
             request.headers.get("x-forwarded-for") ||
