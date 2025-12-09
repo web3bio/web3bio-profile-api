@@ -6,7 +6,20 @@ export const withLogging = (handler: any) => {
       const url = new URL(request.url);
       const startTime = Date.now();
 
+      const userAgent = request.headers.get("user-agent") || "unknown";
+      const origin = request.headers.get("origin") || "none";
+      const referer = request.headers.get("referer") || "none";
+      const host = request.headers.get("host") || "unknown";
+      const contentType = request.headers.get("content-type") || "none";
+      const ip =
+        request.headers.get("cf-connecting-ip") ||
+        request.headers.get("x-forwarded-for") ||
+        request.headers.get("x-real-ip") ||
+        "unknown";
+      const cfData = (request as any).cf || {};
+
       const response = await handler.fetch(request, env, ctx);
+
       if (LOG_PATHS.some((path) => url.pathname.startsWith(path))) {
         const duration = Date.now() - startTime;
         const pathParts = url.pathname.split("/");
@@ -28,21 +41,17 @@ export const withLogging = (handler: any) => {
           endpoint,
           identity,
           status: response.status,
-          host: request.headers.get("host") || "unknown",
-          origin: request.headers.get("origin") || "none",
-          referer: request.headers.get("referer") || "none",
+          host,
+          origin,
+          referer,
           success: response.ok,
           duration_ms: duration,
-          user_agent: request.headers.get("user-agent") || "unknown",
-          content_type: request.headers.get("content-type") || "none",
+          user_agent: userAgent,
+          content_type: contentType,
           api_key: apiKey,
-          ip:
-            request.headers.get("cf-connecting-ip") ||
-            request.headers.get("x-forwarded-for") ||
-            request.headers.get("x-real-ip") ||
-            "unknown",
-          country: (request as any).cf?.country || "unknown",
-          city: (request as any).cf?.city || "unknown",
+          ip,
+          country: cfData.country || "unknown",
+          city: cfData.city || "unknown",
           cache_hit: response.headers.get("X-CACHE-HIT") || "none",
           cache_age: response.headers.get("X-Cache-Age") || "0",
           content_length: response.headers.get("content-length") || "0",
@@ -55,6 +64,7 @@ export const withLogging = (handler: any) => {
                 ? "client_error"
                 : "none",
         };
+
         if (!env.AXIOM_DATASET || !env.AXIOM_API_TOKEN) {
           console.warn(
             "Axiom logging skipped: AXIOM_DATASET or AXIOM_API_TOKEN is not defined.",
