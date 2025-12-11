@@ -32,7 +32,7 @@ export const withLogging = (handler: any) => {
           method: request.method,
           path: pathname,
           query: url.search || "none",
-          endpoint: pathParts.slice(1, -1).join("/") || "unknown",
+          endpoint: pathParts.slice(0, -1).join("/") || "unknown",
           identity: pathParts[pathParts.length - 1] || "unknown",
           status,
           host: request.headers.get("host") || "unknown",
@@ -50,7 +50,6 @@ export const withLogging = (handler: any) => {
           cache_age: response.headers.get("X-Cache-Age") || "0",
           content_length: response.headers.get("content-length") || "0",
           level: status >= 400 ? "error" : "info",
-          is_error: status >= 400,
         };
 
         ctx.waitUntil(
