@@ -11,8 +11,8 @@ const CACHEABLE_API_PATHS = [
   "/credential/",
 ];
 
-const TRUSTED_HOSTS = new Set(["web3.bio"]);
-const DEFAULT_SWR = 86400; // 24h stale-while-revalidate for CF cache
+const TRUSTED_HOST = "web3.bio";
+const DEFAULT_SWR = 86400; // 24h
 
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
@@ -20,11 +20,7 @@ function isCacheableApiPath(pathname) {
 
 function isHostTrusted(host) {
   if (!host) return false;
-  if (TRUSTED_HOSTS.has(host)) return true;
-  for (const trustedHost of TRUSTED_HOSTS) {
-    if (host.endsWith("." + trustedHost)) return true;
-  }
-  return false;
+  return host === TRUSTED_HOST || host.endsWith(`.${TRUSTED_HOST}`);
 }
 
 function isTrustedOrigin(request) {
@@ -54,11 +50,11 @@ async function verifyAuth(token, env) {
   }
 }
 
-function makeCacheKey(request) {
-  const url = new URL(request.url);
-  url.searchParams.delete("x-api-key");
-  url.searchParams.sort();
-  return new Request(url.toString());
+function getCacheKey(url) {
+  const cacheUrl = new URL(url);
+  cacheUrl.search = "";
+  cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
+  return new Request(cacheUrl.toString(), { method: "GET" });
 }
 
 function setCacheHeaders(response, ttl) {
@@ -122,13 +118,18 @@ const handler = {
       }
     }
 
-    const cacheKey = makeCacheKey(request);
+    const cacheKey = getCacheKey(url);
     const cached = await caches.default.match(cacheKey);
-    // Return cached response if available
+
+    // Return cached response if available and valid
     if (cached) {
-      const cachedBody = await cached.clone().text();
+      const cachedBody = await cached.text();
       if (cachedBody?.trim()) {
-        const response = new Response(cachedBody, cached);
+        const response = new Response(cachedBody, {
+          status: cached.status,
+          statusText: cached.statusText,
+          headers: cached.headers,
+        });
         response.headers.set("X-CACHE-HIT", "HIT");
         response.headers.set("X-MATCH-PATH", pathname);
         setCacheHeaders(response, getTTL(pathname));
@@ -139,22 +140,29 @@ const handler = {
 
     // Fetch from origin
     const response = await openNextHandler.fetch(request, env, ctx);
+    const ttl = getTTL(pathname);
+
     response.headers.set("X-CACHE-HIT", "MISS");
     response.headers.set("X-MATCH-PATH", pathname);
-    setCacheHeaders(response, getTTL(pathname));
+    setCacheHeaders(response, ttl);
 
     // Cache successful GET responses
     if (response.status === 200 && request.method === "GET") {
-      const bodyText = await response.clone().text();
+      const bodyText = await response.text();
       if (bodyText?.trim()) {
+        const cacheResponse = new Response(bodyText, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
         ctx.waitUntil(
           caches.default
-            .put(cacheKey, response.clone())
+            .put(cacheKey, cacheResponse)
             .catch((err) => console.error("[Cache]", err)),
         );
+        return new Response(bodyText, response);
       }
     }
-
     return response;
   },
 };

@@ -46,8 +46,8 @@ export const withLogging = (handler: any) => {
           ip: getIp(request),
           country: (request as any).cf?.country || "unknown",
           city: (request as any).cf?.city || "unknown",
-          cache_hit: response.headers.get("X-CACHE-HIT") || "none",
-          cache_age: response.headers.get("X-Cache-Age") || "0",
+          cache_hit: response.headers.get("x-cache-hit") || "none",
+          cache_age: response.headers.get("age") || "0",
           content_length: response.headers.get("content-length") || "0",
           level: status >= 500 ? "error" : status >= 400 ? "warn" : "info",
         };
