@@ -1,6 +1,6 @@
 import type { IdentityRecord, AuthHeaders } from "@/utils/types";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
+import { errorHandle, formatTimestamp, respondJson } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
@@ -12,61 +12,46 @@ export const VALID_DOMAIN_PLATFORMS = new Set([
   Platform.basenames,
   Platform.linea,
 ]);
+
 const EXTEND_DOMAIN_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const TARGET_PLATFORMS = new Set([Platform.ens, Platform.sns]);
 
-const generateResponseStruct = (identity: IdentityRecord) => {
-  const {
-    profile,
-    isPrimary,
-    status,
-    registeredAt,
-    updatedAt,
-    expiredAt,
-    resolver,
-  } = identity;
+const formatAddress = (addr?: Array<{ address: string }>) =>
+  addr?.[0]?.address ?? null;
 
-  return {
-    identity: identity.identity,
-    platform: identity.platform,
-    resolvedAddress: identity.resolvedAddress?.[0]?.address ?? null,
-    ownerAddress: identity.ownerAddress?.[0]?.address ?? null,
-    managerAddress: identity.managerAddress?.[0]?.address ?? null,
-    resolverAddress: resolver ?? null,
-    isPrimary,
-    status,
-    createdAt: registeredAt ? formatTimestamp(registeredAt) : null,
-    updatedAt: updatedAt ? formatTimestamp(updatedAt) : null,
-    expiredAt: expiredAt ? formatTimestamp(expiredAt) : null,
-    contenthash: profile?.contenthash ?? null,
-  };
-};
+const generateResponseStruct = (identity: IdentityRecord) => ({
+  identity: identity.identity,
+  platform: identity.platform,
+  resolvedAddress: formatAddress(identity.resolvedAddress),
+  ownerAddress: formatAddress(identity.ownerAddress),
+  managerAddress: formatAddress(identity.managerAddress),
+  resolverAddress: identity.resolver ?? null,
+  isPrimary: identity.isPrimary,
+  status: identity.status,
+  createdAt: identity.registeredAt
+    ? formatTimestamp(identity.registeredAt)
+    : null,
+  updatedAt: identity.updatedAt ? formatTimestamp(identity.updatedAt) : null,
+  expiredAt: identity.expiredAt ? formatTimestamp(identity.expiredAt) : null,
+  contenthash: identity.profile?.contenthash ?? null,
+});
 
 const buildAddressesMap = (
-  addresses?: Array<{ network: string; address: string }>,
-): Record<string, string> => {
-  if (!addresses?.length) return {};
-  return Object.fromEntries(
-    addresses.map(({ network, address }) => [network, address]),
+  addresses?: Array<{ network: string; address: string }> | null,
+) =>
+  Object.fromEntries(
+    addresses?.map(({ network, address }) => [network, address]) ?? [],
   );
-};
 
-const buildDomainsArray = (
-  vertices: IdentityRecord[] = [],
-  handle: string,
-): ReturnType<typeof generateResponseStruct>[] => {
-  if (!vertices.length) return [];
-  return vertices
-    .filter((vertex) => {
-      const ownerAddr = vertex.ownerAddress?.[0]?.address;
-      return (
-        TARGET_PLATFORMS.has(vertex.platform) &&
-        ownerAddr &&
-        isSameAddress(ownerAddr, handle)
-      );
-    })
-    .map(generateResponseStruct);
-};
+const buildDomainsArray = (vertices?: IdentityRecord[], handle?: string) =>
+  vertices
+    ?.filter(
+      (v) =>
+        TARGET_PLATFORMS.has(v.platform) &&
+        !!v.ownerAddress?.[0]?.address &&
+        isSameAddress(v.ownerAddress[0].address, handle || ""),
+    )
+    .map(generateResponseStruct) ?? [];
 
 export const resolveDomainQuery = async (
   handle: string,
@@ -94,17 +79,12 @@ export const resolveDomainQuery = async (
     });
   }
 
-  const responseData = generateResponseStruct(identity);
   const { profile, identityGraph } = identity;
-  const addresses = buildAddressesMap(profile?.addresses);
 
-  return respondWithCache(
-    {
-      ...responseData,
-      texts: profile?.texts ?? null,
-      addresses,
-      domains: buildDomainsArray(identityGraph?.vertices || [], handle),
-    },
-    true,
-  );
+  return respondJson({
+    ...generateResponseStruct(identity),
+    texts: profile?.texts ?? null,
+    addresses: buildAddressesMap(profile?.addresses),
+    domains: buildDomainsArray(identityGraph?.vertices, handle),
+  });
 };

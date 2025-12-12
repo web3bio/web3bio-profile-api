@@ -10,11 +10,12 @@ export const resolveHandle = (
   handle: string,
   platform?: Platform,
 ): string | null => {
-  if (!handle) return null;
+  const normalizedHandle = handle?.trim();
+  if (!normalizedHandle) return null;
 
   // Handle website platform
   if (platform === Platform.website) {
-    return handle
+    return normalizedHandle
       .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
       .replace(/\/+$/, "")
       .toLowerCase();
@@ -22,14 +23,14 @@ export const resolveHandle = (
 
   // Handle YouTube platform
   if (platform === Platform.youtube) {
-    const match = handle.match(/@([^\/]+)/);
+    const match = normalizedHandle.match(/@([^\/]+)/);
     return match?.[0] ?? null;
   }
 
   // Handle domain-like handles
-  if (REGEX.DOMAIN.test(handle)) {
-    const segments = handle.split("/");
-    const lastSegment = handle.endsWith("/")
+  if (REGEX.DOMAIN.test(normalizedHandle)) {
+    const segments = normalizedHandle.split("/");
+    const lastSegment = normalizedHandle.endsWith("/")
       ? segments[segments.length - 2]
       : segments[segments.length - 1];
 
@@ -37,16 +38,18 @@ export const resolveHandle = (
   }
 
   // Default handle processing
-  return handle.replace(/^@/, "").toLowerCase();
+  return normalizedHandle.replace(/^@/, "").toLowerCase();
 };
 
 export const getSocialMediaLink = (
   url: string | null,
   type: Platform | string,
 ): string | null => {
-  if (!url) return null;
+  const trimmed = url?.trim();
+  if (!trimmed) return null;
 
-  const normalizedUrl = url.toLowerCase().replace(/\?$/, "");
+  const lowered = trimmed.toLowerCase();
+  const normalizedUrl = lowered.endsWith("?") ? lowered.slice(0, -1) : lowered;
 
   return normalizedUrl.startsWith("http")
     ? normalizedUrl
@@ -59,6 +62,7 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
   }
 
   const platformType = type as Platform;
+  const platform = getPlatform(platformType);
 
   switch (platformType) {
     case Platform.url:
@@ -68,15 +72,15 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
       return `https://${name}`;
 
     case Platform.discord:
-      return name.includes("https://")
-        ? getPlatform(platformType).urlPrefix + name
-        : "";
+      if (name.startsWith("http")) return name;
+      return platform?.urlPrefix ? platform.urlPrefix + name : "";
 
     case Platform.lens:
-      return getPlatform(Platform.lens).urlPrefix + name.replace(/\.lens$/, "");
+      return platform?.urlPrefix
+        ? platform.urlPrefix + name.replace(/\.lens$/, "")
+        : "";
 
     default: {
-      const platform = getPlatform(platformType);
       return platform?.urlPrefix ? platform.urlPrefix + name : "";
     }
   }
@@ -85,22 +89,23 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
 export const resolveEipAssetURL = async (
   source: string | null,
 ): Promise<string | null> => {
-  if (!source) return null;
+  const normalized = source?.trim();
+  if (!normalized) return null;
 
-  const eipMatch = source.match(REGEX.EIP);
+  const eipMatch = normalized.match(REGEX.EIP);
   if (!eipMatch) {
-    return resolveMediaURL(source);
+    return resolveMediaURL(normalized);
   }
 
   const [, chainId, , contractAddress, tokenId] = eipMatch;
 
   if (!contractAddress || !tokenId) {
-    return resolveMediaURL(source);
+    return resolveMediaURL(normalized);
   }
 
   const network = getNetwork(Number(chainId))?.key;
   if (!network) {
-    return resolveMediaURL(source);
+    return resolveMediaURL(normalized);
   }
 
   // Try OpenSea first
@@ -146,7 +151,7 @@ export const resolveEipAssetURL = async (
   }
 
   // Final fallback
-  return resolveMediaURL(source);
+  return resolveMediaURL(normalized);
 };
 
 export const getAlchemyBaseUrl = (network: Network) => {

@@ -337,8 +337,6 @@ export const respondWithSVG = async (
   return new Response(svg, {
     headers: {
       "Content-Type": "image/svg+xml",
-      "Cache-Control":
-        "public, max-age=604800, s-maxage=604800, stale-while-revalidate=86400",
     },
   });
 };

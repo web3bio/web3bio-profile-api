@@ -44,30 +44,11 @@ export const errorHandle = ({
   );
 };
 
-export const respondWithCache = (data: any, shortCache?: boolean) => {
-  const CACHE_CONTROL_SHORT =
-    "public, max-age=600, s-maxage=600, stale-while-revalidate=43200";
-  const CACHE_CONTROL_PROD =
-    "public, max-age=3600, s-maxage=3600, stale-while-revalidate=43200";
-  const CACHE_CONTROL_DEV =
-    "public, max-age=60, s-maxage=60, stale-while-revalidate=600";
-  const cacheControl = shortCache
-    ? CACHE_CONTROL_SHORT
-    : process.env.NODE_ENV === "production"
-      ? CACHE_CONTROL_PROD
-      : CACHE_CONTROL_DEV;
-  const cdnCacheControl = shortCache
-    ? "public, s-maxage=60"
-    : process.env.NODE_ENV === "production"
-      ? "public, s-maxage=3600"
-      : "no-cache";
-
+export const respondJson = (data: any) => {
   return NextResponse.json(data, {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Cache-Control": cacheControl,
-      "CDN-Cache-Control": cdnCacheControl,
     },
   });
 };
