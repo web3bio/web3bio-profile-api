@@ -70,8 +70,8 @@ function setCacheHeaders(response, ttl) {
 function getTTL(pathname) {
   if (pathname.startsWith("/avatar/svg/")) return 2592000; // 30d
   if (pathname.startsWith("/avatar/")) return 86400; // 24h
-  if (pathname.startsWith("/domain/")) return 600; // 10m
-  return 3600;
+  if (pathname.startsWith("/domain/")) return 900; // 15m
+  return 7200; // 2h
 }
 
 const handler = {
