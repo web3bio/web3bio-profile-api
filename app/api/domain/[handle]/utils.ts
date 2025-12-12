@@ -1,6 +1,6 @@
 import type { IdentityRecord, AuthHeaders } from "@/utils/types";
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { errorHandle, formatTimestamp, respondWithCache } from "@/utils/utils";
+import { errorHandle, formatTimestamp, respondJson } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
@@ -98,13 +98,12 @@ export const resolveDomainQuery = async (
   const { profile, identityGraph } = identity;
   const addresses = buildAddressesMap(profile?.addresses);
 
-  return respondWithCache(
+  return respondJson(
     {
       ...responseData,
       texts: profile?.texts ?? null,
       addresses,
       domains: buildDomainsArray(identityGraph?.vertices || [], handle),
     },
-    true,
   );
 };

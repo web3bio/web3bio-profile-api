@@ -32,22 +32,15 @@ const nextConfig = {
       {
         source: "/:path*",
         headers: [
-          // CORS headers
           { key: "Access-Control-Allow-Credentials", value: "true" },
           { key: "Access-Control-Allow-Origin", value: "*" },
           {
             key: "Access-Control-Allow-Methods",
-            value: "GET,OPTIONS,PATCH,DELETE,POST,PUT",
+            value: "GET, OPTIONS, HEAD",
           },
           {
             key: "Access-Control-Allow-Headers",
             value: "Content-Type, X-Api-Key",
-          },
-          // Security headers
-          { key: "X-Content-Type-Options", value: "nosniff" },
-          {
-            key: "Permissions-Policy",
-            value: "camera=(), microphone=(), geolocation=()",
           },
         ],
       },

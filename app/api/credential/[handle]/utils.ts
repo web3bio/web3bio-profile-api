@@ -7,7 +7,7 @@ import {
 } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type { AuthHeaders, CredentialRecord } from "@/utils/types";
-import { errorHandle, respondWithCache } from "@/utils/utils";
+import { errorHandle, respondJson } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
@@ -143,7 +143,7 @@ export const resolveCredentialHandle = async (
           platform: vertexPlatform,
         })) || [],
     ) as unknown as CredentialRecord[];
-    return respondWithCache(processCredentials(credentials));
+    return respondJson(processCredentials(credentials));
   } catch (error) {
     return errorHandle({
       identity,

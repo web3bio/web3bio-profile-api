@@ -20,7 +20,7 @@ import {
   errorHandle,
   formatText,
   normalizeText,
-  respondWithCache,
+  respondJson,
 } from "@/utils/utils";
 import {
   generateProfileStruct,
@@ -509,5 +509,5 @@ export const resolveUniversalHandle = async (
     });
   }
 
-  return respondWithCache(resolutionResult);
+  return respondJson(resolutionResult);
 };

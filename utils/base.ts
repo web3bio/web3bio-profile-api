@@ -21,7 +21,7 @@ import {
   errorHandle,
   formatText,
   formatTimestamp,
-  respondWithCache,
+  respondJson,
 } from "@/utils/utils";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import {
@@ -202,7 +202,7 @@ export const resolveIdentityHandle = async (
         message: response.message,
       });
     }
-    return respondWithCache(response);
+    return respondJson(response);
   } catch (e: unknown) {
     return errorHandle({
       identity: handle,
