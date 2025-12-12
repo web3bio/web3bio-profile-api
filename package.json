@@ -1,6 +1,6 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "packageManager": "pnpm@10.24.0",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",

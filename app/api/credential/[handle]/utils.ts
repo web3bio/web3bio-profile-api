@@ -19,33 +19,31 @@ interface CredentialVertice {
 
 type CredentialCategory = keyof CredentialResponse;
 
-const checkIsHuman = (item: CredentialRecord): boolean => {
-  return (
-    item.value === "true" ||
-    (item.dataSource === CredentialSource.humanPassport &&
-      Number(item.value) >= 20)
-  );
-};
-
-const checkIsRisky = (item: CredentialRecord): boolean => {
-  return (
-    Boolean(CREDENTIAL_INFO[item.dataSource as CredentialSource]) &&
-    item.value === "true"
-  );
-};
-
-const checkIsSpam = (item: CredentialRecord): boolean => {
-  return (
-    item.dataSource === CredentialSource.farcasterSpam &&
-    item.type === "score" &&
-    Number(item.value) === 0
-  );
-};
-
-const categoryChecks = {
-  isHuman: checkIsHuman,
-  isRisky: checkIsRisky,
-  isSpam: checkIsSpam,
+const evaluateCategory = (
+  category: CredentialCategory,
+  item: CredentialRecord,
+): boolean => {
+  switch (category) {
+    case "isHuman":
+      return (
+        item.value === "true" ||
+        (item.dataSource === CredentialSource.humanPassport &&
+          Number(item.value) >= 20)
+      );
+    case "isRisky":
+      return (
+        !!CREDENTIAL_INFO[item.dataSource as CredentialSource] &&
+        item.value === "true"
+      );
+    case "isSpam":
+      return (
+        item.dataSource === CredentialSource.farcasterSpam &&
+        item.type === "score" &&
+        Number(item.value) === 0
+      );
+    default:
+      return false;
+  }
 };
 
 const processCredentials = (
@@ -59,9 +57,7 @@ const processCredentials = (
         return groups;
       }
 
-      const evaluate = categoryChecks[category];
-
-      if (!evaluate?.(credential)) {
+      if (!evaluateCategory(category, credential)) {
         return groups;
       }
 
@@ -110,17 +106,28 @@ export const resolveCredentialHandle = async (
       platform,
       headers,
     );
+
     const queryId = `${platform},${identity}`;
     const address = res.data?.identity?.profile?.address || "";
-    const rawVertices = res?.data?.identity?.identityGraph?.vertices;
+    const rawVertices = res.data?.identity?.identityGraph?.vertices;
 
-    const vertices = (rawVertices?.filter((x: CredentialVertice) => {
-      if (x.id === queryId) return true;
+    if (!rawVertices) {
+      return errorHandle({
+        identity,
+        code: 404,
+        path: pathname,
+        platform,
+        message: ErrorMessages.NOT_FOUND,
+      });
+    }
+
+    const vertices = rawVertices.filter((vertex: CredentialVertice) => {
+      if (vertex.id === queryId) return true;
       if (!address) return false;
-      const parts = x.id?.split(",");
-      const _identity = parts?.[1];
-      return _identity ? isSameAddress(address, _identity) : false;
-    }) || []) as CredentialVertice[];
+
+      const [, vertexIdentity] = vertex.id?.split(",") ?? [];
+      return vertexIdentity ? isSameAddress(address, vertexIdentity) : false;
+    });
 
     if (!vertices.length) {
       return errorHandle({
@@ -131,19 +138,21 @@ export const resolveCredentialHandle = async (
         message: ErrorMessages.NOT_FOUND,
       });
     }
+
     const credentials = vertices.flatMap(
       ({
         id: vertexId,
         platform: vertexPlatform,
         credentials: vertexCredentials,
-      }) =>
-        (vertexCredentials as CredentialType[])?.map((credential) => ({
+      }: CredentialVertice) =>
+        vertexCredentials?.map((credential: CredentialType) => ({
           ...credential,
           id: vertexId,
           platform: vertexPlatform,
         })) || [],
-    ) as unknown as CredentialRecord[];
-    return respondJson(processCredentials(credentials));
+    );
+
+    return respondJson(processCredentials(credentials as CredentialRecord[]));
   } catch (error) {
     return errorHandle({
       identity,

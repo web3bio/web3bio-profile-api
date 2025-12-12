@@ -82,6 +82,7 @@ const SOLANA_ECOSYSTEM_PLATFORMS = new Set([Platform.sns, Platform.solana]);
 const PLATFORM_PRIORITY_MAP = new Map(
   PLATFORM_PRIORITY_ORDER.map((platform, index) => [platform, index]),
 );
+const VALID_PLATFORM_SET = new Set(Object.values(Platform));
 
 const isPrimaryOrSocialProfile = (identity: IdentityRecord): boolean =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
@@ -244,10 +245,9 @@ const removeDuplicateProfiles = (
   profiles: ProfileRecord[],
 ): ProfileRecord[] => {
   const uniqueProfilesMap = new Map<string, ProfileRecord>();
-  const validPlatforms = new Set(Object.values(Platform));
 
   for (const profile of profiles) {
-    if (!profile.platform || !validPlatforms.has(profile.platform)) {
+    if (!profile.platform || !VALID_PLATFORM_SET.has(profile.platform)) {
       continue;
     }
 
@@ -305,10 +305,9 @@ const sortProfilesByPriority = (
 
   const normalizedHandle = normalizeText(targetHandle);
   let exactMatchProfile: ProfileRecord | undefined;
-
-  // Group profiles by platform and find exact match
   const platformGroups = new Map<Platform, ProfileRecord[]>();
 
+  // Group profiles and find exact match
   for (const profile of profiles) {
     if (
       profile.identity === normalizedHandle &&
@@ -325,45 +324,43 @@ const sortProfilesByPriority = (
       continue;
     }
 
-    const existingGroup = platformGroups.get(profile.platform);
-    if (existingGroup) {
-      existingGroup.push(profile);
-    } else {
-      platformGroups.set(profile.platform, [profile]);
+    if (!platformGroups.has(profile.platform)) {
+      platformGroups.set(profile.platform, []);
     }
+    platformGroups.get(profile.platform)!.push(profile);
   }
 
   // Sort profiles within each platform group
   for (const profileGroup of platformGroups.values()) {
-    profileGroup.sort((profileA, profileB) => {
-      if (profileA.isPrimary !== profileB.isPrimary) {
-        return profileA.isPrimary ? -1 : 1;
+    profileGroup.sort((a, b) => {
+      if (a.isPrimary !== b.isPrimary) {
+        return a.isPrimary ? -1 : 1;
       }
-
-      const timeA = profileA.createdAt
-        ? new Date(profileA.createdAt).getTime()
+      const timeA = a.createdAt
+        ? new Date(a.createdAt).getTime()
         : Number.MAX_SAFE_INTEGER;
-      const timeB = profileB.createdAt
-        ? new Date(profileB.createdAt).getTime()
+      const timeB = b.createdAt
+        ? new Date(b.createdAt).getTime()
         : Number.MAX_SAFE_INTEGER;
       return timeA - timeB;
     });
   }
 
   // Build final ordered result
-  const platformOrder = [
+  const primaryPlatformOrFallback =
     primaryPlatform === Platform.solana && !platformGroups.has(Platform.solana)
       ? Platform.sns
-      : primaryPlatform,
-    ...PLATFORM_PRIORITY_ORDER.filter(
-      (platform) => platform !== primaryPlatform,
-    ),
-  ];
+      : primaryPlatform;
 
-  const sortedProfiles = platformOrder
-    .map((platform) => platformGroups.get(platform))
-    .filter((group): group is ProfileRecord[] => Boolean(group))
-    .flat();
+  const sortedProfiles = platformGroups.get(primaryPlatformOrFallback) || [];
+  for (const platform of PLATFORM_PRIORITY_ORDER) {
+    if (
+      platform !== primaryPlatformOrFallback &&
+      platformGroups.has(platform)
+    ) {
+      sortedProfiles.push(...platformGroups.get(platform)!);
+    }
+  }
 
   return exactMatchProfile
     ? [exactMatchProfile, ...sortedProfiles]
@@ -456,24 +453,12 @@ export const resolveWithIdentityGraph = async ({
     validProfiles.push(fallbackProfile as ProfileResponse | NSResponse);
   }
 
-  // Remove any remaining duplicates
-  const uniqueProfiles = validProfiles.filter(
-    (profile, index, allProfiles) =>
-      index ===
-      allProfiles.findIndex(
-        (otherProfile) =>
-          otherProfile.platform === profile.platform &&
-          otherProfile.identity === profile.identity,
-      ),
-  ) as ProfileResponse[];
-
-  return uniqueProfiles.length > 0 &&
-    !uniqueProfiles.every((profile) => profile?.error)
-    ? uniqueProfiles
+  return validProfiles.length > 0
+    ? validProfiles
     : {
         identity: handle,
         code: 404,
-        message: uniqueProfiles[0]?.error || ErrorMessages.NOT_FOUND,
+        message: ErrorMessages.NOT_FOUND,
         platform,
       };
 };

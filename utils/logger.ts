@@ -49,7 +49,7 @@ export const withLogging = (handler: any) => {
           cache_hit: response.headers.get("X-CACHE-HIT") || "none",
           cache_age: response.headers.get("X-Cache-Age") || "0",
           content_length: response.headers.get("content-length") || "0",
-          level: status >= 400 ? "error" : "info",
+          level: status >= 500 ? "error" : status >= 400 ? "warn" : "info",
         };
 
         ctx.waitUntil(
