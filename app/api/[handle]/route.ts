@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { BASE_URL, errorHandle, respondWithCache } from "@/utils/utils";
+import { BASE_URL, errorHandle, respondJson } from "@/utils/utils";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 
@@ -39,5 +39,5 @@ export async function GET(
     avatar: `${BASE_URL}/avatar/${handle}`,
   };
 
-  return respondWithCache(responseData);
+  return respondJson(responseData);
 }

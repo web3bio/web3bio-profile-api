@@ -11,7 +11,8 @@ const CACHEABLE_API_PATHS = [
   "/credential/",
 ];
 
-const TRUSTED_HOSTS = new Set(["web3.bio"]);
+const TRUSTED_HOST = "web3.bio";
+const DEFAULT_SWR = 86400; // 24h
 
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
@@ -19,10 +20,7 @@ function isCacheableApiPath(pathname) {
 
 function isHostTrusted(host) {
   if (!host) return false;
-  return (
-    TRUSTED_HOSTS.has(host) ||
-    Array.from(TRUSTED_HOSTS).some((th) => host.endsWith("." + th))
-  );
+  return host === TRUSTED_HOST || host.endsWith(`.${TRUSTED_HOST}`);
 }
 
 function isTrustedOrigin(request) {
@@ -52,81 +50,89 @@ async function verifyAuth(token, env) {
   }
 }
 
+function getCacheKey(url) {
+  const cacheUrl = new URL(url);
+  cacheUrl.search = "";
+  cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
+  return new Request(cacheUrl.toString(), { method: "GET" });
+}
+
+function setCacheHeaders(response, ttl) {
+  if (ttl > 0) {
+    response.headers.set(
+      "Cache-Control",
+      `public, max-age=${ttl}, s-maxage=${ttl}, stale-while-revalidate=${DEFAULT_SWR}`,
+    );
+  }
+  response.headers.set("Vary", "Accept-Encoding");
+}
+
+function getTTL(pathname) {
+  if (pathname.startsWith("/avatar/svg/")) return 2592000; // 30d
+  if (pathname.startsWith("/avatar/")) return 86400; // 24h
+  if (pathname.startsWith("/domain/")) return 900; // 15m
+  return 7200; // 2h
+}
+
 const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
+
     // Bypass caching for non-cacheable paths
-    if (
-      pathname.startsWith("/_next/") ||
-      pathname.startsWith("/icons/") ||
-      !isCacheableApiPath(pathname)
-    ) {
+    if (!isCacheableApiPath(pathname)) {
       return openNextHandler.fetch(request, env, ctx);
     }
 
     // Verify API key
     const userToken = request.headers.get("x-api-key");
-    let isValidApiKey = false;
-
     if (userToken) {
       const verifiedToken = await verifyAuth(
         userToken.replace("Bearer ", ""),
         env,
       );
 
-      if (verifiedToken) {
-        // Valid API key, skip rate limiting
-        isValidApiKey = true;
-      } else {
-        // Invalid API key
+      if (!verifiedToken) {
+        return new Response(JSON.stringify({ error: "Invalid API Token" }), {
+          status: 403,
+          headers: { "Content-Type": "application/json" },
+        });
+      }
+    } else if (
+      !isTrustedOrigin(request) &&
+      !pathname.startsWith("/avatar/") &&
+      env?.API_RATE_LIMIT
+    ) {
+      // Rate limiting for unauthenticated requests
+      const { success } = await env.API_RATE_LIMIT.limit({
+        key: getClientIP(request),
+      });
+      if (!success) {
         return new Response(
           JSON.stringify({
-            error: "Invalid API Token",
+            error:
+              "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
           }),
-          { status: 403 },
+          { status: 429, headers: { "Content-Type": "application/json" } },
         );
       }
     }
 
-    // Rate limiting for unauthenticated or invalid API key
-    if (
-      !isValidApiKey &&
-      !isTrustedOrigin(request) &&
-      !pathname.startsWith("/avatar/")
-    ) {
-      const clientIP = getClientIP(request);
-      if (env && env.API_RATE_LIMIT) {
-        const { success } = await env.API_RATE_LIMIT.limit({ key: clientIP });
-        if (!success) {
-          return new Response(
-            JSON.stringify({
-              error:
-                "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
-            }),
-            { status: 429 },
-          );
-        }
-      }
-    }
-
-    // Bypass cache if no-cache requested
-    // if (request.headers.get("cache-control") === "no-cache") {
-    //   const response = await openNextHandler.fetch(request, env, ctx);
-    //   response.headers.set("X-MATCH-PATH", pathname);
-    //   return response;
-    // }
-
-    const cacheKey = new Request(url.toString());
+    const cacheKey = getCacheKey(url);
     const cached = await caches.default.match(cacheKey);
 
-    // Return cached response if available
+    // Return cached response if available and valid
     if (cached) {
-      const cachedBody = await cached.clone().text();
+      const cachedBody = await cached.text();
       if (cachedBody?.trim()) {
-        const response = new Response(cachedBody, cached);
+        const response = new Response(cachedBody, {
+          status: cached.status,
+          statusText: cached.statusText,
+          headers: cached.headers,
+        });
         response.headers.set("X-CACHE-HIT", "HIT");
         response.headers.set("X-MATCH-PATH", pathname);
+        setCacheHeaders(response, getTTL(pathname));
         return response;
       }
       ctx.waitUntil(caches.default.delete(cacheKey));
@@ -134,29 +140,29 @@ const handler = {
 
     // Fetch from origin
     const response = await openNextHandler.fetch(request, env, ctx);
-    const bodyText = await response.clone().text();
-
-    if (
-      response.status === 200 &&
-      request.method === "GET" &&
-      bodyText?.trim()
-    ) {
-      const finalResponse = new Response(bodyText, response);
-
-      // Cache successful GET responses
-      ctx.waitUntil(
-        caches.default
-          .put(cacheKey, finalResponse.clone())
-          .catch((err) => console.error("[Cache]", err)),
-      );
-
-      finalResponse.headers.set("X-CACHE-HIT", "MISS");
-      finalResponse.headers.set("X-MATCH-PATH", pathname);
-      return finalResponse;
-    }
+    const ttl = getTTL(pathname);
 
     response.headers.set("X-CACHE-HIT", "MISS");
     response.headers.set("X-MATCH-PATH", pathname);
+    setCacheHeaders(response, ttl);
+
+    // Cache successful GET responses
+    if (response.status === 200 && request.method === "GET") {
+      const bodyText = await response.text();
+      if (bodyText?.trim()) {
+        const cacheResponse = new Response(bodyText, {
+          status: response.status,
+          statusText: response.statusText,
+          headers: response.headers,
+        });
+        ctx.waitUntil(
+          caches.default
+            .put(cacheKey, cacheResponse)
+            .catch((err) => console.error("[Cache]", err)),
+        );
+        return new Response(bodyText, response);
+      }
+    }
     return response;
   },
 };

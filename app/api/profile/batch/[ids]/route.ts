@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
-import { errorHandle, getUserHeaders, respondWithCache } from "@/utils/utils";
+import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
 
 export async function GET(
@@ -37,7 +37,7 @@ export async function GET(
     }
 
     const resJson = await queryIdentityGraphBatch(ids, false, headers);
-    return respondWithCache(resJson);
+    return respondJson(resJson);
   } catch (e: unknown) {
     const isParseError = e instanceof SyntaxError;
 
