@@ -12,6 +12,7 @@ export async function GET(
   const { pathname } = req.nextUrl;
 
   const resolvedId = resolveIdentity(handle);
+
   if (!resolvedId) {
     return errorHandle({
       identity: handle,
