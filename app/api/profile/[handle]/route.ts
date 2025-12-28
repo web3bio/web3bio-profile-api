@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
-import { resolveIdentity, detectPlatform } from "web3bio-profile-kit/utils";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "./utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
