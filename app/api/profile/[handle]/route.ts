@@ -1,6 +1,6 @@
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
-import { resolveIdentity } from "web3bio-profile-kit/utils";
+import { resolveIdentity, detectPlatform } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "./utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 
@@ -12,6 +12,7 @@ export async function GET(
   const { pathname } = req.nextUrl;
 
   const resolvedId = resolveIdentity(handle);
+
   if (!resolvedId) {
     return errorHandle({
       identity: handle,
