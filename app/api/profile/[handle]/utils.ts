@@ -415,20 +415,20 @@ export const resolveWithIdentityGraph = async ({
 
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
   // kill eth or solana profile if the address is included in other profiles
-  if (
-    extractedProfiles.some((x) =>
-      [Platform.ethereum, Platform.solana].includes(x.platform),
-    )
-  ) {
-    const addressProfileIdx = extractedProfiles.findIndex((x) =>
-      [Platform.ethereum, Platform.solana].includes(x.platform),
+  const ethSolanaIndex = extractedProfiles.findIndex((profile) =>
+    [Platform.ethereum, Platform.solana].includes(profile.platform),
+  );
+
+  if (ethSolanaIndex !== -1) {
+    const ethSolanaProfile = extractedProfiles[ethSolanaIndex];
+    const hasAddressConflict = extractedProfiles.some(
+      (profile, index) =>
+        index !== ethSolanaIndex &&
+        profile.address === ethSolanaProfile.address,
     );
-    const addressProfileItem = extractedProfiles[addressProfileIdx];
-    if (
-      extractedProfiles.filter((i) => i.address === addressProfileItem.address)
-        .length > 1
-    ) {
-      extractedProfiles.splice(addressProfileIdx, 1);
+
+    if (hasAddressConflict) {
+      extractedProfiles.splice(ethSolanaIndex, 1);
     }
   }
   const sortedProfiles = sortProfilesByPriority(
