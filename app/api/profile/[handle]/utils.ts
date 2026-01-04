@@ -414,6 +414,23 @@ export const resolveWithIdentityGraph = async ({
   const processedResponse = await processJson(response);
 
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
+  // kill eth or solana profile if the address is included in other profiles
+  if (
+    extractedProfiles.some((x) =>
+      [Platform.ethereum, Platform.solana].includes(x.platform),
+    )
+  ) {
+    const addressProfileIdx = extractedProfiles.findIndex((x) =>
+      [Platform.ethereum, Platform.solana].includes(x.platform),
+    );
+    const addressProfileItem = extractedProfiles[addressProfileIdx];
+    if (
+      extractedProfiles.filter((i) => i.address === addressProfileItem.address)
+        .length > 1
+    ) {
+      extractedProfiles.splice(addressProfileIdx, 1);
+    }
+  }
   const sortedProfiles = sortProfilesByPriority(
     extractedProfiles,
     platform,
@@ -438,20 +455,6 @@ export const resolveWithIdentityGraph = async ({
         result.status === "fulfilled",
     )
     .map((result) => result.value);
-
-  // Add Ethereum fallback profile when needed
-  if (validProfiles.length === 0 && platform === Platform.ethereum) {
-    const fallbackProfile = {
-      address: handle,
-      identity: handle,
-      platform: Platform.ethereum,
-      displayName: formatText(handle),
-      avatar: null,
-      description: null,
-      ...(ns ? {} : { email: null, location: null, header: null, links: {} }),
-    };
-    validProfiles.push(fallbackProfile as ProfileResponse | NSResponse);
-  }
 
   return validProfiles.length > 0
     ? validProfiles

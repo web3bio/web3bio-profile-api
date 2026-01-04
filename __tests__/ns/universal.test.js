@@ -71,4 +71,20 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("v2ex.sol");
   });
+  it("It should response 200 data for 0x1af68a3cad9918056106d2ee77879489b56c2f80", async () => {
+    const res = await queryClient(
+      "/ns/0x1af68a3cad9918056106d2ee77879489b56c2f80",
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].platform).toBe("farcaster");
+  });
+  it("It should response 200 data for 0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95", async () => {
+    const res = await queryClient(
+      "/ns/0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95",
+    );
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(json[0].platform).toBe("ethereum");
+  });
 });
