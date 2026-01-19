@@ -19,7 +19,7 @@ const SEARCH_WEB2_LIST = [
   Platform.linkedin,
 ];
 
-export const isWeb2Platform = (platform: string) => {
+const isWeb2Platform = (platform: string) => {
   return SEARCH_WEB2_LIST.includes(platform as Platform);
 };
 
