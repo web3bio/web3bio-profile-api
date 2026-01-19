@@ -2,7 +2,7 @@ import {
   ErrorMessages,
   IdentityString,
   NSResponse,
-  type Platform,
+  Platform,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
 import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";

@@ -9,6 +9,7 @@ const CACHEABLE_API_PATHS = [
   "/ns/",
   "/profile/",
   "/credential/",
+  "/search/",
 ];
 
 const TRUSTED_HOST = "web3.bio";
