@@ -19,6 +19,8 @@ export enum QueryType {
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
   GET_DOMAIN_SINGLE = "GET_DOMAIN_SINGLE",
+  GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
+  GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
 }
 
 const GET_CREDENTIALS_QUERY = `
@@ -400,6 +402,28 @@ const GET_DOMAIN = `
   }
 `;
 
+// Domains Availability
+export const GET_AVAILABLE_DOMAINS = `
+  query GET_AVAILABLE_DOMAINS($name: String!) {
+    domainAvailableSearch(name: $name) {
+      platform
+      name
+      expiredAt
+      availability
+      status
+    }
+  }
+`;
+// Seach Suggest
+export const GET_SEARCH_SUGGEST = `
+  query QUERY_SEARCH_SUGGEST($name: String!) {
+    nameSuggest(name: $name) {
+      platform
+      name
+    }
+  }
+`;
+
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
@@ -409,6 +433,8 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_DOMAIN_SINGLE, GET_DOMAIN_SINGLE],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
+  [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],
+  [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
 ]);
 
 export function getQuery(type: QueryType): string {
