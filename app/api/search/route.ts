@@ -131,7 +131,7 @@ export async function GET(req: NextRequest) {
       return errorHandle({
         identity: identity,
         path: pathname,
-        platform: platform || "graph",
+        platform: platform || "search",
         code: 404,
         message: ErrorMessages.NOT_FOUND,
       });

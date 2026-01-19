@@ -70,23 +70,15 @@ export async function GET(
   try {
     const result = await queryDomains(trimmedHandle, headers);
 
-    if (result.errors) {
+    if (result.errors || result.code) {
       return errorHandle({
         identity: trimmedHandle,
         platform: null,
         path: pathname,
-        message: "GraphQL query failed",
-        code: 500,
-      });
-    }
-
-    if (result.code) {
-      return errorHandle({
-        identity: trimmedHandle,
-        platform: null,
-        path: pathname,
-        message: result.msg || ErrorMessages.NOT_FOUND,
-        code: result.code,
+        message: result.errors
+          ? "GraphQL query failed"
+          : result.msg || ErrorMessages.NOT_FOUND,
+        code: result.code || 500,
       });
     }
 
