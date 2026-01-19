@@ -9,6 +9,7 @@ export const config = {
     "/profile/:path*",
     "/credential/:path*",
     "/search/:path*",
+    "/search",
   ],
 };
 
