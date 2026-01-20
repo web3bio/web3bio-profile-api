@@ -4,11 +4,12 @@ import { withLogging } from "./utils/logger.js";
 import { getClientIP } from "./utils/utils.js";
 
 const CACHEABLE_API_PATHS = [
-  "/avatar/",
-  "/domain/",
-  "/ns/",
-  "/profile/",
-  "/credential/",
+  "/avatar",
+  "/domain",
+  "/ns",
+  "/profile",
+  "/credential",
+  "/search",
 ];
 
 const TRUSTED_HOST = "web3.bio";
@@ -52,8 +53,16 @@ async function verifyAuth(token, env) {
 
 function getCacheKey(url) {
   const cacheUrl = new URL(url);
-  cacheUrl.search = "";
   cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
+
+  if (cacheUrl.search) {
+    const params = new URLSearchParams(cacheUrl.search);
+    const sortedParams = new URLSearchParams(
+      [...params.entries()].sort((a, b) => a[0].localeCompare(b[0])),
+    );
+    cacheUrl.search = sortedParams.toString();
+  }
+
   return new Request(cacheUrl.toString(), { method: "GET" });
 }
 
@@ -78,6 +87,7 @@ const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
     const pathname = url.pathname;
+    const fullPath = pathname + url.search;
 
     // Bypass caching for non-cacheable paths
     if (!isCacheableApiPath(pathname)) {
@@ -131,7 +141,7 @@ const handler = {
           headers: cached.headers,
         });
         response.headers.set("X-CACHE-HIT", "HIT");
-        response.headers.set("X-MATCH-PATH", pathname);
+        response.headers.set("X-MATCH-PATH", fullPath);
         setCacheHeaders(response, getTTL(pathname));
         return response;
       }
@@ -143,7 +153,7 @@ const handler = {
     const ttl = getTTL(pathname);
 
     response.headers.set("X-CACHE-HIT", "MISS");
-    response.headers.set("X-MATCH-PATH", pathname);
+    response.headers.set("X-MATCH-PATH", fullPath);
     setCacheHeaders(response, ttl);
 
     // Cache successful GET responses

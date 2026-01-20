@@ -2,7 +2,7 @@ import {
   ErrorMessages,
   IdentityString,
   NSResponse,
-  type Platform,
+  Platform,
 } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
 import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
@@ -19,6 +19,9 @@ export enum QueryType {
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
   GET_DOMAIN_SINGLE = "GET_DOMAIN_SINGLE",
+  GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
+  GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
+  GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
 }
 
 const GET_CREDENTIALS_QUERY = `
@@ -400,6 +403,93 @@ const GET_DOMAIN = `
   }
 `;
 
+// Domains Availability
+export const GET_AVAILABLE_DOMAINS = `
+  query GET_AVAILABLE_DOMAINS($name: String!) {
+    domainAvailableSearch(name: $name) {
+      platform
+      name
+      expiredAt
+      availability
+      status
+    }
+  }
+`;
+// Seach Suggest
+export const GET_SEARCH_SUGGEST = `
+  query QUERY_SEARCH_SUGGEST($name: String!) {
+    nameSuggest(name: $name) {
+      platform
+      name
+    }
+  }
+`;
+// Search Query
+const GET_SEARCH_QUERY = `
+  query GET_SEARCH_PROFILES($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      identity
+      platform
+      isPrimary
+      expiredAt
+      registeredAt
+      resolvedAddress {
+        network
+        address
+      }
+      ownerAddress {
+        network
+        address
+      }
+      profile {
+        identity
+        platform
+        address
+        displayName
+        avatar
+        description
+        social {
+          uid
+        }
+      }
+      identityGraph {
+        vertices {
+          identity
+          platform
+          isPrimary
+          expiredAt
+          registeredAt
+          resolvedAddress {
+            network
+            address
+          }
+          ownerAddress {
+            network
+            address
+          }
+          profile {
+            identity
+            platform
+            address
+            displayName
+            avatar
+            description
+            social {
+              uid
+            }
+          }
+        }
+        edges {
+          source
+          target
+          dataSource
+          edgeType
+        }
+      }
+    }
+  }
+`;
+
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
@@ -409,6 +499,9 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_DOMAIN_SINGLE, GET_DOMAIN_SINGLE],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
+  [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],
+  [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
+  [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
 ]);
 
 export function getQuery(type: QueryType): string {
