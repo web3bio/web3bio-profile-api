@@ -107,7 +107,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const res = await queryIdentityGraph(
-      QueryType.GET_PROFILES,
+      QueryType.GET_SEARCH_QUERY,
       identity,
       platform,
       headers,
