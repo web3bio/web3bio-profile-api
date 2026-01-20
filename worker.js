@@ -4,24 +4,19 @@ import { withLogging } from "./utils/logger.js";
 import { getClientIP } from "./utils/utils.js";
 
 const CACHEABLE_API_PATHS = [
-  "/avatar/",
-  "/domain/",
-  "/ns/",
-  "/profile/",
-  "/credential/",
-  "/search/",
+  "/avatar",
+  "/domain",
+  "/ns",
+  "/profile",
+  "/credential",
+  "/search",
 ];
 
 const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
 
 function isCacheableApiPath(pathname) {
-  return CACHEABLE_API_PATHS.some((path) => {
-    if (path === "/search/") {
-      return pathname === "/search" || pathname.startsWith("/search/");
-    }
-    return pathname.startsWith(path);
-  });
+  return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
 function isHostTrusted(host) {

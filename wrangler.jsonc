@@ -17,7 +17,7 @@
       "name": "API_RATE_LIMIT",
       "namespace_id": "1001",
       "simple": {
-        "limit": 8,
+        "limit": 6,
         "period": 10,
       },
     },
