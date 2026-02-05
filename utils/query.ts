@@ -22,7 +22,29 @@ export enum QueryType {
   GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
+  GET_WALLET_QUERY = "GET_WALLET_QUERY",
 }
+
+const GET_WALLET_QUERY = `
+  query GET_WALLET_QUERY($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      identityGraph {
+        vertices {
+          id
+          identity
+          platform
+          isPrimary
+          credentials {
+            category
+            type
+            value
+            dataSource
+          }
+        }
+      }
+    }
+  }
+`;
 
 const GET_CREDENTIALS_QUERY = `
   query GET_CREDENTIALS_QUERY($platform: Platform!, $identity: String!) {
@@ -502,6 +524,7 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],
   [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
+  [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
 ]);
 
 export function getQuery(type: QueryType): string {
