@@ -1,7 +1,53 @@
 import { queryIdentityGraph, QueryType } from "@/utils/query";
-import { AuthHeaders } from "@/utils/types";
-import { errorHandle, respondJson } from "@/utils/utils";
+import { resolveEipAssetURL } from "@/utils/resolver";
+import { AuthHeaders, IdentityRecord, CredentialRecord } from "@/utils/types";
+import { BASE_URL, errorHandle, respondJson } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { isSameAddress } from "web3bio-profile-kit/utils";
+import { processCredentials } from "../../credential/[handle]/utils";
+
+const NAME_SERVICE_MAPPING = [
+  { network: Platform.ethereum, ns: Platform.ens },
+  { network: Platform.ethereum, ns: Platform.basenames },
+  { network: Platform.ethereum, ns: Platform.linea },
+  { network: Platform.solana, ns: Platform.sns },
+];
+
+const format = async (
+  v: IdentityRecord,
+  all: IdentityRecord[] = [],
+): Promise<any> => {
+  const avatar = v.profile?.avatar
+    ? await resolveEipAssetURL(v.profile.avatar).catch(() => v.profile.avatar)
+    : `${BASE_URL}/avatar/svg/${v.platform},${v.identity}`;
+
+  const domains = NAME_SERVICE_MAPPING.some((x) => x.network === v.platform)
+    ? await Promise.all(
+        all
+          .filter(
+            (sv) =>
+              NAME_SERVICE_MAPPING.some((m) => m.ns === sv.platform) &&
+              sv.ownerAddress?.some((o) =>
+                isSameAddress(o.address, v.profile?.address),
+              ),
+          )
+          .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
+          .map((sv) => format(sv)),
+      )
+    : [];
+
+  return {
+    identity: v.identity || null,
+    address: v.profile?.address || null,
+    platform: v.platform,
+    isPrimary: v.isPrimary || false,
+    displayName: v.profile?.displayName || null,
+    avatar,
+    description: v.profile?.description || null,
+    updatedAt: v.updatedAt || null,
+    domains,
+  };
+};
 
 export const resolveWalletResponse = async (
   handle: string,
@@ -9,52 +55,42 @@ export const resolveWalletResponse = async (
   headers: AuthHeaders,
   pathname: string,
 ) => {
-  const response = await queryIdentityGraph(
+  const res = await queryIdentityGraph(
     QueryType.GET_WALLET_QUERY,
     handle,
     platform,
     headers,
   );
+  const root = res?.data?.identity;
 
-  const resolutionResult = resolveWalletResolution(
-    response?.data?.identity?.identityGraph?.vertices,
-    handle,
-    platform,
-  );
-  if ("message" in resolutionResult) {
+  if (!root)
     return errorHandle({
-      identity: resolutionResult.identity,
-      path: pathname,
-      platform: resolutionResult.platform,
-      code: resolutionResult.code,
-      message: resolutionResult.message,
-    });
-  }
-
-  return respondJson(resolutionResult);
-};
-
-const resolveWalletResolution = (
-  data: any,
-  handle: string,
-  platform: Platform,
-): any => {
-  if (!data.length)
-    return {
       identity: handle,
+      path: pathname,
       platform,
       code: 404,
       message: ErrorMessages.NOT_FOUND,
-    };
+    });
 
-  const res = {
-    ens:
-      data.find((x: any) => x.platform === Platform.ens && x.isPrimary) || null,
-    sns:
-      data.find((x: any) => x.platform === Platform.sns && x.isPrimary) || null,
-    relations: data.filter(
-      (x: any) => ![Platform.ens, Platform.sns].includes(x.platform),
+  const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];
+  const [main, graph] = await Promise.all([
+    format(root, vertices),
+    Promise.all(
+      vertices
+        .filter(
+          (v) =>
+            !NAME_SERVICE_MAPPING.some((m) => m.ns === v.platform) &&
+            v.identity !== root.identity,
+        )
+        .map((v) => format(v, vertices)),
     ),
-  };
-  return res;
+  ]);
+
+  return respondJson({
+    ...main,
+    credential: processCredentials(
+      (root.credentials || []) as CredentialRecord[],
+    ),
+    identityGraph: graph,
+  });
 };

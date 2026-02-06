@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { resolveWalletResponse } from "./utils";
 
 export async function GET(

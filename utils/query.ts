@@ -28,17 +28,43 @@ export enum QueryType {
 const GET_WALLET_QUERY = `
   query GET_WALLET_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
+      identity
+      platform
+      isPrimary
+      updatedAt
+      credentials {
+        category
+        type
+        value
+        dataSource
+        link
+        updatedAt
+        expiredAt
+      }
+      profile {
+        address
+        identity
+        platform
+        displayName
+        avatar
+        description
+      }
       identityGraph {
         vertices {
-          id
           identity
           platform
+          updatedAt
           isPrimary
-          credentials {
-            category
-            type
-            value
-            dataSource
+          ownerAddress {
+            address
+            network
+          }
+          profile {
+            address
+            identity
+            displayName
+            avatar
+            description
           }
         }
       }
