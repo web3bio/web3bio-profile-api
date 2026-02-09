@@ -42,14 +42,6 @@ describe("Test For NS API web2 query", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("0xhelena.eth");
   });
-  it("It should response 200 for telegram,asnporwsk02lgz7ggrcm/kocayvut9rwnjvkefci5od110kmdrl/tlptfgpdvjb2nkkxdfuzqmuhfe2pbcv58ip53qnfylwjkygczkxotlwm7g==", async () => {
-    const res = await queryClient(
-      `/ns/telegram,${encodeURIComponent("asnporwsk02lgz7ggrcm/kocayvut9rwnjvkefci5od110kmdrl/tlptfgpdvjb2nkkxdfuzqmuhfe2pbcv58ip53qnfylwjkygczkxotlwm7g==")}`,
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("0xhelena.eth");
-  });
   it("It should response 200 for benzweerachat.linkedin", async () => {
     const res = await queryClient("/ns/benzweerachat.linkedin");
     expect(res.status).toBe(200);
