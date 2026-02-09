@@ -8,6 +8,7 @@ import {
   ErrorMessages,
   AddressRecord,
   Network,
+  IdentityString,
 } from "web3bio-profile-kit/types";
 import {
   PLATFORM_DATA,
@@ -128,6 +129,7 @@ export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
   edges?: IdentityGraphEdge[],
+  aliases?: IdentityString[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
 
@@ -151,8 +153,7 @@ export async function generateProfileStruct(
     return nsObj;
   }
 
-  const socialData = await generateSocialLinks(data, edges);
-
+  const socialData = await generateSocialLinks(data, edges, aliases);
   return {
     ...nsObj,
     status: data.texts?.status || null,
@@ -322,10 +323,10 @@ const resolveContenthash = async (
 export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
+  aliases?: IdentityString[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, SocialLinksItem> = {};
-
   // Resolve contenthash early
   const contenthash = await resolveContenthash(
     originalContenthash,
@@ -462,6 +463,19 @@ export const generateSocialLinks = async (
       break;
     default:
       break;
+  }
+
+  // remove duplicated farcaster from aliases
+  if (
+    aliases &&
+    aliases?.length > 0 &&
+    platform !== Platform.farcaster &&
+    links?.farcaster
+  ) {
+    const farcasterLink = links.farcaster.handle;
+    if (aliases.includes(`${Platform.farcaster},${farcasterLink}`)) {
+      delete links.farcaster;
+    }
   }
 
   return { links, contenthash };

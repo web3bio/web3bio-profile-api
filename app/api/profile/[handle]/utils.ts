@@ -372,7 +372,14 @@ const extractProfilesFromGraph = (
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
-  const graphVertices = enrichedRecord.identityGraph?.vertices || [];
+  const graphVertices =
+    enrichedRecord.identityGraph?.vertices?.map((v) => ({
+      ...v,
+      profile: {
+        ...v.profile,
+        aliases: v.aliases || [],
+      },
+    })) || [];
 
   const profileResults =
     isPrimaryOrSocialProfile(enrichedRecord) ||
@@ -387,11 +394,14 @@ export const resolveWithIdentityGraph = async ({
   platform,
   ns,
   response,
+  pathname,
 }: {
   handle: string;
   platform: Platform;
-  ns?: boolean;
   response: IdentityGraphQueryResponse;
+
+  ns?: boolean;
+  pathname?: string;
 }) => {
   // Handle error responses early
   if (response.msg) {
@@ -412,7 +422,6 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
-
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
   // kill eth or solana profile if the address is included in other profiles
   const ethSolanaIndex = extractedProfiles.findIndex((profile) =>
@@ -437,12 +446,27 @@ export const resolveWithIdentityGraph = async ({
     handle,
   );
 
+  const allAliases = pathname?.startsWith("/profile/")
+    ? response.data.identity.identityGraph?.vertices?.reduce((pre, cur) => {
+        if (
+          cur.aliases &&
+          cur.aliases?.length > 0 &&
+          cur.platform === Platform.farcaster
+        ) {
+          const res = pre.concat(pre, cur.aliases as string[]);
+          pre = res;
+        }
+        return pre;
+      }, [] as string[])
+    : [];
+
   // Generate profile structures
   const profileStructPromises = sortedProfiles.map((profile) =>
     generateProfileStruct(
       profile,
       ns,
       response.data.identity.identityGraph?.edges,
+      allAliases,
     ),
   );
 
@@ -485,6 +509,7 @@ export const resolveUniversalHandle = async (
     platform,
     ns,
     response,
+    pathname,
   });
 
   if ("message" in resolutionResult) {
