@@ -201,4 +201,10 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].platform).toBe("farcaster");
     expect(json[0].identity).toBe("suji");
   });
+  it("It should response 200 for krys.eth", async () => {
+    const res = await queryClient("/profile/krys.eth");
+    const json = await res.json();
+    const baseItem = json.find((x) => x.platform === "basenames");
+    expect(baseItem.links.farcaster.handle).toBe("krys.eth");
+  });
 });
