@@ -372,19 +372,26 @@ const extractProfilesFromGraph = (
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
+  // resolve aliases to resolve duplicated links farcaster handle
   const graphVertices =
     enrichedRecord.identityGraph?.vertices?.map((v) => ({
       ...v,
       profile: {
         ...v.profile,
-        aliases: v.aliases || [],
+        aliases:
+          v.aliases && v.aliases?.length > 0
+            ? {
+                identity: v.identity,
+                aliases: v.aliases || [],
+              }
+            : null,
       },
     })) || [];
 
   const profileResults =
     isPrimaryOrSocialProfile(enrichedRecord) ||
     SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
-      ? processIdentityConnections(enrichedRecord, graphVertices)
+      ? processIdentityConnections(enrichedRecord, graphVertices as any)
       : [buildProfileFromRecord(enrichedRecord)];
   return removeDuplicateProfiles(profileResults);
 };
@@ -399,7 +406,6 @@ export const resolveWithIdentityGraph = async ({
   handle: string;
   platform: Platform;
   response: IdentityGraphQueryResponse;
-
   ns?: boolean;
   pathname?: string;
 }) => {
@@ -445,19 +451,13 @@ export const resolveWithIdentityGraph = async ({
     platform,
     handle,
   );
-
   const allAliases = pathname?.startsWith("/profile/")
-    ? response.data.identity.identityGraph?.vertices?.reduce((pre, cur) => {
-        if (
-          cur.aliases &&
-          cur.aliases?.length > 0 &&
-          cur.platform === Platform.farcaster
-        ) {
-          const res = pre.concat(pre, cur.aliases as string[]);
-          pre = res;
+    ? extractedProfiles.reduce((pre, cur) => {
+        if (cur.aliases && cur.platform === Platform.farcaster) {
+          pre.push(cur.aliases);
         }
         return pre;
-      }, [] as string[])
+      }, new Array())
     : [];
 
   // Generate profile structures

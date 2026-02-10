@@ -38,6 +38,11 @@ import type {
   IdentityRecord,
 } from "@/utils/types";
 
+interface ResolvedAliases {
+  identity: string;
+  aliases: IdentityString[];
+}
+
 const UD_ACCOUNTS_LIST = [
   Platform.twitter,
   Platform.discord,
@@ -129,7 +134,7 @@ export async function generateProfileStruct(
   data: ProfileRecord,
   ns?: boolean,
   edges?: IdentityGraphEdge[],
-  aliases?: IdentityString[],
+  aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
 
@@ -153,7 +158,7 @@ export async function generateProfileStruct(
     return nsObj;
   }
 
-  const socialData = await generateSocialLinks(data, edges, aliases);
+  const socialData = await generateSocialLinks(data, edges, aliases as any);
   return {
     ...nsObj,
     status: data.texts?.status || null,
@@ -323,7 +328,7 @@ const resolveContenthash = async (
 export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
-  aliases?: IdentityString[],
+  aliases?: ResolvedAliases[],
 ) => {
   const { platform, texts, identity, contenthash: originalContenthash } = data;
   const links: Record<string, SocialLinksItem> = {};
@@ -466,15 +471,17 @@ export const generateSocialLinks = async (
   }
 
   // remove duplicated farcaster from aliases
-  if (
-    aliases &&
-    aliases?.length > 0 &&
-    platform !== Platform.farcaster &&
-    links?.farcaster
-  ) {
+  if (aliases && platform !== Platform.farcaster && links?.farcaster) {
     const farcasterLink = links.farcaster.handle;
-    if (aliases.includes(`${Platform.farcaster},${farcasterLink}`)) {
-      delete links.farcaster;
+    const matchItem = aliases.find((x) =>
+      x.aliases.includes(`${Platform.farcaster},${farcasterLink}`),
+    );
+    if (matchItem) {
+      links.farcaster = {
+        link: getSocialMediaLink(matchItem.identity, Platform.farcaster),
+        handle: matchItem.identity,
+        sources: links.farcaster.sources,
+      };
     }
   }
 
