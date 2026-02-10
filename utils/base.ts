@@ -158,7 +158,7 @@ export async function generateProfileStruct(
     return nsObj;
   }
 
-  const socialData = await generateSocialLinks(data, edges, aliases as any);
+  const socialData = await generateSocialLinks(data, edges, aliases);
   return {
     ...nsObj,
     status: data.texts?.status || null,
@@ -471,7 +471,7 @@ export const generateSocialLinks = async (
   }
 
   // remove duplicated farcaster from aliases
-  if (aliases && platform !== Platform.farcaster && links?.farcaster) {
+  if (aliases?.length && platform !== Platform.farcaster && links?.farcaster) {
     const farcasterLink = links.farcaster.handle;
     const matchItem = aliases.find((x) =>
       x.aliases.includes(`${Platform.farcaster},${farcasterLink}`),

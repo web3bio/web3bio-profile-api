@@ -180,16 +180,19 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient(
       "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
     );
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("🦊🦊🦊.eth");
   });
   it("It should response 200 for filelly.eth", async () => {
     const res = await queryClient("/profile/filelly.eth");
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].address).toBe("0xea1c2886d9cb0c3b119cd145c9c1a6bc1f26f150");
   });
   it("It should response 200 for 30315.eth", async () => {
     const res = await queryClient("/profile/30315.eth");
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("30315.eth");
   });
@@ -197,12 +200,14 @@ describe("Test For Universal Profile API", () => {
     const res = await queryClient(
       "/profile/farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
     );
+    expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].platform).toBe("farcaster");
     expect(json[0].identity).toBe("suji");
   });
   it("It should response 200 for krys.eth", async () => {
     const res = await queryClient("/profile/krys.eth");
+    expect(res.status).toBe(200);
     const json = await res.json();
     const baseItem = json.find((x) => x.platform === "basenames");
     expect(baseItem.links.farcaster.handle).toBe("krys.eth");
