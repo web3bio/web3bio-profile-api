@@ -55,7 +55,6 @@ const SUPPORTED_PLATFORMS = new Set([
   Platform.instagram,
   Platform.reddit,
   Platform.keybase,
-  Platform.linkedin,
   Platform.facebook,
   Platform.telegram,
   Platform.nostr,
@@ -160,22 +159,19 @@ const shouldAddDefaultProfile = (
   platform: Platform,
   existingProfiles: ProfileRecord[],
 ): boolean => {
-  if (platform === Platform.ethereum) {
-    return !existingProfiles.some(
-      (profile) => profile.isPrimary && profile.platform === Platform.ens,
-    );
-  }
-
-  if (platform === Platform.solana) {
-    return !existingProfiles.some(
-      (profile) => profile.isPrimary && profile.platform === Platform.sns,
-    );
-  }
-
   const isSocialMedia = SOCIAL_MEDIA_PLATFORMS.has(platform);
-  const isWeb3Address = WEB3_ADDRESS_PLATFORMS.has(platform);
+  const isWeb3AddressPlatform = WEB3_ADDRESS_PLATFORMS.has(platform);
 
-  return !isSocialMedia && !isWeb3Address;
+  if (isSocialMedia || isWeb3AddressPlatform) {
+    // For Ethereum, check if ENS exists; for Solana, check if SNS exists
+    const relatedPlatform =
+      platform === Platform.ethereum ? Platform.ens : Platform.sns;
+    return !existingProfiles.some(
+      (profile) => profile.isPrimary && profile.platform === relatedPlatform,
+    );
+  }
+
+  return true;
 };
 
 const filterConnectedProfiles = (
@@ -247,18 +243,16 @@ const removeDuplicateProfiles = (
   const uniqueProfilesMap = new Map<string, ProfileRecord>();
 
   for (const profile of profiles) {
-    if (!profile.platform || !VALID_PLATFORM_SET.has(profile.platform)) {
+    if (
+      !profile.platform ||
+      !VALID_PLATFORM_SET.has(profile.platform) ||
+      !isSupportedPlatform(profile.platform as any)
+    ) {
       continue;
     }
 
-    if (!isSupportedPlatform(profile.platform as any)) {
-      continue;
-    }
-
-    const profileKey = `${profile.platform}:${profile.identity}`;
-    if (!uniqueProfilesMap.has(profileKey)) {
-      uniqueProfilesMap.set(profileKey, profile);
-    }
+    const profileKey = `${profile.platform},${profile.identity}`;
+    uniqueProfilesMap.set(profileKey, profile);
   }
 
   return Array.from(uniqueProfilesMap.values());
@@ -272,16 +266,18 @@ const enrichWithFarcasterEnsRelations = (
   const graphVertices = identity.identityGraph?.vertices;
   if (!graphVertices) return identity;
 
+  const farcasterIdentities = new Set(
+    graphVertices
+      .filter((v) => v.platform === Platform.farcaster)
+      .map((v) => v.identity),
+  );
+
   // Find ENS entries linked to Farcaster profiles
   const farcasterLinkedEnsEntries = graphVertices.filter(
     (vertex) =>
       vertex.platform === Platform.ens &&
       !vertex.isPrimary &&
-      graphVertices.some(
-        (otherVertex) =>
-          otherVertex.platform === Platform.farcaster &&
-          otherVertex.identity === vertex.identity,
-      ),
+      farcasterIdentities.has(vertex.identity),
   );
 
   if (farcasterLinkedEnsEntries.length > 0) {
@@ -324,10 +320,11 @@ const sortProfilesByPriority = (
       continue;
     }
 
-    if (!platformGroups.has(profile.platform)) {
-      platformGroups.set(profile.platform, []);
+    const platform = profile.platform;
+    if (!platformGroups.has(platform)) {
+      platformGroups.set(platform, []);
     }
-    platformGroups.get(profile.platform)!.push(profile);
+    platformGroups.get(platform)!.push(profile);
   }
 
   // Sort profiles within each platform group
@@ -352,13 +349,17 @@ const sortProfilesByPriority = (
       ? Platform.sns
       : primaryPlatform;
 
-  const sortedProfiles = platformGroups.get(primaryPlatformOrFallback) || [];
+  const primaryPlatformProfiles = platformGroups.get(primaryPlatformOrFallback);
+  const sortedProfiles = primaryPlatformProfiles
+    ? [...primaryPlatformProfiles]
+    : [];
+
   for (const platform of PLATFORM_PRIORITY_ORDER) {
-    if (
-      platform !== primaryPlatformOrFallback &&
-      platformGroups.has(platform)
-    ) {
-      sortedProfiles.push(...platformGroups.get(platform)!);
+    if (platform !== primaryPlatformOrFallback) {
+      const groupProfiles = platformGroups.get(platform);
+      if (groupProfiles) {
+        sortedProfiles.push(...groupProfiles);
+      }
     }
   }
 
@@ -451,13 +452,11 @@ export const resolveWithIdentityGraph = async ({
     platform,
     handle,
   );
+  const farcasterProfiles = extractedProfiles.filter(
+    (p) => p.aliases && p.platform === Platform.farcaster,
+  );
   const allAliases = pathname?.startsWith("/profile/")
-    ? extractedProfiles.reduce((pre, cur) => {
-        if (cur.aliases && cur.platform === Platform.farcaster) {
-          pre.push(cur.aliases);
-        }
-        return pre;
-      }, new Array())
+    ? (farcasterProfiles.map((p) => p.aliases) as any)
     : [];
 
   // Generate profile structures
