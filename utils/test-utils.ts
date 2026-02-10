@@ -1,32 +1,22 @@
 if (process.env.NODE_ENV !== "production") {
-  const fs = require("fs");
-  const path = require("path");
-
-  const loadEnv = (filePath: string) => {
-    try {
-      const content = fs.readFileSync(filePath, "utf8");
-      content.split("\n").forEach((line: string) => {
-        const [key, ...values] = line.split("=");
-        if (key && values.length && !process.env[key.trim()]) {
-          process.env[key.trim()] = values
-            .join("=")
-            .trim()
-            .replace(/^["']|["']$/g, "");
+  try {
+    require("fs")
+      .readFileSync(".env.local", "utf8")
+      .split("\n")
+      .forEach((line: string) => {
+        const [key, value] = line.split("=");
+        if (key && value && !process.env[key.trim()]) {
+          process.env[key.trim()] = value.trim().replace(/^["']|["']$/g, "");
         }
       });
-    } catch (e) {}
-  };
-
-  loadEnv(path.resolve(process.cwd(), ".env.local"));
+  } catch (e) {}
 }
 
 export const queryClient = async (path: string) => {
   const baseUrl = process.env.BASE_URL || "http://localhost:3000";
   const API_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
-  return await fetch(baseUrl + path, {
-    headers: {
-      "x-api-key": API_KEY,
-    },
+  return fetch(baseUrl + path, {
+    headers: { "x-api-key": API_KEY },
   });
 };
