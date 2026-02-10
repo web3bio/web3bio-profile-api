@@ -159,19 +159,22 @@ const shouldAddDefaultProfile = (
   platform: Platform,
   existingProfiles: ProfileRecord[],
 ): boolean => {
-  const isSocialMedia = SOCIAL_MEDIA_PLATFORMS.has(platform);
-  const isWeb3AddressPlatform = WEB3_ADDRESS_PLATFORMS.has(platform);
-
-  if (isSocialMedia || isWeb3AddressPlatform) {
-    // For Ethereum, check if ENS exists; for Solana, check if SNS exists
-    const relatedPlatform =
-      platform === Platform.ethereum ? Platform.ens : Platform.sns;
+  if (platform === Platform.ethereum) {
     return !existingProfiles.some(
-      (profile) => profile.isPrimary && profile.platform === relatedPlatform,
+      (profile) => profile.isPrimary && profile.platform === Platform.ens,
     );
   }
 
-  return true;
+  if (platform === Platform.solana) {
+    return !existingProfiles.some(
+      (profile) => profile.isPrimary && profile.platform === Platform.sns,
+    );
+  }
+
+  return (
+    !SOCIAL_MEDIA_PLATFORMS.has(platform) &&
+    !WEB3_ADDRESS_PLATFORMS.has(platform)
+  );
 };
 
 const filterConnectedProfiles = (
@@ -251,7 +254,7 @@ const removeDuplicateProfiles = (
       continue;
     }
 
-    const profileKey = `${profile.platform},${profile.identity}`;
+    const profileKey = `${profile.platform}:${profile.identity}`;
     uniqueProfilesMap.set(profileKey, profile);
   }
 
@@ -266,6 +269,7 @@ const enrichWithFarcasterEnsRelations = (
   const graphVertices = identity.identityGraph?.vertices;
   if (!graphVertices) return identity;
 
+  // Build a set of Farcaster identities for O(1) lookup
   const farcasterIdentities = new Set(
     graphVertices
       .filter((v) => v.platform === Platform.farcaster)
