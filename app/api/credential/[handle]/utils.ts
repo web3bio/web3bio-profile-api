@@ -6,20 +6,18 @@ import {
   Platform,
 } from "web3bio-profile-kit/types";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import type { AuthHeaders, CredentialRecord } from "@/utils/types";
+import type {
+  AuthHeaders,
+  CredentialRecord,
+  CredentialVertice,
+} from "@/utils/types";
 import { errorHandle, respondJson } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
-interface CredentialVertice {
-  id: string;
-  platform: Platform;
-  credentials: CredentialType[];
-}
-
 type CredentialCategory = keyof CredentialResponse;
 
-const evaluateCategory = (
+export const evaluateCategory = (
   category: CredentialCategory,
   item: CredentialRecord,
 ): boolean => {
@@ -46,7 +44,7 @@ const evaluateCategory = (
   }
 };
 
-const processCredentials = (
+export const processCredentials = (
   credentials: CredentialRecord[],
 ): CredentialResponse => {
   return credentials.reduce(
