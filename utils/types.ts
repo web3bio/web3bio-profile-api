@@ -1,4 +1,5 @@
 import {
+  CredentialType,
   type AddressRecord,
   type CredentialCategory,
   type ErrorMessages,
@@ -96,4 +97,10 @@ export interface CredentialRecord {
   link: string | null;
   updatedAt: number | null;
   expiredAt: number | null;
+}
+
+export interface CredentialVertice {
+  id: string;
+  platform: Platform;
+  credentials: CredentialType[];
 }
