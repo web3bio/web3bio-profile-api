@@ -55,7 +55,6 @@ const SUPPORTED_PLATFORMS = new Set([
   Platform.instagram,
   Platform.reddit,
   Platform.keybase,
-  Platform.linkedin,
   Platform.facebook,
   Platform.telegram,
   Platform.nostr,
@@ -172,10 +171,10 @@ const shouldAddDefaultProfile = (
     );
   }
 
-  const isSocialMedia = SOCIAL_MEDIA_PLATFORMS.has(platform);
-  const isWeb3Address = WEB3_ADDRESS_PLATFORMS.has(platform);
-
-  return !isSocialMedia && !isWeb3Address;
+  return (
+    !SOCIAL_MEDIA_PLATFORMS.has(platform) &&
+    !WEB3_ADDRESS_PLATFORMS.has(platform)
+  );
 };
 
 const filterConnectedProfiles = (
@@ -247,18 +246,16 @@ const removeDuplicateProfiles = (
   const uniqueProfilesMap = new Map<string, ProfileRecord>();
 
   for (const profile of profiles) {
-    if (!profile.platform || !VALID_PLATFORM_SET.has(profile.platform)) {
-      continue;
-    }
-
-    if (!isSupportedPlatform(profile.platform as any)) {
+    if (
+      !profile.platform ||
+      !VALID_PLATFORM_SET.has(profile.platform) ||
+      !isSupportedPlatform(profile.platform as any)
+    ) {
       continue;
     }
 
     const profileKey = `${profile.platform}:${profile.identity}`;
-    if (!uniqueProfilesMap.has(profileKey)) {
-      uniqueProfilesMap.set(profileKey, profile);
-    }
+    uniqueProfilesMap.set(profileKey, profile);
   }
 
   return Array.from(uniqueProfilesMap.values());
@@ -272,16 +269,19 @@ const enrichWithFarcasterEnsRelations = (
   const graphVertices = identity.identityGraph?.vertices;
   if (!graphVertices) return identity;
 
+  // Build a set of Farcaster identities for O(1) lookup
+  const farcasterIdentities = new Set(
+    graphVertices
+      .filter((v) => v.platform === Platform.farcaster)
+      .map((v) => v.identity),
+  );
+
   // Find ENS entries linked to Farcaster profiles
   const farcasterLinkedEnsEntries = graphVertices.filter(
     (vertex) =>
       vertex.platform === Platform.ens &&
       !vertex.isPrimary &&
-      graphVertices.some(
-        (otherVertex) =>
-          otherVertex.platform === Platform.farcaster &&
-          otherVertex.identity === vertex.identity,
-      ),
+      farcasterIdentities.has(vertex.identity),
   );
 
   if (farcasterLinkedEnsEntries.length > 0) {
@@ -324,10 +324,11 @@ const sortProfilesByPriority = (
       continue;
     }
 
-    if (!platformGroups.has(profile.platform)) {
-      platformGroups.set(profile.platform, []);
+    const platform = profile.platform;
+    if (!platformGroups.has(platform)) {
+      platformGroups.set(platform, []);
     }
-    platformGroups.get(profile.platform)!.push(profile);
+    platformGroups.get(platform)!.push(profile);
   }
 
   // Sort profiles within each platform group
@@ -352,13 +353,17 @@ const sortProfilesByPriority = (
       ? Platform.sns
       : primaryPlatform;
 
-  const sortedProfiles = platformGroups.get(primaryPlatformOrFallback) || [];
+  const primaryPlatformProfiles = platformGroups.get(primaryPlatformOrFallback);
+  const sortedProfiles = primaryPlatformProfiles
+    ? [...primaryPlatformProfiles]
+    : [];
+
   for (const platform of PLATFORM_PRIORITY_ORDER) {
-    if (
-      platform !== primaryPlatformOrFallback &&
-      platformGroups.has(platform)
-    ) {
-      sortedProfiles.push(...platformGroups.get(platform)!);
+    if (platform !== primaryPlatformOrFallback) {
+      const groupProfiles = platformGroups.get(platform);
+      if (groupProfiles) {
+        sortedProfiles.push(...groupProfiles);
+      }
     }
   }
 
@@ -372,12 +377,26 @@ const extractProfilesFromGraph = (
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
-  const graphVertices = enrichedRecord.identityGraph?.vertices || [];
+  // resolve aliases to resolve duplicated links farcaster handle
+  const graphVertices =
+    enrichedRecord.identityGraph?.vertices?.map((v) => ({
+      ...v,
+      profile: {
+        ...v.profile,
+        aliases:
+          v.aliases && v.aliases?.length > 0
+            ? {
+                identity: v.identity,
+                aliases: v.aliases || [],
+              }
+            : null,
+      },
+    })) || [];
 
   const profileResults =
     isPrimaryOrSocialProfile(enrichedRecord) ||
     SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
-      ? processIdentityConnections(enrichedRecord, graphVertices)
+      ? processIdentityConnections(enrichedRecord, graphVertices as any)
       : [buildProfileFromRecord(enrichedRecord)];
   return removeDuplicateProfiles(profileResults);
 };
@@ -387,11 +406,13 @@ export const resolveWithIdentityGraph = async ({
   platform,
   ns,
   response,
+  pathname,
 }: {
   handle: string;
   platform: Platform;
-  ns?: boolean;
   response: IdentityGraphQueryResponse;
+  ns?: boolean;
+  pathname?: string;
 }) => {
   // Handle error responses early
   if (response.msg) {
@@ -412,7 +433,6 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
-
   const extractedProfiles = extractProfilesFromGraph(processedResponse);
   // kill eth or solana profile if the address is included in other profiles
   const ethSolanaIndex = extractedProfiles.findIndex((profile) =>
@@ -436,6 +456,12 @@ export const resolveWithIdentityGraph = async ({
     platform,
     handle,
   );
+  const farcasterProfiles = extractedProfiles.filter(
+    (p) => p.aliases && p.platform === Platform.farcaster,
+  );
+  const allAliases = pathname?.startsWith("/profile/")
+    ? (farcasterProfiles.map((p) => p.aliases) as any)
+    : [];
 
   // Generate profile structures
   const profileStructPromises = sortedProfiles.map((profile) =>
@@ -443,6 +469,7 @@ export const resolveWithIdentityGraph = async ({
       profile,
       ns,
       response.data.identity.identityGraph?.edges,
+      allAliases,
     ),
   );
 
@@ -485,6 +512,7 @@ export const resolveUniversalHandle = async (
     platform,
     ns,
     response,
+    pathname,
   });
 
   if ("message" in resolutionResult) {

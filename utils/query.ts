@@ -161,6 +161,7 @@ const GET_PROFILES_NS = `
 const GET_PROFILES = `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
+      aliases
       identity
       platform
       isPrimary
@@ -197,6 +198,7 @@ const GET_PROFILES = `
       }
       identityGraph {
         vertices {
+          aliases
           identity
           platform
           isPrimary
