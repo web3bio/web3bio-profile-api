@@ -10,7 +10,7 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "node",
   testTimeout: 200000,
-  setupFiles: ["<rootDir>/utils/setup.ts"],
+  setupFiles: ["<rootDir>/utils/test-utils.ts"],
   transform: {
     "^.+\\.tsx?$": "ts-jest",
   },
