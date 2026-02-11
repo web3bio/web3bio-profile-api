@@ -1,7 +1,7 @@
 import { queryIdentityGraph, QueryType } from "@/utils/query";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import { AuthHeaders, IdentityRecord, CredentialRecord } from "@/utils/types";
-import { BASE_URL, errorHandle, respondJson } from "@/utils/utils";
+import { errorHandle, respondJson } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 import { processCredentials } from "../../credential/[handle]/utils";
@@ -19,7 +19,7 @@ const format = async (
 ): Promise<any> => {
   const avatar = v.profile?.avatar
     ? await resolveEipAssetURL(v.profile.avatar).catch(() => v.profile.avatar)
-    : `${BASE_URL}/avatar/svg/${v.platform},${v.identity}`;
+    : null;
 
   const domains = NAME_SERVICE_MAPPING.some((x) => x.network === v.platform)
     ? await Promise.all(
