@@ -67,6 +67,10 @@ const GET_WALLET_QUERY = `
             description
           }
         }
+        edges {
+          target
+          dataSource
+        }
       }
     }
   }
