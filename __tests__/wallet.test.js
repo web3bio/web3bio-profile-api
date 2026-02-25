@@ -31,6 +31,6 @@ describe("Test For NS API web2 query", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.sources.length > 0).toBeTruthy();
+    expect(json.identityGraph.some((x) => x.sources.length > 0)).toBeTruthy();
   });
 });

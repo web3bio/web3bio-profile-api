@@ -86,7 +86,8 @@ export const resolveWalletResponse = async (
   const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];
   const edges: IdentityGraphEdge[] = root.identityGraph?.edges || [];
   const [main, graph] = await Promise.all([
-    format(root, vertices, edges),
+    // root without sources
+    format(root, vertices, edges, true),
     Promise.all(
       vertices
         .filter(
