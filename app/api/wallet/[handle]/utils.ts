@@ -1,6 +1,11 @@
 import { queryIdentityGraph, QueryType } from "@/utils/query";
 import { resolveEipAssetURL } from "@/utils/resolver";
-import { AuthHeaders, IdentityRecord, CredentialRecord } from "@/utils/types";
+import {
+  AuthHeaders,
+  IdentityRecord,
+  CredentialRecord,
+  IdentityGraphEdge,
+} from "@/utils/types";
 import { errorHandle, respondJson } from "@/utils/utils";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { isSameAddress } from "web3bio-profile-kit/utils";
@@ -16,6 +21,8 @@ const NAME_SERVICE_MAPPING = [
 const format = async (
   v: IdentityRecord,
   all: IdentityRecord[] = [],
+  edges: IdentityGraphEdge[] = [],
+  isDomainItem: Boolean = false,
 ): Promise<any> => {
   const avatar = v.profile?.avatar
     ? await resolveEipAssetURL(v.profile.avatar).catch(() => v.profile.avatar)
@@ -32,11 +39,11 @@ const format = async (
               ),
           )
           .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
-          .map((sv) => format(sv)),
+          .map((sv) => format(sv, [], [], true)),
       )
     : [];
 
-  return {
+  const res = {
     identity: v.identity || null,
     address: v.profile?.address || null,
     platform: v.platform,
@@ -47,6 +54,10 @@ const format = async (
     updatedAt: v.updatedAt || null,
     domains,
   };
+  if (!isDomainItem) {
+    (res as any).sources = resolveSources(`${v.platform},${v.identity}`, edges);
+  }
+  return res;
 };
 
 export const resolveWalletResponse = async (
@@ -73,8 +84,10 @@ export const resolveWalletResponse = async (
     });
 
   const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];
+  const edges: IdentityGraphEdge[] = root.identityGraph?.edges || [];
   const [main, graph] = await Promise.all([
-    format(root, vertices),
+    // root without sources
+    format(root, vertices, edges, true),
     Promise.all(
       vertices
         .filter(
@@ -82,7 +95,7 @@ export const resolveWalletResponse = async (
             !NAME_SERVICE_MAPPING.some((m) => m.ns === v.platform) &&
             v.identity !== root.identity,
         )
-        .map((v) => format(v, vertices)),
+        .map((v) => format(v, vertices, edges)),
     ),
   ]);
 
@@ -93,4 +106,17 @@ export const resolveWalletResponse = async (
     ),
     identityGraph: graph,
   });
+};
+
+const resolveSources = (id: string, edges: IdentityGraphEdge[]) => {
+  if (!edges?.length) return [];
+
+  const sources = new Set<string>();
+  edges.forEach((edge) => {
+    if (edge.target === id && edge.dataSource) {
+      sources.add(edge.dataSource);
+    }
+  });
+
+  return Array.from(sources);
 };
