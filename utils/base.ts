@@ -174,12 +174,14 @@ export async function generateProfileStruct(
       data.social || data.uid
         ? {
             uid: Number(data.social?.uid || data.uid) || null,
-            follower: data.social?.follower
-              ? Number(data.social?.follower)
-              : null,
-            following: data.social?.following
-              ? Number(data.social?.following)
-              : null,
+            follower:
+              data.social?.follower != null
+                ? Number(data.social.follower)
+                : null,
+            following:
+              data.social?.following != null
+                ? Number(data.social.following)
+                : null,
           }
         : {},
   };
