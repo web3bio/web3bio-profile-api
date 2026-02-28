@@ -188,7 +188,7 @@ export async function generateProfileStruct(
                 : null,
           }
         : {},
-  } as any;
+  };
   return res;
 }
 
