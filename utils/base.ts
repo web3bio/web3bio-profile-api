@@ -159,7 +159,7 @@ export async function generateProfileStruct(
   }
 
   const socialData = await generateSocialLinks(data, edges, aliases);
-  return {
+  const res = {
     ...nsObj,
     status: data.texts?.status || null,
     createdAt: data.createdAt ? formatTimestamp(data.createdAt) : null,
@@ -169,6 +169,10 @@ export async function generateProfileStruct(
       ? await resolveEipAssetURL(data.texts.header)
       : null,
     contenthash: socialData.contenthash || null,
+    widgets:
+      data.platform === Platform.ens
+        ? data.texts?.["web3.bio.widgets"] || null
+        : null,
     links: (socialData.links as SocialLinks) || {},
     social:
       data.social || data.uid
@@ -184,7 +188,8 @@ export async function generateProfileStruct(
                 : null,
           }
         : {},
-  };
+  } as any;
+  return res;
 }
 
 export const resolveIdentityHandle = async (
