@@ -137,7 +137,6 @@ export async function generateProfileStruct(
   aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
-  console.log(data,'kkk')
   const nsObj: NSResponse = {
     address:
       data.platform !== Platform.farcaster
