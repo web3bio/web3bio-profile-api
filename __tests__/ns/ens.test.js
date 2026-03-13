@@ -4,8 +4,10 @@ describe("Test For ENS NS API", () => {
   it("It should response 200 for brantly.eth", async () => {
     const res = await queryClient("/ns/ens/brantly.eth");
     const json = await res.json();
-    expect(json.address).toBeTruthy();
     expect(res.status).toBe(200);
+    expect(json.address).toBeTruthy();
+    expect(json.status).toBeTruthy();
+    expect(json.header).toBeTruthy();
   });
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/ns/ens/mcdonalds.eth");

@@ -137,7 +137,7 @@ export async function generateProfileStruct(
   aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
   // Basic profile data used in both response types
-
+  console.log(data,'kkk')
   const nsObj: NSResponse = {
     address:
       data.platform !== Platform.farcaster
@@ -152,6 +152,10 @@ export async function generateProfileStruct(
         : data.identity),
     avatar: await resolveEipAssetURL(data.avatar),
     description: data.description || null,
+    header: data.texts?.header
+      ? await resolveEipAssetURL(data.texts.header)
+      : null,
+    status: data.texts?.status || null,
   };
 
   if (ns) {
@@ -161,13 +165,9 @@ export async function generateProfileStruct(
   const socialData = await generateSocialLinks(data, edges, aliases);
   const res = {
     ...nsObj,
-    status: data.texts?.status || null,
     createdAt: data.createdAt ? formatTimestamp(data.createdAt) : null,
     email: data.texts?.email || null,
     location: resolveLocation(data.texts?.location),
-    header: data.texts?.header
-      ? await resolveEipAssetURL(data.texts.header)
-      : null,
     contenthash: socialData.contenthash || null,
     widgets:
       data.platform === Platform.ens
