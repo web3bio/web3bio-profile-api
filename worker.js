@@ -107,7 +107,7 @@ const handler = {
     const userToken = request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
 
-    if (requiredRole !== null) {
+    if (requiredRole !== null && !isTrustedOrigin(request)) {
       if (!userToken) {
         return new Response(
           JSON.stringify({ error: "API key required" }),
