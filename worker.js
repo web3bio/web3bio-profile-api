@@ -125,7 +125,7 @@ const handler = {
         );
       }
       const role = Number(verifiedToken.role ?? 0);
-      if (role < requiredRole) {
+      if (role <= requiredRole) {
         return new Response(
           JSON.stringify({ error: "Insufficient permissions" }),
           { status: 403, headers: { "Content-Type": "application/json" } },
