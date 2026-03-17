@@ -37,7 +37,7 @@ const processProfileAvatar = async (
 
 const processJson = async (json: IdentityGraphQueryResponse) => {
   const _json = structuredClone(json);
-  const identity = _json?.data?.identityQuery;
+  const identity = (_json?.data as any)?.identityQuery;
 
   if (!identity) return _json;
 
