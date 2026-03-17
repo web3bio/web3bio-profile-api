@@ -37,7 +37,7 @@ const processProfileAvatar = async (
 
 const processJson = async (json: IdentityGraphQueryResponse) => {
   const _json = structuredClone(json);
-  const identity = _json?.data?.identity;
+  const identity = _json?.data?.identityQuery;
 
   if (!identity) return _json;
 
@@ -127,7 +127,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    if (isSingleWeb2Identity(res.data.identity)) {
+    if (isSingleWeb2Identity(res.data.identityQuery)) {
       return errorHandle({
         identity: identity,
         path: pathname,

@@ -30,8 +30,8 @@ describe("Test For Solana Profile API", () => {
     const res = await queryClient("/profile/sns/lewsales.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json.contenthash).toBe(
-      "ipfs://QmNzcrH1Rf9765XeGBmXTtQs8jbefGf9x3VQJcCJsQjvqx",
+    expect(json.address).toBe(
+      "D6d5byBxBcddovgQ2UPUMpPDpJukjyC7C4Hcg3v4FRkZ",
     );
   });
   it("It should response 200 for anarcrypt.sol", async () => {

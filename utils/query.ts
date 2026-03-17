@@ -27,7 +27,7 @@ export enum QueryType {
 
 const GET_WALLET_QUERY = `
   query GET_WALLET_QUERY($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       identity
       platform
       isPrimary
@@ -103,7 +103,7 @@ const GET_CREDENTIALS_QUERY = `
 
 const GET_PROFILES_NS = `
   query GET_PROFILES_NS($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       identity
       platform
       isPrimary
@@ -164,7 +164,7 @@ const GET_PROFILES_NS = `
 
 const GET_PROFILES = `
   query GET_PROFILES($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       aliases
       identity
       platform
@@ -251,7 +251,7 @@ const GET_PROFILES = `
 
 const GET_REFRESH_PROFILE = `
   query GET_REFRESH_PROFILE($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity, refresh: true) {
+    identityQuery(platform: $platform, identity: $identity, refresh: true) {
       status
       identityGraph {
         graphId
@@ -354,7 +354,7 @@ const GET_BATCH_UNIVERSAL = `
 `;
 const GET_DOMAIN_SINGLE = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       platform
       identity
       registeredAt
@@ -392,7 +392,7 @@ const GET_DOMAIN_SINGLE = `
   }`;
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       platform
       identity
       registeredAt
@@ -481,7 +481,7 @@ export const GET_SEARCH_SUGGEST = `
 // Search Query
 const GET_SEARCH_QUERY = `
   query GET_SEARCH_PROFILES($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
+    identityQuery(platform: $platform, identity: $identity) {
       identity
       platform
       isPrimary

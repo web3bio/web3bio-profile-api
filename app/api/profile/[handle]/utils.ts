@@ -375,7 +375,9 @@ const sortProfilesByPriority = (
 const extractProfilesFromGraph = (
   data: IdentityGraphQueryResponse,
 ): ProfileRecord[] => {
-  const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
+  const enrichedRecord = enrichWithFarcasterEnsRelations(
+    (data as any)?.data?.identityQuery,
+  );
   if (!enrichedRecord) return [];
   // resolve aliases to resolve duplicated links farcaster handle
   const graphVertices =
@@ -423,7 +425,7 @@ export const resolveWithIdentityGraph = async ({
       code: response.code || 500,
     };
   }
-  if (!response?.data?.identity || response?.errors) {
+  if (!(response as any)?.data?.identityQuery || response?.errors) {
     return {
       identity: handle,
       platform,
@@ -468,7 +470,7 @@ export const resolveWithIdentityGraph = async ({
     generateProfileStruct(
       profile,
       ns,
-      response.data.identity.identityGraph?.edges,
+      (response as any).data.identityQuery.identityGraph?.edges,
       allAliases,
     ),
   );

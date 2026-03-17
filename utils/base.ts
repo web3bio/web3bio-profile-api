@@ -87,7 +87,7 @@ export const resolveIdentityResponse = async (
     };
   }
 
-  const profile = res?.data?.identity?.profile;
+  const profile = res?.data?.identityQuery?.profile;
 
   if (!profile) {
     if ([Platform.sns, Platform.ens].includes(platform)) {
@@ -123,10 +123,10 @@ export const resolveIdentityResponse = async (
   return generateProfileStruct(
     {
       ...profile,
-      createdAt: res.data.identity?.registeredAt,
+      createdAt: res.data.identityQuery?.registeredAt,
     },
     ns,
-    res.data.identity?.identityGraph?.edges,
+    res.data.identityQuery?.identityGraph?.edges,
   );
 };
 
@@ -229,7 +229,7 @@ export const resolveIdentityHandle = async (
 
 export const processJson = async (json: IdentityGraphQueryResponse) => {
   const _json = structuredClone(json);
-  const identity = _json?.data?.identity;
+  const identity = (_json as any)?.data?.identityQuery;
 
   if (!identity) return _json;
 

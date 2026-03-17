@@ -72,7 +72,7 @@ export const resolveWalletResponse = async (
     platform,
     headers,
   );
-  const root = res?.data?.identity;
+  const root = res?.data?.identityQuery;
 
   if (!root)
     return errorHandle({

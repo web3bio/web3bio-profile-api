@@ -68,7 +68,7 @@ export const resolveDomainQuery = async (
     headers,
   );
 
-  const identity = response?.data?.identity;
+  const identity = response?.data?.identityQuery;
   if (!identity) {
     return errorHandle({
       identity: handle,
