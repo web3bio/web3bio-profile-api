@@ -84,6 +84,15 @@ function getTTL(pathname) {
   return 7200; // 2h
 }
 
+const PATH_MIN_ROLE = { "/wallet": 6 };
+
+function getRequiredRole(pathname) {
+  for (const [path, minRole] of Object.entries(PATH_MIN_ROLE)) {
+    if (pathname.startsWith(path)) return minRole;
+  }
+  return null;
+}
+
 const handler = {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
@@ -95,19 +104,46 @@ const handler = {
       return openNextHandler.fetch(request, env, ctx);
     }
 
-    // Verify API key
     const userToken = request.headers.get("x-api-key");
-    if (userToken) {
+    const requiredRole = getRequiredRole(pathname);
+
+    if (requiredRole !== null && !isTrustedOrigin(request)) {
+      if (!userToken) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden", message: "API key required" }),
+          { status: 403, headers: { "Content-Type": "application/json" } },
+        );
+      }
       const verifiedToken = await verifyAuth(
         userToken.replace("Bearer ", ""),
         env,
       );
-
       if (!verifiedToken) {
-        return new Response(JSON.stringify({ error: "Invalid API Token" }), {
-          status: 403,
-          headers: { "Content-Type": "application/json" },
-        });
+        return new Response(
+          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
+          { status: 403, headers: { "Content-Type": "application/json" } },
+        );
+      }
+      const role = Number(verifiedToken.role ?? 0);
+      if (role <= requiredRole) {
+        return new Response(
+          JSON.stringify({
+            error: "Forbidden",
+            message: "Insufficient permissions",
+          }),
+          { status: 403, headers: { "Content-Type": "application/json" } },
+        );
+      }
+    } else if (userToken) {
+      const verifiedToken = await verifyAuth(
+        userToken.replace("Bearer ", ""),
+        env,
+      );
+      if (!verifiedToken) {
+        return new Response(
+          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
+          { status: 403, headers: { "Content-Type": "application/json" } },
+        );
       }
     } else if (
       !isTrustedOrigin(request) &&

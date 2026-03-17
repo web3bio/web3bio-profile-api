@@ -101,6 +101,8 @@ export const resolveIdentityResponse = async (
           platform === Platform.ens ? Platform.ethereum : Platform.solana,
         displayName: formatText(handle),
         avatar: null,
+        header: null,
+        status: null,
       };
 
       if (ns) return nsResponse;
@@ -136,8 +138,8 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
   aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
+  const avatar = await processProfileAvatar(data);
   // Basic profile data used in both response types
-
   const nsObj: NSResponse = {
     address:
       data.platform !== Platform.farcaster
@@ -150,8 +152,12 @@ export async function generateProfileStruct(
       (isWeb3Address(data.identity)
         ? formatText(data.identity)
         : data.identity),
-    avatar: await resolveEipAssetURL(data.avatar),
+    avatar,
     description: data.description || null,
+    header: data.texts?.header
+      ? await resolveEipAssetURL(data.texts.header)
+      : null,
+    status: data.texts?.status || null,
   };
 
   if (ns) {
@@ -161,13 +167,9 @@ export async function generateProfileStruct(
   const socialData = await generateSocialLinks(data, edges, aliases);
   const res = {
     ...nsObj,
-    status: data.texts?.status || null,
     createdAt: data.createdAt ? formatTimestamp(data.createdAt) : null,
     email: data.texts?.email || null,
     location: resolveLocation(data.texts?.location),
-    header: data.texts?.header
-      ? await resolveEipAssetURL(data.texts.header)
-      : null,
     contenthash: socialData.contenthash || null,
     widgets:
       data.platform === Platform.ens
@@ -323,6 +325,10 @@ const resolveContenthash = async (
     const ipnsMatch = originalContenthash.match(/ipns=(k51[a-zA-Z0-9]{59})/i);
     if (ipnsMatch?.[1]) {
       return `ipns://${ipnsMatch[1]}`;
+    }
+    const ipfsUrlMatch = originalContenthash.match(/ipfs:\/\/([^\s,;'"<>]+)/i);
+    if (ipfsUrlMatch?.[0]) {
+      return ipfsUrlMatch[0];
     }
     if (isIPFS(originalContenthash)) {
       return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
@@ -560,9 +566,20 @@ const processProfileAvatar = async (
   if (!profile?.avatar) return null;
 
   try {
-    return await resolveEipAssetURL(profile.avatar);
+    const resolvedAvatar = await resolveEipAssetURL(profile.avatar);
+    if (!resolvedAvatar) return null;
+    return isValidUrl(resolvedAvatar) ? resolvedAvatar : null;
   } catch {
     return null;
+  }
+};
+
+const isValidUrl = (value: string): boolean => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
   }
 };
 

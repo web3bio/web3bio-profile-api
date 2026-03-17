@@ -1,6 +1,6 @@
 import { queryClient } from "../utils/test-utils";
 
-describe("Test For NS API web2 query", () => {
+describe("Test For Wallet API query", () => {
   it("It should response 200 for 0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1", async () => {
     const res = await queryClient(
       "/wallet/0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1",
