@@ -110,7 +110,7 @@ const handler = {
     if (requiredRole !== null && !isTrustedOrigin(request)) {
       if (!userToken) {
         return new Response(
-          JSON.stringify({ error: "API key required" }),
+          JSON.stringify({ error: "Forbidden", message: "API key required" }),
           { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }
@@ -120,14 +120,17 @@ const handler = {
       );
       if (!verifiedToken) {
         return new Response(
-          JSON.stringify({ error: "Invalid API Token" }),
+          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
           { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }
       const role = Number(verifiedToken.role ?? 0);
       if (role <= requiredRole) {
         return new Response(
-          JSON.stringify({ error: "Insufficient permissions" }),
+          JSON.stringify({
+            error: "Forbidden",
+            message: "Insufficient permissions",
+          }),
           { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }
@@ -138,7 +141,7 @@ const handler = {
       );
       if (!verifiedToken) {
         return new Response(
-          JSON.stringify({ error: "Invalid API Token" }),
+          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
           { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }

@@ -101,6 +101,8 @@ export const resolveIdentityResponse = async (
           platform === Platform.ens ? Platform.ethereum : Platform.solana,
         displayName: formatText(handle),
         avatar: null,
+        header: null,
+        status: null,
       };
 
       if (ns) return nsResponse;
