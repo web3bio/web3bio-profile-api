@@ -6,18 +6,18 @@
     justify-content: flex-start;
     position: relative;
     transform: translateY(20vh);
-    transition: all .25s ease-in-out;
+    transition: all 0.25s ease-in-out;
     z-index: 99;
   }
 
   .web3bio-logo {
-    margin-bottom: .2rem;
+    margin-bottom: 0.2rem;
   }
 
   .form-label {
     font-size: 2.2rem;
     font-weight: 900;
-    letter-spacing: -.05rem;
+    letter-spacing: -0.05rem;
     line-height: 1;
     margin: 1rem 0;
 
@@ -32,16 +32,18 @@
   }
 
   .form-input-group {
-    margin: .3rem 0;
+    margin: 0.3rem 0;
     position: relative;
 
     .form-input {
       border: transparent;
-      box-shadow: 0 .05rem .2rem rgba($dark-color, .1);
+      box-shadow: 0 0.05rem 0.2rem rgba($dark-color, 0.1);
       padding-right: 2.4rem;
 
       &:focus {
-        box-shadow: 0 .8rem 4rem rgba($dark-color, .25), 0 .05rem .2rem rgba($dark-color, .1);
+        box-shadow:
+          0 0.8rem 4rem rgba($dark-color, 0.25),
+          0 0.05rem 0.2rem rgba($dark-color, 0.1);
       }
     }
 
@@ -49,20 +51,22 @@
       height: 2rem;
       padding: 0;
       position: absolute;
-      right: .2rem;
-      top: .2rem;
+      right: 0.2rem;
+      top: 0.2rem;
       width: 2rem;
     }
 
     .search-list {
-      animation: slide-down .2s ease 1;
+      animation: slide-down 0.2s ease 1;
       background: #fff;
-      box-shadow: 0 .8rem 4rem rgba($dark-color, .25), 0 .05rem .2rem rgba($dark-color, .1);
-      border-radius: .4rem;
+      box-shadow:
+        0 0.8rem 4rem rgba($dark-color, 0.25),
+        0 0.05rem 0.2rem rgba($dark-color, 0.1);
+      border-radius: 0.4rem;
       display: block;
       left: 0;
       overflow-y: auto;
-      padding: .5rem;
+      padding: 0.5rem;
       position: absolute;
       top: 2.5rem;
       width: 100%;
@@ -70,25 +74,25 @@
 
       .search-list-item {
         align-items: center;
-        border-radius: .4rem;
+        border-radius: 0.4rem;
         cursor: pointer;
         display: flex;
-        padding: .5rem;
-        gap: .5rem;
-        transition: all .2s ease;
+        padding: 0.5rem;
+        gap: 0.5rem;
+        transition: all 0.2s ease;
 
         &:focus,
         &:hover {
-          background: rgba($dark-color, .05);
+          background: rgba($dark-color, 0.05);
         }
 
         &:not(:last-child) {
-          margin-bottom: .05rem;
+          margin-bottom: 0.05rem;
         }
       }
 
       .search-list-item-active {
-        background: rgba($dark-color, .05);
+        background: rgba($dark-color, 0.05);
       }
     }
   }
@@ -109,7 +113,7 @@
     .loading-subtitle {
       width: 100%;
       text-align: center;
-      font-size: .7rem;
+      font-size: 0.7rem;
     }
   }
 }
@@ -118,23 +122,23 @@
   position: fixed;
   top: 50%;
   left: 50%;
-  transform: translate(-50%,-50%);
+  transform: translate(-50%, -50%);
   text-align: center;
 }
 
 // Search results
 .search-result {
-  animation: slide-down .2s ease 1;
-  background: rgba($light-color, .85);
+  animation: slide-down 0.2s ease 1;
+  background: rgba($light-color, 0.85);
   border-radius: $border-radius;
-  box-shadow: 0 .05rem .2rem rgba($dark-color, .1);
+  box-shadow: 0 0.05rem 0.2rem rgba($dark-color, 0.1);
   position: relative;
 
   .search-result-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: .8rem;
+    padding: 0.8rem;
 
     .search-result-text {
       word-break: break-all;
@@ -147,7 +151,7 @@
       flex-shrink: 0;
 
       svg {
-        margin-right: .2rem;
+        margin-right: 0.2rem;
       }
     }
   }
@@ -155,25 +159,25 @@
   .search-result-body {
     display: flex;
     flex-direction: column;
-    padding: 0 .8rem .8rem .8rem;
+    padding: 0 0.8rem 0.8rem 0.8rem;
   }
 
   .social-item {
-    background: rgba($gray-color, .05);
+    background: rgba($gray-color, 0.05);
     border-radius: $border-radius;
     display: flex;
     position: relative;
-    transition: all .2s ease-in;
+    transition: all 0.2s ease-in;
     width: 100%;
 
     &:not(:last-child) {
-      margin-bottom: .2rem;
+      margin-bottom: 0.2rem;
     }
 
     &:focus,
     &:hover {
-      background: rgba($gray-color, .1);
-      transform: translateY(-.1rem);
+      background: rgba($gray-color, 0.1);
+      transform: translateY(-0.1rem);
 
       .actions {
         display: flex;
@@ -185,7 +189,7 @@
     }
 
     &:active {
-      background: rgba($gray-color, .15);
+      background: rgba($gray-color, 0.15);
     }
 
     .social-main {
@@ -193,12 +197,12 @@
       display: flex;
       flex: 1 1 1rem;
       overflow: hidden;
-      padding: .4rem;
+      padding: 0.4rem;
       width: 80%;
 
       .avatar {
         align-items: center;
-        border-radius: .5rem;
+        border-radius: 0.5rem;
         display: flex;
         flex: 0 0 1.8rem;
         height: 1.8rem;
@@ -213,13 +217,13 @@
         }
 
         .avatar-img {
-          border-radius: .5rem;
+          border-radius: 0.5rem;
 
           & + .icon {
-            bottom: -.7rem;
+            bottom: -0.7rem;
             position: absolute;
-            right: -.7rem;
-            transform: scale(.5);
+            right: -0.7rem;
+            transform: scale(0.5);
             z-index: 1;
           }
         }
@@ -231,7 +235,7 @@
       }
 
       .title {
-        margin-left: .5rem;
+        margin-left: 0.5rem;
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
@@ -239,28 +243,32 @@
     }
 
     .social-actions {
-      padding: .25rem;
+      padding: 0.25rem;
 
       .action {
-        background: rgba($dark-color, .035);
-        font-size: .6rem;
+        background: rgba($dark-color, 0.035);
+        font-size: 0.6rem;
         height: 100%;
       }
     }
 
     .social-footer {
       align-items: center;
-      background: linear-gradient(-135deg, rgba($dark-color, .05), transparent);
-      border-radius: .1rem;
+      background: linear-gradient(
+        -135deg,
+        rgba($dark-color, 0.05),
+        transparent
+      );
+      border-radius: 0.1rem;
       color: $gray-color;
       display: none;
-      font-size: .5rem;
-      height: .6rem;
+      font-size: 0.5rem;
+      height: 0.6rem;
       justify-content: flex-end;
       padding: 0;
       position: absolute;
       right: 0;
-      top: -.2rem;
+      top: -0.2rem;
     }
 
     &.social-web3 {
@@ -279,14 +287,14 @@
 
     &.farcaster {
       .icon {
-        background: #8a63d2;
+        background: #6a3cff;
         color: #fff;
       }
     }
 
     &.spaceid {
       .icon {
-        background: #71EBAA;
+        background: #71ebaa;
         color: #fff;
       }
     }
@@ -306,14 +314,14 @@
 
   .label-ens {
     align-items: center;
-    border-radius: .3rem;
+    border-radius: 0.3rem;
     color: lighten($dark-color, 25%);
     display: inline-flex;
-    font-size: .6rem;
-    line-height: .8rem;
-    margin: .1rem .1rem 0 0;
+    font-size: 0.6rem;
+    line-height: 0.8rem;
+    margin: 0.1rem 0.1rem 0 0;
     max-width: 12rem;
-    padding: .1rem .15rem .1rem .15rem;
+    padding: 0.1rem 0.15rem 0.1rem 0.15rem;
     text-decoration: none;
 
     span {
@@ -323,21 +331,21 @@
     }
 
     .icon {
-      color: #5298FF;
-      flex: 0 0 .7rem;
-      margin-right: .2rem;
+      color: #5298ff;
+      flex: 0 0 0.7rem;
+      margin-right: 0.2rem;
     }
   }
 
   .actions {
     display: none;
     margin-left: auto;
-    padding: .2rem;
+    padding: 0.2rem;
 
     .action {
       align-items: center;
       display: inline-flex;
-      font-size: .55rem;
+      font-size: 0.55rem;
       line-height: 1.2rem;
       position: relative;
     }
@@ -351,42 +359,42 @@
 
 .social {
   align-items: center;
-  border-radius: .2rem;
+  border-radius: 0.2rem;
   display: flex;
   flex: 1;
-  font-size: .6rem;
+  font-size: 0.6rem;
   line-height: 1rem;
-  padding: .1rem .1rem .1rem .3rem;
+  padding: 0.1rem 0.1rem 0.1rem 0.3rem;
   text-decoration: none;
-  transition: all .25s ease-in-out;
+  transition: all 0.25s ease-in-out;
 
   .icon {
     align-items: center;
     border-radius: $border-radius;
     color: $dark-color;
     display: flex;
-    font-size: .7rem;
+    font-size: 0.7rem;
     height: 1.4rem;
     justify-content: center;
-    margin: 0 .2rem;
-    padding: .2rem;
+    margin: 0 0.2rem;
+    padding: 0.2rem;
     width: 1.4rem;
   }
 
   .content {
     flex: 1;
-    margin-left: .5rem;
+    margin-left: 0.5rem;
   }
 
   .content-title {
-    font-size: .75rem;
+    font-size: 0.75rem;
     line-height: 1.2rem;
   }
 
   .content-subtitle {
     align-items: center;
     display: flex;
-    font-size: .55rem;
+    font-size: 0.55rem;
     line-height: 1rem;
     max-width: 80%;
 
@@ -394,9 +402,9 @@
       cursor: pointer;
       flex: 0 1;
       height: 1rem;
-      margin-left: .2rem;
+      margin-left: 0.2rem;
       position: relative;
-      transition: all .2s ease-in-out;
+      transition: all 0.2s ease-in-out;
       width: 1rem;
 
       &:focus,
@@ -407,6 +415,6 @@
   }
 
   .title {
-    font-size: .7rem;
+    font-size: 0.7rem;
   }
 }
