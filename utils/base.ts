@@ -138,6 +138,7 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
   aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
+  const avatar = await processProfileAvatar(data);
   // Basic profile data used in both response types
   const nsObj: NSResponse = {
     address:
@@ -151,7 +152,7 @@ export async function generateProfileStruct(
       (isWeb3Address(data.identity)
         ? formatText(data.identity)
         : data.identity),
-    avatar: await resolveEipAssetURL(data.avatar),
+    avatar,
     description: data.description || null,
     header: data.texts?.header
       ? await resolveEipAssetURL(data.texts.header)
@@ -565,9 +566,20 @@ const processProfileAvatar = async (
   if (!profile?.avatar) return null;
 
   try {
-    return await resolveEipAssetURL(profile.avatar);
+    const resolvedAvatar = await resolveEipAssetURL(profile.avatar);
+    if (!resolvedAvatar) return null;
+    return isValidUrl(resolvedAvatar) ? resolvedAvatar : null;
   } catch {
     return null;
+  }
+};
+
+const isValidUrl = (value: string): boolean => {
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
   }
 };
 
