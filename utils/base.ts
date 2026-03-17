@@ -323,6 +323,10 @@ const resolveContenthash = async (
     if (ipnsMatch?.[1]) {
       return `ipns://${ipnsMatch[1]}`;
     }
+    const ipfsUrlMatch = originalContenthash.match(/ipfs:\/\/([^\s,;'"<>]+)/i);
+    if (ipfsUrlMatch?.[0]) {
+      return ipfsUrlMatch[0];
+    }
     if (isIPFS(originalContenthash)) {
       return `ipfs://${resolveIPFS_CID(originalContenthash)}`;
     }
