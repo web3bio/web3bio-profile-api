@@ -1,7 +1,7 @@
 {
   "name": "web3bio-profile-api",
   "version": "0.4.3",
-  "packageManager": "pnpm@10.26.2",
+  "packageManager": "pnpm@10.32.1",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
   "scripts": {
@@ -25,7 +25,7 @@
     "react": "19.2.0",
     "react-dom": "19.2.0",
     "viem": "^2.39.3",
-    "web3bio-profile-kit": "^0.2.0"
+    "web3bio-profile-kit": "^0.2.3"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",

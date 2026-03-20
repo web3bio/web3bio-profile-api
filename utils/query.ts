@@ -123,6 +123,7 @@ const GET_PROFILES_NS = `
         displayName
         avatar
         description
+        texts
         addresses {
           address
           network
@@ -147,6 +148,7 @@ const GET_PROFILES_NS = `
             identity
             platform
             address
+            texts
             addresses {
               address
               network

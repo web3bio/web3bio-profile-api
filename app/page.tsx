@@ -258,7 +258,7 @@ export default async function Home() {
                       >
                         <div className="platform-badge-icon">
                           <svg
-                            fill="#8a63d2"
+                            fill="#6a3cff"
                             height="32"
                             viewBox="0 0 32 32"
                             width="20"
@@ -346,7 +346,7 @@ export default async function Home() {
                       >
                         <div className="platform-badge-icon">
                           <svg
-                            fill="#8a63d2"
+                            fill="#6a3cff"
                             height="32"
                             viewBox="0 0 32 32"
                             width="20"
@@ -434,7 +434,7 @@ export default async function Home() {
                       >
                         <div className="platform-badge-icon">
                           <svg
-                            fill="#8a63d2"
+                            fill="#6a3cff"
                             height="32"
                             viewBox="0 0 32 32"
                             width="20"
@@ -509,6 +509,37 @@ export default async function Home() {
               explains how to use them and what they return. Currently, the APIs
               are offered for free to assist developers in getting started with
               Web3 profiles. We will do our best to maintain uptime.
+            </p>
+          </section>
+          <section className="pt-4 pb-4">
+            <h2 className="text-bold h4">Profile Kit</h2>
+            <p>
+              For React developers, we provide the{" "}
+              <strong>Web3.bio Profile Kit</strong>, a lightweight client
+              library that simplifies integrating Web3 profiles into your
+              applications.
+            </p>
+            <p>
+              The Profile Kit offers React hooks, types, and components for
+              fetching and displaying profile data from multiple Web3 platforms,
+              making it easier to build user interfaces that leverage Web3
+              identities.
+            </p>
+            <p>
+              <a
+                href="https://www.npmjs.com/package/web3bio-profile-kit"
+                target="_blank"
+                className="btn btn-sm btn-primary pt-4 pb-4"
+              >
+                🛠️ Install Profile Kit
+              </a>{" "}
+              <a
+                href="https://github.com/web3bio/profile-kit"
+                target="_blank"
+                className="btn btn-sm pt-4 pb-4"
+              >
+                View on GitHub
+              </a>
             </p>
           </section>
           <section className="pt-4 pb-4">
@@ -984,22 +1015,6 @@ export default async function Home() {
             </a>
 
             <a
-              href="#unstoppabledomains-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Unstoppable Domains Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
               href="#solana-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
@@ -1151,8 +1166,10 @@ export default async function Home() {
               "identity": "vitalik.eth",
               "platform": "ens",
               "displayName": "vitalik.eth",
-              "avatar": "https://cdn.simplehash.com/assets/db17eebeede377614b156126590d5e4c521a80fef6bdce78e8e6563b4526b417.gif",
-              "description": null
+              "avatar": "https://euc.li/vitalik.eth",
+              "description": "mi pinxe lo crino tcati",
+              "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+              "status": null
             }
               `}
             />
@@ -1304,8 +1321,10 @@ export default async function Home() {
               "identity": "tony.base.eth",
               "platform": "basenames",
               "displayName": "tony.base.eth",
-              "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
-              "description": "mfer building on base"
+              "avatar": "https://ipfs.io/ipfs/bafybeid7wspcdu2m7qtntomflncnyepfstuqym3xc6w6ui7kytomaz5kl4",
+              "description": "mfer building on base",
+              "header": null,
+              "status": null
             }
               `}
             />
@@ -1434,7 +1453,9 @@ export default async function Home() {
               "platform": "linea",
               "displayName": "name.linea.eth",
               "avatar": null,
-              "description": null
+              "description": null,
+              "header": null,
+              "status": null
             }
               `}
             />
@@ -1584,12 +1605,14 @@ export default async function Home() {
             // ${BASE_URL}/ns/farcaster/dwr.eth
             // ${BASE_URL}/ns/farcaster/farcaster%2C%233
             {
-              "address": "0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea",
-              "identity": "dwr.eth",
+              "address": "0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5",
+              "identity": "dwr",
               "platform": "farcaster",
               "displayName": "Dan Romero",
-              "avatar": "https://res.cloudinary.com/merkle-manufactory/image/fetch/c_fill,f_png,w_256/https://lh3.googleusercontent.com/MyUBL0xHzMeBu7DXQAqv0bM9y6s4i4qjnhcXz5fxZKS3gwWgtamxxmxzCJX7m2cuYeGalyseCA2Y6OBKDMR06TWg2uwknnhdkDA1AA",
-              "description": "Working on Farcaster and Warpcast."
+              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+              "description": "Interested in technology and other stuff.",
+              "header": null,
+              "status": null
             }
               `}
             />
@@ -1721,157 +1744,10 @@ export default async function Home() {
               "identity": "stani.lens",
               "platform": "lens",
               "displayName": "Stani",
-              "avatar": "https://ik.imagekit.io/lens/media-snapshot/e3adfb7046a549480a92c63de2d431f1ced8e516ea285970267c4dc24f941856.png",
-              "description": "@Avara (@Aave @Lens @Family)"
-            }
-              `}
-            />
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="unstoppabledomains-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Unstoppable Domains Profile API</h2>
-            <p>
-              Fetch a detailed Unstoppable Domains profile using an Ethereum
-              address or Unstoppable Domains domain.
-            </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  unstoppabledomains
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  unstoppabledomains
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or an Unstoppable Domains domain.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/0x94ef...ab23
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23`}
-                  target="_blank"
-                >
-                  /ns/unstoppabledomains/0x94ef...ab23
-                </a>
-              </li>
-              <li>
-                <span className="label">Unstoppable Domains</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/unstoppabledomains/sandy.nft`}
-                  target="_blank"
-                >
-                  /profile/unstoppabledomains/sandy.nft
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/unstoppabledomains/sandy.nft`}
-                  target="_blank"
-                >
-                  /ns/unstoppabledomains/sandy.nft
-                </a>
-              </li>
-            </ul>
-            <CodeBlock
-              language="json"
-              code={`
-            // ${BASE_URL}/profile/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
-            // ${BASE_URL}/profile/unstoppabledomains/sandy.nft
-            {
-              "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-              "identity": "sandy.nft",
-              "platform": "unstoppabledomains",
-              "displayName": "Pink Mamba",
-              "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-              "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech.",
-              "status": null,
-              "email": null,
-              "location": "Metaverse",
-              "header": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/4d3f4608-6b29-4847-95d3-e7484b255278.png",
-              "contenthash": "ipfs://Qmar8DH5xBihbGU449zKAg4sx7ahHbFZgksYHKBFFhfVq7",
-              "links": {
-                "twitter": {
-                  "link": "https://x.com/Sandy_carter",
-                  "handle": "Sandy_carter",
-                  "sources": []
-                },
-                "telegram": {
-                  "link": "https://t.me/sandycarter",
-                  "handle": "sandycarter",
-                  "sources": []
-                },
-                "youtube": {
-                  "link": "https://www.youtube.com/@sandycarter3993",
-                  "handle": "@sandycarter3993",
-                  "sources": []
-                }
-              },
-              "social": {
-                "uid": "sandy.nft",
-                "follower": 137,
-                "following": 0
-              }
-            }
-
-            // ${BASE_URL}/ns/unstoppabledomains/0x94ef5300cbc0aa600a821ccbc561b057e456ab23
-            // ${BASE_URL}/ns/unstoppabledomains/sandy.nft
-            {
-              "address": "0x94ef5300cbc0aa600a821ccbc561b057e456ab23",
-              "identity": "sandy.nft",
-              "platform": "unstoppabledomains",
-              "displayName": "Pink Mamba",
-              "avatar": "https://storage.googleapis.com/unstoppable-client-assets/images/user/1092584/f259e49c-a3d3-429f-a703-2e9d35d8da21.png",
-              "description": "COO of Unstoppable and Founder of Unstoppable Women of Web3 Sandy Carter is a leading voice in technology, social media, and web3/metaverse being recognized as TOP10 most powerful women in tech."
+              "avatar": "https://ik.imagekit.io/lens/4f0b6ecae2682c22c38a3f1c12f70e386ec68638b1895e53c969fdc9853f7022_rHSuskh0J.webp",
+              "description": "Founder & CEO @Aave",
+              "header": "https://ik.imagekit.io/lens/205d97d8c8bbf46058ce9666423fde941883e75d34ceeaedfeb0194fe9ec2407_TPKvCEnc54.webp",
+              "status": null
             }
               `}
             />
@@ -1991,12 +1867,14 @@ export default async function Home() {
             // ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA
             // ${BASE_URL}/ns/solana/bonfida.sol
             {
-              "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
+              "address": "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
               "identity": "bonfida.sol",
               "platform": "sns",
               "displayName": "bonfida.sol",
               "avatar": null,
-              "description": null
+              "description": null,
+              "header": null,
+              "status": null
             }
               `}
             />
@@ -2071,7 +1949,7 @@ export default async function Home() {
               "lens,stani.lens",
               "farcaster,dwr.eth",
               "basenames,tony.base.eth",
-              "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+              "ethereum,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
               "linea,name.linea.eth"
             ]
               `}
@@ -2086,7 +1964,7 @@ export default async function Home() {
                   href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                      "ens,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
                     ]),
                   )}`}
                   target="_blank"
@@ -2098,12 +1976,12 @@ export default async function Home() {
                   href={`${BASE_URL}/profile/batch/${encodeURIComponent(
                     JSON.stringify([
                       "ethereum,0xd8da6bf26964af9d7eed9e03e53415d37aa96045",
-                      "ens,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                      "ens,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
                     ]),
                   )}`}
                   target="_blank"
                 >
-                  ens,0x934b...d649
+                  ens,0x7cbb...acf5
                 </a>
               </li>
               <li>
@@ -2219,7 +2097,7 @@ export default async function Home() {
                 "lens,stani.lens",
                 "farcaster,dwr.eth",
                 "basenames,tony.base.eth",
-                "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "ethereum,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
               ]),
             )}
             [
@@ -2360,7 +2238,7 @@ export default async function Home() {
                 ]
               },
               {
-                "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "address": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
                 "identity": "sujiyan.eth",
                 "platform": "ens",
                 "displayName": "sujiyan.eth",
@@ -2395,7 +2273,7 @@ export default async function Home() {
                 },
                 "social": {},
                 "aliases": [
-                  "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                  "ethereum,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
                 ]
               }
             ]
@@ -2406,7 +2284,7 @@ export default async function Home() {
                 "lens,stani.lens",
                 "farcaster,dwr.eth",
                 "basenames,tony.base.eth",
-                "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "ethereum,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
               ]),
             )}
             [
@@ -2417,6 +2295,8 @@ export default async function Home() {
                 "displayName": "vitalik.eth",
                 "avatar": "https://euc.li/vitalik.eth",
                 "description": "mi pinxe lo crino tcati",
+                "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+                "status": null,
                 "aliases": [
                   "ens,vitalik.eth",
                   "ens,0xd8da6bf26964af9d7eed9e03e53415d37aa96045"
@@ -2427,26 +2307,32 @@ export default async function Home() {
                 "identity": "stani.lens",
                 "platform": "lens",
                 "displayName": "Stani",
-                "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-                "description": "@Avara (@Aave @Lens @Family)",
+                "avatar": "https://ik.imagekit.io/lens/4f0b6ecae2682c22c38a3f1c12f70e386ec68638b1895e53c969fdc9853f7022_rHSuskh0J.webp",
+                "description": "Founder & CEO @Aave",
+                "header": "https://ik.imagekit.io/lens/205d97d8c8bbf46058ce9666423fde941883e75d34ceeaedfeb0194fe9ec2407_TPKvCEnc54.webp",
+                "status": null,
                 "aliases": [
                   "lens,stani.lens",
                   "lens,0x7241dddec3a6af367882eaf9651b87e1c7549dff"
                 ]
               },
               {
-                "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-                "identity": "dwr.eth",
+                "address": "0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5",
+                "identity": "dwr",
                 "platform": "farcaster",
                 "displayName": "Dan Romero",
                 "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-                "description": "Working on Farcaster and Warpcast.",
+                "description": "Interested in technology and other stuff.",
+                "header": null,
+                "status": null,
                 "aliases": [
                   "farcaster,#3",
                   "farcaster,dwr",
                   "farcaster,dwr.eth",
                   "farcaster,danromero.eth",
-                  "farcaster,0xd7029bdea1c17493893aafe29aad69ef892b8ff2"
+                  "farcaster,0x187c7b0393ebe86378128f2653d0930e33218899",
+                  "farcaster,ExAqci8uUVKtqHqFW58fmwgMMY9PATfRGGyv6837j9Lx",
+                  "farcaster,0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5"
                 ]
               },
               {
@@ -2454,22 +2340,25 @@ export default async function Home() {
                 "identity": "tony.base.eth",
                 "platform": "basenames",
                 "displayName": "tony.base.eth",
-                "avatar": "https://zku9gdedgba48lmr.public.blob.vercel-storage.com/basenames/avatar/tony.base.eth/1724097976538/to-KihxRGRzOZbjF9tW937zYGMLMYQOjz.png",
+                "avatar": "https://ipfs.io/ipfs/bafybeid7wspcdu2m7qtntomflncnyepfstuqym3xc6w6ui7kytomaz5kl4",
                 "description": "mfer building on base",
+                "header": null,
+                "status": null,
                 "aliases": [
-                  "basenames,tony.base.eth",
-                  "basenames,0x041be0b39a80388364fe223dcd2b733d5a1144c4"
+                  "basenames,tony.base.eth"
                 ]
               },
               {
-                "address": "0x934b510d4c9103e6a87aef13b816fb080286d649",
+                "address": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
                 "identity": "sujiyan.eth",
                 "platform": "ens",
                 "displayName": "sujiyan.eth",
-                "avatar": "https://i.imgur.com/rkMlngS_d.webp?maxwidth=640&shape=thumb&fidelity=medium",
+                "avatar": "https://euc.li/sujiyan.eth",
                 "description": null,
+                "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
+                "status": null,
                 "aliases": [
-                  "ethereum,0x934b510d4c9103e6a87aef13b816fb080286d649"
+                  "ethereum,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
                 ]
               }
             ]
@@ -2745,23 +2634,34 @@ export default async function Home() {
               .
             </p>
             <h3 className="text-bold h6 mt-4">
-              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
-              Sept Update
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🪁</span>{" "}
+              2026 March Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added the
-                new <code>credential</code> endpoint and data.
+                <span className="label label-gray">Feature</span> Added new
+                field <code>header</code> and <code>status</code> to the Profile
+                API <code>/ns</code> endpoint.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
-              Aug Update
+              2025 Sept Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added the
-                new <code>Profile Kit</code> (
+                <span className="label label-gray">Feature</span> Added the new{" "}
+                <code>credential</code> endpoint and data.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
+              2025 Aug Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-gray">Feature</span> Added the new{" "}
+                <code>Profile Kit</code> (
                 <a
                   href="https://www.npmjs.com/package/web3bio-profile-kit"
                   target="_blank"
@@ -2776,41 +2676,41 @@ export default async function Home() {
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
-              June Update
+              2025 June Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Change</span> Deprecated{" "}
+                <span className="label label-gray">Change</span> Deprecated{" "}
                 <code>dotbit</code> platform support.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎨</span>{" "}
-              March Update
+              2025 March Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added new
+                <span className="label label-gray">Feature</span> Added new
                 field <code>status</code> to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
-              February Update
+              2025 February Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added Linea
+                <span className="label label-gray">Feature</span> Added Linea
                 Name Service query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
-              November Update
+              2024 November Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added{" "}
+                <span className="label label-gray">Feature</span> Added{" "}
                 <a href="#batch-query">
                   <code>Batch Query</code>
                 </a>{" "}
@@ -2819,108 +2719,108 @@ export default async function Home() {
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
-              October Update
+              2024 October Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added
+                <span className="label label-gray">Feature</span> Added
                 Basenames query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🏝️</span>{" "}
-              March Update
+              2024 March Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added
-                Solana Name Service (Bonfida) query support to the Profile API.
+                <span className="label label-gray">Feature</span> Added Solana
+                Name Service (Bonfida) query support to the Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
-              January Update
+              2024 January Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Update</span> Added{" "}
+                <span className="label label-gray">Update</span> Added{" "}
                 <code>contenthash</code> field for more complete ENS,
                 Unstoppable Domains and .bit Profile API queries.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added
-                offchain query support for ENS Profile API.
+                <span className="label label-gray">Update</span> Added offchain
+                query support for ENS Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
-              December Update
+              2023 December Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added{" "}
+                <span className="label label-gray">Feature</span> Added{" "}
                 <code>ns</code> basic profile resolution query support to the
                 Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎊</span>{" "}
-              November Update
+              2023 November Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added
+                <span className="label label-gray">Feature</span> Added
                 Unstoppable Domains query support to the Profile API.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added
-                Ethereum address query support to all Profile APIs.
+                <span className="label label-gray">Update</span> Added Ethereum
+                address query support to all Profile APIs.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🛠️</span>{" "}
-              October Update
+              2023 October Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Change</span> Deprecated{" "}
+                <span className="label label-gray">Change</span> Deprecated{" "}
                 <code>addresses</code> field for faster ENS API queries.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🔮</span>{" "}
-              August Update
+              2023 August Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added .bit
+                <span className="label label-gray">Feature</span> Added .bit
                 query support to the Profile API.
               </li>
               <li>
-                <span className="label label-primary">Update</span> Added ENS
+                <span className="label label-gray">Update</span> Added ENS
                 username support in the Farcaster Profile API.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎁</span>{" "}
-              June Update
+              2023 June Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added
+                <span className="label label-gray">Feature</span> Added
                 Universal Profile API. Developers can Fetch universal profiles
                 across supported platforms with a single query.
               </li>
             </ul>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🎉</span>{" "}
-              May Update
+              2023 May Update
             </h3>
             <ul>
               <li>
-                <span className="label label-primary">Feature</span> Added
-                Ethereum Name Service (ENS), Lens, and Farcaster support to the
-                Profile API.
+                <span className="label label-gray">Feature</span> Added Ethereum
+                Name Service (ENS), Lens, and Farcaster support to the Profile
+                API.
               </li>
             </ul>
           </section>
