@@ -124,8 +124,8 @@ const handler = {
           { status: 403, headers: { "Content-Type": "application/json" } },
         );
       }
-      const role = Number(verifiedToken.role ?? 0);
-      if (role <= requiredRole) {
+      const role = Number(verifiedToken.role);
+      if (!Number.isFinite(role) || role <= requiredRole) {
         return new Response(
           JSON.stringify({
             error: "Forbidden",

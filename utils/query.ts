@@ -148,7 +148,7 @@ const GET_PROFILES_NS = `
             identity
             platform
             address
-            texts 
+            texts
             addresses {
               address
               network

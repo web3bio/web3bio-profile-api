@@ -6,8 +6,8 @@ describe("Test For ENS NS API", () => {
     const json = await res.json();
     expect(res.status).toBe(200);
     expect(json.address).toBeTruthy();
-    expect(json.status).toBeTruthy();
-    expect(json.header).toBeTruthy();
+    expect(json).toHaveProperty("status");
+    expect(json).toHaveProperty("header");
   });
   it("It should response 404 for mcdonalds.eth", async () => {
     const res = await queryClient("/ns/ens/mcdonalds.eth");
@@ -35,7 +35,7 @@ describe("Test For ENS NS API", () => {
   });
   it("It should response 200 for 0xc0074d4f69f4281d7a8eb4d266348ba9f7599e0a", async () => {
     const res = await queryClient(
-      "/ns/ens/0xc0074d4f69f4281d7a8eb4d266348ba9f7599e0a"
+      "/ns/ens/0xc0074d4f69f4281d7a8eb4d266348ba9f7599e0a",
     );
     expect(res.status).toBe(200);
     const json = await res.json();

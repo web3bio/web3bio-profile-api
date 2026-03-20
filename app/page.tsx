@@ -520,9 +520,10 @@ export default async function Home() {
               applications.
             </p>
             <p>
-              The Profile Kit offers React , types, and components for fetching
-              and displaying profile data from multiple Web3 platforms, making
-              it easier to build user interfaces that leverage Web3 identities.
+              The Profile Kit offers React hooks, types, and components for
+              fetching and displaying profile data from multiple Web3 platforms,
+              making it easier to build user interfaces that leverage Web3
+              identities.
             </p>
             <p>
               <a
