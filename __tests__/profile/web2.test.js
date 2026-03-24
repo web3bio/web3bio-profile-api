@@ -2,10 +2,7 @@ import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Profile Web2 API", () => {
   it("It should response 403 for invalid role", async () => {
-    const res = await queryClient("/profile/sujiyan.eth/web2", {
-      "x-api-key": "123456",
-    });
-    console.log(res,'kk')
+    const res = await queryClient("/profile/sujiyan.eth/web2");
     expect(res.status).toBe(403);
   });
   it("It should response 200 for sujiyan.eth", async () => {
