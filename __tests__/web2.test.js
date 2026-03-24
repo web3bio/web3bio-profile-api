@@ -40,7 +40,7 @@ describe("Test For NS API web2 query", () => {
     const res = await queryClient("/ns/0xhelena.bluesky");
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].identity).toBe("0xhelena.eth");
+    expect(json[0].identity).toBe("thedefianalyst.eth");
   });
   it("It should response 200 for benzweerachat.linkedin", async () => {
     const res = await queryClient("/ns/benzweerachat.linkedin");

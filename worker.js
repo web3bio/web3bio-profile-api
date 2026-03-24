@@ -87,6 +87,9 @@ function getTTL(pathname) {
 const PATH_MIN_ROLE = { "/wallet": 6 };
 
 function getRequiredRole(pathname) {
+  if (/^\/profile\/[^/]+\/web2$/.test(pathname)) {
+    return 6;
+  }
   for (const [path, minRole] of Object.entries(PATH_MIN_ROLE)) {
     if (pathname.startsWith(path)) return minRole;
   }
