@@ -17,9 +17,6 @@ const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
 
 function isCacheableApiPath(pathname) {
-  if (pathname.startsWith("/profile/") && pathname.endsWith("/web2")) {
-    return true;
-  }
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
 }
 
@@ -89,12 +86,8 @@ function getTTL(pathname) {
 
 const PATH_MIN_ROLE = { "/wallet": 6 };
 
-function isProfileWeb2Path(pathname) {
-  return /^\/profile\/[^/]+\/web2$/.test(pathname);
-}
-
 function getRequiredRole(pathname) {
-  if (isProfileWeb2Path(pathname)) {
+  if (/^\/profile\/[^/]+\/web2$/.test(pathname)) {
     return 6;
   }
   for (const [path, minRole] of Object.entries(PATH_MIN_ROLE)) {
