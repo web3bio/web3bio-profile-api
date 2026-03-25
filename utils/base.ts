@@ -481,7 +481,7 @@ export const generateSocialLinks = async (
       break;
     // web2 platforms
     default:
-      if (texts.website) {
+      if (texts?.website) {
         links[Platform.website] = {
           link: getSocialMediaLink(texts.website, Platform.website),
           handle: texts.website,

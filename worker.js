@@ -15,6 +15,8 @@ const CACHEABLE_API_PATHS = [
 
 const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
+const MIN_ROLE_RESTRICTED = 6;
+const PATH_MIN_ROLE = { "/wallet": MIN_ROLE_RESTRICTED };
 
 function isCacheableApiPath(pathname) {
   return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
@@ -84,11 +86,9 @@ function getTTL(pathname) {
   return 7200; // 2h
 }
 
-const PATH_MIN_ROLE = { "/wallet": 6 };
-
 function getRequiredRole(pathname) {
   if (/^\/profile\/[^/]+\/web2$/.test(pathname)) {
-    return 6;
+    return MIN_ROLE_RESTRICTED;
   }
   for (const [path, minRole] of Object.entries(PATH_MIN_ROLE)) {
     if (pathname.startsWith(path)) return minRole;
