@@ -100,8 +100,13 @@ const isAddressMatching = (
   record: IdentityRecord,
   sourceAddress: string,
   sourcePlatform: Platform,
+  includeWeb2Platforms?: boolean,
 ): boolean => {
-  if (!record.isPrimary && !SOCIAL_PLATFORMS.has(record.platform)) {
+  if (
+    !record.isPrimary &&
+    !SOCIAL_PLATFORMS.has(record.platform) &&
+    !(includeWeb2Platforms && SOCIAL_MEDIA_PLATFORMS.has(record.platform))
+  ) {
     return false;
   }
 
@@ -181,6 +186,7 @@ const filterConnectedProfiles = (
   allRecords: IdentityRecord[],
   targetRecord: IdentityRecord,
   usePrimaryFlow: boolean,
+  includeWeb2Platforms?: boolean,
 ): ProfileRecord[] => {
   const sourceAddress = WEB3_ADDRESS_PLATFORMS.has(targetRecord.platform)
     ? targetRecord.identity
@@ -196,8 +202,15 @@ const filterConnectedProfiles = (
       }
 
       return usePrimaryFlow
-        ? isPrimaryOrSocialProfile(record) && isValidEnsRecord(record)
-        : isAddressMatching(record, sourceAddress, targetRecord.platform);
+        ? (includeWeb2Platforms && SOCIAL_MEDIA_PLATFORMS.has(record.platform)
+            ? true
+            : isPrimaryOrSocialProfile(record)) && isValidEnsRecord(record)
+        : isAddressMatching(
+            record,
+            sourceAddress,
+            targetRecord.platform,
+            includeWeb2Platforms,
+          );
     })
     .map((record) => ({
       ...record.profile,
@@ -209,6 +222,7 @@ const filterConnectedProfiles = (
 const processIdentityConnections = (
   targetRecord: IdentityRecord,
   allRecords: IdentityRecord[],
+  includeWeb2Platforms?: boolean,
 ): ProfileRecord[] => {
   const defaultProfile = buildProfileFromRecord(targetRecord);
   // Handle invalid Basenames configuration
@@ -226,6 +240,7 @@ const processIdentityConnections = (
     allRecords,
     targetRecord,
     usePrimaryFlow,
+    includeWeb2Platforms,
   );
 
   // Add default profile when appropriate
@@ -300,12 +315,14 @@ const sortProfilesByPriority = (
   profiles: ProfileRecord[],
   primaryPlatform: Platform,
   targetHandle: string,
+  includeWeb2Platforms?: boolean,
 ): ProfileRecord[] => {
   if (profiles.length === 0) return profiles;
 
   const normalizedHandle = normalizeText(targetHandle);
   let exactMatchProfile: ProfileRecord | undefined;
   const platformGroups = new Map<Platform, ProfileRecord[]>();
+  const nonPriorityProfiles: ProfileRecord[] = [];
 
   // Group profiles and find exact match
   for (const profile of profiles) {
@@ -321,6 +338,9 @@ const sortProfilesByPriority = (
       !profile.platform ||
       !PLATFORM_PRIORITY_MAP.has(profile.platform as any)
     ) {
+      if (includeWeb2Platforms) {
+        nonPriorityProfiles.push(profile);
+      }
       continue;
     }
 
@@ -367,13 +387,15 @@ const sortProfilesByPriority = (
     }
   }
 
+  const tail = includeWeb2Platforms ? nonPriorityProfiles : [];
   return exactMatchProfile
-    ? [exactMatchProfile, ...sortedProfiles]
-    : sortedProfiles;
+    ? [exactMatchProfile, ...sortedProfiles, ...tail]
+    : [...sortedProfiles, ...tail];
 };
 
 const extractProfilesFromGraph = (
   data: IdentityGraphQueryResponse,
+  includeWeb2Platforms?: boolean,
 ): ProfileRecord[] => {
   const enrichedRecord = enrichWithFarcasterEnsRelations(data?.data?.identity);
   if (!enrichedRecord) return [];
@@ -396,7 +418,11 @@ const extractProfilesFromGraph = (
   const profileResults =
     isPrimaryOrSocialProfile(enrichedRecord) ||
     SUPPORTED_PLATFORMS.has(enrichedRecord.platform)
-      ? processIdentityConnections(enrichedRecord, graphVertices as any)
+      ? processIdentityConnections(
+          enrichedRecord,
+          graphVertices as any,
+          includeWeb2Platforms,
+        )
       : [buildProfileFromRecord(enrichedRecord)];
   return removeDuplicateProfiles(profileResults);
 };
@@ -407,12 +433,14 @@ export const resolveWithIdentityGraph = async ({
   ns,
   response,
   pathname,
+  includeWeb2Platforms,
 }: {
   handle: string;
   platform: Platform;
   response: IdentityGraphQueryResponse;
   ns?: boolean;
   pathname?: string;
+  includeWeb2Platforms?: boolean;
 }) => {
   // Handle error responses early
   if (response.msg) {
@@ -433,7 +461,10 @@ export const resolveWithIdentityGraph = async ({
   }
 
   const processedResponse = await processJson(response);
-  const extractedProfiles = extractProfilesFromGraph(processedResponse);
+  const extractedProfiles = extractProfilesFromGraph(
+    processedResponse,
+    includeWeb2Platforms,
+  );
   // kill eth or solana profile if the address is included in other profiles
   const ethSolanaIndex = extractedProfiles.findIndex((profile) =>
     [Platform.ethereum, Platform.solana].includes(profile.platform),
@@ -455,6 +486,7 @@ export const resolveWithIdentityGraph = async ({
     extractedProfiles,
     platform,
     handle,
+    includeWeb2Platforms,
   );
   const farcasterProfiles = extractedProfiles.filter(
     (p) => p.aliases && p.platform === Platform.farcaster,
@@ -499,6 +531,7 @@ export const resolveUniversalHandle = async (
   headers: AuthHeaders,
   ns: boolean = false,
   pathname: string,
+  includeWeb2Platforms: boolean = false,
 ) => {
   const response = await queryIdentityGraph(
     ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
@@ -513,6 +546,7 @@ export const resolveUniversalHandle = async (
     ns,
     response,
     pathname,
+    includeWeb2Platforms,
   });
 
   if ("message" in resolutionResult) {
