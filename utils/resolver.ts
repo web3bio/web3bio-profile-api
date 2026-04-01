@@ -13,7 +13,6 @@ export const resolveHandle = (
   const normalizedHandle = handle?.trim();
   if (!normalizedHandle) return null;
 
-  // Handle website platform
   if (platform === Platform.website) {
     return normalizedHandle
       .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")

@@ -8,5 +8,19 @@ describe("Test For Profile Web2 API", () => {
     expect(json.some((x) => x.platform === "instagram")).toBe(true);
     expect(json.some((x) => x.platform === "reddit")).toBe(true);
     expect(json.some((x) => x.platform === "github")).toBe(true);
+    expect(
+      json.find((x) => x.platform === "instagram").links.website.handle,
+    ).toBe("dimension.im");
+  });
+  it("It should response 200 for accountless.eth", async () => {
+    const res = await queryClient("/profile/accountless.eth/web2");
+    expect(res.status).toBe(200);
+    const json = await res.json();
+    expect(
+      json.find((x) => x.platform === "ens").links.website.handle,
+    ).toBe("linktr.ee/alexanderchopan");
+    expect(
+      json.find((x) => x.platform === "github").links.website.handle,
+    ).toBe("linktr.ee/alexanderchopan");
   });
 });
