@@ -616,11 +616,6 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
   }
 
   try {
-    const queryIds = resolveIdentityBatch(ids);
-    if (queryIds.length === 0) {
-      return [];
-    }
-
     const response = await fetch(IDENTITY_GRAPH_SERVER, {
       method: "POST",
       headers: {
