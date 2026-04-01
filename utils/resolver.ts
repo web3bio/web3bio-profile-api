@@ -10,7 +10,6 @@ export const resolveHandle = (
   handle: string,
   platform?: Platform,
 ): string | null => {
-  console.log(handle,'handle')
   const normalizedHandle = handle?.trim();
   if (!normalizedHandle) return null;
 
