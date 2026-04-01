@@ -14,18 +14,10 @@ export const resolveHandle = (
   if (!normalizedHandle) return null;
 
   if (platform === Platform.website) {
-    try {
-      const u = new URL(
-        /^https?:\/\//i.test(normalizedHandle)
-          ? normalizedHandle
-          : `https://${normalizedHandle}`,
-      );
-      const host = u.hostname.replace(/^www\./i, "").toLowerCase();
-      const path = u.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
-      return path ? `${host}/${path}` : host || null;
-    } catch {
-      return handle;
-    }
+    return normalizedHandle
+      .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
+      .replace(/\/+$/, "")
+      .toLowerCase();
   }
 
   // Handle YouTube platform

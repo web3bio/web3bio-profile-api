@@ -8,5 +8,8 @@ describe("Test For Profile Web2 API", () => {
     expect(json.some((x) => x.platform === "instagram")).toBe(true);
     expect(json.some((x) => x.platform === "reddit")).toBe(true);
     expect(json.some((x) => x.platform === "github")).toBe(true);
+    expect(
+      json.find((x) => x.platform === "instagram").links.website.handle,
+    ).toBe("dimension.im");
   });
 });
