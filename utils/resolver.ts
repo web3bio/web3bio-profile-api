@@ -10,15 +10,23 @@ export const resolveHandle = (
   handle: string,
   platform?: Platform,
 ): string | null => {
+  console.log(handle,'handle')
   const normalizedHandle = handle?.trim();
   if (!normalizedHandle) return null;
 
-  // Handle website platform
   if (platform === Platform.website) {
-    return normalizedHandle
-      .replace(/^(?:https?:\/\/)?(?:www\.)?/i, "")
-      .replace(/\/+$/, "")
-      .toLowerCase();
+    try {
+      const u = new URL(
+        /^https?:\/\//i.test(normalizedHandle)
+          ? normalizedHandle
+          : `https://${normalizedHandle}`,
+      );
+      const host = u.hostname.replace(/^www\./i, "").toLowerCase();
+      const path = u.pathname.replace(/^\/+|\/+$/g, "").toLowerCase();
+      return path ? `${host}/${path}` : host || null;
+    } catch {
+      return handle;
+    }
   }
 
   // Handle YouTube platform
