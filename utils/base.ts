@@ -484,7 +484,7 @@ export const generateSocialLinks = async (
       if (texts?.website) {
         links[Platform.website] = {
           link: getSocialMediaLink(texts.website, Platform.website),
-          handle: texts.website,
+          handle: resolveHandle(texts.website, Platform.website),
           sources: resolveVerifiedLink(
             `${Platform.website},${texts.website}`,
             edges,
