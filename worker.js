@@ -87,7 +87,7 @@ function getTTL(pathname) {
 }
 
 function getRequiredRole(pathname) {
-  if (/^\/profile\/[^/]+\/web2$/.test(pathname)) {
+  if (/^\/profile\/web2\/[^/]+$/.test(pathname)) {
     return MIN_ROLE_RESTRICTED;
   }
   for (const [path, minRole] of Object.entries(PATH_MIN_ROLE)) {
