@@ -868,7 +868,7 @@ export default async function Home() {
                 "identity": "vitalik.lens",
                 "platform": "lens",
                 "displayName": "vitalik.lens",
-                "avatar": "https://api.hey.xyz/avatar?id=100275",
+                "avatar": "https://ik.imagekit.io/lens/6a5c67c2bff07e56d352d29cf0a858b67690dc25fc49d2f30ecf347d00348184_kX7EqG2mt.webp",
                 "description": null,
                 "status": null,
                 "email": null,
@@ -914,7 +914,7 @@ export default async function Home() {
                 "identity": "vitalik.lens",
                 "platform": "lens",
                 "displayName": "vitalik.lens",
-                "avatar": "https://api.hey.xyz/avatar?id=100275",
+                "avatar": "https://ik.imagekit.io/lens/6a5c67c2bff07e56d352d29cf0a858b67690dc25fc49d2f30ecf347d00348184_kX7EqG2mt.webp",
                 "description": null
               }
             ]
