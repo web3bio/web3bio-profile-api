@@ -1,27 +1,14 @@
-import { queryIdentityGraph, QueryType } from "@/utils/query";
+import type { NextRequest } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { isWeb2Platform } from "web3bio-profile-kit/utils";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import {
   IdentityGraphQueryResponse,
   IdentityRecord,
   ProfileRecord,
 } from "@/utils/types";
-import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
-import type { NextRequest } from "next/server";
-import { Platform, ErrorMessages } from "web3bio-profile-kit/types";
-
-const SEARCH_WEB2_LIST = [
-  Platform.twitter,
-  Platform.github,
-  Platform.discord,
-  Platform.keybase,
-  Platform.reddit,
-  Platform.instagram,
-  Platform.linkedin,
-];
-
-const isWeb2Platform = (platform: string) => {
-  return SEARCH_WEB2_LIST.includes(platform as Platform);
-};
+import { errorHandle, respondJson } from "@/utils/utils";
+import { getQuery, QueryType } from "@/utils/query";
 
 const processProfileAvatar = async (
   profile: ProfileRecord,
@@ -41,53 +28,62 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
 
   if (!identity) return _json;
 
-  const promises: Promise<any>[] = [];
+  const avatarTasks: Promise<void>[] = [];
 
-  // Process main identity avatar
-  if (identity.profile) {
-    promises.push(
+  if (identity.profile?.avatar) {
+    avatarTasks.push(
       processProfileAvatar(identity.profile).then((processedAvatar) => {
         identity.profile.avatar = processedAvatar;
       }),
     );
   }
 
-  const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
+  const isRemovedNode = (v: IdentityRecord) =>
+    v.platform === Platform.clusters && v.identity.includes("/");
 
-  if (vertices.length > 0) {
-    // Find current identity in vertices
-    const currentIndex = vertices.findIndex(
-      (vertex) =>
-        vertex.identity === identity.identity &&
-        vertex.platform === identity.platform,
+  const filteredNodes = new Set(
+    identity.identityGraph?.vertices
+      ?.filter(isRemovedNode)
+      .map((v) => `${v.platform},${v.identity}`) || [],
+  );
+
+  if (filteredNodes.size > 0 && identity.identityGraph) {
+    const graph = identity.identityGraph;
+    graph.vertices = graph.vertices?.filter((v) => !isRemovedNode(v));
+    graph.edges = graph.edges?.filter(
+      (e) => !filteredNodes.has(e.source) && !filteredNodes.has(e.target),
     );
-
-    // Ensure current identity is at the front
-    if (currentIndex === -1) {
-      // Current identity not in vertices, add it at the beginning
-      const currentIdentity = { ...identity };
-      delete currentIdentity.identityGraph;
-      vertices.unshift(currentIdentity);
-    } else if (currentIndex > 0) {
-      // Current identity exists but not at front, move it to front
-      const [currentIdentity] = vertices.splice(currentIndex, 1);
-      vertices.unshift(currentIdentity);
-    }
-
-    // Process avatars for all vertices with profiles
-    const avatarPromises = vertices
-      .filter((vertex) => vertex?.profile?.avatar)
-      .map(async (vertex) => {
-        const processedAvatar = await processProfileAvatar(vertex.profile);
-        vertex.profile.avatar = processedAvatar;
-      });
-
-    if (avatarPromises.length > 0) {
-      promises.push(Promise.allSettled(avatarPromises));
-    }
   }
 
-  await Promise.allSettled(promises);
+  const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
+  if (vertices.length > 0) {
+    const currentIndex = vertices.findIndex(
+      (v) =>
+        v.identity === identity.identity && v.platform === identity.platform,
+    );
+    const currentKey = `${identity.platform},${identity.identity}`;
+
+    if (currentIndex === -1 && !filteredNodes.has(currentKey)) {
+      const { identityGraph, ...currentIdentity } = identity;
+      vertices.unshift(currentIdentity as IdentityRecord);
+    } else if (currentIndex > 0) {
+      vertices.unshift(...vertices.splice(currentIndex, 1));
+    }
+
+    vertices
+      .filter((v) => v?.profile?.avatar)
+      .forEach((v) => {
+        avatarTasks.push(
+          processProfileAvatar(v.profile).then((processedAvatar) => {
+            v.profile.avatar = processedAvatar;
+          }),
+        );
+      });
+  }
+
+  if (avatarTasks.length > 0) {
+    await Promise.allSettled(avatarTasks);
+  }
   return _json;
 };
 
@@ -95,56 +91,60 @@ export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as Platform;
-  if (!identity || !platform)
+
+  if (!identity || !platform) {
     return errorHandle({
-      identity: identity,
+      identity,
       path: pathname,
-      platform: platform,
+      platform,
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
-  const headers = getUserHeaders(req.headers);
-
+  }
   try {
-    const res = await queryIdentityGraph(
-      QueryType.GET_SEARCH_QUERY,
-      identity,
-      platform,
-      headers,
-    );
+    const rawJson = await fetch(process.env.GRAPHQL_SERVER || "", {
+      method: "POST",
+      headers: {
+        "x-api-key": process.env.WEB3BIO_API_KEY || "",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        query: getQuery(QueryType.GET_SEARCH_QUERY),
+        variables: { identity, platform },
+      }),
+    }).then((res) => res.json());
 
-    if (res?.code || res?.errors) {
+    if (rawJson?.code || rawJson?.errors) {
       return errorHandle({
-        identity: identity,
+        identity,
         path: pathname,
-        platform: platform,
-        code: res.code,
-        message: res.msg
-          ? res.msg
-          : res.errors
-            ? JSON.stringify(res.errors)
-            : ErrorMessages.NOT_FOUND,
+        platform,
+        code: rawJson.code,
+        message:
+          rawJson.msg ||
+          (rawJson.errors
+            ? JSON.stringify(rawJson.errors)
+            : ErrorMessages.NOT_FOUND),
       });
     }
 
-    if (isSingleWeb2Identity(res.data.identity)) {
+    if (isSingleWeb2Identity(rawJson.data.identity)) {
       return errorHandle({
-        identity: identity,
+        identity,
         path: pathname,
-        platform: platform || "search",
+        platform: platform || "graph",
         code: 404,
         message: ErrorMessages.NOT_FOUND,
       });
     }
 
-    const result = await processJson(res);
-
+    const result = await processJson(rawJson);
     return respondJson(result);
   } catch (e: unknown) {
     return errorHandle({
-      identity: identity,
+      identity,
       path: pathname,
-      platform: platform,
+      platform,
       message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
       code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });

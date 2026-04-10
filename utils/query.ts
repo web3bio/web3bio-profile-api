@@ -482,7 +482,7 @@ export const GET_SEARCH_SUGGEST = `
 `;
 // Search Query
 const GET_SEARCH_QUERY = `
-  query GET_SEARCH_PROFILES($platform: Platform!, $identity: String!) {
+ query GET_GRAPH_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
       identity
       platform
