@@ -92,7 +92,7 @@ describe("Test For Universal Profile API", () => {
     );
     expect(res.status).toBe(200);
     const json = await res.json();
-    expect(json[0].platform).toBe("ethereum");
+    expect(json[0].platform).toBe("lens");
   });
   it("It should response 200 data for 0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c", async () => {
     const res = await queryClient(
@@ -158,9 +158,9 @@ describe("Test For Universal Profile API", () => {
     expect(json[0].platform).toBe("ens");
     expect(json[0].identity).toBe("sujiyan.eth");
   });
-  it("It should response 200 for 0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid", async () => {
+  it("It should response 200 for nextid,0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f", async () => {
     const res = await queryClient(
-      "/profile/0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f.nextid",
+      "/profile/nextid,0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f",
     );
     const json = await res.json();
     expect(json[0].platform).toBe("ens");
