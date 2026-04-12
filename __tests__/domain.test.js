@@ -1,13 +1,13 @@
 import { queryClient } from "../utils/test-utils";
 
 describe("Test For Domain API", () => {
-  it("It should response 200 for ens,sujiyan.eth", async () => {
+  it("It should respond 200 for ens,sujiyan.eth", async () => {
     const res = await queryClient("/domain/ens,sujiyan.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("sujiyan.eth");
   });
-  it("It should response 200 for bonfida.sol", async () => {
+  it("It should respond 200 for bonfida.sol", async () => {
     const res = await queryClient("/domain/bonfida.sol");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -15,23 +15,23 @@ describe("Test For Domain API", () => {
       "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
     );
   });
-  it("It should response 200 for dwr.farcaster", async () => {
+  it("It should respond 200 for dwr.farcaster", async () => {
     const res = await queryClient("/domain/dwr.farcaster");
     expect(res.status).toBe(404);
   });
-  it("It should response 200 for linea,184.linea.eth", async () => {
+  it("It should respond 200 for linea,184.linea.eth", async () => {
     const res = await queryClient("/domain/linea,184.linea.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
   });
-  it("It should response 200 for linea,184.linea.eth", async () => {
+  it("It should respond 200 for linea,184.linea.eth", async () => {
     const res = await queryClient("/domain/linea,184.linea.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
   });
-  it("It should response 200 for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
+  it("It should respond 200 for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
     const res = await queryClient(
       "/domain/0xc28de09ad1a20737b92834943558ddfcc88d020d",
     );

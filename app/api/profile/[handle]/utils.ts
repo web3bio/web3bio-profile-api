@@ -388,6 +388,30 @@ const sortProfilesByPriority = (
   }
 
   const tail = includeWeb2Platforms ? nonPriorityProfiles : [];
+  const sourceAddress =
+    exactMatchProfile?.address ||
+    ((primaryPlatform === Platform.ethereum ||
+      primaryPlatform === Platform.solana) &&
+    isWeb3Address(targetHandle)
+      ? targetHandle
+      : "");
+
+  if (sourceAddress) {
+    const addressMatchedProfiles = sortedProfiles.filter((profile) =>
+      isSameAddress(profile.address, sourceAddress),
+    );
+    const addressUnmatchedProfiles = sortedProfiles.filter(
+      (profile) => !isSameAddress(profile.address, sourceAddress),
+    );
+    const reorderedProfiles = [
+      ...addressMatchedProfiles,
+      ...addressUnmatchedProfiles,
+    ];
+    return exactMatchProfile
+      ? [exactMatchProfile, ...reorderedProfiles, ...tail]
+      : [...reorderedProfiles, ...tail];
+  }
+
   return exactMatchProfile
     ? [exactMatchProfile, ...sortedProfiles, ...tail]
     : [...sortedProfiles, ...tail];

@@ -1,5 +1,5 @@
 import { getQuery, QueryType } from "@/utils/query";
-import { respondJson } from "@/utils/utils";
+import { getUserHeaders, respondJson } from "@/utils/utils";
 import { NextRequest, NextResponse } from "next/server";
 import { Platform } from "web3bio-profile-kit/types";
 
@@ -16,12 +16,13 @@ export async function GET(
   if (!name || typeof name !== "string") {
     return NextResponse.json([]);
   }
+  const headers = getUserHeaders(req.headers);
 
   const results = await fetch(process.env.GRAPHQL_SERVER || "", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.WEB3BIO_API_KEY || "",
+      ...headers,
     },
     body: JSON.stringify({
       query: getQuery(QueryType.GET_SEARCH_SUGGEST),
