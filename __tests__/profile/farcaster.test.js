@@ -1,7 +1,7 @@
 import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Farcaster Profile API", () => {
-  it("It should response 200 for suji", async () => {
+  it("It should respond 200 for suji", async () => {
     const res = await queryClient("/profile/farcaster/suji");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -9,7 +9,7 @@ describe("Test For Farcaster Profile API", () => {
     expect(json.links.twitter.handle).toBe("suji_yan");
     expect(json.links.twitter.sources.includes("farcaster")).toBeTruthy();
   });
-  it("It should response 200 for 0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2", async () => {
+  it("It should respond 200 for 0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2", async () => {
     const res = await queryClient(
       "/profile/farcaster/0xc648dbbe0a20f850ff5ef2aa73ffb5a149befca2",
     );
@@ -20,36 +20,36 @@ describe("Test For Farcaster Profile API", () => {
     expect(json.links.farcaster.handle).toBe("suji");
     expect(json.createdAt).toBe("2023-11-07T22:14:15.000Z");
   });
-  it("It should response 200 for farcaster", async () => {
+  it("It should respond 200 for farcaster", async () => {
     const res = await queryClient("/profile/farcaster/farcaster");
     expect(res.status).toBe(200);
     expect((await res.json()).displayName).toBe("Farcaster");
   });
-  it("It should response 404 for 💗", async () => {
+  it("It should respond 404 for 💗", async () => {
     const res = await queryClient("/profile/farcaster/💗");
     expect(res.status).toBe(404);
     const json = await res.json();
     expect(json.error).toBe("Invalid Identity or Domain");
   });
-  it("It should response 200 for july", async () => {
+  it("It should respond 200 for july", async () => {
     const res = await queryClient("/profile/farcaster/july");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0xb2c42d93c1ec6c57b1713e03827369d59866e4b4");
   });
-  it("It should response 200 for dwr", async () => {
+  it("It should respond 200 for dwr", async () => {
     const res = await queryClient("/profile/farcaster/dwr");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.displayName).toBe("Dan Romero");
   });
-  it("It should response 200 for dwr.eth", async () => {
+  it("It should respond 200 for dwr.eth", async () => {
     const res = await queryClient("/profile/farcaster/dwr.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.address).toBe("0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5");
   });
-  it("It should response 200 for farcaster%2C%233", async () => {
+  it("It should respond 200 for farcaster%2C%233", async () => {
     const res = await queryClient("/profile/farcaster/farcaster%2C%233");
     expect(res.status).toBe(200);
     expect((await res.json()).identity).toBe("dwr");

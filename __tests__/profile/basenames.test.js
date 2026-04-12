@@ -1,14 +1,14 @@
 import { queryClient } from "../../utils/test-utils";
 
 describe("Test For BaseNames Profile API", () => {
-  it("It should response 200 for suji.base", async () => {
+  it("It should respond 200 for suji.base", async () => {
     const res = await queryClient("/profile/basenames/suji.base");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.createdAt).toBe("2024-08-22T06:32:25.000Z");
     expect(json.address).toBe("0xc9d18042baabe51d38297d1f3520cfbef0c83c32");
   });
-  it("It should response 200 for tony.base.eth", async () => {
+  it("It should respond 200 for tony.base.eth", async () => {
     const res = await queryClient("/profile/basenames/tony.base.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
