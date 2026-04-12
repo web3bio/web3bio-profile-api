@@ -1,5 +1,6 @@
 import { getQuery, QueryType } from "@/utils/query";
-import { errorHandle, respondJson } from "@/utils/utils";
+import { AuthHeaders } from "@/utils/types";
+import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 
@@ -20,12 +21,15 @@ interface GraphQLResponse {
   msg?: string;
 }
 
-const queryDomains = async (handle: string): Promise<GraphQLResponse> => {
+const queryDomains = async (
+  handle: string,
+  headers: AuthHeaders,
+): Promise<GraphQLResponse> => {
   const response = await fetch(process.env.GRAPHQL_SERVER || "", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "x-api-key": process.env.WEB3BIO_API_KEY || "",
+      ...headers,
     },
     body: JSON.stringify({
       query: getQuery(QueryType.GET_AVAILABLE_DOMAINS),
@@ -57,9 +61,10 @@ export async function GET(
   }
 
   const trimmedHandle = handle.trim();
+  const headers = getUserHeaders(req.headers);
 
   try {
-    const result = await queryDomains(trimmedHandle);
+    const result = await queryDomains(trimmedHandle, headers);
 
     if (result.errors) {
       return errorHandle({

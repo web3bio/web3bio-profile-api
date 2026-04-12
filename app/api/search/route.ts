@@ -7,7 +7,7 @@ import {
   IdentityRecord,
   ProfileRecord,
 } from "@/utils/types";
-import { errorHandle, respondJson } from "@/utils/utils";
+import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { getQuery, QueryType } from "@/utils/query";
 
 const processProfileAvatar = async (
@@ -91,6 +91,7 @@ export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const identity = searchParams.get("identity");
   const platform = searchParams.get("platform") as Platform;
+  const headers = getUserHeaders(req.headers);
 
   if (!identity || !platform) {
     return errorHandle({
@@ -105,7 +106,7 @@ export async function GET(req: NextRequest) {
     const rawJson = await fetch(process.env.GRAPHQL_SERVER || "", {
       method: "POST",
       headers: {
-        "x-api-key": process.env.WEB3BIO_API_KEY || "",
+        ...headers,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
