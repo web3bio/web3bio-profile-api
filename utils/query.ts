@@ -569,6 +569,68 @@ export function getQuery(type: QueryType): string {
   return query;
 }
 
+export interface IdentityGraphPostResult {
+  ok: boolean;
+  status: number;
+  statusText: string;
+  body: unknown;
+}
+
+export async function postIdentityGraphQuery(
+  headers: AuthHeaders,
+  query: string,
+  variables: Record<string, unknown>,
+): Promise<IdentityGraphPostResult> {
+  const response = await fetch(IDENTITY_GRAPH_SERVER, {
+    method: "POST",
+    headers: {
+      ...headers,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ query, variables }),
+  });
+
+  let body: unknown;
+  try {
+    body = await response.json();
+  } catch {
+    body = null;
+  }
+
+  return {
+    ok: response.ok,
+    status: response.status,
+    statusText: response.statusText,
+    body,
+  };
+}
+
+/** Resolve HTTP status for Identity Graph error responses (body `code` wins when numeric). */
+export function identityGraphErrorStatus(
+  responseOk: boolean,
+  httpStatus: number,
+  bodyCode: unknown,
+): number {
+  if (typeof bodyCode === "number" && !Number.isNaN(bodyCode)) {
+    return bodyCode;
+  }
+  return responseOk ? 500 : httpStatus;
+}
+
+export function identityGraphErrorMessage(
+  body: unknown,
+  fallback: string,
+): string {
+  if (!body || typeof body !== "object") {
+    return fallback;
+  }
+  const b = body as { msg?: string; errors?: unknown };
+  return (
+    b.msg ||
+    (b.errors != null ? JSON.stringify(b.errors) : fallback)
+  );
+}
+
 export async function queryIdentityGraph(
   query: QueryType,
   handle: string,
@@ -579,29 +641,19 @@ export async function queryIdentityGraph(
     return { errors: `Unable to detect platform for handle: ${handle}` };
   }
   try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(query),
-        variables: {
-          identity: handle,
-          platform,
-        },
-      }),
+    const r = await postIdentityGraphQuery(headers, getQuery(query), {
+      identity: handle,
+      platform,
     });
 
-    if (!response.ok) {
+    if (!r.ok) {
       return {
-        errors: `HTTP ${response.status}: ${response.statusText}`,
-        code: response.status,
+        errors: `HTTP ${r.status}: ${r.statusText}`,
+        code: r.status,
       };
     }
 
-    return await response.json();
+    return r.body as any;
   } catch (error) {
     return {
       errors: error instanceof Error ? error.message : "Unknown error occurred",
@@ -616,23 +668,17 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
   }
 
   try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(QueryType.GET_BATCH_UNIVERSAL),
-        variables: { ids: queryIds },
-      }),
-    });
+    const r = await postIdentityGraphQuery(
+      headers,
+      getQuery(QueryType.GET_BATCH_UNIVERSAL),
+      { ids: queryIds },
+    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
     }
 
-    const json = await response.json();
+    const json = r.body as any;
     const identities = json?.data?.identitiesWithGraph;
 
     if (!Array.isArray(identities)) {
@@ -698,23 +744,17 @@ export async function queryIdentityGraphBatch(
   }
 
   try {
-    const response = await fetch(IDENTITY_GRAPH_SERVER, {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(QueryType.GET_BATCH),
-        variables: { ids: queryIds },
-      }),
-    });
+    const r = await postIdentityGraphQuery(
+      headers,
+      getQuery(QueryType.GET_BATCH),
+      { ids: queryIds },
+    );
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
     }
 
-    const json = await response.json();
+    const json = r.body as any;
 
     if (!json?.data?.identities) {
       return json || [];

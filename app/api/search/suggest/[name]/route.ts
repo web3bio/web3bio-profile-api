@@ -1,56 +1,49 @@
-import { getQuery, QueryType } from "@/utils/query";
-import { getUserHeaders, respondJson } from "@/utils/utils";
-import { NextRequest, NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { Platform } from "web3bio-profile-kit/types";
+import { getQuery, postIdentityGraphQuery, QueryType } from "@/utils/query";
+import { getUserHeaders, normalizeText, respondJson } from "@/utils/utils";
 
 interface NameSuggest {
   name: string;
   platform: Platform;
 }
 
+function mapSuggestItem(x: NameSuggest): NameSuggest {
+  return x.platform === Platform.box
+    ? { platform: Platform.ens, name: x.name }
+    : x;
+}
+
 export async function GET(
   req: NextRequest,
-  props: { params: Promise<{ name: string }> },
-): Promise<NextResponse> {
-  const { name } = await props.params;
-  if (!name || typeof name !== "string") {
-    return NextResponse.json([]);
+  { params }: { params: Promise<{ name: string }> },
+) {
+  const name = normalizeText((await params).name);
+  if (!name.trim()) {
+    return respondJson([]);
   }
+
   const headers = getUserHeaders(req.headers);
 
-  const results = await fetch(process.env.GRAPHQL_SERVER || "", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...headers,
-    },
-    body: JSON.stringify({
-      query: getQuery(QueryType.GET_SEARCH_SUGGEST),
-      variables: { name },
-    }),
-  })
-    .then((res) => res.json())
-    .then((result) => {
-      if (!result || result.errors) {
-        return [];
-      }
+  try {
+    const { ok, body } = await postIdentityGraphQuery(
+      headers,
+      getQuery(QueryType.GET_SEARCH_SUGGEST),
+      { name },
+    );
 
-      return (
-        result.data?.nameSuggest.map((x: NameSuggest) => {
-          if (x.platform === Platform.box) {
-            return {
-              platform: Platform.ens,
-              name: x.name,
-            };
-          } else {
-            return x;
-          }
-        }) || []
-      );
-    })
-    .catch((e) => {
-      return [];
-    });
+    const result = body as {
+      data?: { nameSuggest?: NameSuggest[] };
+      errors?: unknown;
+    } | null;
 
-  return respondJson(results);
+    if (!ok || !result || result.errors) {
+      return respondJson([]);
+    }
+
+    const list: NameSuggest[] = result.data?.nameSuggest ?? [];
+    return respondJson(list.map(mapSuggestItem));
+  } catch {
+    return respondJson([]);
+  }
 }

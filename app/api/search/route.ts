@@ -8,7 +8,13 @@ import {
   ProfileRecord,
 } from "@/utils/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
-import { getQuery, QueryType } from "@/utils/query";
+import {
+  getQuery,
+  identityGraphErrorMessage,
+  identityGraphErrorStatus,
+  postIdentityGraphQuery,
+  QueryType,
+} from "@/utils/query";
 
 const processProfileAvatar = async (
   profile: ProfileRecord,
@@ -103,33 +109,40 @@ export async function GET(req: NextRequest) {
     });
   }
   try {
-    const rawJson = await fetch(process.env.GRAPHQL_SERVER || "", {
-      method: "POST",
-      headers: {
-        ...headers,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        query: getQuery(QueryType.GET_SEARCH_QUERY),
-        variables: { identity, platform },
-      }),
-    }).then((res) => res.json());
+    const { ok, status, body: rawJson } = await postIdentityGraphQuery(
+      headers,
+      getQuery(QueryType.GET_SEARCH_QUERY),
+      { identity, platform },
+    );
 
-    if (rawJson?.code || rawJson?.errors) {
+    const envelope = rawJson as {
+      code?: number;
+      errors?: unknown;
+      data?: { identity?: IdentityRecord };
+    } | null;
+
+    if (!ok || envelope?.code || envelope?.errors) {
       return errorHandle({
         identity,
         path: pathname,
         platform,
-        code: rawJson.code,
-        message:
-          rawJson.msg ||
-          (rawJson.errors
-            ? JSON.stringify(rawJson.errors)
-            : ErrorMessages.NOT_FOUND),
+        code: identityGraphErrorStatus(ok, status, envelope?.code),
+        message: identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
       });
     }
 
-    if (isSingleWeb2Identity(rawJson.data.identity)) {
+    const graphIdentity = envelope?.data?.identity;
+    if (!graphIdentity) {
+      return errorHandle({
+        identity,
+        path: pathname,
+        platform,
+        code: 404,
+        message: ErrorMessages.NOT_FOUND,
+      });
+    }
+
+    if (isSingleWeb2Identity(graphIdentity)) {
       return errorHandle({
         identity,
         path: pathname,
@@ -139,7 +152,7 @@ export async function GET(req: NextRequest) {
       });
     }
 
-    const result = await processJson(rawJson);
+    const result = await processJson(envelope as IdentityGraphQueryResponse);
     return respondJson(result);
   } catch (e: unknown) {
     return errorHandle({
