@@ -18,7 +18,6 @@ export enum QueryType {
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
-  GET_DOMAIN_SINGLE = "GET_DOMAIN_SINGLE",
   GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
@@ -354,44 +353,7 @@ const GET_BATCH_UNIVERSAL = `
     }
   }
 `;
-const GET_DOMAIN_SINGLE = `
-  query GET_DOMAIN($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-      platform
-      identity
-      registeredAt
-      updatedAt
-      expiredAt
-      status
-      isPrimary
-      resolver
-      managerAddress {
-        network
-        address
-      }
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      profile {
-        uid
-        identity
-        platform
-        address
-        contenthash
-        texts
-        addresses {
-          address
-          network
-          isPrimary
-        }
-      }
-    }
-  }`;
+
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
@@ -552,7 +514,6 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
-  [QueryType.GET_DOMAIN_SINGLE, GET_DOMAIN_SINGLE],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
   [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],

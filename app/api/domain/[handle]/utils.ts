@@ -19,7 +19,41 @@ const TARGET_PLATFORMS = new Set([Platform.ens, Platform.sns]);
 const formatAddress = (addr?: Array<{ address: string }>) =>
   addr?.[0]?.address ?? null;
 
-const generateResponseStruct = (identity: IdentityRecord) => ({
+const getFirstTxAt = (
+  identity: IdentityRecord,
+  vertices?: IdentityRecord[],
+): string | null => {
+  if (EXTEND_DOMAIN_PLATFORMS.has(identity.platform)) {
+    return identity.registeredAt
+      ? formatTimestamp(identity.registeredAt)
+      : null;
+  }
+
+  const resolvedAddress = formatAddress(identity.resolvedAddress);
+  if (!resolvedAddress || !vertices?.length) {
+    return null;
+  }
+
+  const resolvedAddressRecord = vertices.find((v) => {
+    if (!EXTEND_DOMAIN_PLATFORMS.has(v.platform)) {
+      return false;
+    }
+
+    return (
+      isSameAddress(v.identity, resolvedAddress) ||
+      isSameAddress(formatAddress(v.resolvedAddress) || "", resolvedAddress)
+    );
+  });
+
+  return resolvedAddressRecord?.registeredAt
+    ? formatTimestamp(resolvedAddressRecord.registeredAt)
+    : null;
+};
+
+const generateResponseStruct = (
+  identity: IdentityRecord,
+  vertices?: IdentityRecord[],
+) => ({
   identity: identity.identity,
   platform: identity.platform,
   resolvedAddress: formatAddress(identity.resolvedAddress),
@@ -31,6 +65,7 @@ const generateResponseStruct = (identity: IdentityRecord) => ({
   createdAt: identity.registeredAt
     ? formatTimestamp(identity.registeredAt)
     : null,
+  firstTxAt: getFirstTxAt(identity, vertices),
   updatedAt: identity.updatedAt ? formatTimestamp(identity.updatedAt) : null,
   expiredAt: identity.expiredAt ? formatTimestamp(identity.expiredAt) : null,
   contenthash: identity.profile?.contenthash ?? null,
@@ -51,7 +86,7 @@ const buildDomainsArray = (vertices?: IdentityRecord[], handle?: string) =>
         !!v.ownerAddress?.[0]?.address &&
         isSameAddress(v.ownerAddress[0].address, handle || ""),
     )
-    .map(generateResponseStruct) ?? [];
+    .map((v) => generateResponseStruct(v, vertices)) ?? [];
 
 export const resolveDomainQuery = async (
   handle: string,
@@ -60,9 +95,7 @@ export const resolveDomainQuery = async (
   pathname: string,
 ) => {
   const response = await queryIdentityGraph(
-    EXTEND_DOMAIN_PLATFORMS.has(platform)
-      ? QueryType.GET_DOMAIN
-      : QueryType.GET_DOMAIN_SINGLE,
+    QueryType.GET_DOMAIN,
     handle,
     platform,
     headers,
@@ -82,7 +115,7 @@ export const resolveDomainQuery = async (
   const { profile, identityGraph } = identity;
 
   return respondJson({
-    ...generateResponseStruct(identity),
+    ...generateResponseStruct(identity, identityGraph?.vertices),
     texts: profile?.texts ?? null,
     addresses: buildAddressesMap(profile?.addresses),
     domains: buildDomainsArray(identityGraph?.vertices, handle),
