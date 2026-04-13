@@ -39,10 +39,7 @@ const getFirstTxAt = (
       return false;
     }
 
-    return (
-      isSameAddress(v.identity, resolvedAddress) ||
-      isSameAddress(formatAddress(v.resolvedAddress) || "", resolvedAddress)
-    );
+    return isSameAddress(v.identity, resolvedAddress);
   });
 
   return resolvedAddressRecord?.registeredAt
