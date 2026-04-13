@@ -1,11 +1,11 @@
 import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Unstoppable Domains NS API", () => {
-  it("It should response 200 for sandy.x", async () => {
+  it("It should respond 200 for sandy.x", async () => {
     const res = await queryClient("/ns/unstoppabledomains/sandy.x");
     expect(res.status).toBe(200);
   });
-  it("It should response 200 for al.x", async () => {
+  it("It should respond 200 for al.x", async () => {
     const res = await queryClient("/ns/unstoppabledomains/al.x");
     expect(res.status).toBe(200);
     const json = await res.json();

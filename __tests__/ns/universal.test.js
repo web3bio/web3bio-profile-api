@@ -1,7 +1,7 @@
 import { queryClient } from "../../utils/test-utils";
 
 describe("Test For Universal NS API", () => {
-  it("It should response 200 for sujiyan.lens", async () => {
+  it("It should respond 200 for sujiyan.lens", async () => {
     const res = await queryClient("/ns/sujiyan.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -11,26 +11,26 @@ describe("Test For Universal NS API", () => {
     );
   });
 
-  it("It should response 200 data for stani.lens", async () => {
+  it("It should respond 200 data for stani.lens", async () => {
     const res = await queryClient("/ns/stani.lens");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json[0].identity).toBe("stani.lens");
   });
 
-  it("It should response 200 data for gamedb.eth", async () => {
+  it("It should respond 200 data for gamedb.eth", async () => {
     const res = await queryClient("/profile/gamedb.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "ens").identity).toBe("gamedb.eth");
   });
-  it("It should response 200 data for livid.farcaster", async () => {
+  it("It should respond 200 data for livid.farcaster", async () => {
     const res = await queryClient("/ns/livid.farcaster");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
   });
-  it("It should response 200 data for luc.eth", async () => {
+  it("It should respond 200 data for luc.eth", async () => {
     const res = await queryClient("/ns/luc.eth");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -41,7 +41,7 @@ describe("Test For Universal NS API", () => {
       ).length,
     ).toBe(0);
   });
-  it("It should response 200 data for 184.linea.eth", async () => {
+  it("It should respond 200 data for 184.linea.eth", async () => {
     const res = await queryClient("/ns/184.linea");
     expect(res.status).toBe(200);
     const json = await res.json();
@@ -49,7 +49,7 @@ describe("Test For Universal NS API", () => {
     expect(json[0].identity).toBe("184.linea.eth");
     expect(json[1].platform).toBe("ens");
   });
-  it("It should response 200 data for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
+  it("It should respond 200 data for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
     const res = await queryClient(
       "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d",
     );
@@ -57,13 +57,13 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(true);
   });
-  it("It should response 200 data for linea,184.linea", async () => {
+  it("It should respond 200 data for linea,184.linea", async () => {
     const res = await queryClient("/ns/linea,184.linea");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.some((x) => x.platform === "linea")).toBe(true);
   });
-  it("It should response 200 data for solana,4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s", async () => {
+  it("It should respond 200 data for solana,4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s", async () => {
     const res = await queryClient(
       "/ns/4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s",
     );
@@ -71,7 +71,7 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json[0].identity).toBe("v2ex.sol");
   });
-  it("It should response 200 data for 0x1af68a3cad9918056106d2ee77879489b56c2f80", async () => {
+  it("It should respond 200 data for 0x1af68a3cad9918056106d2ee77879489b56c2f80", async () => {
     const res = await queryClient(
       "/ns/0x1af68a3cad9918056106d2ee77879489b56c2f80",
     );
@@ -79,7 +79,7 @@ describe("Test For Universal NS API", () => {
     const json = await res.json();
     expect(json[0].platform).toBe("farcaster");
   });
-  it("It should response 200 data for 0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95", async () => {
+  it("It should respond 200 data for 0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95", async () => {
     const res = await queryClient(
       "/ns/0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95",
     );

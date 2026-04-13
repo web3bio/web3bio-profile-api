@@ -8,7 +8,7 @@ describe("Test For Batch Query", () => {
     "farcaster,dwr.eth",
   ];
 
-  it("It should response 200 for Batch Query GET", async () => {
+  it("It should respond 200 for Batch Query GET", async () => {
     const url = `/ns/batch/${encodeURIComponent(JSON.stringify(getIds))}`;
     const res = await queryClient(url);
     expect(res.status).toBe(200);

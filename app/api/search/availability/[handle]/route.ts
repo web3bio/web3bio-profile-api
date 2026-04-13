@@ -1,61 +1,29 @@
-import { getQuery, QueryType } from "@/utils/query";
-import { AuthHeaders } from "@/utils/types";
-import {
-  errorHandle,
-  getUserHeaders,
-  IDENTITY_GRAPH_SERVER,
-  respondJson,
-} from "@/utils/utils";
 import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
+import {
+  getQuery,
+  identityGraphErrorMessage,
+  identityGraphErrorStatus,
+  postIdentityGraphQuery,
+  QueryType,
+} from "@/utils/query";
+import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 
-interface DomainAvailabilityResponse {
-  platform: string;
-  name: string;
-  expiredAt: string | null;
-  availability: boolean;
-  status: string;
-}
-
-interface GraphQLResponse {
-  data?: {
-    domainAvailableSearch: DomainAvailabilityResponse[];
-  };
+interface GraphQLEnvelope {
+  data?: unknown;
   errors?: unknown;
   code?: number;
   msg?: string;
 }
 
-const queryDomains = async (
-  handle: string,
-  headers: AuthHeaders,
-): Promise<GraphQLResponse> => {
-  const response = await fetch(IDENTITY_GRAPH_SERVER, {
-    method: "POST",
-    headers: {
-      ...headers,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      query: getQuery(QueryType.GET_AVAILABLE_DOMAINS),
-      variables: { name: handle },
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(`GraphQL request failed: ${response.status}`);
-  }
-
-  return response.json();
-};
-
 export async function GET(
   req: NextRequest,
-  props: { params: Promise<{ handle: string }> },
-): Promise<Response> {
+  { params }: { params: Promise<{ handle: string }> },
+) {
   const { pathname } = req.nextUrl;
-  const { handle } = await props.params;
+  const handle = (await params).handle?.trim() ?? "";
 
-  if (!handle || typeof handle !== "string" || handle.trim().length === 0) {
+  if (!handle) {
     return errorHandle({
       identity: null,
       path: pathname,
@@ -65,34 +33,35 @@ export async function GET(
     });
   }
 
-  const trimmedHandle = handle.trim();
   const headers = getUserHeaders(req.headers);
-  try {
-    const result = await queryDomains(trimmedHandle, headers);
 
-    if (result.errors || result.code) {
+  try {
+    const { ok, status, body } = await postIdentityGraphQuery(
+      headers,
+      getQuery(QueryType.GET_AVAILABLE_DOMAINS),
+      { name: handle },
+    );
+
+    const result = body as GraphQLEnvelope | null;
+
+    if (!ok || !result || result.code || result.errors) {
       return errorHandle({
-        identity: trimmedHandle,
+        identity: handle,
         platform: null,
         path: pathname,
-        message: result.errors
-          ? "GraphQL query failed"
-          : result.msg || ErrorMessages.NOT_FOUND,
-        code: result.code || 500,
+        message: identityGraphErrorMessage(result, ErrorMessages.NOT_FOUND),
+        code: identityGraphErrorStatus(ok, status, result?.code),
       });
     }
 
     return respondJson(result);
-  } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : "Unknown error occurred";
-
+  } catch (e: unknown) {
     return errorHandle({
-      identity: trimmedHandle,
+      identity: handle,
       platform: null,
       path: pathname,
-      message: errorMessage,
-      code: 500,
+      message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
+      code: e instanceof Error ? Number(e.cause) || 500 : 500,
     });
   }
 }
