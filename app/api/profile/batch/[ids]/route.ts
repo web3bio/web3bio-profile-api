@@ -2,11 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
-
-const parseIdsParam = (idsParam: string): string[] | null => {
-  const ids = JSON.parse(decodeURIComponent(idsParam));
-  return Array.isArray(ids) ? ids : null;
-};
+import {
+  invalidBatchIdentityResponse,
+  parseIdsParam,
+} from "@/app/api/_shared/batch-route";
 
 export async function GET(
   req: NextRequest,
@@ -16,13 +15,7 @@ export async function GET(
   const { pathname } = req.nextUrl;
 
   if (!idsParam) {
-    return errorHandle({
-      identity: "",
-      path: pathname,
-      platform: null,
-      code: 400,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidBatchIdentityResponse(pathname, "", 400);
   }
 
   const headers = getUserHeaders(req.headers);
@@ -30,13 +23,7 @@ export async function GET(
   try {
     const ids = parseIdsParam(idsParam);
     if (!ids) {
-      return errorHandle({
-        identity: idsParam,
-        path: pathname,
-        platform: null,
-        code: 400,
-        message: ErrorMessages.INVALID_IDENTITY,
-      });
+      return invalidBatchIdentityResponse(pathname, idsParam, 400);
     }
 
     const resJson = await queryIdentityGraphBatch(ids, false, headers);

@@ -1,33 +1,11 @@
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import { getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveCredentialHandle } from "./utils";
-
-const invalidIdentityResponse = (
-  pathname: string,
-  handle: string,
-  platform: Platform | null = null,
-  code = 404,
-) =>
-  errorHandle({
-    identity: handle,
-    code,
-    path: pathname,
-    platform,
-    message: ErrorMessages.INVALID_IDENTITY,
-  });
-
-const parseCredentialHandle = (
-  resolvedIdentity: string | null,
-): [Platform, string] | null => {
-  if (!resolvedIdentity) {
-    return null;
-  }
-
-  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
-  return platform && identity ? [platform, identity] : null;
-};
+import {
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/app/api/_shared/identity-route";
 
 export async function GET(
   req: NextRequest,
@@ -41,7 +19,7 @@ export async function GET(
     return invalidIdentityResponse(pathname, "", null, 400);
   }
 
-  const parsedIdentity = parseCredentialHandle(resolveIdentity(handle));
+  const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
   if (!parsedIdentity) {
     return invalidIdentityResponse(pathname, handle);
   }

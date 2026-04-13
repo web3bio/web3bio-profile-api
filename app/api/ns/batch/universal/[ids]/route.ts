@@ -2,6 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryBatchUniversal } from "@/utils/query";
+import {
+  invalidBatchIdentityResponse,
+  parseIdsParam,
+} from "@/app/api/_shared/batch-route";
 
 type RouteParams = {
   params: Promise<{
@@ -9,23 +13,12 @@ type RouteParams = {
   }>;
 };
 
-const parseIdsParam = (idsParam: string): string[] | null => {
-  const ids = JSON.parse(decodeURIComponent(idsParam));
-  return Array.isArray(ids) ? ids : null;
-};
-
 export async function GET(req: NextRequest, { params }: RouteParams) {
   const { ids: idsParam } = await params;
   const { pathname } = req.nextUrl;
 
   if (!idsParam) {
-    return errorHandle({
-      identity: "",
-      path: pathname,
-      platform: null,
-      code: 400,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidBatchIdentityResponse(pathname, "", 400);
   }
 
   const headers = getUserHeaders(req.headers);
@@ -33,13 +26,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   try {
     const ids = parseIdsParam(idsParam);
     if (!ids) {
-      return errorHandle({
-        identity: idsParam,
-        path: pathname,
-        platform: null,
-        code: 400,
-        message: ErrorMessages.INVALID_IDENTITY,
-      });
+      return invalidBatchIdentityResponse(pathname, idsParam, 400);
     }
 
     const resJson = await queryBatchUniversal(ids, headers);

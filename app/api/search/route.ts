@@ -21,7 +21,7 @@ const createSearchError = (
   pathname: string,
   platform: Platform | null,
   code: number,
-  message: unknown,
+  message: string,
 ) =>
   errorHandle({
     identity,
@@ -115,7 +115,8 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
 export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
   const identity = searchParams.get("identity")?.trim() || null;
-  const platform = (searchParams.get("platform")?.trim() || null) as Platform | null;
+  const platform = (searchParams.get("platform")?.trim() ||
+    null) as Platform | null;
   const headers = getUserHeaders(req.headers);
 
   if (!identity || !platform) {
@@ -128,7 +129,11 @@ export async function GET(req: NextRequest) {
     );
   }
   try {
-    const { ok, status, body: rawJson } = await postIdentityGraphQuery(
+    const {
+      ok,
+      status,
+      body: rawJson,
+    } = await postIdentityGraphQuery(
       headers,
       getQuery(QueryType.GET_SEARCH_QUERY),
       { identity, platform },

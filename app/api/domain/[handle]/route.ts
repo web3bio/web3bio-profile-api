@@ -1,37 +1,12 @@
 import type { NextRequest } from "next/server";
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import { getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
-
-const invalidIdentityResponse = (
-  pathname: string,
-  handle: string,
-  platform: Platform | null = null,
-  code = 404,
-) =>
-  errorHandle({
-    identity: handle,
-    code,
-    path: pathname,
-    platform,
-    message: ErrorMessages.INVALID_IDENTITY,
-  });
-
-const parseDomainHandle = (
-  resolvedIdentity: string | null,
-): [Platform, string] | null => {
-  if (!resolvedIdentity) {
-    return null;
-  }
-
-  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
-  if (!platform || !identity || !VALID_DOMAIN_PLATFORMS.has(platform)) {
-    return null;
-  }
-
-  return [platform, identity];
-};
+import {
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/app/api/_shared/identity-route";
 
 export async function GET(
   req: NextRequest,
@@ -45,8 +20,8 @@ export async function GET(
     return invalidIdentityResponse(pathname, "", null, 400);
   }
 
-  const parsedIdentity = parseDomainHandle(resolveIdentity(handle));
-  if (!parsedIdentity) {
+  const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
+  if (!parsedIdentity || !VALID_DOMAIN_PLATFORMS.has(parsedIdentity[0])) {
     return invalidIdentityResponse(pathname, handle);
   }
 
