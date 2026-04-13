@@ -18,15 +18,20 @@ const TARGET_PLATFORMS = new Set([Platform.ens, Platform.sns]);
 
 const formatAddress = (addr?: Array<{ address: string }>) =>
   addr?.[0]?.address ?? null;
+const formatTime = (timestamp?: number) =>
+  timestamp ? formatTimestamp(timestamp) : null;
+const isExtendedPlatform = (platform: Platform) =>
+  EXTEND_DOMAIN_PLATFORMS.has(platform);
+const hasSameOwner = (identity: IdentityRecord, ownerAddress: string) =>
+  !!identity.ownerAddress?.[0]?.address &&
+  isSameAddress(identity.ownerAddress[0].address, ownerAddress);
 
 const getFirstTxAt = (
   identity: IdentityRecord,
   vertices?: IdentityRecord[],
 ): string | null => {
-  if (EXTEND_DOMAIN_PLATFORMS.has(identity.platform)) {
-    return identity.registeredAt
-      ? formatTimestamp(identity.registeredAt)
-      : null;
+  if (isExtendedPlatform(identity.platform)) {
+    return formatTime(identity.registeredAt);
   }
 
   const resolvedAddress = formatAddress(identity.resolvedAddress);
@@ -34,17 +39,11 @@ const getFirstTxAt = (
     return null;
   }
 
-  const resolvedAddressRecord = vertices.find((v) => {
-    if (!EXTEND_DOMAIN_PLATFORMS.has(v.platform)) {
-      return false;
-    }
+  const resolvedAddressRecord = vertices.find(
+    (v) => isExtendedPlatform(v.platform) && isSameAddress(v.identity, resolvedAddress),
+  );
 
-    return isSameAddress(v.identity, resolvedAddress);
-  });
-
-  return resolvedAddressRecord?.registeredAt
-    ? formatTimestamp(resolvedAddressRecord.registeredAt)
-    : null;
+  return formatTime(resolvedAddressRecord?.registeredAt);
 };
 
 const generateResponseStruct = (
@@ -59,12 +58,10 @@ const generateResponseStruct = (
   resolverAddress: identity.resolver ?? null,
   isPrimary: identity.isPrimary,
   status: identity.status,
-  createdAt: identity.registeredAt
-    ? formatTimestamp(identity.registeredAt)
-    : null,
+  createdAt: formatTime(identity.registeredAt),
   firstTxAt: getFirstTxAt(identity, vertices),
-  updatedAt: identity.updatedAt ? formatTimestamp(identity.updatedAt) : null,
-  expiredAt: identity.expiredAt ? formatTimestamp(identity.expiredAt) : null,
+  updatedAt: formatTime(identity.updatedAt),
+  expiredAt: formatTime(identity.expiredAt),
   contenthash: identity.profile?.contenthash ?? null,
 });
 
@@ -80,8 +77,7 @@ const buildDomainsArray = (vertices?: IdentityRecord[], handle?: string) =>
     ?.filter(
       (v) =>
         TARGET_PLATFORMS.has(v.platform) &&
-        !!v.ownerAddress?.[0]?.address &&
-        isSameAddress(v.ownerAddress[0].address, handle || ""),
+        hasSameOwner(v, handle || ""),
     )
     .map((v) => generateResponseStruct(v, vertices)) ?? [];
 
@@ -110,11 +106,12 @@ export const resolveDomainQuery = async (
   }
 
   const { profile, identityGraph } = identity;
+  const vertices = identityGraph?.vertices;
 
   return respondJson({
-    ...generateResponseStruct(identity, identityGraph?.vertices),
+    ...generateResponseStruct(identity, vertices),
     texts: profile?.texts ?? null,
     addresses: buildAddressesMap(profile?.addresses),
-    domains: buildDomainsArray(identityGraph?.vertices, handle),
+    domains: buildDomainsArray(vertices, handle),
   });
 };

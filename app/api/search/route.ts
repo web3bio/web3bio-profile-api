@@ -16,10 +16,27 @@ import {
   QueryType,
 } from "@/utils/query";
 
+const createSearchError = (
+  identity: string | null,
+  pathname: string,
+  platform: Platform | null,
+  code: number,
+  message: unknown,
+) =>
+  errorHandle({
+    identity,
+    path: pathname,
+    platform,
+    code,
+    message,
+  });
+
 const processProfileAvatar = async (
   profile: ProfileRecord,
 ): Promise<string | null> => {
-  if (!profile?.avatar) return null;
+  if (!profile?.avatar) {
+    return null;
+  }
 
   try {
     return await resolveEipAssetURL(profile.avatar);
@@ -32,7 +49,9 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
   const _json = structuredClone(json);
   const identity = _json?.data?.identity;
 
-  if (!identity) return _json;
+  if (!identity) {
+    return _json;
+  }
 
   const avatarTasks: Promise<void>[] = [];
 
@@ -95,18 +114,18 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
 
 export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
-  const identity = searchParams.get("identity");
-  const platform = searchParams.get("platform") as Platform;
+  const identity = searchParams.get("identity")?.trim() || null;
+  const platform = (searchParams.get("platform")?.trim() || null) as Platform | null;
   const headers = getUserHeaders(req.headers);
 
   if (!identity || !platform) {
-    return errorHandle({
+    return createSearchError(
       identity,
-      path: pathname,
+      pathname,
       platform,
-      code: 404,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+      404,
+      ErrorMessages.INVALID_IDENTITY,
+    );
   }
   try {
     const { ok, status, body: rawJson } = await postIdentityGraphQuery(
@@ -122,52 +141,56 @@ export async function GET(req: NextRequest) {
     } | null;
 
     if (!ok || envelope?.code || envelope?.errors) {
-      return errorHandle({
+      return createSearchError(
         identity,
-        path: pathname,
+        pathname,
         platform,
-        code: identityGraphErrorStatus(ok, status, envelope?.code),
-        message: identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
-      });
+        identityGraphErrorStatus(ok, status, envelope?.code),
+        identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
+      );
     }
 
     const graphIdentity = envelope?.data?.identity;
     if (!graphIdentity) {
-      return errorHandle({
+      return createSearchError(
         identity,
-        path: pathname,
+        pathname,
         platform,
-        code: 404,
-        message: ErrorMessages.NOT_FOUND,
-      });
+        404,
+        ErrorMessages.NOT_FOUND,
+      );
     }
 
     if (isSingleWeb2Identity(graphIdentity)) {
-      return errorHandle({
+      return createSearchError(
         identity,
-        path: pathname,
-        platform: platform || "graph",
-        code: 404,
-        message: ErrorMessages.NOT_FOUND,
-      });
+        pathname,
+        (platform || "graph") as Platform,
+        404,
+        ErrorMessages.NOT_FOUND,
+      );
     }
 
     const result = await processJson(envelope as IdentityGraphQueryResponse);
     return respondJson(result);
   } catch (e: unknown) {
-    return errorHandle({
+    return createSearchError(
       identity,
-      path: pathname,
+      pathname,
       platform,
-      message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
-      code: e instanceof Error ? Number(e.cause) || 500 : 500,
-    });
+      e instanceof Error ? Number(e.cause) || 500 : 500,
+      e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
+    );
   }
 }
 
 const isSingleWeb2Identity = (identity: IdentityRecord): boolean => {
-  if (!identity?.identityGraph) return true;
-  if (!isWeb2Platform(identity.platform)) return false;
+  if (!identity?.identityGraph) {
+    return true;
+  }
+  if (!isWeb2Platform(identity.platform)) {
+    return false;
+  }
 
   const { vertices, edges } = identity.identityGraph;
   return vertices.length === 1 && edges.length === 0;

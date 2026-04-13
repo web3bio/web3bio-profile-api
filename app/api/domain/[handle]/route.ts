@@ -4,52 +4,54 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
 
+const invalidIdentityResponse = (
+  pathname: string,
+  handle: string,
+  platform: Platform | null = null,
+  code = 404,
+) =>
+  errorHandle({
+    identity: handle,
+    code,
+    path: pathname,
+    platform,
+    message: ErrorMessages.INVALID_IDENTITY,
+  });
+
+const parseDomainHandle = (
+  resolvedIdentity: string | null,
+): [Platform, string] | null => {
+  if (!resolvedIdentity) {
+    return null;
+  }
+
+  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
+  if (!platform || !identity || !VALID_DOMAIN_PLATFORMS.has(platform)) {
+    return null;
+  }
+
+  return [platform, identity];
+};
+
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
 ) {
-  const params = await props.params;
+  const { handle: rawHandle } = await props.params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle;
+  const handle = rawHandle?.trim() ?? "";
 
-  // Early validation
   if (!handle) {
-    return errorHandle({
-      identity: "",
-      code: 400,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidIdentityResponse(pathname, "", null, 400);
   }
 
-  // Resolve identity once
-  const resolvedId = resolveIdentity(handle);
-  if (!resolvedId) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  const parsedIdentity = parseDomainHandle(resolveIdentity(handle));
+  if (!parsedIdentity) {
+    return invalidIdentityResponse(pathname, handle);
   }
 
-  // Parse platform and identity
-  const [platform, identity] = resolvedId.split(",") as [Platform, string];
+  const [platform, identity] = parsedIdentity;
 
-  // Validate parsed values
-  if (!platform || !identity || !VALID_DOMAIN_PLATFORMS.has(platform)) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: platform || null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
-  }
-
-  // Get headers and resolve domain
   const headers = getUserHeaders(req.headers);
   return resolveDomainQuery(identity, platform, headers, pathname);
 }

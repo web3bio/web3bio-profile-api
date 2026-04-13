@@ -4,36 +4,47 @@ import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { resolveWalletResponse } from "./utils";
 
+const invalidIdentityResponse = (
+  pathname: string,
+  handle: string,
+  platform: Platform | null = null,
+) =>
+  errorHandle({
+    identity: handle,
+    code: 404,
+    path: pathname,
+    platform,
+    message: ErrorMessages.INVALID_IDENTITY,
+  });
+
+const parseWalletHandle = (
+  resolvedIdentity: string | null,
+): [Platform, string] | null => {
+  if (!resolvedIdentity) {
+    return null;
+  }
+
+  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
+  return platform && identity ? [platform, identity] : null;
+};
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
-  const resolvedId = resolveIdentity(handle);
-
-  if (!resolvedId) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  if (!handle) {
+    return invalidIdentityResponse(pathname, "");
   }
 
-  const [platform, identity] = resolvedId.split(",");
-
-  if (!platform || !identity) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: platform as Platform,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  const parsedIdentity = parseWalletHandle(resolveIdentity(handle));
+  if (!parsedIdentity) {
+    return invalidIdentityResponse(pathname, handle);
   }
+  const [platform, identity] = parsedIdentity;
 
   const headers = getUserHeaders(req.headers);
   return resolveWalletResponse(

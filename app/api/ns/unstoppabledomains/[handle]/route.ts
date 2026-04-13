@@ -8,13 +8,15 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
   if (
-    !REGEX.UNSTOPPABLE_DOMAINS.test(handle) &&
-    !isValidEthereumAddress(handle)
-  )
+    !handle ||
+    (!REGEX.UNSTOPPABLE_DOMAINS.test(handle) &&
+      !isValidEthereumAddress(handle))
+  ) {
     return errorHandle({
       identity: handle,
       path: pathname,
@@ -22,6 +24,7 @@ export async function GET(
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
+  }
 
   const headers = getUserHeaders(req.headers);
   return resolveIdentityHandle(

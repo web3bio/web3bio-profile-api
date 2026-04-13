@@ -9,11 +9,15 @@ type RouteParams = {
   }>;
 };
 
+const parseIdsParam = (idsParam: string): string[] | null => {
+  const ids = JSON.parse(decodeURIComponent(idsParam));
+  return Array.isArray(ids) ? ids : null;
+};
+
 export async function GET(req: NextRequest, { params }: RouteParams) {
   const { ids: idsParam } = await params;
   const { pathname } = req.nextUrl;
 
-  // Early validation for missing ids parameter
   if (!idsParam) {
     return errorHandle({
       identity: "",
@@ -27,12 +31,8 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const headers = getUserHeaders(req.headers);
 
   try {
-    // Decode URL-encoded JSON
-    const decodedIds = decodeURIComponent(idsParam);
-    const ids = JSON.parse(decodedIds);
-
-    // Validate that ids is an array
-    if (!Array.isArray(ids)) {
+    const ids = parseIdsParam(idsParam);
+    if (!ids) {
       return errorHandle({
         identity: idsParam,
         path: pathname,
@@ -45,7 +45,6 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     const resJson = await queryBatchUniversal(ids, headers);
     return respondJson(resJson);
   } catch (e: unknown) {
-    // More specific error handling for JSON parsing vs other errors
     const isParseError = e instanceof SyntaxError;
 
     return errorHandle({

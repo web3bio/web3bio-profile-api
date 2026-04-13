@@ -3,6 +3,11 @@ import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
 
+const parseIdsParam = (idsParam: string): string[] | null => {
+  const ids = JSON.parse(decodeURIComponent(idsParam));
+  return Array.isArray(ids) ? ids : null;
+};
+
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ ids: string }> },
@@ -23,10 +28,8 @@ export async function GET(
   const headers = getUserHeaders(req.headers);
 
   try {
-    const decodedIds = decodeURIComponent(idsParam);
-    const ids = JSON.parse(decodedIds);
-
-    if (!Array.isArray(ids)) {
+    const ids = parseIdsParam(idsParam);
+    if (!ids) {
       return errorHandle({
         identity: idsParam,
         path: pathname,

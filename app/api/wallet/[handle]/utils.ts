@@ -17,29 +17,53 @@ const NAME_SERVICE_MAPPING = [
   { network: Platform.ethereum, ns: Platform.linea },
   { network: Platform.solana, ns: Platform.sns },
 ];
+const NETWORK_PLATFORM_SET = new Set(
+  NAME_SERVICE_MAPPING.map(({ network }) => network),
+);
+const NS_PLATFORM_SET = new Set(NAME_SERVICE_MAPPING.map(({ ns }) => ns));
+
+const buildSourcesMap = (edges: IdentityGraphEdge[]): Map<string, string[]> => {
+  const sourceSets = new Map<string, Set<string>>();
+  for (const edge of edges) {
+    if (!edge?.target || !edge.dataSource) {
+      continue;
+    }
+    if (!sourceSets.has(edge.target)) {
+      sourceSets.set(edge.target, new Set());
+    }
+    sourceSets.get(edge.target)!.add(edge.dataSource);
+  }
+
+  return new Map(
+    Array.from(sourceSets.entries()).map(([target, sources]) => [
+      target,
+      Array.from(sources),
+    ]),
+  );
+};
 
 const format = async (
   v: IdentityRecord,
   all: IdentityRecord[] = [],
-  edges: IdentityGraphEdge[] = [],
+  sourcesMap?: Map<string, string[]>,
   isDomainItem: Boolean = false,
 ): Promise<any> => {
   const avatar = v.profile?.avatar
     ? await resolveEipAssetURL(v.profile.avatar).catch(() => v.profile.avatar)
     : null;
 
-  const domains = NAME_SERVICE_MAPPING.some((x) => x.network === v.platform)
+  const domains = NETWORK_PLATFORM_SET.has(v.platform)
     ? await Promise.all(
         all
           .filter(
             (sv) =>
-              NAME_SERVICE_MAPPING.some((m) => m.ns === sv.platform) &&
+              NS_PLATFORM_SET.has(sv.platform) &&
               sv.ownerAddress?.some((o) =>
                 isSameAddress(o.address, v.profile?.address),
               ),
           )
           .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
-          .map((sv) => format(sv, [], [], true)),
+          .map((sv) => format(sv, [], undefined, true)),
       )
     : [];
 
@@ -55,7 +79,7 @@ const format = async (
     domains,
   };
   if (!isDomainItem) {
-    (res as any).sources = resolveSources(`${v.platform},${v.identity}`, edges);
+    (res as any).sources = sourcesMap?.get(`${v.platform},${v.identity}`) || [];
   }
   return res;
 };
@@ -85,17 +109,18 @@ export const resolveWalletResponse = async (
 
   const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];
   const edges: IdentityGraphEdge[] = root.identityGraph?.edges || [];
+  const sourcesMap = buildSourcesMap(edges);
   const [main, graph] = await Promise.all([
     // root without sources
-    format(root, vertices, edges, true),
+    format(root, vertices, sourcesMap, true),
     Promise.all(
       vertices
         .filter(
           (v) =>
-            !NAME_SERVICE_MAPPING.some((m) => m.ns === v.platform) &&
+            !NS_PLATFORM_SET.has(v.platform) &&
             v.identity !== root.identity,
         )
-        .map((v) => format(v, vertices, edges)),
+        .map((v) => format(v, vertices, sourcesMap)),
     ),
   ]);
 
@@ -106,17 +131,4 @@ export const resolveWalletResponse = async (
     ),
     identityGraph: graph,
   });
-};
-
-const resolveSources = (id: string, edges: IdentityGraphEdge[]) => {
-  if (!edges?.length) return [];
-
-  const sources = new Set<string>();
-  edges.forEach((edge) => {
-    if (edge.target === id && edge.dataSource) {
-      sources.add(edge.dataSource);
-    }
-  });
-
-  return Array.from(sources);
 };

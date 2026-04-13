@@ -655,11 +655,13 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
         ]),
     );
 
+    const emptyResult = (id: string) => ({ id, profiles: [] as NSResponse[] });
+
     const results = await Promise.all(
       queryIds.map(async (id) => {
         const matchingIdentity = identityMap.get(id);
         if (!matchingIdentity) {
-          return { id, profiles: [] };
+          return emptyResult(id);
         }
 
         try {
@@ -680,11 +682,11 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
               profiles: [...(resolvedResult as NSResponse[])],
             };
           }
-        } catch (error) {
+        } catch {
           // Silent fail for individual identity resolution
         }
 
-        return { id, profiles: [] };
+        return emptyResult(id);
       }),
     );
 
@@ -751,9 +753,16 @@ export async function queryIdentityGraphBatch(
       )
       .map((result) => result.value);
 
+    const queryIdSet = new Set(queryIds);
+    const normalizedResultMap = new Map(
+      validResults.map((result) => [
+        `${result.platform},${normalizeText(result.identity)}`,
+        result,
+      ]),
+    );
     const resultMap = new Map(
       validResults.map((result) => [
-        result.aliases?.find((alias: string) => queryIds.includes(alias)) ||
+        result.aliases?.find((alias: string) => queryIdSet.has(alias)) ||
           `${result.platform},${normalizeText(result.identity)}`,
         result,
       ]),
@@ -761,18 +770,12 @@ export async function queryIdentityGraphBatch(
 
     return queryIds
       .map((queryId) => {
-        if (resultMap.has(queryId)) {
-          return resultMap.get(queryId);
+        const directMatch = resultMap.get(queryId);
+        if (directMatch) {
+          return directMatch;
         }
-
         const [platform, identity] = queryId.split(",");
-        return (
-          validResults.find(
-            (result) =>
-              result.platform === platform &&
-              normalizeText(result.identity) === normalizeText(identity),
-          ) || null
-        );
+        return normalizedResultMap.get(`${platform},${normalizeText(identity)}`) || null;
       })
       .filter(Boolean);
   } catch (error) {

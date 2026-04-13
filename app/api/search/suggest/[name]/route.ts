@@ -18,8 +18,8 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ name: string }> },
 ) {
-  const name = normalizeText((await params).name);
-  if (!name.trim()) {
+  const name = normalizeText((await params).name).trim();
+  if (!name) {
     return respondJson([]);
   }
 
