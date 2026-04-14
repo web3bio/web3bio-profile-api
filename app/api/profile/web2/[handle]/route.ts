@@ -1,45 +1,35 @@
 import type { NextRequest } from "next/server";
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveUniversalHandle } from "../../[handle]/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import {
+  getUserHeaders,
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/utils/utils";
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
-  const resolvedId = resolveIdentity(handle);
-
-  if (!resolvedId) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  if (!handle) {
+    return invalidIdentityResponse(pathname, "");
   }
 
-  const [platform, identity] = resolvedId.split(",");
-
-  if (!platform || !identity) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: platform as Platform,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
+  if (!parsedIdentity) {
+    return invalidIdentityResponse(pathname, handle);
   }
+  const [platform, identity] = parsedIdentity;
 
   const headers = getUserHeaders(req.headers);
 
   return resolveUniversalHandle(
     identity,
-    platform as Platform,
+    platform,
     headers,
     false,
     pathname,

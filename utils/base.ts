@@ -65,6 +65,23 @@ const SNS_RECORDS_LIST = [
 
 export const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 
+export const toErrorMessage = (message: unknown, fallback: string): string => {
+  if (typeof message === "string") {
+    return message;
+  }
+  if (message instanceof Error) {
+    return message.message;
+  }
+  if (message == null) {
+    return fallback;
+  }
+  try {
+    return JSON.stringify(message);
+  } catch {
+    return String(message);
+  }
+};
+
 export const resolveIdentityResponse = async (
   handle: string,
   platform: Platform,
@@ -214,7 +231,7 @@ export const resolveIdentityHandle = async (
         path: pathname,
         platform,
         code: response.code,
-        message: response.message,
+        message: toErrorMessage(response.message, ErrorMessages.UNKNOWN_ERROR),
       });
     }
     return respondJson(response);

@@ -6,6 +6,7 @@ describe("Test For Domain API", () => {
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.identity).toBe("sujiyan.eth");
+    expect(json.firstTxAt).toBe("2020-01-24T16:01:08.000Z");
   });
   it("It should respond 200 for bonfida.sol", async () => {
     const res = await queryClient("/domain/bonfida.sol");

@@ -2,6 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryIdentityGraphBatch } from "@/utils/query";
+import {
+  invalidBatchIdentityResponse,
+  parseIdsParam,
+} from "@/utils/utils";
 
 export async function GET(
   req: NextRequest,
@@ -11,29 +15,15 @@ export async function GET(
   const { pathname } = req.nextUrl;
 
   if (!idsParam) {
-    return errorHandle({
-      identity: "",
-      path: pathname,
-      platform: null,
-      code: 400,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidBatchIdentityResponse(pathname, "", 400);
   }
 
   const headers = getUserHeaders(req.headers);
 
   try {
-    const decodedIds = decodeURIComponent(idsParam);
-    const ids = JSON.parse(decodedIds);
-
-    if (!Array.isArray(ids)) {
-      return errorHandle({
-        identity: idsParam,
-        path: pathname,
-        platform: null,
-        code: 400,
-        message: ErrorMessages.INVALID_IDENTITY,
-      });
+    const ids = parseIdsParam(idsParam);
+    if (!ids) {
+      return invalidBatchIdentityResponse(pathname, idsParam, 400);
     }
 
     const resJson = await queryIdentityGraphBatch(ids, false, headers);

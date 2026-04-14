@@ -12,8 +12,18 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle: inputName } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const inputName = rawHandle?.trim() ?? "";
+  if (!inputName) {
+    return errorHandle({
+      identity: inputName,
+      path: pathname,
+      platform: Platform.basenames,
+      code: 404,
+      message: ErrorMessages.INVALID_IDENTITY,
+    });
+  }
   const isEthAddress = isValidEthereumAddress(inputName);
 
   const handle = isEthAddress

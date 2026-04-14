@@ -2,6 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages } from "web3bio-profile-kit/types";
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 import { queryBatchUniversal } from "@/utils/query";
+import {
+  invalidBatchIdentityResponse,
+  parseIdsParam,
+} from "@/utils/utils";
 
 type RouteParams = {
   params: Promise<{
@@ -13,39 +17,21 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
   const { ids: idsParam } = await params;
   const { pathname } = req.nextUrl;
 
-  // Early validation for missing ids parameter
   if (!idsParam) {
-    return errorHandle({
-      identity: "",
-      path: pathname,
-      platform: null,
-      code: 400,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidBatchIdentityResponse(pathname, "", 400);
   }
 
   const headers = getUserHeaders(req.headers);
 
   try {
-    // Decode URL-encoded JSON
-    const decodedIds = decodeURIComponent(idsParam);
-    const ids = JSON.parse(decodedIds);
-
-    // Validate that ids is an array
-    if (!Array.isArray(ids)) {
-      return errorHandle({
-        identity: idsParam,
-        path: pathname,
-        platform: null,
-        code: 400,
-        message: ErrorMessages.INVALID_IDENTITY,
-      });
+    const ids = parseIdsParam(idsParam);
+    if (!ids) {
+      return invalidBatchIdentityResponse(pathname, idsParam, 400);
     }
 
     const resJson = await queryBatchUniversal(ids, headers);
     return respondJson(resJson);
   } catch (e: unknown) {
-    // More specific error handling for JSON parsing vs other errors
     const isParseError = e instanceof SyntaxError;
 
     return errorHandle({

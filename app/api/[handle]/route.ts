@@ -7,9 +7,9 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
 ) {
-  const params = await props.params;
+  const { handle: rawHandle } = await props.params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle;
+  const handle = rawHandle?.trim() ?? "";
 
   if (!handle) {
     return errorHandle({
