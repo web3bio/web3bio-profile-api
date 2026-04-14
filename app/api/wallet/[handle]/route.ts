@@ -1,11 +1,11 @@
 import type { NextRequest } from "next/server";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { getUserHeaders } from "@/utils/utils";
-import { resolveWalletResponse } from "./utils";
 import {
+  getUserHeaders,
   invalidIdentityResponse,
   parseResolvedIdentityHandle,
-} from "@/app/api/_shared/identity-route";
+} from "@/utils/utils";
+import { resolveWalletResponse } from "./utils";
 
 export async function GET(
   req: NextRequest,

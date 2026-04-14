@@ -5,7 +5,7 @@ import { queryIdentityGraphBatch } from "@/utils/query";
 import {
   invalidBatchIdentityResponse,
   parseIdsParam,
-} from "@/app/api/_shared/batch-route";
+} from "@/utils/utils";
 
 export async function GET(
   req: NextRequest,

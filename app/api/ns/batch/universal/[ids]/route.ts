@@ -5,7 +5,7 @@ import { queryBatchUniversal } from "@/utils/query";
 import {
   invalidBatchIdentityResponse,
   parseIdsParam,
-} from "@/app/api/_shared/batch-route";
+} from "@/utils/utils";
 
 type RouteParams = {
   params: Promise<{

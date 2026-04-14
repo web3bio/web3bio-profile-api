@@ -1,12 +1,12 @@
 import type { NextRequest } from "next/server";
 import { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { getUserHeaders } from "@/utils/utils";
-import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
 import {
+  getUserHeaders,
   invalidIdentityResponse,
   parseResolvedIdentityHandle,
-} from "@/app/api/_shared/identity-route";
+} from "@/utils/utils";
+import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
 
 export async function GET(
   req: NextRequest,

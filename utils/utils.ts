@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalize } from "viem/ens";
+import { ErrorMessages, type Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, errorHandleProps } from "./types";
 
@@ -96,3 +97,46 @@ export function getClientIP(req: NextRequest): string {
   }
   return ip || "unknown";
 }
+
+export const invalidIdentityResponse = (
+  pathname: string,
+  handle: string,
+  platform: Platform | null = null,
+  code = 404,
+) =>
+  errorHandle({
+    identity: handle,
+    code,
+    path: pathname,
+    platform,
+    message: ErrorMessages.INVALID_IDENTITY,
+  });
+
+export const parseResolvedIdentityHandle = (
+  resolvedIdentity: string | null,
+): [Platform, string] | null => {
+  if (!resolvedIdentity) {
+    return null;
+  }
+
+  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
+  return platform && identity ? [platform, identity] : null;
+};
+
+export const parseIdsParam = (idsParam: string): string[] | null => {
+  const ids = JSON.parse(decodeURIComponent(idsParam));
+  return Array.isArray(ids) ? ids : null;
+};
+
+export const invalidBatchIdentityResponse = (
+  pathname: string,
+  identity: string,
+  code = 400,
+) =>
+  errorHandle({
+    identity,
+    path: pathname,
+    platform: null,
+    code,
+    message: ErrorMessages.INVALID_IDENTITY,
+  });
