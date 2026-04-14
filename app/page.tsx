@@ -6,9 +6,9 @@ import { BASE_URL } from "../utils/utils";
 import CodeBlock from "@/components/CodeBlock";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Web3.bio Profile API - ENS, Farcaster and Lens Resolver API";
+  const title = "Web3.bio Profile API - ENS, Lens and Farcaster APIs";
   const description =
-    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Basenames, Farcaster, Lens, Linea Name Service, Solana Name Service and more into their apps.";
+    "Web3.bio Profile API enables developers to easily and quickly integrate Web3 universal profiles from Ethereum, ENS, Lens, Farcaster, Basenames, Solana Name Service and more into their apps.";
 
   return {
     metadataBase: new URL(BASE_URL),
@@ -37,22 +37,24 @@ export async function generateMetadata(): Promise<Metadata> {
       shortcut: "/favicon.svg",
     },
     keywords: [
-      "Web3",
-      "Web3.bio",
       "Web3 DID",
       "Web3 Identity",
       "Web3 Identity Search",
       "Web3 Identity Resolver",
       "Web3 Identity Graph",
+      "Web3 Wallet Resolver",
       "Web3 Social Graph",
       "Web3 Identity Explorer",
       "Web3 Profile",
       "Web3 Profile Explorer",
-      "DID",
       "DID Search Engine",
       "DID Explorer",
       "Ethereum Identity Kit",
       "Ethereum OnchainKit",
+      "ENS Identity Kit",
+      "Lens Identity Kit",
+      "Farcaster Identity Kit",
+      "Base Identity Kit",
       "Web3 Domain Search",
       "Web3 Domain Explorer",
       "Web3 Domain WHOIS",
@@ -88,7 +90,7 @@ export default async function Home() {
           </h1>
           <h2 className="h6 text-gray mb-4 pb-4">
             Universal Identity & Domain Resolver API for Ethereum, ENS
-            Ecosystem, Farcaster, Lens, and Solana.
+            Ecosystem, Lens, Farcaster, and Solana.
           </h2>
           <section className="mt-4 pt-4 pb-4">
             <p>
@@ -100,8 +102,8 @@ export default async function Home() {
               >
                 Ethereum / ENS
               </span>
-              , <span className="text-underline">Farcaster</span>,{" "}
-              <span className="text-underline">Lens</span>,{" "}
+              , <span className="text-underline">Lens</span>,{" "}
+              <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Basenames</span>,{" "}
               <span className="text-underline">Linea Name Service</span>,{" "}
               <span
@@ -499,7 +501,7 @@ export default async function Home() {
                   className="btn btn-sm pt-4 pb-4 ml-2"
                   title="Web3.bio Web3 Identity Graph Search and Link-in-bio Profile Service"
                 >
-                  Release Notes 0.4.1
+                  Release Notes 0.4.4
                 </a>
               </div>
             </div>
@@ -534,7 +536,7 @@ export default async function Home() {
                 🛠️ Install Profile Kit
               </a>{" "}
               <a
-                href="https://github.com/web3bio/profile-kit"
+                href="https://github.com/web3bio/web3bio-profile-kit"
                 target="_blank"
                 className="btn btn-sm pt-4 pb-4"
               >
@@ -590,9 +592,8 @@ export default async function Home() {
                 <div className="mr-2">Batch Profile Query</div>
               </div>
               <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
+                <div className="text-small"></div>
+                <span className="hide-sm">Endpoints</span> &rarr;
               </div>
             </a>
 
@@ -612,6 +613,54 @@ export default async function Home() {
               </div>
             </a>
 
+            <a
+              href="#domain"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Domain Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#wallet"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Wallet Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#avatar"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Avatar Query</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
             <p>
               Web3.bio Profile API also provides basic profiles for name service
               resolution under <span className="label">{host}/ns</span> (Replace{" "}
@@ -620,8 +669,8 @@ export default async function Home() {
             </p>
           </section>
 
-          <section className="pt-4 pb-4" id="authentication">
-            <h2 className="text-bold h4">Authentication</h2>
+          <section className="pt-4 pb-4" id="api-key">
+            <h2 className="text-bold h4">API Key and Authentication</h2>
             <p>
               The Profile API is free, but usage without API keys includes rate
               limiting mechanisms to ensure fair usage and prevent abuse. If you
@@ -674,7 +723,10 @@ export default async function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Universal Profiles</h2>
-            <p>Fetch detailed Universal Profiles across multiple platforms.</p>
+            <p>
+              Fetch detailed universal profiles from an Identity Graph across
+              multiple platforms, using any identity.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -715,9 +767,9 @@ export default async function Home() {
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
                 <br />
-                An Ethereum address, an ENS domain, a Basenames domain, a Linea
-                Name Service domain, a Farcaster username (ends with
-                .farcaster), or a Lens handle.
+                An Ethereum address, an ENS domain, a Lens handle, a Farcaster
+                username (ends with .farcaster), a Basenames domain, a Linea
+                domain, or a Solana address or SNS domain.
               </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -751,6 +803,29 @@ export default async function Home() {
                 </a>
               </li>
               <li>
+                <span className="label">Lens</span>{" "}
+                <a href={`${BASE_URL}/profile/stani.lens`} target="_blank">
+                  /profile/stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/stani.lens`} target="_blank">
+                  /ns/stani.lens
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/dwr.eth.farcaster`}
+                  target="_blank"
+                >
+                  /profile/dwr.eth.farcaster
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/dwr.eth.farcaster`} target="_blank">
+                  /ns/dwr.eth.farcaster
+                </a>
+              </li>
+              <li>
                 <span className="label">Basenames</span>{" "}
                 <a href={`${BASE_URL}/profile/tony.base.eth`} target="_blank">
                   /profile/tony.base.eth
@@ -771,26 +846,13 @@ export default async function Home() {
                 </a>
               </li>
               <li>
-                <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/dwr.eth.farcaster`}
-                  target="_blank"
-                >
-                  /profile/dwr.eth.farcaster
+                <span className="label">SNS</span>{" "}
+                <a href={`${BASE_URL}/profile/bonfida.sol`} target="_blank">
+                  /profile/bonfida.sol
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/dwr.eth.farcaster`} target="_blank">
-                  /ns/dwr.eth.farcaster
-                </a>
-              </li>
-              <li>
-                <span className="label">Lens</span>{" "}
-                <a href={`${BASE_URL}/profile/stani.lens`} target="_blank">
-                  /profile/stani.lens
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/stani.lens`} target="_blank">
-                  /ns/stani.lens
+                <a href={`${BASE_URL}/ns/bonfida.sol`} target="_blank">
+                  /ns/bonfida.sol
                 </a>
               </li>
             </ul>
@@ -829,7 +891,10 @@ export default async function Home() {
                   "twitter": {
                     "link": "https://x.com/VitalikButerin",
                     "handle": "VitalikButerin",
-                    "sources": []
+                    "sources": [
+                      "crowdsourcing",
+                      "nostr"
+                    ]
                   }
                 },
                 "social": {
@@ -951,29 +1016,13 @@ export default async function Home() {
               </div>
             </a>
             <a
-              href="#basenames-profile-api"
+              href="#lens-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Basenames Profile API</div>
-              </div>
-              <div className="mr-2" style={endpointRight}>
-                <div className="text-small">
-                  <span className="hide-sm">Endpoints</span> &rarr;
-                </div>
-              </div>
-            </a>
-
-            <a
-              href="#linea-profile-api"
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Linea Profile API</div>
+                <div className="mr-2">Lens Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -999,13 +1048,29 @@ export default async function Home() {
             </a>
 
             <a
-              href="#lens-profile-api"
+              href="#basenames-profile-api"
               className="s-rounded d-flex mt-4 mb-4 p-1"
               style={endpointItem}
             >
               <div className="d-flex" style={endpointLeft}>
                 <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">Lens Profile API</div>
+                <div className="mr-2">Basenames Profile API</div>
+              </div>
+              <div className="mr-2" style={endpointRight}>
+                <div className="text-small">
+                  <span className="hide-sm">Endpoints</span> &rarr;
+                </div>
+              </div>
+            </a>
+
+            <a
+              href="#linea-profile-api"
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">Linea Profile API</div>
               </div>
               <div className="mr-2" style={endpointRight}>
                 <div className="text-small">
@@ -1153,7 +1218,10 @@ export default async function Home() {
                 "twitter": {
                   "link": "https://x.com/VitalikButerin",
                   "handle": "VitalikButerin",
-                  "sources": []
+                  "sources": [
+                    "crowdsourcing",
+                    "nostr"
+                  ]
                 }
               },
               "social": {}
@@ -1169,6 +1237,298 @@ export default async function Home() {
               "avatar": "https://euc.li/vitalik.eth",
               "description": "mi pinxe lo crino tcati",
               "header": "https://pbs.twimg.com/profile_banners/295218901/1638557376/1500x500",
+              "status": null
+            }
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="lens-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Lens Profile API</h2>
+            <p>
+              Fetch a detailed Lens profile using an Ethereum address or Lens
+              handle.
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  lens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  lens
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Lens handle
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum / EVM</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  target="_blank"
+                >
+                  /profile/lens/0x7241...9dff
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
+                  target="_blank"
+                >
+                  /ns/lens/0x7241...9dff
+                </a>
+              </li>
+              <li>
+                <span className="label">Lens</span>{" "}
+                <a href={`${BASE_URL}/profile/lens/stani.lens`} target="_blank">
+                  /profile/lens/stani.lens
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/lens/stani.lens`} target="_blank">
+                  /ns/lens/stani.lens
+                </a>
+              </li>
+            </ul>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
+            // ${BASE_URL}/profile/lens/stani.lens
+            {
+              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+              "identity": "stani.lens",
+              "platform": "lens",
+              "displayName": "Stani",
+              "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
+              "description": "@Avara (@Aave @Lens @Family)",
+              "status": null,
+              "email": null,
+              "location": null,
+              "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
+              "contenthash": null,
+              "links": {
+                "lens": {
+                  "link": "https://www.lensfrens.xyz/stani",
+                  "handle": "stani",
+                  "sources": ["lens"]
+                }
+              },
+              "social": {
+                "uid": null,
+                "follower": 115084,
+                "following": 1265
+              }
+            }
+
+            // ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
+            // ${BASE_URL}/ns/lens/stani.lens
+            {
+              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+              "identity": "stani.lens",
+              "platform": "lens",
+              "displayName": "Stani",
+              "avatar": "https://ik.imagekit.io/lens/4f0b6ecae2682c22c38a3f1c12f70e386ec68638b1895e53c969fdc9853f7022_rHSuskh0J.webp",
+              "description": "Founder & CEO @Aave",
+              "header": "https://ik.imagekit.io/lens/205d97d8c8bbf46058ce9666423fde941883e75d34ceeaedfeb0194fe9ec2407_TPKvCEnc54.webp",
+              "status": null
+            }
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="farcaster-profile-api"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Farcaster Profile API</h2>
+            <p>
+              Fetch a detailed Farcaster profile using an Ethereum address or
+              Farcaster username/fname or encoded Farcaster FID.
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  profile
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  farcaster
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  ns
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  farcaster
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or Farcaster username/fname or encoded
+                Farcaster FID.
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  target="_blank"
+                >
+                  /profile/farcaster/0x8fc5...a2ea
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
+                  target="_blank"
+                >
+                  /ns/farcaster/0x8fc5...a2ea
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/farcaster/dwr.eth`}
+                  target="_blank"
+                >
+                  /profile/farcaster/dwr.eth
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a href={`${BASE_URL}/ns/farcaster/dwr.eth`} target="_blank">
+                  /ns/farcaster/dwr.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Farcaster</span>{" "}
+                <a
+                  href={`${BASE_URL}/profile/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /profile/farcaster/farcaster,#3
+                </a>
+                <span className="text-gray ml-2 mr-2">OR</span>
+                <a
+                  href={`${BASE_URL}/ns/farcaster/farcaster%2C%233`}
+                  target="_blank"
+                >
+                  /ns/farcaster/farcaster,#3
+                </a>
+              </li>
+            </ul>
+            <CodeBlock
+              language="json"
+              code={`
+            // ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
+            // ${BASE_URL}/profile/farcaster/dwr.eth
+            // ${BASE_URL}/profile/farcaster/farcaster%2C%233
+            {
+              "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
+              "identity": "dwr.eth",
+              "platform": "farcaster",
+              "displayName": "Dan Romero",
+              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+              "description": "Working on Farcaster",
+              "status": null,
+              "email": null,
+              "location": "Los Angeles, California",
+              "header": null,
+              "contenthash": null,
+              "links": {
+                "farcaster": {
+                  "link": "https://farcaster.xyz/dwr.eth",
+                  "handle": "dwr.eth",
+                  "sources": ["farcaster"]
+                }
+              },
+              "social": {
+                "uid": 3,
+                "follower": 493153,
+                "following": 3534
+              }
+            }
+
+            // ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
+            // ${BASE_URL}/ns/farcaster/dwr.eth
+            // ${BASE_URL}/ns/farcaster/farcaster%2C%233
+            {
+              "address": "0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5",
+              "identity": "dwr",
+              "platform": "farcaster",
+              "displayName": "Dan Romero",
+              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
+              "description": "Interested in technology and other stuff.",
+              "header": null,
               "status": null
             }
               `}
@@ -1455,298 +1815,6 @@ export default async function Home() {
               "avatar": null,
               "description": null,
               "header": null,
-              "status": null
-            }
-              `}
-            />
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="farcaster-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Farcaster Profile API</h2>
-            <p>
-              Fetch a detailed Farcaster profile using an Ethereum address or
-              Farcaster username/fname or encoded Farcaster FID.
-            </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  farcaster
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  farcaster
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or Farcaster username/fname or encoded
-                Farcaster FID.
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
-                  target="_blank"
-                >
-                  /profile/farcaster/0x8fc5...a2ea
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea`}
-                  target="_blank"
-                >
-                  /ns/farcaster/0x8fc5...a2ea
-                </a>
-              </li>
-              <li>
-                <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/farcaster/dwr.eth`}
-                  target="_blank"
-                >
-                  /profile/farcaster/dwr.eth
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/farcaster/dwr.eth`} target="_blank">
-                  /ns/farcaster/dwr.eth
-                </a>
-              </li>
-              <li>
-                <span className="label">Farcaster</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/farcaster/farcaster%2C%233`}
-                  target="_blank"
-                >
-                  /profile/farcaster/farcaster,#3
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/farcaster/farcaster%2C%233`}
-                  target="_blank"
-                >
-                  /ns/farcaster/farcaster,#3
-                </a>
-              </li>
-            </ul>
-            <CodeBlock
-              language="json"
-              code={`
-            // ${BASE_URL}/profile/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
-            // ${BASE_URL}/profile/farcaster/dwr.eth
-            // ${BASE_URL}/profile/farcaster/farcaster%2C%233
-            {
-              "address": "0xd7029bdea1c17493893aafe29aad69ef892b8ff2",
-              "identity": "dwr.eth",
-              "platform": "farcaster",
-              "displayName": "Dan Romero",
-              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-              "description": "Working on Farcaster",
-              "status": null,
-              "email": null,
-              "location": "Los Angeles, California",
-              "header": null,
-              "contenthash": null,
-              "links": {
-                "farcaster": {
-                  "link": "https://farcaster.xyz/dwr.eth",
-                  "handle": "dwr.eth",
-                  "sources": ["farcaster"]
-                }
-              },
-              "social": {
-                "uid": 3,
-                "follower": 493153,
-                "following": 3534
-              }
-            }
-
-            // ${BASE_URL}/ns/farcaster/0x8fc5d6afe572fefc4ec153587b63ce543f6fa2ea
-            // ${BASE_URL}/ns/farcaster/dwr.eth
-            // ${BASE_URL}/ns/farcaster/farcaster%2C%233
-            {
-              "address": "0x6ce09ed5526de4afe4a981ad86d17b2f5c92fea5",
-              "identity": "dwr",
-              "platform": "farcaster",
-              "displayName": "Dan Romero",
-              "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/bc698287-5adc-4cc5-a503-de16963ed900/original",
-              "description": "Interested in technology and other stuff.",
-              "header": null,
-              "status": null
-            }
-              `}
-            />
-          </section>
-
-          <section
-            className="pt-4 pb-4"
-            id="lens-profile-api"
-            style={{ marginTop: "4rem" }}
-          >
-            <h2 className="text-bold h4">Lens Profile API</h2>
-            <p>
-              Fetch a detailed Lens profile using an Ethereum address or Lens
-              handle.
-            </p>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Endpoints
-            </h3>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  profile
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  lens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <div
-              className="s-rounded d-flex mt-4 mb-4 p-1"
-              style={endpointItem}
-            >
-              <div className="d-flex" style={endpointLeft}>
-                <div className="label label-primary p-2 mr-2">GET</div>
-                <div className="mr-2">
-                  <span className="text-gray hide-sm">{BASE_URL}</span>
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  ns
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  lens
-                  <span className="ml-1 mr-1 text-gray">/</span>
-                  {"{"}identity{"}"}
-                </div>
-              </div>
-            </div>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Parameters
-            </h3>
-            <ul>
-              <li>
-                <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or a Lens handle
-              </li>
-            </ul>
-            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
-              Examples
-            </h3>
-            <ul>
-              <li>
-                <span className="label">Ethereum / Polygon</span>{" "}
-                <a
-                  href={`${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
-                  target="_blank"
-                >
-                  /profile/lens/0x7241...9dff
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a
-                  href={`${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff`}
-                  target="_blank"
-                >
-                  /ns/lens/0x7241...9dff
-                </a>
-              </li>
-              <li>
-                <span className="label">Lens</span>{" "}
-                <a href={`${BASE_URL}/profile/lens/stani.lens`} target="_blank">
-                  /profile/lens/stani.lens
-                </a>
-                <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/lens/stani.lens`} target="_blank">
-                  /ns/lens/stani.lens
-                </a>
-              </li>
-            </ul>
-            <CodeBlock
-              language="json"
-              code={`
-            // ${BASE_URL}/profile/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
-            // ${BASE_URL}/profile/lens/stani.lens
-            {
-              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-              "identity": "stani.lens",
-              "platform": "lens",
-              "displayName": "Stani",
-              "avatar": "https://ik.imagekit.io/lens/media-snapshot/98e279526cad20389c0959c26059cc3fe7a35793e8e050b43802916ea0d42d33.png",
-              "description": "@Avara (@Aave @Lens @Family)",
-              "status": null,
-              "email": null,
-              "location": null,
-              "header": "https://ik.imagekit.io/lens/media-snapshot/b23bb0344546aa064c6aeb39520e148576574113755385e5083465f25d2db098.webp",
-              "contenthash": null,
-              "links": {
-                "lens": {
-                  "link": "https://www.lensfrens.xyz/stani",
-                  "handle": "stani",
-                  "sources": ["lens"]
-                }
-              },
-              "social": {
-                "uid": null,
-                "follower": 115084,
-                "following": 1265
-              }
-            }
-
-            // ${BASE_URL}/ns/lens/0x7241dddec3a6af367882eaf9651b87e1c7549dff
-            // ${BASE_URL}/ns/lens/stani.lens
-            {
-              "address": "0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-              "identity": "stani.lens",
-              "platform": "lens",
-              "displayName": "Stani",
-              "avatar": "https://ik.imagekit.io/lens/4f0b6ecae2682c22c38a3f1c12f70e386ec68638b1895e53c969fdc9853f7022_rHSuskh0J.webp",
-              "description": "Founder & CEO @Aave",
-              "header": "https://ik.imagekit.io/lens/205d97d8c8bbf46058ce9666423fde941883e75d34ceeaedfeb0194fe9ec2407_TPKvCEnc54.webp",
               "status": null
             }
               `}
@@ -2372,7 +2440,7 @@ export default async function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Credential Query</h2>
-            <p>Fetch formatted credential information using a query ID</p>
+            <p>Fetch formatted credential information using a query ID.</p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2571,6 +2639,448 @@ export default async function Home() {
                   ]
                 }
 
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="domain"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Domain Query</h2>
+            <p>Fetch detailed domain raw information using a domain name.</p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  domain
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An ENS domain, a Basenames domain, a Linea domain, or a SNS
+                domain.{" "}
+              </li>
+            </ul>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a href={`${BASE_URL}/domain/sujiyan.eth`} target="_blank">
+                  sujiyan.eth
+                </a>
+              </li>
+
+              <li>
+                <span className="label">Basenames</span>{" "}
+                <a href={`${BASE_URL}/domain/tony.base.eth`} target="_blank">
+                  tony.base.eth
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <CodeBlock
+              language="json"
+              code={`
+                // ${BASE_URL}/domain/sujiyan.eth
+                {
+                  "identity": "sujiyan.eth",
+                  "platform": "ens",
+                  "resolvedAddress": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+                  "ownerAddress": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+                  "managerAddress": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+                  "resolverAddress": "0x231b0ee14048e9dccd1d247744d114a4eb5e8e63",
+                  "isPrimary": true,
+                  "status": "cached",
+                  "createdAt": "2020-01-30T12:05:30.000Z",
+                  "firstTxAt": "2020-01-24T16:01:08.000Z",
+                  "updatedAt": "2026-04-14T05:31:12.000Z",
+                  "expiredAt": "2029-04-30T04:49:54.000Z",
+                  "contenthash": "ipns://k51qzi5uqu5di7afkyk8msyok5bxqlaudfzem68t8jilihitaz6ii523ve9tbw",
+                  "texts": {
+                    "url": "https://mask.io",
+                    "email": "suji.yan@dimension.im",
+                    "avatar": "https://euc.li/sujiyan.eth",
+                    "header": "https://rainbow.mypinata.cloud/ipfs/QmUpk4q82RFMTLU9nLtheenjMn56UMJsAMrHs55PK1iJtW",
+                    "snapshot": "ipns://storage.snapshot.page/registry/0x934B510D4C9103E6a87AEf13b816fb080286D649/sujiyan.eth",
+                    "vnd.github": "tedko",
+                    "vnd.twitter": "suji_yan",
+                    "com.instagram": "suji_yan_",
+                    "verifications": "...",
+                    "eth.ens.delegate": "https://discuss.ens.domains/t/ens-dao-delegate-applications/815/526?u=sujiyan"
+                  },
+                  "addresses": {
+                    "ethereum": "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5"
+                  },
+                  "domains": []
+                }
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="wallet"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Wallet Query</h2>
+            <p>
+              Fetch a basic profile, credentials, and Identity Graph for an
+              address. The endpoint is designed to be concise and efficient for
+              wallet use cases. This can power identity resolution by mapping an
+              address to a human-readable name and verified socials and profile
+              when transferring funds and viewing other users.{" "}
+            </p>
+            <p>
+              This endpoint{" "}
+              <a href="#api-key" className="text-underline">
+                requires a valid API key
+              </a>{" "}
+              to prevent abuse and ensure fair usage. Please ask for an API key
+              if you want to use this endpoint via{" "}
+              <a
+                href="https://x.com/web3bio"
+                target="_blank"
+                className="text-underline"
+              >
+                Twitter (X)
+              </a>{" "}
+              or{" "}
+              <a
+                href="https://t.me/web3dotbio"
+                target="_blank"
+                className="text-underline"
+              >
+                Telegram group
+              </a>
+              .
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  wallet
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address or a Solana address, or any identity.{" "}
+              </li>
+            </ul>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/wallet/0x5c51b52694719931919aebb2dccf7ca3447d0608`}
+                  target="_blank"
+                >
+                  0x5c51...0608
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <CodeBlock
+              language="json"
+              code={`
+                // ${BASE_URL}/wallet/0x5c51b52694719931919aebb2dccf7ca3447d0608
+                {
+                  "identity": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                  "address": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                  "platform": "ethereum",
+                  "isPrimary": true,
+                  "displayName": "Web3.bio",
+                  "avatar": "https://euc.li/web3.bio",
+                  "description": "Web3 Identity Graph search and Link-in-Bio profile for ENS, Farcaster, Lens, and more, representing your Web3 presence in a rich and informative way.",
+                  "updatedAt": 1776138042,
+                  "domains": [
+                    {
+                      "identity": "web3.bio",
+                      "address": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                      "platform": "ens",
+                      "isPrimary": true,
+                      "displayName": "Web3.bio",
+                      "avatar": "https://euc.li/web3.bio",
+                      "description": "Web3 Identity Graph search and Link-in-Bio profile for ENS, Farcaster, Lens, and more, representing your Web3 presence in a rich and informative way.",
+                      "updatedAt": 1776138042,
+                      "domains": []
+                    },
+                    {
+                      "identity": "web3bio.base.eth",
+                      "address": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                      "platform": "basenames",
+                      "isPrimary": true,
+                      "displayName": "web3bio.base.eth",
+                      "avatar": "https://ipfs.io/ipfs/bafkreif4tujcxyfkajulbvoflmetzfqytsanrepffc2bsz4nqitwajole4",
+                      "description": "Web3 Identity Graph search and Link-in-Bio profile for ENS, Farcaster, Lens, and more, representing your Web3 presence in a rich and informative way.",
+                      "updatedAt": 1776138042,
+                      "domains": []
+                    }
+                  ],
+                  "credential": {
+                    "isHuman": [
+                      {
+                        "platform": "humanpassport",
+                        "category": "isHuman",
+                        "credentialSource": "human-passport",
+                        "type": "score",
+                        "value": "21.6",
+                        "label": "Passport Humanity Verified",
+                        "description": "Proof of Personhood by Human Passport",
+                        "link": "https://app.passport.xyz",
+                        "updatedAt": 1776092424,
+                        "expiredAt": null
+                      }
+                    ],
+                    "isRisky": [],
+                    "isSpam": []
+                  },
+                  "identityGraph": [
+                    {
+                      "identity": "web3bio",
+                      "address": null,
+                      "platform": "twitter",
+                      "isPrimary": false,
+                      "displayName": "Web3.bio",
+                      "avatar": "https://pbs.twimg.com/profile_images/1836416488137486336/1wAO8RJd_400x400.png",
+                      "description": "Link-in-Bio for your Web3 Journey. No setup required ➡️ https://t.co/w2CvuuOisN\\\\n\\\\nAPIs for developers ➡️ https://t.co/eLT31j45JA",
+                      "updatedAt": 1776146007,
+                      "domains": [],
+                      "sources": [
+                        "farcaster"
+                      ]
+                    },
+                    {
+                      "identity": "web3bio.lens",
+                      "address": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                      "platform": "lens",
+                      "isPrimary": true,
+                      "displayName": "Web3.bio",
+                      "avatar": "https://gw.ipfs-lens.dev/ipfs/bafkreihxmcy37ks6jeuawjpyzdesjtnz3fs2tbyspysfstlx3wkbv553zy",
+                      "description": "Web3 Identity Graph search and Link-in-Bio profile for ENS, Farcaster, Lens, and more, representing your Web3 presence in a rich and informative way.",
+                      "updatedAt": 1776228527,
+                      "domains": [],
+                      "sources": [
+                        "lens"
+                      ]
+                    },
+                    {
+                      "identity": "0xd2d984f5061053ba9feb0035cc41bd2ee427c247",
+                      "address": "0xd2d984f5061053ba9feb0035cc41bd2ee427c247",
+                      "platform": "ethereum",
+                      "isPrimary": false,
+                      "displayName": null,
+                      "avatar": null,
+                      "description": null,
+                      "updatedAt": 1776138042,
+                      "domains": [],
+                      "sources": [
+                        "privy"
+                      ]
+                    },
+                    {
+                      "identity": "0xc19c807c86ae2aaeec659bd280baf877145b4dc6",
+                      "address": "0xc19c807c86ae2aaeec659bd280baf877145b4dc6",
+                      "platform": "ethereum",
+                      "isPrimary": false,
+                      "displayName": null,
+                      "avatar": null,
+                      "description": null,
+                      "updatedAt": 1776138042,
+                      "domains": [],
+                      "sources": [
+                        "farcaster"
+                      ]
+                    },
+                    {
+                      "identity": "web3bio",
+                      "address": "0x5c51b52694719931919aebb2dccf7ca3447d0608",
+                      "platform": "farcaster",
+                      "isPrimary": false,
+                      "displayName": "Web3.bio",
+                      "avatar": "https://imagedelivery.net/BXluQx4ige9GuW0Ia56BHw/d984e36e-e040-4118-9122-b2027955de00/original",
+                      "description": "Link-in-Bio for your Web3 Journey. No setup required.",
+                      "updatedAt": 1776138042,
+                      "domains": [],
+                      "sources": [
+                        "farcaster"
+                      ]
+                    },
+                    {
+                      "identity": "DcAPHi15YntUwZjmpJN6dvaMx1NVi8SHgZL4WUQJsiCq",
+                      "address": "DcAPHi15YntUwZjmpJN6dvaMx1NVi8SHgZL4WUQJsiCq",
+                      "platform": "solana",
+                      "isPrimary": false,
+                      "displayName": null,
+                      "avatar": null,
+                      "description": null,
+                      "updatedAt": 1776138042,
+                      "domains": [],
+                      "sources": [
+                        "farcaster"
+                      ]
+                    },
+                    {
+                      "identity": "HUwoXGT8A1aTWzeTwduQTZ4N3eGxQ94Wij7XV6PjXrvJ",
+                      "address": "HUwoXGT8A1aTWzeTwduQTZ4N3eGxQ94Wij7XV6PjXrvJ",
+                      "platform": "solana",
+                      "isPrimary": false,
+                      "displayName": null,
+                      "avatar": null,
+                      "description": null,
+                      "updatedAt": 1776138042,
+                      "domains": [],
+                      "sources": [
+                        "privy"
+                      ]
+                    },
+                    {
+                      "identity": "1315716245",
+                      "address": null,
+                      "platform": "firefly",
+                      "isPrimary": false,
+                      "displayName": null,
+                      "avatar": null,
+                      "description": null,
+                      "updatedAt": null,
+                      "domains": [],
+                      "sources": [
+                        "firefly",
+                        "privy"
+                      ]
+                    }
+                  ]
+              }
+              `}
+            />
+          </section>
+
+          <section
+            className="pt-4 pb-4"
+            id="avatar"
+            style={{ marginTop: "4rem" }}
+          >
+            <h2 className="text-bold h4">Avatar Query</h2>
+            <p>
+              Fetch avatar URL using an identity. This endpoint is designed to
+              provide a simple and efficient way to retrieve an avatar for any
+              given identity, which can be used across various apps and
+              platforms.
+            </p>
+            <p>
+              We prioritize avatars based on the queried identity’s platform.
+              For example, ENS queries return an ENS avatar first (if
+              available), followed by Farcaster, Lens, and others. Similarly,
+              Lens queries prioritize Lens avatars, then ENS, Farcaster, and so
+              on.
+            </p>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Endpoints
+            </h3>
+            <div
+              className="s-rounded d-flex mt-4 mb-4 p-1"
+              style={endpointItem}
+            >
+              <div className="d-flex" style={endpointLeft}>
+                <div className="label label-primary p-2 mr-2">GET</div>
+                <div className="mr-2">
+                  <span className="text-gray hide-sm">{BASE_URL}</span>
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  avatar
+                  <span className="ml-1 mr-1 text-gray">/</span>
+                  {"{"}identity{"}"}
+                </div>
+              </div>
+            </div>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Parameters
+            </h3>
+            <ul>
+              <li>
+                <strong>identity</strong> <span className="label">string</span>{" "}
+                <br />
+                An Ethereum address, an ENS domain, a Lens handle, a Farcaster
+                username (ends with .farcaster), a Basenames domain, a Linea
+                domain, or a Solana address or SNS domain.{" "}
+              </li>
+            </ul>
+
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Examples
+            </h3>
+            <ul>
+              <li>
+                <span className="label">ENS</span>{" "}
+                <a href={`${BASE_URL}/domain/sujiyan.eth`} target="_blank">
+                  sujiyan.eth
+                </a>
+              </li>
+              <li>
+                <span className="label">Ethereum</span>{" "}
+                <a
+                  href={`${BASE_URL}/domain/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5`}
+                  target="_blank"
+                >
+                  0x7cbb...acf5
+                </a>
+              </li>
+            </ul>
+            <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
+              Responses
+            </h3>
+            <CodeBlock
+              language="json"
+              code={`
+                // ${BASE_URL}/avatar/sujiyan.eth
+                // ${BASE_URL}/avatar/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5
+                
+                https://euc.li/sujiyan.eth
               `}
             />
           </section>
