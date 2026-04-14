@@ -97,6 +97,15 @@ export const resolveCredentialHandle = async (
   headers: AuthHeaders,
   pathname: string,
 ) => {
+  const notFoundResponse = () =>
+    errorHandle({
+      identity,
+      code: 404,
+      path: pathname,
+      platform,
+      message: ErrorMessages.NOT_FOUND,
+    });
+
   try {
     const res = await queryIdentityGraph(
       QueryType.GET_CREDENTIALS_QUERY,
@@ -110,13 +119,7 @@ export const resolveCredentialHandle = async (
     const rawVertices = res.data?.identity?.identityGraph?.vertices;
 
     if (!rawVertices) {
-      return errorHandle({
-        identity,
-        code: 404,
-        path: pathname,
-        platform,
-        message: ErrorMessages.NOT_FOUND,
-      });
+      return notFoundResponse();
     }
 
     const vertices = rawVertices.filter((vertex: CredentialVertice) => {
@@ -128,13 +131,7 @@ export const resolveCredentialHandle = async (
     });
 
     if (!vertices.length) {
-      return errorHandle({
-        identity,
-        code: 404,
-        path: pathname,
-        platform,
-        message: ErrorMessages.NOT_FOUND,
-      });
+      return notFoundResponse();
     }
 
     const credentials = vertices.flatMap(
@@ -151,7 +148,7 @@ export const resolveCredentialHandle = async (
     );
 
     return respondJson(processCredentials(credentials as CredentialRecord[]));
-  } catch (error) {
+  } catch {
     return errorHandle({
       identity,
       code: 500,

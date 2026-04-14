@@ -12,8 +12,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
   if (!handle) {
     return errorHandle({
@@ -25,12 +26,13 @@ export async function GET(
     });
   }
 
-  const resolvedHandle = REGEX.SOLANA_ADDRESS.test(handle)
+  const isSolanaAddress = REGEX.SOLANA_ADDRESS.test(handle);
+  const resolvedHandle = isSolanaAddress
     ? handle
     : handle.toLowerCase();
 
   const isValidEth = isValidEthereumAddress(resolvedHandle);
-  const isValidSolana = REGEX.SOLANA_ADDRESS.test(resolvedHandle);
+  const isValidSolana = isSolanaAddress;
   const isValidFarcaster = REGEX.FARCASTER.test(resolvedHandle);
 
   if (!isValidEth && !isValidSolana && !isValidFarcaster) {

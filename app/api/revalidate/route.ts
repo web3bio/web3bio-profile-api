@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 
 // e.g `https://api.web3.bio/revalidate?path=/[domain]`
 export async function GET(request: NextRequest) {
-  const path = request.nextUrl.searchParams.get("path");
+  const path = request.nextUrl.searchParams.get("path")?.trim() ?? "";
 
   if (!path) {
     return NextResponse.json(

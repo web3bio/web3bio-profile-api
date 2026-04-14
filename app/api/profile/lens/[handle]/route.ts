@@ -12,10 +12,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
-  if (!REGEX.LENS.test(handle) && !isValidEthereumAddress(handle)) {
+  if (!handle || (!REGEX.LENS.test(handle) && !isValidEthereumAddress(handle))) {
     return errorHandle({
       identity: handle,
       path: pathname,

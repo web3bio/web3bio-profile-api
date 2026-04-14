@@ -8,10 +8,11 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ handle: string }> },
 ) {
-  const { handle } = await params;
+  const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
+  const handle = rawHandle?.trim() ?? "";
 
-  if (!REGEX.SNS.test(handle) && !isValidSolanaAddress(handle))
+  if (!handle || (!REGEX.SNS.test(handle) && !isValidSolanaAddress(handle))) {
     return errorHandle({
       identity: handle,
       path: pathname,
@@ -19,6 +20,7 @@ export async function GET(
       code: 404,
       message: ErrorMessages.INVALID_IDENTITY,
     });
+  }
 
   const headers = getUserHeaders(req.headers);
   return resolveIdentityHandle(handle, Platform.sns, headers, true, pathname);

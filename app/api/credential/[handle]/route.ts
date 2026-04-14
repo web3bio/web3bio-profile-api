@@ -1,59 +1,34 @@
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import { getUserHeaders } from "@/utils/utils";
 import type { NextRequest } from "next/server";
-import { type Platform, ErrorMessages } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { resolveCredentialHandle } from "./utils";
+import {
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/app/api/_shared/identity-route";
 
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
 ) {
   const { pathname } = req.nextUrl;
-  const { handle } = await props.params;
+  const { handle: rawHandle } = await props.params;
+  const handle = rawHandle?.trim() ?? "";
 
-  // Early validation for empty handle
-  if (!handle.trim()) {
-    return errorHandle({
-      identity: handle,
-      code: 400,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  if (!handle) {
+    return invalidIdentityResponse(pathname, "", null, 400);
   }
 
-  // Resolve identity once and validate
-  const resolvedId = resolveIdentity(handle);
-  if (!resolvedId) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
+  if (!parsedIdentity) {
+    return invalidIdentityResponse(pathname, handle);
   }
-
-  // Parse platform and identity from resolved ID
-  const [platform, identity] = resolvedId.split(",", 2);
-
-  // Validate both platform and identity exist
-  if (!platform || !identity) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: platform as Platform,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
-  }
-
-  // Get headers only after validation passes
+  const [platform, identity] = parsedIdentity;
   const headers = getUserHeaders(req.headers);
 
   return resolveCredentialHandle(
     identity,
-    platform as Platform,
+    platform,
     headers,
     pathname,
   );

@@ -18,7 +18,6 @@ export enum QueryType {
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
-  GET_DOMAIN_SINGLE = "GET_DOMAIN_SINGLE",
   GET_AVAILABLE_DOMAINS = "GET_AVAILABLE_DOMAINS",
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
@@ -354,44 +353,7 @@ const GET_BATCH_UNIVERSAL = `
     }
   }
 `;
-const GET_DOMAIN_SINGLE = `
-  query GET_DOMAIN($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity) {
-      platform
-      identity
-      registeredAt
-      updatedAt
-      expiredAt
-      status
-      isPrimary
-      resolver
-      managerAddress {
-        network
-        address
-      }
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      profile {
-        uid
-        identity
-        platform
-        address
-        contenthash
-        texts
-        addresses {
-          address
-          network
-          isPrimary
-        }
-      }
-    }
-  }`;
+
 const GET_DOMAIN = `
   query GET_DOMAIN($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
@@ -552,7 +514,6 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
-  [QueryType.GET_DOMAIN_SINGLE, GET_DOMAIN_SINGLE],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
   [QueryType.GET_AVAILABLE_DOMAINS, GET_AVAILABLE_DOMAINS],
@@ -694,11 +655,13 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
         ]),
     );
 
+    const emptyResult = (id: string) => ({ id, profiles: [] as NSResponse[] });
+
     const results = await Promise.all(
       queryIds.map(async (id) => {
         const matchingIdentity = identityMap.get(id);
         if (!matchingIdentity) {
-          return { id, profiles: [] };
+          return emptyResult(id);
         }
 
         try {
@@ -719,11 +682,11 @@ export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
               profiles: [...(resolvedResult as NSResponse[])],
             };
           }
-        } catch (error) {
+        } catch {
           // Silent fail for individual identity resolution
         }
 
-        return { id, profiles: [] };
+        return emptyResult(id);
       }),
     );
 
@@ -790,9 +753,16 @@ export async function queryIdentityGraphBatch(
       )
       .map((result) => result.value);
 
+    const queryIdSet = new Set(queryIds);
+    const normalizedResultMap = new Map(
+      validResults.map((result) => [
+        `${result.platform},${normalizeText(result.identity)}`,
+        result,
+      ]),
+    );
     const resultMap = new Map(
       validResults.map((result) => [
-        result.aliases?.find((alias: string) => queryIds.includes(alias)) ||
+        result.aliases?.find((alias: string) => queryIdSet.has(alias)) ||
           `${result.platform},${normalizeText(result.identity)}`,
         result,
       ]),
@@ -800,18 +770,12 @@ export async function queryIdentityGraphBatch(
 
     return queryIds
       .map((queryId) => {
-        if (resultMap.has(queryId)) {
-          return resultMap.get(queryId);
+        const directMatch = resultMap.get(queryId);
+        if (directMatch) {
+          return directMatch;
         }
-
         const [platform, identity] = queryId.split(",");
-        return (
-          validResults.find(
-            (result) =>
-              result.platform === platform &&
-              normalizeText(result.identity) === normalizeText(identity),
-          ) || null
-        );
+        return normalizedResultMap.get(`${platform},${normalizeText(identity)}`) || null;
       })
       .filter(Boolean);
   } catch (error) {

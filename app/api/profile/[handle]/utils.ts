@@ -451,6 +451,75 @@ const extractProfilesFromGraph = (
   return removeDuplicateProfiles(profileResults);
 };
 
+type ResolveErrorResult = {
+  identity: string;
+  platform: Platform;
+  message: string;
+  code: number;
+};
+
+type ResolveSuccessResult = Array<ProfileResponse | NSResponse>;
+type ResolveResult = ResolveErrorResult | ResolveSuccessResult;
+
+const EVM_SOLANA_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
+
+const toErrorMessage = (message: unknown): string => {
+  if (typeof message === "string") {
+    return message;
+  }
+  if (message instanceof Error) {
+    return message.message;
+  }
+  if (message == null) {
+    return ErrorMessages.NOT_FOUND;
+  }
+  try {
+    return JSON.stringify(message);
+  } catch {
+    return String(message);
+  }
+};
+
+const createResolveError = (
+  handle: string,
+  platform: Platform,
+  message: unknown,
+  code: number,
+): ResolveErrorResult => ({
+  identity: handle,
+  platform,
+  message: toErrorMessage(message),
+  code,
+});
+
+const removeConflictingAddressProfile = (
+  profiles: ProfileRecord[],
+): ProfileRecord[] => {
+  const conflictProfileIndex = profiles.findIndex((profile) =>
+    EVM_SOLANA_PLATFORMS.has(profile.platform),
+  );
+  if (conflictProfileIndex === -1) {
+    return profiles;
+  }
+
+  const conflictProfile = profiles[conflictProfileIndex];
+  const hasAddressConflict = profiles.some(
+    (profile, index) =>
+      index !== conflictProfileIndex &&
+      profile.address === conflictProfile.address,
+  );
+
+  if (!hasAddressConflict) {
+    return profiles;
+  }
+
+  return profiles.filter((_, index) => index !== conflictProfileIndex);
+};
+
+const isResolveErrorResult = (
+  result: ResolveResult,
+): result is ResolveErrorResult => "message" in result;
+
 export const resolveWithIdentityGraph = async ({
   handle,
   platform,
@@ -465,47 +534,29 @@ export const resolveWithIdentityGraph = async ({
   ns?: boolean;
   pathname?: string;
   includeWeb2Platforms?: boolean;
-}) => {
+}): Promise<ResolveResult> => {
   // Handle error responses early
   if (response.msg) {
-    return {
-      identity: handle,
+    return createResolveError(
+      handle,
       platform,
-      message: response.msg,
-      code: response.code || 500,
-    };
+      response.msg,
+      response.code || 500,
+    );
   }
   if (!response?.data?.identity || response?.errors) {
-    return {
-      identity: handle,
+    return createResolveError(
+      handle,
       platform,
-      message: response.errors || ErrorMessages.NOT_FOUND,
-      code: response.code ? response.code : response.errors ? 500 : 404,
-    };
+      response.errors || ErrorMessages.NOT_FOUND,
+      response.code ? response.code : response.errors ? 500 : 404,
+    );
   }
 
   const processedResponse = await processJson(response);
-  const extractedProfiles = extractProfilesFromGraph(
-    processedResponse,
-    includeWeb2Platforms,
+  const extractedProfiles = removeConflictingAddressProfile(
+    extractProfilesFromGraph(processedResponse, includeWeb2Platforms),
   );
-  // kill eth or solana profile if the address is included in other profiles
-  const ethSolanaIndex = extractedProfiles.findIndex((profile) =>
-    [Platform.ethereum, Platform.solana].includes(profile.platform),
-  );
-
-  if (ethSolanaIndex !== -1) {
-    const ethSolanaProfile = extractedProfiles[ethSolanaIndex];
-    const hasAddressConflict = extractedProfiles.some(
-      (profile, index) =>
-        index !== ethSolanaIndex &&
-        profile.address === ethSolanaProfile.address,
-    );
-
-    if (hasAddressConflict) {
-      extractedProfiles.splice(ethSolanaIndex, 1);
-    }
-  }
   const sortedProfiles = sortProfilesByPriority(
     extractedProfiles,
     platform,
@@ -529,8 +580,7 @@ export const resolveWithIdentityGraph = async ({
     ),
   );
 
-  const profileResults = await Promise.allSettled(profileStructPromises);
-  const validProfiles = profileResults
+  const validProfiles = (await Promise.allSettled(profileStructPromises))
     .filter(
       (
         result,
@@ -541,12 +591,7 @@ export const resolveWithIdentityGraph = async ({
 
   return validProfiles.length > 0
     ? validProfiles
-    : {
-        identity: handle,
-        code: 404,
-        message: ErrorMessages.NOT_FOUND,
-        platform,
-      };
+    : createResolveError(handle, platform, ErrorMessages.NOT_FOUND, 404);
 };
 
 export const resolveUniversalHandle = async (
@@ -573,7 +618,7 @@ export const resolveUniversalHandle = async (
     includeWeb2Platforms,
   });
 
-  if ("message" in resolutionResult) {
+  if (isResolveErrorResult(resolutionResult)) {
     return errorHandle({
       identity: resolutionResult.identity,
       path: pathname,

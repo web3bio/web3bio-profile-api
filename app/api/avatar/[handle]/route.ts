@@ -13,10 +13,28 @@ import {
 import { resolveWithIdentityGraph } from "../../profile/[handle]/utils";
 import { respondWithSVG } from "../svg/[handle]/utils";
 
-// Check if URL is WebP
+const AVATAR_SIZE = 240;
+
+const parseAvatarHandle = (
+  rawHandle: string,
+): { id: string; platform: Platform; identity: string } | null => {
+  const id = resolveIdentity(rawHandle?.trim());
+  if (!id) {
+    return null;
+  }
+
+  const [platform, identity] = id.split(",") as [Platform, string];
+  return platform && identity ? { id, platform, identity } : null;
+};
+
+const isProfileError = (value: unknown): value is { message: unknown } =>
+  !!value && typeof value === "object" && "message" in value;
+
 async function isWebPUrl(url: string): Promise<boolean> {
-  const lowerUrl = url.toLowerCase().split("?")[0];
-  if (lowerUrl.endsWith(".webp")) return true;
+  const normalizedUrl = url.toLowerCase().split("?")[0];
+  if (normalizedUrl.endsWith(".webp")) {
+    return true;
+  }
   try {
     const response = await fetch(url, { method: "HEAD" });
     return (
@@ -27,7 +45,6 @@ async function isWebPUrl(url: string): Promise<boolean> {
   }
 }
 
-// Validate URL
 function isValidUrl(url: string): boolean {
   try {
     new URL(url);
@@ -41,24 +58,25 @@ export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
 ) {
-  const params = await props.params;
-
-  const id = resolveIdentity(params.handle);
-  const { pathname } = req.nextUrl;
-
-  if (!id) {
+  const { handle } = await props.params;
+  const parsed = parseAvatarHandle(handle);
+  const fallbackId = handle?.trim() ?? "";
+  if (!parsed) {
     return errorHandle({
-      identity: params.handle,
+      identity: fallbackId,
       code: 404,
-      path: pathname,
+      path: req.nextUrl.pathname,
       platform: null,
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-  const headers = getUserHeaders(req.headers);
 
-  const [platform, identity] = id.split(",") as [Platform, string];
-  if (!isSupportedPlatform(platform)) return respondWithSVG(id, 240);
+  const { pathname } = req.nextUrl;
+  const headers = getUserHeaders(req.headers);
+  const { id, platform, identity } = parsed;
+  if (!isSupportedPlatform(platform)) {
+    return respondWithSVG(id, AVATAR_SIZE);
+  }
   try {
     const response = await queryIdentityGraph(
       QueryType.GET_PROFILES_NS,
@@ -72,10 +90,13 @@ export async function GET(
       ns: true,
       response,
     });
-    if ("message" in profiles) return NextResponse.json(profiles);
+    if (isProfileError(profiles)) {
+      return NextResponse.json(profiles);
+    }
     const profile = (profiles as ProfileResponse[]).find((x) => x.avatar);
-    if (!profile?.avatar || !isValidUrl(profile.avatar))
-      return respondWithSVG(id, 240);
+    if (!profile?.avatar || !isValidUrl(profile.avatar)) {
+      return respondWithSVG(id, AVATAR_SIZE);
+    }
     const avatarUrl = profile.avatar;
     const isWebP = await isWebPUrl(avatarUrl);
     return NextResponse.redirect(
@@ -84,6 +105,6 @@ export async function GET(
         : avatarUrl,
     );
   } catch {
-    return respondWithSVG(id, 240);
+    return respondWithSVG(id, AVATAR_SIZE);
   }
 }

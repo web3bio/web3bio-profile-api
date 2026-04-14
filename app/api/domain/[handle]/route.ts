@@ -1,55 +1,32 @@
 import type { NextRequest } from "next/server";
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { errorHandle, getUserHeaders } from "@/utils/utils";
+import { getUserHeaders } from "@/utils/utils";
 import { resolveDomainQuery, VALID_DOMAIN_PLATFORMS } from "./utils";
+import {
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/app/api/_shared/identity-route";
 
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
 ) {
-  const params = await props.params;
+  const { handle: rawHandle } = await props.params;
   const { pathname } = req.nextUrl;
-  const handle = params.handle;
+  const handle = rawHandle?.trim() ?? "";
 
-  // Early validation
   if (!handle) {
-    return errorHandle({
-      identity: "",
-      code: 400,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+    return invalidIdentityResponse(pathname, "", null, 400);
   }
 
-  // Resolve identity once
-  const resolvedId = resolveIdentity(handle);
-  if (!resolvedId) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
+  const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
+  if (!parsedIdentity || !VALID_DOMAIN_PLATFORMS.has(parsedIdentity[0])) {
+    return invalidIdentityResponse(pathname, handle);
   }
 
-  // Parse platform and identity
-  const [platform, identity] = resolvedId.split(",") as [Platform, string];
+  const [platform, identity] = parsedIdentity;
 
-  // Validate parsed values
-  if (!platform || !identity || !VALID_DOMAIN_PLATFORMS.has(platform)) {
-    return errorHandle({
-      identity: handle,
-      code: 404,
-      path: pathname,
-      platform: platform || null,
-      message: ErrorMessages.INVALID_IDENTITY,
-    });
-  }
-
-  // Get headers and resolve domain
   const headers = getUserHeaders(req.headers);
   return resolveDomainQuery(identity, platform, headers, pathname);
 }

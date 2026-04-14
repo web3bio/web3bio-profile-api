@@ -1,9 +1,9 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger.js";
-import { getClientIP } from "./utils/utils.js";
+import { extractClientIp } from "./utils/ip.js";
 
-const CACHEABLE_API_PATHS = [
+const CACHEABLE_API_PATHS = new Set([
   "/avatar",
   "/domain",
   "/ns",
@@ -11,7 +11,7 @@ const CACHEABLE_API_PATHS = [
   "/credential",
   "/search",
   "/wallet",
-];
+]);
 
 const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
@@ -19,7 +19,10 @@ const MIN_ROLE_RESTRICTED = 6;
 const PATH_MIN_ROLE = { "/wallet": MIN_ROLE_RESTRICTED };
 
 function isCacheableApiPath(pathname) {
-  return CACHEABLE_API_PATHS.some((path) => pathname.startsWith(path));
+  const secondSlash = pathname.indexOf("/", 1);
+  const topLevelPath =
+    secondSlash === -1 ? pathname : pathname.slice(0, secondSlash);
+  return CACHEABLE_API_PATHS.has(topLevelPath);
 }
 
 function isHostTrusted(host) {
@@ -54,6 +57,34 @@ async function verifyAuth(token, env) {
   }
 }
 
+function getBearerToken(value) {
+  if (!value) {
+    return "";
+  }
+  return value.startsWith("Bearer ") ? value.slice(7) : value;
+}
+
+function jsonResponse(status, payload) {
+  return new Response(JSON.stringify(payload), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function withClientIpHeader(request, clientIp) {
+  if (!clientIp || clientIp === "unknown") {
+    return request;
+  }
+  const existing = request.headers.get("x-client-ip");
+  if (existing === clientIp) {
+    return request;
+  }
+
+  const headers = new Headers(request.headers);
+  headers.set("x-client-ip", clientIp);
+  return new Request(request, { headers });
+}
+
 function getCacheKey(url) {
   const cacheUrl = new URL(url);
   cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
@@ -79,6 +110,11 @@ function setCacheHeaders(response, ttl) {
   response.headers.set("Vary", "Accept-Encoding");
 }
 
+function isCacheableResponse(response) {
+  const contentLength = response.headers.get("content-length");
+  return contentLength !== "0";
+}
+
 function getTTL(pathname) {
   if (pathname.startsWith("/avatar/svg/")) return 2592000; // 30d
   if (pathname.startsWith("/avatar/")) return 86400; // 24h
@@ -98,73 +134,64 @@ function getRequiredRole(pathname) {
 
 const handler = {
   async fetch(request, env, ctx) {
+    const clientIp = extractClientIp(request);
+    const requestWithClientIp = withClientIpHeader(request, clientIp);
     const url = new URL(request.url);
     const pathname = url.pathname;
     const fullPath = pathname + url.search;
+    const trustedOrigin = isTrustedOrigin(request);
 
     // Bypass caching for non-cacheable paths
     if (!isCacheableApiPath(pathname)) {
-      return openNextHandler.fetch(request, env, ctx);
+      return openNextHandler.fetch(requestWithClientIp, env, ctx);
     }
 
     const userToken = request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
 
-    if (requiredRole !== null && !isTrustedOrigin(request)) {
+    if (requiredRole !== null && !trustedOrigin) {
       if (!userToken) {
-        return new Response(
-          JSON.stringify({ error: "Forbidden", message: "API key required" }),
-          { status: 403, headers: { "Content-Type": "application/json" } },
-        );
+        return jsonResponse(403, {
+          error: "Forbidden",
+          message: "API key required",
+        });
       }
-      const verifiedToken = await verifyAuth(
-        userToken.replace("Bearer ", ""),
-        env,
-      );
+      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
       if (!verifiedToken) {
-        return new Response(
-          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
-          { status: 403, headers: { "Content-Type": "application/json" } },
-        );
+        return jsonResponse(403, {
+          error: "Forbidden",
+          message: "Invalid API token",
+        });
       }
       const role = Number(verifiedToken.role);
       if (!Number.isFinite(role) || role <= requiredRole) {
-        return new Response(
-          JSON.stringify({
-            error: "Forbidden",
-            message: "Insufficient permissions",
-          }),
-          { status: 403, headers: { "Content-Type": "application/json" } },
-        );
+        return jsonResponse(403, {
+          error: "Forbidden",
+          message: "Insufficient permissions",
+        });
       }
     } else if (userToken) {
-      const verifiedToken = await verifyAuth(
-        userToken.replace("Bearer ", ""),
-        env,
-      );
+      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
       if (!verifiedToken) {
-        return new Response(
-          JSON.stringify({ error: "Forbidden", message: "Invalid API token" }),
-          { status: 403, headers: { "Content-Type": "application/json" } },
-        );
+        return jsonResponse(403, {
+          error: "Forbidden",
+          message: "Invalid API token",
+        });
       }
     } else if (
-      !isTrustedOrigin(request) &&
+      !trustedOrigin &&
       !pathname.startsWith("/avatar/") &&
       env?.API_RATE_LIMIT
     ) {
       // Rate limiting for unauthenticated requests
       const { success } = await env.API_RATE_LIMIT.limit({
-        key: getClientIP(request),
+        key: clientIp,
       });
       if (!success) {
-        return new Response(
-          JSON.stringify({
-            error:
-              "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
-          }),
-          { status: 429, headers: { "Content-Type": "application/json" } },
-        );
+        return jsonResponse(429, {
+          error:
+            "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
+        });
       }
     }
 
@@ -173,23 +200,19 @@ const handler = {
 
     // Return cached response if available and valid
     if (cached) {
-      const cachedBody = await cached.text();
-      if (cachedBody?.trim()) {
-        const response = new Response(cachedBody, {
-          status: cached.status,
-          statusText: cached.statusText,
-          headers: cached.headers,
-        });
-        response.headers.set("X-CACHE-HIT", "HIT");
-        response.headers.set("X-MATCH-PATH", fullPath);
-        setCacheHeaders(response, getTTL(pathname));
-        return response;
-      }
-      ctx.waitUntil(caches.default.delete(cacheKey));
+      const response = new Response(cached.body, {
+        status: cached.status,
+        statusText: cached.statusText,
+        headers: cached.headers,
+      });
+      response.headers.set("X-CACHE-HIT", "HIT");
+      response.headers.set("X-MATCH-PATH", fullPath);
+      setCacheHeaders(response, getTTL(pathname));
+      return response;
     }
 
     // Fetch from origin
-    const response = await openNextHandler.fetch(request, env, ctx);
+    const response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
     const ttl = getTTL(pathname);
 
     response.headers.set("X-CACHE-HIT", "MISS");
@@ -198,19 +221,13 @@ const handler = {
 
     // Cache successful GET responses
     if (response.status === 200 && request.method === "GET") {
-      const bodyText = await response.text();
-      if (bodyText?.trim()) {
-        const cacheResponse = new Response(bodyText, {
-          status: response.status,
-          statusText: response.statusText,
-          headers: response.headers,
-        });
+      const cacheResponse = response.clone();
+      if (isCacheableResponse(cacheResponse)) {
         ctx.waitUntil(
           caches.default
             .put(cacheKey, cacheResponse)
             .catch((err) => console.error("[Cache]", err)),
         );
-        return new Response(bodyText, response);
       }
     }
     return response;
