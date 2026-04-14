@@ -105,7 +105,6 @@ export default async function Home() {
               , <span className="text-underline">Lens</span>,{" "}
               <span className="text-underline">Farcaster</span>,{" "}
               <span className="text-underline">Basenames</span>,{" "}
-              <span className="text-underline">Linea Name Service</span>,{" "}
               <span
                 className="text-underline"
                 title="Solana and Solana Name Service (Bonfida)"
@@ -2649,7 +2648,15 @@ export default async function Home() {
             style={{ marginTop: "4rem" }}
           >
             <h2 className="text-bold h4">Domain Query</h2>
-            <p>Fetch detailed domain raw information using a domain name.</p>
+            <p>
+              Fetch rich domain-level metadata by querying a supported name
+              service identity.
+            </p>
+            <p>
+              This endpoint is useful when you need ownership, resolver,
+              contenthash, text records, and lifecycle timestamps (created,
+              updated, expired) in one response.
+            </p>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Endpoints
             </h3>
@@ -2675,9 +2682,9 @@ export default async function Home() {
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An ENS domain, a Basenames domain, a Linea domain, or a SNS
-                domain.{" "}
+                <br />A domain name from supported services, such as ENS,
+                Basenames, Linea Name Service, or Solana Name Service /
+                SNS.{" "}
               </li>
             </ul>
 
@@ -2702,6 +2709,12 @@ export default async function Home() {
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
+            <p>
+              Key fields: <code>resolvedAddress</code> is the address resolved
+              by the current resolver, <code>ownerAddress</code> is on-chain
+              owner, <code>managerAddress</code> is the controller/manager role
+              where applicable.
+            </p>
             <CodeBlock
               language="json"
               code={`
@@ -2748,11 +2761,14 @@ export default async function Home() {
           >
             <h2 className="text-bold h4">Wallet Query</h2>
             <p>
-              Fetch a basic profile, credentials, and Identity Graph for an
-              address. The endpoint is designed to be concise and efficient for
-              wallet use cases. This can power identity resolution by mapping an
-              address to a human-readable name and verified socials and profile
-              when transferring funds and viewing other users.{" "}
+              Fetch a compact identity bundle for a wallet address, including
+              profile basics, trust/risk credentials, and linked identities in
+              the Identity Graph.
+            </p>
+            <p>
+              This endpoint is optimized for wallet and social surfaces where
+              you need fast identity resolution from raw address to
+              human-readable profile context.
             </p>
             <p>
               This endpoint{" "}
@@ -2803,8 +2819,8 @@ export default async function Home() {
             <ul>
               <li>
                 <strong>identity</strong> <span className="label">string</span>{" "}
-                <br />
-                An Ethereum address or a Solana address, or any identity.{" "}
+                <br />A wallet address or identity. Currently supports EVM
+                addresses, Solana addresses and domain names.{" "}
               </li>
             </ul>
 
@@ -2821,10 +2837,25 @@ export default async function Home() {
                   0x5c51...0608
                 </a>
               </li>
+              <li>
+                <span className="label">Solana</span>{" "}
+                <a
+                  href={`${BASE_URL}/wallet/HUwoXGT8A1aTWzeTwduQTZ4N3eGxQ94Wij7XV6PjXrvJ`}
+                  target="_blank"
+                >
+                  HUwoXG...XrvJ
+                </a>
+              </li>
             </ul>
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
               Responses
             </h3>
+            <p>
+              <code>domains</code> returns known primary/related domain
+              identities. <code>credential</code> groups trust signals by
+              category. <code>identityGraph</code> returns linked identities and
+              the <code>sources</code> used to infer each link.
+            </p>
             <CodeBlock
               language="json"
               code={`
@@ -3057,14 +3088,14 @@ export default async function Home() {
             <ul>
               <li>
                 <span className="label">ENS</span>{" "}
-                <a href={`${BASE_URL}/domain/sujiyan.eth`} target="_blank">
+                <a href={`${BASE_URL}/avatar/sujiyan.eth`} target="_blank">
                   sujiyan.eth
                 </a>
               </li>
               <li>
                 <span className="label">Ethereum</span>{" "}
                 <a
-                  href={`${BASE_URL}/domain/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5`}
+                  href={`${BASE_URL}/avatar/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5`}
                   target="_blank"
                 >
                   0x7cbb...acf5
@@ -3096,10 +3127,11 @@ export default async function Home() {
               status code.{" "}
             </p>
             <p>
-              Error responses are served with a non-200-series HTTP code,
-              specifically <code>404</code> or <code>500</code>. Typical error
-              responses contain an <code>error</code> node indicating a
-              human-readable description of the error.
+              Error responses are returned with non-2xx HTTP codes, typically{" "}
+              <code>401</code> (missing/invalid API key), <code>404</code> (not
+              found), <code>429</code> (rate limited), or <code>500</code>{" "}
+              (upstream/internal failure). Most endpoints include an{" "}
+              <code>error</code> field with a human-readable reason.
             </p>
             <CodeBlock
               language="json"
