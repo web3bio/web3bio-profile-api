@@ -26,6 +26,7 @@ import {
   generateProfileStruct,
   processJson,
   SOCIAL_PLATFORMS,
+  toErrorMessage,
 } from "@/utils/base";
 
 const PLATFORM_PRIORITY_ORDER = [
@@ -463,23 +464,6 @@ type ResolveResult = ResolveErrorResult | ResolveSuccessResult;
 
 const EVM_SOLANA_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 
-const toErrorMessage = (message: unknown): string => {
-  if (typeof message === "string") {
-    return message;
-  }
-  if (message instanceof Error) {
-    return message.message;
-  }
-  if (message == null) {
-    return ErrorMessages.NOT_FOUND;
-  }
-  try {
-    return JSON.stringify(message);
-  } catch {
-    return String(message);
-  }
-};
-
 const createResolveError = (
   handle: string,
   platform: Platform,
@@ -488,7 +472,7 @@ const createResolveError = (
 ): ResolveErrorResult => ({
   identity: handle,
   platform,
-  message: toErrorMessage(message),
+  message: toErrorMessage(message, ErrorMessages.NOT_FOUND),
   code,
 });
 

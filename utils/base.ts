@@ -65,7 +65,7 @@ const SNS_RECORDS_LIST = [
 
 export const SOCIAL_PLATFORMS = new Set([Platform.farcaster, Platform.lens]);
 
-const toErrorMessage = (message: unknown, fallback: string): string => {
+export const toErrorMessage = (message: unknown, fallback: string): string => {
   if (typeof message === "string") {
     return message;
   }

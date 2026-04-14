@@ -45,9 +45,8 @@ function isValidIp(ip) {
 
 export function extractClientIp(request) {
   const candidateHeaders = [
-    request.headers.get("x-client-ip"),
-    request.headers.get("cf-connecting-ipv6"),
     request.headers.get("cf-connecting-ip"),
+    request.headers.get("cf-connecting-ipv6"),
     request.headers.get("true-client-ip"),
     request.headers.get("x-forwarded-for"),
     request.headers.get("x-real-ip"),
