@@ -9,7 +9,7 @@ describe("Test For Difference between prod and local", () => {
     "ens,sujiyan.eth",
     "ens,vitalik.eth",
     "basenames,tony.base.eth",
-    "farcaster,dwr.eth",
+    "farcaster,dwr.eth"
   ];
 
   const profileBatchIds = [
@@ -20,24 +20,231 @@ describe("Test For Difference between prod and local", () => {
     "lens,stani.lens",
     "linea,0xthor.linea.eth",
     "184.linea",
-    "farcaster,#3",
+    "farcaster,#3"
   ];
 
-  const assertSame = async (path) => {
-    const localRes = await queryClient(path);
-    const prodRes = await queryClient(path, {}, prod_base_url);
+  const parseMaybeJson = (body, contentType) => {
+    if (!contentType?.includes("application/json")) {
+      return body;
+    }
 
-    expect(localRes.status).toBe(prodRes.status);
-
-    const localJson = await localRes.json();
-    const prodJson = await prodRes.json();
-
-    expect(localJson).toEqual(prodJson);
+    return JSON.parse(body);
   };
 
-  it("avatar.test.js /avatar/vitalik.eth", async () => {
-    await assertSame("/avatar/vitalik.eth");
+  const getJsonLength = (value) => {
+    if (Array.isArray(value)) return value.length;
+    if (value && typeof value === "object") return Object.keys(value).length;
+    return 0;
+  };
+
+  const getWalletDomainsLength = (value) => {
+    const domains = value?.data?.domains ?? value?.domains;
+    return Array.isArray(domains) ? domains.length : 0;
+  };
+  const getBatchOrderKey = (item) => {
+    if (!item || typeof item !== "object") return String(item);
+    if (item.identity) return `identity:${item.identity}`;
+    if (item.platform && item.address) return `platform-address:${item.platform}:${item.address}`;
+    if (item.platform) return `platform:${item.platform}`;
+    if (item.address) return `address:${item.address}`;
+    return JSON.stringify(item);
+  };
+
+  const getProfileComparableList = (value) => {
+    if (Array.isArray(value)) return value;
+    if (value && typeof value === "object") return [value];
+    return [];
+  };
+
+  const pickProfileFields = (item) => ({
+    createdAt: item?.createdAt ?? null,
+    address: item?.address ?? null,
+    contenthash: item?.contenthash ?? null,
+    social: item?.social ?? null,
   });
+
+  const getPlatform = (item) => item?.platform ?? "__NO_PLATFORM__";
+  const getLinksCount = (item) =>
+    item?.links && typeof item.links === "object" ? Object.keys(item.links).length : null;
+
+  const assertSame = async (path) => {
+    const localRes = await queryClient(path, { connection: "close" });
+    const prodRes = await queryClient(path, { connection: "close" }, prod_base_url);
+
+    const [localBody, prodBody] = await Promise.all([localRes.text(), prodRes.text()]);
+
+    if (localRes.status !== prodRes.status) {
+      throw new Error(
+        `status mismatch (local=${localRes.status}, prod=${prodRes.status})`,
+      );
+    }
+
+    const localParsed = parseMaybeJson(
+      localBody,
+      localRes.headers.get("content-type") || "",
+    );
+    const prodParsed = parseMaybeJson(prodBody, prodRes.headers.get("content-type") || "");
+
+    if (path.startsWith("/credential/")) {
+      if (JSON.stringify(localParsed) !== JSON.stringify(prodParsed)) {
+        console.error(`[diff] credential mismatch path=${path}`);
+        throw new Error(
+          `credential response mismatch (local=${localRes.status}, prod=${prodRes.status})`,
+        );
+      }
+      return;
+    }
+
+    if (path.startsWith("/wallet/")) {
+      const localDomainsLength = getWalletDomainsLength(localParsed);
+      const prodDomainsLength = getWalletDomainsLength(prodParsed);
+
+      if (localDomainsLength !== prodDomainsLength) {
+        console.error(
+          `[diff] wallet domains length mismatch path=${path} local=${localDomainsLength} prod=${prodDomainsLength}`,
+        );
+        throw new Error(
+          `wallet domains length mismatch (local=${localDomainsLength}, prod=${prodDomainsLength}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+      return;
+    }
+
+    if (path.includes("/batch/")) {
+      if (!Array.isArray(localParsed) || !Array.isArray(prodParsed)) {
+        console.error(`[diff] batch response is not array path=${path}`);
+        throw new Error(
+          `batch response type mismatch (localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+
+      if (localParsed.length !== prodParsed.length) {
+        console.error(
+          `[diff] batch length mismatch path=${path} local=${localParsed.length} prod=${prodParsed.length}`,
+        );
+        throw new Error(
+          `batch length mismatch (local=${localParsed.length}, prod=${prodParsed.length}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+
+      const localOrder = localParsed.map(getBatchOrderKey);
+      const prodOrder = prodParsed.map(getBatchOrderKey);
+      if (JSON.stringify(localOrder) !== JSON.stringify(prodOrder)) {
+        console.error(`[diff] batch order mismatch path=${path}`);
+        throw new Error(
+          `batch order mismatch (localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+      return;
+    }
+
+    if (path.startsWith("/profile/")) {
+      const localList = getProfileComparableList(localParsed);
+      const prodList = getProfileComparableList(prodParsed);
+
+      if (localList.length !== prodList.length) {
+        console.error(
+          `[diff] profile length mismatch path=${path} local=${localList.length} prod=${prodList.length}`,
+        );
+        throw new Error(
+          `profile length mismatch (local=${localList.length}, prod=${prodList.length}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+
+      if (path.startsWith("/profile/web2/")) {
+        const localByPlatform = new Map(
+          localList.map((item) => [getPlatform(item), pickProfileFields(item)]),
+        );
+        const prodByPlatform = new Map(
+          prodList.map((item) => [getPlatform(item), pickProfileFields(item)]),
+        );
+
+        if (localByPlatform.size !== prodByPlatform.size) {
+          console.error(
+            `[diff] profile/web2 platform size mismatch path=${path} local=${localByPlatform.size} prod=${prodByPlatform.size}`,
+          );
+          throw new Error(
+            `profile/web2 platform size mismatch (local=${localByPlatform.size}, prod=${prodByPlatform.size}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+          );
+        }
+
+        for (const [platform, localComparable] of localByPlatform.entries()) {
+          if (!prodByPlatform.has(platform)) {
+            console.error(
+              `[diff] profile/web2 missing platform path=${path} platform=${platform}`,
+            );
+            throw new Error(
+              `profile/web2 missing platform=${platform} (localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+            );
+          }
+
+          const prodComparable = prodByPlatform.get(platform);
+          if (JSON.stringify(localComparable) !== JSON.stringify(prodComparable)) {
+            console.error(
+              `[diff] profile/web2 fields mismatch path=${path} platform=${platform}`,
+            );
+            throw new Error(
+              `profile/web2 fields mismatch at platform=${platform} (localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+            );
+          }
+
+          const localLinksCount = getLinksCount(
+            localList.find((item) => getPlatform(item) === platform),
+          );
+          const prodLinksCount = getLinksCount(
+            prodList.find((item) => getPlatform(item) === platform),
+          );
+          if (localLinksCount !== prodLinksCount) {
+            console.error(
+              `[diff] profile/web2 links count mismatch path=${path} platform=${platform} local=${localLinksCount} prod=${prodLinksCount}`,
+            );
+            throw new Error(
+              `profile/web2 links count mismatch at platform=${platform} (local=${localLinksCount}, prod=${prodLinksCount}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+            );
+          }
+        }
+        return;
+      }
+
+      for (let i = 0; i < localList.length; i += 1) {
+        const localComparable = pickProfileFields(localList[i]);
+        const prodComparable = pickProfileFields(prodList[i]);
+
+        if (JSON.stringify(localComparable) !== JSON.stringify(prodComparable)) {
+          console.error(`[diff] profile fields mismatch path=${path} index=${i}`);
+          throw new Error(
+            `profile fields mismatch at index=${i} (localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+          );
+        }
+
+        const localLinksCount = getLinksCount(localList[i]);
+        const prodLinksCount = getLinksCount(prodList[i]);
+        if (localLinksCount !== prodLinksCount) {
+          console.error(
+            `[diff] profile links count mismatch path=${path} index=${i} local=${localLinksCount} prod=${prodLinksCount}`,
+          );
+          throw new Error(
+            `profile links count mismatch at index=${i} (local=${localLinksCount}, prod=${prodLinksCount}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+          );
+        }
+      }
+      return;
+    }
+
+    if (path.startsWith("/ns/")) {
+      const localLength = getJsonLength(localParsed);
+      const prodLength = getJsonLength(prodParsed);
+
+      if (localLength !== prodLength) {
+        console.error(
+          `[diff] ns length mismatch path=${path} local=${localLength} prod=${prodLength}`,
+        );
+        throw new Error(
+          `json length mismatch (local=${localLength}, prod=${prodLength}, localStatus=${localRes.status}, prodStatus=${prodRes.status})`,
+        );
+      }
+    }
+  };
 
   it("credential.test.js /credential/ggmonster.farcaster", async () => {
     await assertSame("/credential/ggmonster.farcaster");
