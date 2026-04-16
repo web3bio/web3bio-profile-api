@@ -3,11 +3,15 @@ import { AuthHeaders } from "./types";
 
 dotenv.config({ path: ".env.local" });
 
-export const queryClient = async (path: string, headers?: AuthHeaders) => {
-  const baseUrl = process.env.BASE_URL || "http://localhost:3000";
+export const queryClient = async (
+  path: string,
+  headers?: AuthHeaders,
+  baseUrl?: string,
+) => {
+  const apiBase = baseUrl || process.env.BASE_URL || "http://localhost:3000";
   const API_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
-  return fetch(baseUrl + path, {
+  return fetch(apiBase + path, {
     headers: { "x-api-key": API_KEY, ...headers },
   });
 };
