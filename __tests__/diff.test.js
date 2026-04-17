@@ -56,11 +56,27 @@ describe("Test For Difference between prod and local", () => {
     return [];
   };
 
+  const removeUpdatedAtDeep = (value) => {
+    if (Array.isArray(value)) {
+      return value.map(removeUpdatedAtDeep);
+    }
+    if (value && typeof value === "object") {
+      return Object.entries(value).reduce((acc, [key, nestedValue]) => {
+        if (key === "updatedAt") {
+          return acc;
+        }
+        acc[key] = removeUpdatedAtDeep(nestedValue);
+        return acc;
+      }, {});
+    }
+    return value;
+  };
+
   const pickProfileFields = (item) => ({
     createdAt: item?.createdAt ?? null,
     address: item?.address ?? null,
     contenthash: item?.contenthash ?? null,
-    social: item?.social ?? null,
+    social: removeUpdatedAtDeep(item?.social ?? null),
   });
 
   const getPlatform = (item) => item?.platform ?? "__NO_PLATFORM__";
@@ -153,10 +169,16 @@ describe("Test For Difference between prod and local", () => {
 
       if (path.startsWith("/profile/web2/")) {
         const localByPlatform = new Map(
-          localList.map((item) => [getPlatform(item), pickProfileFields(item)]),
+          localList.map((item) => [
+            getPlatform(item),
+            pickProfileFields(item),
+          ]),
         );
         const prodByPlatform = new Map(
-          prodList.map((item) => [getPlatform(item), pickProfileFields(item)]),
+          prodList.map((item) => [
+            getPlatform(item),
+            pickProfileFields(item),
+          ]),
         );
 
         if (localByPlatform.size !== prodByPlatform.size) {
@@ -317,6 +339,12 @@ describe("Test For Difference between prod and local", () => {
   it("profile/ethereum.test.js /profile/ethereum/sio.eth", async () => {
     await assertSame("/profile/ethereum/sio.eth");
   });
+  it("profile/ethereum.test.js /profile/ens/komacash.eth", async () => {
+    await assertSame("/profile/ethereum/komacash.eth");
+  });
+  it("profile/ethereum.test.js /profile/ens/wijuwiju.eth", async () => {
+    await assertSame("/profile/ethereum/wijuwiju.eth");
+  });
 
   it("profile/farcaster.test.js /profile/farcaster/suji", async () => {
     await assertSame("/profile/farcaster/suji");
@@ -346,6 +374,9 @@ describe("Test For Difference between prod and local", () => {
 
   it("profile/universal.test.js /profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
     await assertSame("/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
+  });
+  it("profile/universal.test.js /profile/web3.bio", async () => {
+    await assertSame("/profile/web3.bio");
   });
 
   it("profile/web2.test.js /profile/web2/sujiyan.eth", async () => {
