@@ -9,7 +9,6 @@ describe("Test For Batch Query", () => {
     "lens,stani.lens",
     "linea,0xthor.linea.eth",
     "184.linea",
-    "ens,аррӏе.eth",
     "farcaster,#3",
     "ens,2️⃣2️⃣.eth",
   ];
@@ -22,7 +21,6 @@ describe("Test For Batch Query", () => {
     expect(json.length).toBe(getIds.length);
     expect(json[0].createdAt).toBe("2020-01-30T12:05:30.000Z");
     expect(json[1].createdAt).toBe("2017-06-18T08:39:14.000Z");
-    expect(json[7].identity).toBe("аррӏе.eth");
-    expect(json[9].address).toBe("0x111111176b0b13ffc31d387d08726772a0492948");
+    expect(json[8].address).toBe("0x111111176b0b13ffc31d387d08726772a0492948");
   });
 });

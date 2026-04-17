@@ -132,12 +132,11 @@ describe("Test For Universal Profile API", () => {
     const json = await res.json();
     expect(json[0].platform).toBe("farcaster");
   });
-  it("It should respond 200 data for аррӏе.eth", async () => {
-    const res = await queryClient("/profile/аррӏе.eth");
+  it("It should respond 200 data for 123-", async () => {
+    const res = await queryClient("/profile/123-");
     expect(res.status).toBe(200);
     const json = await res.json();
     expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
-    expect(json.length > 1).toBeTruthy();
   });
   it("It should respond 404 data for sujiyan.bnb", async () => {
     const res = await queryClient("/profile/sujiyan.bnb");

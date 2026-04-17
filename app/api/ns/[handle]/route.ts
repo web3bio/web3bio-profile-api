@@ -20,6 +20,7 @@ export async function GET(
   }
 
   const parsedIdentity = parseResolvedIdentityHandle(resolveIdentity(handle));
+
   if (!parsedIdentity) {
     return invalidIdentityResponse(pathname, handle);
   }
