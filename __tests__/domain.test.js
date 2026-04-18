@@ -1,43 +1,47 @@
-import { queryClient } from "../utils/test-utils";
+import { expectJsonCase } from "./helpers/api-assertions";
 
 describe("Test For Domain API", () => {
-  it("It should respond 200 for ens,sujiyan.eth", async () => {
-    const res = await queryClient("/domain/ens,sujiyan.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("sujiyan.eth");
-    expect(json.firstTxAt).toBe("2020-01-24T16:01:08.000Z");
-  });
-  it("It should respond 200 for bonfida.sol", async () => {
-    const res = await queryClient("/domain/bonfida.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.resolvedAddress).toBe(
-      "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
-    );
-  });
-  it("It should respond 200 for dwr.farcaster", async () => {
-    const res = await queryClient("/domain/dwr.farcaster");
-    expect(res.status).toBe(404);
-  });
-  it("It should respond 200 for linea,184.linea.eth", async () => {
-    const res = await queryClient("/domain/linea,184.linea.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
-  });
-  it("It should respond 200 for linea,184.linea.eth", async () => {
-    const res = await queryClient("/domain/linea,184.linea.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
-  });
-  it("It should respond 200 for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
-    const res = await queryClient(
-      "/domain/0xc28de09ad1a20737b92834943558ddfcc88d020d",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.domains.some((x) => x.identity === "danny.box")).toBeTruthy();
+  const cases = [
+    {
+      name: "ens,sujiyan.eth",
+      path: "/domain/ens,sujiyan.eth",
+      assertJson: (json) => {
+        expect(json.identity).toBe("sujiyan.eth");
+        expect(json.firstTxAt).toBe("2020-01-24T16:01:08.000Z");
+      },
+    },
+    {
+      name: "bonfida.sol",
+      path: "/domain/bonfida.sol",
+      assertJson: (json) => {
+        expect(json.resolvedAddress).toBe(
+          "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
+        );
+      },
+    },
+    {
+      name: "dwr.farcaster not found",
+      path: "/domain/dwr.farcaster",
+      expectedStatus: 404,
+      assertJson: () => {},
+    },
+    {
+      name: "linea,184.linea.eth",
+      path: "/domain/linea,184.linea.eth",
+      assertJson: (json) => {
+        expect(json.addresses.dogecoin).toBe("D8ehuDjCuZkWLGQoaqbghFd9fJ4a72PKTh");
+      },
+    },
+    {
+      name: "0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      path: "/domain/0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      assertJson: (json) => {
+        expect(json.domains.some((x) => x.identity === "danny.box")).toBeTruthy();
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, expectedStatus, assertJson }) => {
+    await expectJsonCase({ path, expectedStatus, assertJson });
   });
 });

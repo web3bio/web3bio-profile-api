@@ -1,18 +1,24 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase } from "../helpers/api-assertions";
 
 describe("Test For Linea NS API", () => {
-  it("It should respond 200 for suji.linea.eth", async () => {
-    const res = await queryClient("/ns/linea/suji");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("0x15fecfa8fa295ad7383d84d172dbe51792fa95bb");
-  });
-  it("It should respond 200 for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
-    const res = await queryClient(
-      "/ns/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.identity).toBe("184.linea.eth");
+  const cases = [
+    {
+      name: "suji.linea.eth",
+      path: "/ns/linea/suji",
+      assertJson: (json) => {
+        expect(json.address).toBe("0x15fecfa8fa295ad7383d84d172dbe51792fa95bb");
+      },
+    },
+    {
+      name: "0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      path: "/ns/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      assertJson: (json) => {
+        expect(json.identity).toBe("184.linea.eth");
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

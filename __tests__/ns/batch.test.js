@@ -1,4 +1,4 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase } from "../helpers/api-assertions";
 
 describe("Test For Batch Query", () => {
   const getIds = [
@@ -9,10 +9,11 @@ describe("Test For Batch Query", () => {
   ];
 
   it("It should respond 200 for Batch Query GET", async () => {
-    const url = `/ns/batch/${encodeURIComponent(JSON.stringify(getIds))}`;
-    const res = await queryClient(url);
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.length).toBe(getIds.length);
+    await expectJsonCase({
+      path: `/ns/batch/${encodeURIComponent(JSON.stringify(getIds))}`,
+      assertJson: (json) => {
+        expect(json.length).toBe(getIds.length);
+      },
+    });
   });
 });

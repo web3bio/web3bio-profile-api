@@ -1,6 +1,6 @@
 {
   "name": "web3bio-profile-api",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "packageManager": "pnpm@10.32.1",
   "description": "Web3 Identity Resolver · Web3 Identity Kit · Web3 Domain Name Service Resolver",
   "license": "MIT",
@@ -8,8 +8,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "test": "jest --testPathIgnorePatterns=\"/__tests__/(ns|profile)/ud.test.js$\"",
-    "test:all": "jest",
+    "test": "jest",
+    "test:diff": "RUN_DIFF_TESTS=1 jest __tests__/diff.test.js",
     "lint": "eslint .",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview --remote --port 3000",

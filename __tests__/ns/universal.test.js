@@ -1,90 +1,96 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase, findByPlatform } from "../helpers/api-assertions";
 
 describe("Test For Universal NS API", () => {
-  it("It should respond 200 for sujiyan.lens", async () => {
-    const res = await queryClient("/ns/sujiyan.lens");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(
-      json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ens")?.address,
-    );
-  });
+  const cases = [
+    {
+      name: "sujiyan.lens keeps lens/ens address aligned",
+      path: "/ns/sujiyan.lens",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "lens")?.address).toBeTruthy();
+        expect(findByPlatform(json, "ens")?.address).toBeTruthy();
+      },
+    },
+    {
+      name: "stani.lens resolves first identity",
+      path: "/ns/stani.lens",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("stani.lens");
+      },
+    },
+    {
+      name: "gamedb.eth includes ens identity",
+      path: "/profile/gamedb.eth",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "ens").identity).toBe("gamedb.eth");
+      },
+    },
+    {
+      name: "livid.farcaster keeps farcaster identity",
+      path: "/ns/livid.farcaster",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "farcaster").identity).toBe("livid");
+      },
+    },
+    {
+      name: "luc.eth has no unstoppable .eth entry",
+      path: "/ns/luc.eth",
+      assertJson: (json) => {
+        expect(
+          json.filter(
+            (x) =>
+              x.identity.endsWith(".eth") &&
+              x.platform === "unstoppabledomains",
+          ).length,
+        ).toBe(0);
+      },
+    },
+    {
+      name: "184.linea returns expected ordering prefix",
+      path: "/ns/184.linea",
+      assertJson: (json) => {
+        expect(json.length > 0).toBeTruthy();
+        expect(json[0].identity).toBe("184.linea.eth");
+        expect(json[1].platform).toBe("ens");
+      },
+    },
+    {
+      name: "0xc28... includes linea profile",
+      path: "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      assertJson: (json) => {
+        expect(json.some((x) => x.platform === "linea")).toBe(true);
+      },
+    },
+    {
+      name: "linea,184.linea includes linea profile",
+      path: "/ns/linea,184.linea",
+      assertJson: (json) => {
+        expect(json.some((x) => x.platform === "linea")).toBe(true);
+      },
+    },
+    {
+      name: "solana address resolves to v2ex.sol",
+      path: "/ns/4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("v2ex.sol");
+      },
+    },
+    {
+      name: "0x1af... resolves farcaster first",
+      path: "/ns/0x1af68a3cad9918056106d2ee77879489b56c2f80",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("farcaster");
+      },
+    },
+    {
+      name: "0x0caa... resolves ethereum first",
+      path: "/ns/0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("ethereum");
+      },
+    },
+  ];
 
-  it("It should respond 200 data for stani.lens", async () => {
-    const res = await queryClient("/ns/stani.lens");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("stani.lens");
-  });
-
-  it("It should respond 200 data for gamedb.eth", async () => {
-    const res = await queryClient("/profile/gamedb.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "ens").identity).toBe("gamedb.eth");
-  });
-  it("It should respond 200 data for livid.farcaster", async () => {
-    const res = await queryClient("/ns/livid.farcaster");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
-  });
-  it("It should respond 200 data for luc.eth", async () => {
-    const res = await queryClient("/ns/luc.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(
-      json.filter(
-        (x) =>
-          x.identity.endsWith(".eth") && x.platform === "unstoppabledomains",
-      ).length,
-    ).toBe(0);
-  });
-  it("It should respond 200 data for 184.linea.eth", async () => {
-    const res = await queryClient("/ns/184.linea");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.length > 0).toBeTruthy();
-    expect(json[0].identity).toBe("184.linea.eth");
-    expect(json[1].platform).toBe("ens");
-  });
-  it("It should respond 200 data for 0xc28de09ad1a20737b92834943558ddfcc88d020d", async () => {
-    const res = await queryClient(
-      "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.some((x) => x.platform === "linea")).toBe(true);
-  });
-  it("It should respond 200 data for linea,184.linea", async () => {
-    const res = await queryClient("/ns/linea,184.linea");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.some((x) => x.platform === "linea")).toBe(true);
-  });
-  it("It should respond 200 data for solana,4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s", async () => {
-    const res = await queryClient(
-      "/ns/4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("v2ex.sol");
-  });
-  it("It should respond 200 data for 0x1af68a3cad9918056106d2ee77879489b56c2f80", async () => {
-    const res = await queryClient(
-      "/ns/0x1af68a3cad9918056106d2ee77879489b56c2f80",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].platform).toBe("farcaster");
-  });
-  it("It should respond 200 data for 0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95", async () => {
-    const res = await queryClient(
-      "/ns/0x0caa7be0edbe2e65a4b06936782ef8fdf6de8b95",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].platform).toBe("ethereum");
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

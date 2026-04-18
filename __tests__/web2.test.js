@@ -1,56 +1,71 @@
-import { queryClient } from "../utils/test-utils";
+import { expectJsonCase } from "./helpers/api-assertions";
 
 describe("Test For NS API web2 query", () => {
-  it("It should respond 200 for nostr,sujiyan", async () => {
-    const res = await queryClient("/ns/nostr,yuopu6");
-    // single identity
-    expect(res.status).toBe(404);
-  });
-  it("It should respond 200 for tedko.github", async () => {
-    const res = await queryClient("/ns/tedko.github");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("sujiyan.eth");
-  });
-  it("It should respond 200 for nicksdjohnson.twitter", async () => {
-    const res = await queryClient("/ns/nicksdjohnson.twitter");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("nick.eth");
-  });
-  it("It should respond 200 for sujiyan.discord", async () => {
-    const res = await queryClient("/ns/sujiyan.discord");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("sujiyan.eth");
-  });
-  it("It should respond 200 for wgmeets.instagram", async () => {
-    const res = await queryClient("/ns/wgmeets.instagram");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("wgmeets.eth");
-  });
-  it("It should respond 200 for jktedko.reddit", async () => {
-    const res = await queryClient("/ns/jktedko.reddit");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("sujiyan.eth");
-  });
-  it("It should respond 200 for 0xhelena.bluesky", async () => {
-    const res = await queryClient("/ns/0xhelena.bluesky");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.some((x) => x.identity === "0xhelena.eth")).toBeTruthy();
-  });
-  it("It should respond 200 for benzweerachat.linkedin", async () => {
-    const res = await queryClient("/ns/benzweerachat.linkedin");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("cbenz.eth");
-  });
-  it("It should respond 200 for igorls.facebook", async () => {
-    const res = await queryClient("/ns/igorls.facebook");
-    // others all web2
-    expect(res.status).toBe(404);
+  const cases = [
+    {
+      name: "nostr,yuopu6 not found",
+      path: "/ns/nostr,yuopu6",
+      expectedStatus: 404,
+      assertJson: () => {},
+    },
+    {
+      name: "tedko.github",
+      path: "/ns/tedko.github",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("sujiyan.eth");
+      },
+    },
+    {
+      name: "nicksdjohnson.twitter",
+      path: "/ns/nicksdjohnson.twitter",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("nick.eth");
+      },
+    },
+    {
+      name: "sujiyan.discord",
+      path: "/ns/sujiyan.discord",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("sujiyan.eth");
+      },
+    },
+    {
+      name: "wgmeets.instagram",
+      path: "/ns/wgmeets.instagram",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("wgmeets.eth");
+      },
+    },
+    {
+      name: "jktedko.reddit",
+      path: "/ns/jktedko.reddit",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("sujiyan.eth");
+      },
+    },
+    {
+      name: "0xhelena.bluesky",
+      path: "/ns/0xhelena.bluesky",
+      assertJson: (json) => {
+        expect(json.some((x) => x.identity === "0xhelena.eth")).toBeTruthy();
+      },
+    },
+    {
+      name: "benzweerachat.linkedin",
+      path: "/ns/benzweerachat.linkedin",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("cbenz.eth");
+      },
+    },
+    {
+      name: "igorls.facebook not found",
+      path: "/ns/igorls.facebook",
+      expectedStatus: 404,
+      assertJson: () => {},
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, expectedStatus, assertJson }) => {
+    await expectJsonCase({ path, expectedStatus, assertJson });
   });
 });
