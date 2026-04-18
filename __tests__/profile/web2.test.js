@@ -1,26 +1,34 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase, findByPlatform } from "../helpers/api-assertions";
 
 describe("Test For Profile Web2 API", () => {
-  it("It should respond 200 for sujiyan.eth", async () => {
-    const res = await queryClient("/profile/web2/sujiyan.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.some((x) => x.platform === "instagram")).toBe(true);
-    expect(json.some((x) => x.platform === "reddit")).toBe(true);
-    expect(json.some((x) => x.platform === "github")).toBe(true);
-    expect(
-      json.find((x) => x.platform === "instagram").links.website.handle,
-    ).toBe("dimension.im");
-  });
-  it("It should respond 200 for accountless.eth", async () => {
-    const res = await queryClient("/profile/web2/accountless.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "ens").links.website.handle).toBe(
-      "linktr.ee/alexanderchopan",
-    );
-    expect(json.find((x) => x.platform === "github").links.website.handle).toBe(
-      "linktr.ee/alexanderchopan",
-    );
+  const cases = [
+    {
+      name: "sujiyan.eth",
+      path: "/profile/web2/sujiyan.eth",
+      assertJson: (json) => {
+        expect(json.some((x) => x.platform === "instagram")).toBe(true);
+        expect(json.some((x) => x.platform === "reddit")).toBe(true);
+        expect(json.some((x) => x.platform === "github")).toBe(true);
+        expect(findByPlatform(json, "instagram").links.website.handle).toBe(
+          "dimension.im",
+        );
+      },
+    },
+    {
+      name: "accountless.eth",
+      path: "/profile/web2/accountless.eth",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "ens").links.website.handle).toBe(
+          "linktr.ee/alexanderchopan",
+        );
+        expect(findByPlatform(json, "github").links.website.handle).toBe(
+          "linktr.ee/alexanderchopan",
+        );
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

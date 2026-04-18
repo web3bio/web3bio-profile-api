@@ -1,214 +1,218 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase, findByPlatform } from "../helpers/api-assertions";
 
 describe("Test For Universal Profile API", () => {
-  it("It should respond 200 data for 0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
-    const res = await queryClient(
-      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
-    expect(json[0].displayName).toBe("sujiyan.eth");
-    expect(json[1].platform).toBe("basenames");
-  });
-  it("It should respond 200 data for lilgho.lens", async () => {
-    const res = await queryClient("/profile/lilgho.lens");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("lilgho.lens");
-    expect(json[0].createdAt).toBe("2023-02-10T19:45:20.000Z");
-    expect(json[1].platform).toBe("lens");
-    expect(json.length).toBe(11);
-  });
-  it("It should respond 200 data for 0x7241dddec3a6af367882eaf9651b87e1c7549dff", async () => {
-    const res = await queryClient(
-      "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.some((x) => x.identity === "stani.lens")).toBe(true);
-  });
-  it("It should respond 200 data for noun124.eth", async () => {
-    const res = await queryClient("/profile/noun124.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("noun124.eth");
-  });
-  it("It should respond 200 data for 0x3ddfa8ec3052539b6c9549f12cea2c295cff5296", async () => {
-    const res = await queryClient(
-      "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].address).toBe("0x3ddfa8ec3052539b6c9549f12cea2c295cff5296");
-    expect(json.length).toBe(1);
-  });
+  const cases = [
+    {
+      name: "0x7cb... profile identity",
+      path: "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+      assertJson: (json) => {
+        expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
+        expect(json[0].displayName).toBe("sujiyan.eth");
+        expect(json[1].platform).toBe("basenames");
+      },
+    },
+    {
+      name: "lilgho.lens profile entries",
+      path: "/profile/lilgho.lens",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("lilgho.lens");
+        expect(json[0].createdAt).toBe("2023-02-10T19:45:20.000Z");
+        expect(json[1].platform).toBe("lens");
+        expect(json.length).toBe(11);
+      },
+    },
+    {
+      name: "0x724... includes stani.lens",
+      path: "/profile/0x7241dddec3a6af367882eaf9651b87e1c7549dff",
+      assertJson: (json) => {
+        expect(json.some((x) => x.identity === "stani.lens")).toBe(true);
+      },
+    },
+    {
+      name: "noun124.eth",
+      path: "/profile/noun124.eth",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("noun124.eth");
+      },
+    },
+    {
+      name: "0x3dd... single result",
+      path: "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296",
+      assertJson: (json) => {
+        expect(json[0].address).toBe("0x3ddfa8ec3052539b6c9549f12cea2c295cff5296");
+        expect(json.length).toBe(1);
+      },
+    },
+    {
+      name: "sujiyan.eth cross-platform coherence",
+      path: "/profile/sujiyan.eth",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "lens")?.address).toBeTruthy();
+        expect(findByPlatform(json, "ens")?.address).toBeTruthy();
+        expect(findByPlatform(json, "farcaster")?.social?.follower).toBeTruthy();
+      },
+    },
+    {
+      name: "mcdonalds.eth",
+      path: "/profile/mcdonalds.eth",
+      assertJson: (json) => {
+        expect(json[0].address).toBe("0x782cf6b6e735496f7e608489b0c57ee27f407e7d");
+      },
+    },
+    {
+      name: "stani.lens social following",
+      path: "/profile/stani.lens",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("stani.lens");
+        expect(findByPlatform(json, "lens")?.social?.following).toBeTruthy();
+      },
+    },
+    {
+      name: "brantly.eth links normalization",
+      path: "/profile/brantly.eth",
+      assertJson: (json) => {
+        const linksObj = findByPlatform(json, "ens").links;
+        const hasAtPrefix = Object.values(linksObj).some((link) =>
+          link?.handle?.includes("@"),
+        );
+        expect(hasAtPrefix).toBe(false);
+        expect(Object.keys(linksObj).length).toBe(4);
+      },
+    },
+    {
+      name: "0x934... starts with lens",
+      path: "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("lens");
+      },
+    },
+    {
+      name: "0xE0b... has multiple lens records",
+      path: "/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c",
+      assertJson: (json) => {
+        expect(json.filter((x) => x.platform === "lens").length).toBeGreaterThan(
+          1,
+        );
+      },
+    },
+    {
+      name: "0x638... contains ens",
+      path: "/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "ens")).toBeTruthy();
+      },
+    },
+    {
+      name: "gamedb.eth ens identity",
+      path: "/profile/gamedb.eth",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "ens").identity).toBe("gamedb.eth");
+      },
+    },
+    {
+      name: "livid.farcaster profile mapping",
+      path: "/profile/livid.farcaster",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "farcaster").identity).toBe("livid");
+        expect(findByPlatform(json, "farcaster").links.twitter.handle).toBe(
+          "livid",
+        );
+      },
+    },
+    {
+      name: "griff.eth.farcaster",
+      path: "/profile/griff.eth.farcaster",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("farcaster");
+      },
+    },
+    {
+      name: "123- farcaster identity",
+      path: "/profile/123-",
+      assertJson: (json) => {
+        expect(findByPlatform(json, "farcaster").identity).toBe("123-");
+      },
+    },
+    {
+      name: "sujiyan.bnb invalid identity",
+      path: "/profile/sujiyan.bnb",
+      expectedStatus: 404,
+      assertJson: (json) => {
+        expect(json.error).toBe("Invalid Identity or Domain");
+      },
+    },
+    {
+      name: "shoni.eth",
+      path: "/profile/shoni.eth",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("shoni.eth");
+      },
+    },
+    {
+      name: "twitter,suji_yan resolves ens",
+      path: "/profile/twitter,suji_yan",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("ens");
+        expect(json[0].identity).toBe("sujiyan.eth");
+      },
+    },
+    {
+      name: "nextid hash resolves without nextid profile",
+      path: "/profile/nextid,0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("ens");
+        expect(json.some((x) => x.platform === "nextid")).toBe(false);
+      },
+    },
+    {
+      name: "solana address direct resolve",
+      path: "/profile/8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
+      assertJson: (json) => {
+        expect(json[0].address).toBe(
+          "8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
+        );
+      },
+    },
+    {
+      name: "emoji ens sorting profile",
+      path: "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("🦊🦊🦊.eth");
+      },
+    },
+    {
+      name: "filelly.eth address",
+      path: "/profile/filelly.eth",
+      assertJson: (json) => {
+        expect(json[0].address).toBe("0xea1c2886d9cb0c3b119cd145c9c1a6bc1f26f150");
+      },
+    },
+    {
+      name: "30315.eth identity",
+      path: "/profile/30315.eth",
+      assertJson: (json) => {
+        expect(json[0].identity).toBe("30315.eth");
+      },
+    },
+    {
+      name: "farcaster,address resolves suji",
+      path: "/profile/farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+      assertJson: (json) => {
+        expect(json[0].platform).toBe("farcaster");
+        expect(json[0].identity).toBe("suji");
+      },
+    },
+    {
+      name: "krys.eth basenames farcaster handle",
+      path: "/profile/krys.eth",
+      assertJson: (json) => {
+        const baseItem = findByPlatform(json, "basenames");
+        expect(baseItem.links.farcaster.handle).toBe("krys.eth");
+      },
+    },
+  ];
 
-  it("It should respond 200 for sujiyan.eth", async () => {
-    const res = await queryClient("/profile/sujiyan.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(
-      json.find((x) => x.platform === "lens")?.address ===
-        json.find((x) => x.platform === "ens")?.address,
-    );
-    expect(
-      json.find((x) => x.platform === "farcaster").social.follower,
-    ).toBeTruthy();
-  });
-  it("It should respond 200 for mcdonalds.eth", async () => {
-    const res = await queryClient("/profile/mcdonalds.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].address).toBe("0x782cf6b6e735496f7e608489b0c57ee27f407e7d");
-  });
-  it("It should respond 200 data for stani.lens", async () => {
-    const res = await queryClient("/profile/stani.lens");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("stani.lens");
-    expect(
-      json.find((x) => x.platform === "lens").social.following,
-    ).toBeTruthy();
-  });
-  it("It should respond 200 data for brantly.eth", async () => {
-    const res = await queryClient("/profile/brantly.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    const linksOBJ = json.find((x) => x.platform === "ens").links;
-    const links = Object.keys(linksOBJ);
-    const isValidHandle = (() => {
-      for (let i in linksOBJ) {
-        if (linksOBJ[i]?.handle.includes("@")) return false;
-        return true;
-      }
-    })();
-    expect(isValidHandle).toBe(true);
-    expect(links.length).toBe(4);
-  });
-  it("It should respond 200 data for 0x934b510d4c9103e6a87aef13b816fb080286d649", async () => {
-    const res = await queryClient(
-      "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].platform).toBe("lens");
-  });
-  it("It should respond 200 data for 0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c", async () => {
-    const res = await queryClient(
-      "/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.filter((x) => x.platform === "lens").length > 1);
-  });
-
-  it("It should respond 200 data for 0x638b1350920333d23a7a7472c00aa5c38c278b90", async () => {
-    const res = await queryClient(
-      "/profile/0x638b1350920333d23a7a7472c00aa5c38c278b90",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "ens")).toBeTruthy();
-  });
-  it("It should respond 200 data for gamedb.eth", async () => {
-    const res = await queryClient("/profile/gamedb.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "ens").identity).toBe("gamedb.eth");
-  });
-  it("It should respond 200 data for livid.farcaster", async () => {
-    const res = await queryClient("/profile/livid.farcaster");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "farcaster").identity).toBe("livid");
-    expect(
-      json.find((x) => x.platform === "farcaster").links.twitter.handle,
-    ).toBe("livid");
-  });
-  it("It should respond 200 data for griff.eth.farcaster", async () => {
-    const res = await queryClient("/profile/griff.eth.farcaster");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].platform).toBe("farcaster");
-  });
-  it("It should respond 200 data for 123-", async () => {
-    const res = await queryClient("/profile/123-");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.find((x) => x.platform === "farcaster").identity).toBe("123-");
-  });
-  it("It should respond 404 data for sujiyan.bnb", async () => {
-    const res = await queryClient("/profile/sujiyan.bnb");
-    expect(res.status).toBe(404);
-    const json = await res.json();
-    expect(json.error).toBe("Invalid Identity or Domain");
-  });
-  it("It should respond 200 data for shoni.eth", async () => {
-    const res = await queryClient("/profile/shoni.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("shoni.eth");
-  });
-
-  it("It should respond 200 for suji_yan.twitter", async () => {
-    const res = await queryClient("/profile/twitter,suji_yan");
-    const json = await res.json();
-    expect(json[0].platform).toBe("ens");
-    expect(json[0].identity).toBe("sujiyan.eth");
-  });
-  it("It should respond 200 for nextid,0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f", async () => {
-    const res = await queryClient(
-      "/profile/nextid,0x027e55e1b78e873c6f7d585064b41cd2735000bacc0092fe947c11ab7742ed351f",
-    );
-    const json = await res.json();
-    expect(json[0].platform).toBe("ens");
-    expect(json.some((x) => x.platform === "nextid")).toBe(false);
-  });
-  it("It should respond 200 for 8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL.nextid", async () => {
-    const res = await queryClient(
-      "/profile/8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
-    );
-    const json = await res.json();
-    expect(json[0].address).toBe(
-      "8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
-    );
-  });
-  // test sort for emoji 🦊%EF%B8%8F🦊%EF%B8%8F🦊%EF%B8%8F.eth
-  it("It should respond 200 for %F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth", async () => {
-    const res = await queryClient(
-      "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("🦊🦊🦊.eth");
-  });
-  it("It should respond 200 for filelly.eth", async () => {
-    const res = await queryClient("/profile/filelly.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].address).toBe("0xea1c2886d9cb0c3b119cd145c9c1a6bc1f26f150");
-  });
-  it("It should respond 200 for 30315.eth", async () => {
-    const res = await queryClient("/profile/30315.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].identity).toBe("30315.eth");
-  });
-  it("It should respond 200 for farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
-    const res = await queryClient(
-      "/profile/farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json[0].platform).toBe("farcaster");
-    expect(json[0].identity).toBe("suji");
-  });
-  it("It should respond 200 for krys.eth", async () => {
-    const res = await queryClient("/profile/krys.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    const baseItem = json.find((x) => x.platform === "basenames");
-    expect(baseItem.links.farcaster.handle).toBe("krys.eth");
+  it.each(cases)("$name", async ({ path, expectedStatus, assertJson }) => {
+    await expectJsonCase({ path, expectedStatus, assertJson });
   });
 });

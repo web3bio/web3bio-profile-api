@@ -1,20 +1,30 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase } from "../helpers/api-assertions";
 
 describe("Test For Solana Profile API", () => {
-  it("It should respond 200 for sujiyan.sol", async () => {
-    const res = await queryClient("/profile/solana/sujiyan.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("2E3k7otC558kJJsK8wV8oehXf2VxPRQA3LtyW2mvF6w5");
-    expect(json.platform).toBe("sns");
-  });
-  it("It should respond 200 for 46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y", async () => {
-    const res = await queryClient(
-      "/profile/solana/46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y");
-    expect(json.platform).toBe("sns");
+  const cases = [
+    {
+      name: "sujiyan.sol",
+      path: "/profile/solana/sujiyan.sol",
+      assertJson: (json) => {
+        expect(json.address).toBe(
+          "2E3k7otC558kJJsK8wV8oehXf2VxPRQA3LtyW2mvF6w5",
+        );
+        expect(json.platform).toBe("sns");
+      },
+    },
+    {
+      name: "46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
+      path: "/profile/solana/46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
+      assertJson: (json) => {
+        expect(json.address).toBe(
+          "46YaTaa8Xa1xFEVDxPa4CVJpzsNADocgixS51HLNCS4Y",
+        );
+        expect(json.platform).toBe("sns");
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

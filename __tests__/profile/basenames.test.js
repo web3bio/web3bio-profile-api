@@ -1,17 +1,25 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase } from "../helpers/api-assertions";
 
 describe("Test For BaseNames Profile API", () => {
-  it("It should respond 200 for suji.base", async () => {
-    const res = await queryClient("/profile/basenames/suji.base");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.createdAt).toBe("2024-08-22T06:32:25.000Z");
-    expect(json.address).toBe("0xc9d18042baabe51d38297d1f3520cfbef0c83c32");
-  });
-  it("It should respond 200 for tony.base.eth", async () => {
-    const res = await queryClient("/profile/basenames/tony.base.eth");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.links.twitter.handle).toBe("tonymfer");
+  const cases = [
+    {
+      name: "suji.base",
+      path: "/profile/basenames/suji.base",
+      assertJson: (json) => {
+        expect(json.createdAt).toBe("2024-08-22T06:32:25.000Z");
+        expect(json.address).toBe("0xc9d18042baabe51d38297d1f3520cfbef0c83c32");
+      },
+    },
+    {
+      name: "tony.base.eth",
+      path: "/profile/basenames/tony.base.eth",
+      assertJson: (json) => {
+        expect(json.links.twitter.handle).toBe("tonymfer");
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

@@ -1,47 +1,62 @@
-import { queryClient } from "../../utils/test-utils";
+import { expectJsonCase } from "../helpers/api-assertions";
 
 describe("Test For Solana Profile API", () => {
-  it("It should respond 200 for bonfida.sol", async () => {
-    const res = await queryClient("/profile/sns/bonfida.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v");
-  });
-  it("It should respond 200 for 🍍.sol", async () => {
-    const res = await queryClient("/profile/sns/🍍.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBe("8fe1EFcmz4BYeX6zGp6HUdoaHjVYhzsv599ub52WJbos");
-    expect(json.displayName).toBeTruthy();
-  });
-  it("It should respond 200 for 7059.sol", async () => {
-    const res = await queryClient("/profile/sns/7059.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.address).toBeTruthy();
-  });
-  it("It should respond 200 for 0x33.sol", async () => {
-    const res = await queryClient("/profile/sns/0x33.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.avatar).toBeTruthy();
-  });
-  it("It should respond 200 for lewsales.sol", async () => {
-    const res = await queryClient("/profile/sns/lewsales.sol");
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.contenthash).toBe("ipfs://lewsales.blockchain");
-  });
-  it("It should respond 200 for anarcrypt.sol", async () => {
-    const res = await queryClient("/profile/sns/anarcrypt.sol");
-    expect(res.status).toBe(200);
-  });
-  it("It should respond 200 for CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK", async () => {
-    const res = await queryClient(
-      "/profile/sns/CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK",
-    );
-    expect(res.status).toBe(200);
-    const json = await res.json();
-    expect(json.displayName).toBe("CHzTB...GaXoK");
+  const cases = [
+    {
+      name: "bonfida.sol",
+      path: "/profile/sns/bonfida.sol",
+      assertJson: (json) => {
+        expect(json.address).toBe(
+          "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
+        );
+      },
+    },
+    {
+      name: "🍍.sol",
+      path: "/profile/sns/🍍.sol",
+      assertJson: (json) => {
+        expect(json.address).toBe(
+          "8fe1EFcmz4BYeX6zGp6HUdoaHjVYhzsv599ub52WJbos",
+        );
+        expect(json.displayName).toBeTruthy();
+      },
+    },
+    {
+      name: "7059.sol",
+      path: "/profile/sns/7059.sol",
+      assertJson: (json) => {
+        expect(json.address).toBeTruthy();
+      },
+    },
+    {
+      name: "0x33.sol",
+      path: "/profile/sns/0x33.sol",
+      assertJson: (json) => {
+        expect(json.avatar).toBeTruthy();
+      },
+    },
+    {
+      name: "lewsales.sol",
+      path: "/profile/sns/lewsales.sol",
+      assertJson: (json) => {
+        expect(json.contenthash).toBe("ipfs://lewsales.blockchain");
+      },
+    },
+    {
+      name: "anarcrypt.sol",
+      path: "/profile/sns/anarcrypt.sol",
+      assertJson: () => {},
+    },
+    {
+      name: "CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK",
+      path: "/profile/sns/CHzTBh4fvhsszz1jrQhThtfVDBcLppaiwrhJ1dJGaXoK",
+      assertJson: (json) => {
+        expect(json.displayName).toBe("CHzTB...GaXoK");
+      },
+    },
+  ];
+
+  it.each(cases)("$name", async ({ path, assertJson }) => {
+    await expectJsonCase({ path, assertJson });
   });
 });

@@ -1,8 +1,16 @@
 import { queryClient } from "../utils/test-utils";
 
-const prod_base_url = "https://api.web3.bio";
+const DEFAULT_LOCAL_BASE_URL = "http://localhost:3000";
+const DEFAULT_PROD_BASE_URL = "https://api.web3.bio";
+const localBaseUrl = process.env.DIFF_LOCAL_BASE_URL;
+const prodBaseUrl = process.env.DIFF_PROD_BASE_URL ?? DEFAULT_PROD_BASE_URL;
 
-describe("Test For Difference between prod and local", () => {
+/** Set RUN_DIFF_TESTS=1 (see package.json test:diff) — otherwise this file is skipped so `npm test` stays fast and offline-safe. */
+const runDiffSuite = process.env.RUN_DIFF_TESTS === "1";
+
+(runDiffSuite ? describe : describe.skip)(
+  "Test For Difference between prod and local",
+  () => {
   jest.setTimeout(30_000);
 
   const nsBatchIds = [
@@ -23,12 +31,18 @@ describe("Test For Difference between prod and local", () => {
     "farcaster,#3",
   ];
 
-  const parseMaybeJson = (body, contentType) => {
+  const parseMaybeJson = (body, contentType, path, envLabel) => {
     if (!contentType?.includes("application/json")) {
       return body;
     }
 
-    return JSON.parse(body);
+    try {
+      return JSON.parse(body);
+    } catch (error) {
+      throw new Error(
+        `[${envLabel}] invalid json body path=${path} error=${error instanceof Error ? error.message : String(error)}`,
+      );
+    }
   };
 
   const getJsonLength = (value) => {
@@ -202,6 +216,7 @@ describe("Test For Difference between prod and local", () => {
     if (path.startsWith("/profile/web2/")) return "web2";
     if (path.startsWith("/wallet/")) return "wallet";
     if (path.startsWith("/profile/")) return "profile";
+    if (path.startsWith("/domain/")) return "domain";
     if (path.startsWith("/ns/")) return "ns";
     return "unknown";
   };
@@ -412,13 +427,29 @@ describe("Test For Difference between prod and local", () => {
     }
   };
 
+  const requestByEnv = async (path, envLabel, baseUrl) => {
+    const startedAt = Date.now();
+    const response = await queryClient(path, { connection: "close" }, baseUrl);
+
+    return {
+      envLabel,
+      baseUrl:
+        baseUrl ??
+        process.env.BASE_URL ??
+        (envLabel === "prod" ? DEFAULT_PROD_BASE_URL : DEFAULT_LOCAL_BASE_URL),
+      response,
+      elapsedMs: Date.now() - startedAt,
+    };
+  };
+
   const assertSame = async (path, compareProps) => {
-    const localRes = await queryClient(path, { connection: "close" });
-    const prodRes = await queryClient(
-      path,
-      { connection: "close" },
-      prod_base_url,
-    );
+    const [localRequest, prodRequest] = await Promise.all([
+      requestByEnv(path, "local", localBaseUrl),
+      requestByEnv(path, "prod", prodBaseUrl),
+    ]);
+
+    const localRes = localRequest.response;
+    const prodRes = prodRequest.response;
 
     const [localBody, prodBody] = await Promise.all([
       localRes.text(),
@@ -427,17 +458,25 @@ describe("Test For Difference between prod and local", () => {
 
     if (localRes.status !== prodRes.status) {
       throw new Error(
-        `status mismatch (local=${localRes.status}, prod=${prodRes.status})`,
+        [
+          `status mismatch path=${path}`,
+          `local=${localRes.status} (${localRequest.baseUrl}, ${localRequest.elapsedMs}ms)`,
+          `prod=${prodRes.status} (${prodRequest.baseUrl}, ${prodRequest.elapsedMs}ms)`,
+        ].join(" | "),
       );
     }
 
     const localParsed = parseMaybeJson(
       localBody,
       localRes.headers.get("content-type") || "",
+      path,
+      "local",
     );
     const prodParsed = parseMaybeJson(
       prodBody,
       prodRes.headers.get("content-type") || "",
+      path,
+      "prod",
     );
 
     compareJsonLengthAndOrder(path, localParsed, prodParsed, localRes, prodRes);
@@ -451,135 +490,42 @@ describe("Test For Difference between prod and local", () => {
     );
   };
 
-  it("credential.test.js /credential/ggmonster.farcaster", async () => {
-    await assertSame("/credential/ggmonster.farcaster", mergeCompareProps());
-  });
+  const testCases = [
+    "credential.test.js /credential/ggmonster.farcaster",
+    "domain.test.js /domain/ens,sujiyan.eth",
+    "ns/basenames.test.js /ns/basenames/jesse.base.eth",
+    `ns/batch.test.js /ns/batch/${encodeURIComponent(JSON.stringify(nsBatchIds))}`,
+    "ns/ens.test.js /ns/ens/brantly.eth",
+    "ns/ethereum.test.js /ns/ethereum/luc.eth",
+    "ns/farcaster.test.js /ns/farcaster/suji",
+    "ns/lens.test.js /ns/lens/sujiyan.lens",
+    "ns/linea.test.js /ns/linea/suji",
+    "ns/sns.test.js /ns/sns/bonfida.sol",
+    "ns/solana.test.js /ns/solana/bonfida.sol",
+    "ns/universal.test.js /ns/sujiyan.lens",
+    "profile/basenames.test.js /profile/basenames/suji.base",
+    `profile/batch.test.js /profile/batch/${encodeURIComponent(JSON.stringify(profileBatchIds))}`,
+    "profile/ens.test.js /profile/ens/brantly.eth",
+    "profile/ens.test.js /profile/ens/0xhelena.eth",
+    "profile/ens.test.js /profile/ens/pugson.eth",
+    "profile/ens.test.js /profile/ens/jango.eth",
+    "profile/ethereum.test.js /profile/ethereum/sio.eth",
+    "profile/ethereum.test.js /profile/ethereum/komacash.eth",
+    "profile/ethereum.test.js /profile/ethereum/wijuwiju.eth",
+    "profile/farcaster.test.js /profile/farcaster/suji",
+    "profile/lens.test.js /profile/lens/sujiyan.lens",
+    "profile/linea.test.js /profile/linea/184.linea",
+    "profile/sns.test.js /profile/sns/bonfida.sol",
+    "profile/solana.test.js /profile/solana/sujiyan.sol",
+    "profile/universal.test.js /profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+    "profile/universal.test.js /profile/web3.bio",
+    "profile/web2.test.js /profile/web2/sujiyan.eth",
+    "wallet.test.js /wallet/0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1",
+    "web2.test.js /ns/nostr,yuopu6",
+  ];
 
-  it("domain.test.js /domain/ens,sujiyan.eth", async () => {
-    await assertSame("/domain/ens,sujiyan.eth", mergeCompareProps());
-  });
-
-  it("ns/basenames.test.js /ns/basenames/jesse.base.eth", async () => {
-    await assertSame("/ns/basenames/jesse.base.eth", mergeCompareProps());
-  });
-
-  it("ns/batch.test.js /ns/batch", async () => {
-    await assertSame(
-      `/ns/batch/${encodeURIComponent(JSON.stringify(nsBatchIds))}`,
-      mergeCompareProps(),
-    );
-  });
-
-  it("ns/ens.test.js /ns/ens/brantly.eth", async () => {
-    await assertSame("/ns/ens/brantly.eth", mergeCompareProps());
-  });
-
-  it("ns/ethereum.test.js /ns/ethereum/luc.eth", async () => {
-    await assertSame("/ns/ethereum/luc.eth", mergeCompareProps());
-  });
-
-  it("ns/farcaster.test.js /ns/farcaster/suji", async () => {
-    await assertSame("/ns/farcaster/suji", mergeCompareProps());
-  });
-
-  it("ns/lens.test.js /ns/lens/sujiyan.lens", async () => {
-    await assertSame("/ns/lens/sujiyan.lens", mergeCompareProps());
-  });
-
-  it("ns/linea.test.js /ns/linea/suji", async () => {
-    await assertSame("/ns/linea/suji", mergeCompareProps());
-  });
-
-  it("ns/sns.test.js /ns/sns/bonfida.sol", async () => {
-    await assertSame("/ns/sns/bonfida.sol", mergeCompareProps());
-  });
-
-  it("ns/solana.test.js /ns/solana/bonfida.sol", async () => {
-    await assertSame("/ns/solana/bonfida.sol", mergeCompareProps());
-  });
-
-  it("ns/ud.test.js /ns/unstoppabledomains/sandy.x", async () => {
-    await assertSame("/ns/unstoppabledomains/sandy.x", mergeCompareProps());
-  });
-
-  it("ns/universal.test.js /ns/sujiyan.lens", async () => {
-    await assertSame("/ns/sujiyan.lens", mergeCompareProps());
-  });
-
-  it("profile/basenames.test.js /profile/basenames/suji.base", async () => {
-    await assertSame("/profile/basenames/suji.base", mergeCompareProps());
-  });
-
-  it("profile/batch.test.js /profile/batch", async () => {
-    await assertSame(
-      `/profile/batch/${encodeURIComponent(JSON.stringify(profileBatchIds))}`,
-      mergeCompareProps(),
-    );
-  });
-
-  it("profile/ens.test.js /profile/ens/brantly.eth", async () => {
-    await assertSame("/profile/ens/brantly.eth", mergeCompareProps());
-  });
-
-  it("profile/ethereum.test.js /profile/ethereum/sio.eth", async () => {
-    await assertSame("/profile/ethereum/sio.eth", mergeCompareProps());
-  });
-  it("profile/ethereum.test.js /profile/ens/komacash.eth", async () => {
-    await assertSame("/profile/ethereum/komacash.eth", mergeCompareProps());
-  });
-  it("profile/ethereum.test.js /profile/ens/wijuwiju.eth", async () => {
-    await assertSame("/profile/ethereum/wijuwiju.eth", mergeCompareProps());
-  });
-
-  it("profile/farcaster.test.js /profile/farcaster/suji", async () => {
-    await assertSame("/profile/farcaster/suji", mergeCompareProps());
-  });
-
-  it("profile/lens.test.js /profile/lens/sujiyan.lens", async () => {
-    await assertSame("/profile/lens/sujiyan.lens", mergeCompareProps());
-  });
-
-  it("profile/linea.test.js /profile/linea/184.linea", async () => {
-    await assertSame("/profile/linea/184.linea", mergeCompareProps());
-  });
-
-  it("profile/sns.test.js /profile/sns/bonfida.sol", async () => {
-    await assertSame("/profile/sns/bonfida.sol", mergeCompareProps());
-  });
-
-  it("profile/solana.test.js /profile/solana/sujiyan.sol", async () => {
-    await assertSame("/profile/solana/sujiyan.sol", mergeCompareProps());
-  });
-
-  it("profile/ud.test.js /profile/unstoppabledomains/0x0da0ee86269797618032e56a69b1aad095c581fc", async () => {
-    await assertSame(
-      "/profile/unstoppabledomains/0x0da0ee86269797618032e56a69b1aad095c581fc",
-      mergeCompareProps(),
-    );
-  });
-
-  it("profile/universal.test.js /profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5", async () => {
-    await assertSame(
-      "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
-      mergeCompareProps(),
-    );
-  });
-  it("profile/universal.test.js /profile/web3.bio", async () => {
-    await assertSame("/profile/web3.bio", mergeCompareProps());
-  });
-
-  it("profile/web2.test.js /profile/web2/sujiyan.eth", async () => {
-    await assertSame("/profile/web2/sujiyan.eth", mergeCompareProps());
-  });
-
-  it("wallet.test.js /wallet/0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1", async () => {
-    await assertSame(
-      "/wallet/0xcd133d337ead9c2ac799ec7524a1e0f8aa30c3b1",
-      mergeCompareProps(),
-    );
-  });
-
-  it("web2.test.js /ns/nostr,yuopu6", async () => {
-    await assertSame("/ns/nostr,yuopu6", mergeCompareProps());
+  it.each(testCases)("%s", async (rawCase) => {
+    const path = rawCase.slice(rawCase.indexOf(" /") + 1);
+    await assertSame(path, mergeCompareProps());
   });
 });
