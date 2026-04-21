@@ -898,7 +898,7 @@ export default async function Home() {
                 },
                 "social": {
                   "uid": null,
-                  "follower": 4449,
+                  "follower": 5360,
                   "following": 10
                 }
               },
@@ -923,8 +923,8 @@ export default async function Home() {
                 },
                 "social": {
                   "uid": 5650,
-                  "follower": 396461,
-                  "following": 73
+                  "follower": 517005,
+                  "following": 110
                 }
               },
               {
@@ -947,8 +947,8 @@ export default async function Home() {
                   }
                 },
                 "social": {
-                  "uid": null,
-                  "follower": 42267,
+                  "uid": 134682,
+                  "follower": 53837,
                   "following": 7
                 }
               }
@@ -1355,9 +1355,9 @@ export default async function Home() {
                 }
               },
               "social": {
-                "uid": null,
-                "follower": 115084,
-                "following": 1265
+                "uid": 12747,
+                "follower": 141799,
+                "following": 1322
               }
             }
 
@@ -1512,8 +1512,8 @@ export default async function Home() {
               },
               "social": {
                 "uid": 3,
-                "follower": 493153,
-                "following": 3534
+                "follower": 141799,
+                "following": 1322,
               }
             }
 
@@ -2223,9 +2223,9 @@ export default async function Home() {
                   }
                 },
                 "social": {
-                  "uid": null,
-                  "following": 1265,
-                  "follower": 115084
+                  "uid": 12747,
+                  "following": 1322,
+                  "follower": 141799
                 },
                 "aliases": [
                   "lens,stani.lens",
@@ -2253,8 +2253,8 @@ export default async function Home() {
                 },
                 "social": {
                   "uid": 3,
-                  "following": 3534,
-                  "follower": 493153
+                  "following": 1426,
+                  "follower": 612797
                 },
                 "aliases": [
                   "farcaster,#3",
