@@ -71,8 +71,11 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
       return `https://${name}`;
 
     case Platform.discord:
-      if (name.startsWith("http")) return name;
-      return platform?.urlPrefix ? platform.urlPrefix + name : "";
+      return name.startsWith("http")
+        ? name
+        : platform?.urlPrefix
+          ? platform.urlPrefix + name
+          : "";
 
     case Platform.lens:
       return platform?.urlPrefix
@@ -90,21 +93,22 @@ export const resolveEipAssetURL = async (
 ): Promise<string | null> => {
   const normalized = source?.trim();
   if (!normalized) return null;
+  const fallback = () => resolveMediaURL(normalized);
 
   const eipMatch = normalized.match(REGEX.EIP);
   if (!eipMatch) {
-    return resolveMediaURL(normalized);
+    return fallback();
   }
 
   const [, chainId, , contractAddress, tokenId] = eipMatch;
 
   if (!contractAddress || !tokenId) {
-    return resolveMediaURL(normalized);
+    return fallback();
   }
 
   const network = getNetwork(Number(chainId))?.key;
   if (!network) {
-    return resolveMediaURL(normalized);
+    return fallback();
   }
 
   // Try OpenSea first
@@ -150,14 +154,17 @@ export const resolveEipAssetURL = async (
   }
 
   // Final fallback
-  return resolveMediaURL(normalized);
+  return fallback();
+};
+
+const ALCHEMY_BASE_BY_NETWORK: Partial<Record<Network, string>> = {
+  [Network.ethereum]: "eth",
+  [Network.optimism]: "opt",
+  [Network.polygon]: "polygon",
+  [Network.arbitrum]: "arb",
+  [Network.base]: "base",
 };
 
 export const getAlchemyBaseUrl = (network: Network) => {
-  if (network === Network.ethereum) return "eth";
-  if (network === Network.optimism) return "opt";
-  if (network === Network.polygon) return "polygon";
-  if (network === Network.arbitrum) return "arb";
-  if (network === Network.base) return "base";
-  return network;
+  return ALCHEMY_BASE_BY_NETWORK[network] ?? network;
 };

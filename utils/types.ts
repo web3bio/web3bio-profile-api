@@ -1,10 +1,10 @@
-import {
+import type {
+  AddressRecord,
+  CredentialCategory,
   CredentialType,
-  type AddressRecord,
-  type CredentialCategory,
-  type ErrorMessages,
-  type Platform,
-  type SocialRecord,
+  ErrorMessages,
+  Platform,
+  SocialRecord,
 } from "web3bio-profile-kit/types";
 
 export interface AuthHeaders {
@@ -12,7 +12,7 @@ export interface AuthHeaders {
   ["x-client-ip"]?: string;
 }
 
-export interface errorHandleProps {
+export interface ErrorHandleProps {
   identity: string | null;
   code: number;
   message: ErrorMessages | string;
@@ -99,7 +99,7 @@ export interface CredentialRecord {
   expiredAt: number | null;
 }
 
-export interface CredentialVertice {
+export interface CredentialVertex {
   id: string;
   platform: Platform;
   credentials: CredentialType[];

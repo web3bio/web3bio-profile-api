@@ -1,7 +1,7 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
-import { withLogging } from "./utils/logger.js";
-import { extractClientIp } from "./utils/ip.js";
+import { withLogging } from "./utils/logger";
+import { extractClientIp } from "./utils/ip";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
@@ -17,6 +17,8 @@ const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
 const MIN_ROLE_RESTRICTED = 6;
 const PATH_MIN_ROLE = { "/wallet": MIN_ROLE_RESTRICTED };
+const RATE_LIMIT_ERROR =
+  "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
 
 function isCacheableApiPath(pathname) {
   const secondSlash = pathname.indexOf("/", 1);
@@ -58,10 +60,7 @@ async function verifyAuth(token, env) {
 }
 
 function getBearerToken(value) {
-  if (!value) {
-    return "";
-  }
-  return value.startsWith("Bearer ") ? value.slice(7) : value;
+  return value?.startsWith("Bearer ") ? value.slice(7) : value || "";
 }
 
 function jsonResponse(status, payload) {
@@ -69,6 +68,17 @@ function jsonResponse(status, payload) {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+function forbidden(message) {
+  return jsonResponse(403, { error: "Forbidden", message });
+}
+
+async function verifyApiToken(userToken, env) {
+  if (!userToken) {
+    return null;
+  }
+  return verifyAuth(getBearerToken(userToken), env);
 }
 
 function withClientIpHeader(request, clientIp) {
@@ -111,8 +121,7 @@ function setCacheHeaders(response, ttl) {
 }
 
 function isCacheableResponse(response) {
-  const contentLength = response.headers.get("content-length");
-  return contentLength !== "0";
+  return response.headers.get("content-length") !== "0";
 }
 
 function getTTL(pathname) {
@@ -132,6 +141,13 @@ function getRequiredRole(pathname) {
   return null;
 }
 
+function withCacheMetadata(response, cacheHit, fullPath, ttl) {
+  response.headers.set("X-CACHE-HIT", cacheHit);
+  response.headers.set("X-MATCH-PATH", fullPath);
+  setCacheHeaders(response, ttl);
+  return response;
+}
+
 const handler = {
   async fetch(request, env, ctx) {
     const clientIp = extractClientIp(request);
@@ -148,37 +164,22 @@ const handler = {
 
     const userToken = request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
+    const verifiedToken = userToken ? await verifyApiToken(userToken, env) : null;
+
+    if (userToken && !verifiedToken) {
+      return forbidden("Invalid API token");
+    }
 
     if (requiredRole !== null && !trustedOrigin) {
       if (!userToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "API key required",
-        });
+        return forbidden("API key required");
       }
-      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
-      if (!verifiedToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Invalid API token",
-        });
-      }
-      const role = Number(verifiedToken.role);
+      const role = Number(verifiedToken?.role);
       if (!Number.isFinite(role) || role <= requiredRole) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Insufficient permissions",
-        });
-      }
-    } else if (userToken) {
-      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
-      if (!verifiedToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Invalid API token",
-        });
+        return forbidden("Insufficient permissions");
       }
     } else if (
+      !userToken &&
       !trustedOrigin &&
       !pathname.startsWith("/avatar/") &&
       env?.API_RATE_LIMIT
@@ -189,8 +190,7 @@ const handler = {
       });
       if (!success) {
         return jsonResponse(429, {
-          error:
-            "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.",
+          error: RATE_LIMIT_ERROR,
         });
       }
     }
@@ -200,24 +200,22 @@ const handler = {
 
     // Return cached response if available and valid
     if (cached) {
-      const response = new Response(cached.body, {
-        status: cached.status,
-        statusText: cached.statusText,
-        headers: cached.headers,
-      });
-      response.headers.set("X-CACHE-HIT", "HIT");
-      response.headers.set("X-MATCH-PATH", fullPath);
-      setCacheHeaders(response, getTTL(pathname));
-      return response;
+      return withCacheMetadata(
+        new Response(cached.body, {
+          status: cached.status,
+          statusText: cached.statusText,
+          headers: cached.headers,
+        }),
+        "HIT",
+        fullPath,
+        getTTL(pathname),
+      );
     }
 
     // Fetch from origin
     const response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
     const ttl = getTTL(pathname);
-
-    response.headers.set("X-CACHE-HIT", "MISS");
-    response.headers.set("X-MATCH-PATH", fullPath);
-    setCacheHeaders(response, ttl);
+    withCacheMetadata(response, "MISS", fullPath, ttl);
 
     // Cache successful GET responses
     if (response.status === 200 && request.method === "GET") {
