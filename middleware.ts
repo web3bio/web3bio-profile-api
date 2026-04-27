@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { extractClientIp } from "@/utils/ip.js";
+import { extractClientIp } from "@/utils/ip";
 
 export const config = {
   matcher: ["/(avatar|domain|ns|profile|credential|search|wallet)/:path*"],

@@ -1,4 +1,10 @@
-function parseForwardedFor(forwarded) {
+type RequestLike = {
+  headers: {
+    get(name: string): string | null;
+  };
+};
+
+function parseForwardedFor(forwarded: string | null): string {
   if (!forwarded) {
     return "";
   }
@@ -6,7 +12,7 @@ function parseForwardedFor(forwarded) {
   return match?.[1] || "";
 }
 
-function normalizeIp(raw) {
+function normalizeIp(raw: string | null): string {
   if (!raw) {
     return "";
   }
@@ -34,7 +40,7 @@ function normalizeIp(raw) {
   return ip;
 }
 
-function isValidIp(ip) {
+function isValidIp(ip: string): boolean {
   if (!ip) {
     return false;
   }
@@ -43,7 +49,7 @@ function isValidIp(ip) {
   return isIpv4 || isIpv6;
 }
 
-export function extractClientIp(request) {
+export function extractClientIp(request: RequestLike): string {
   const candidateHeaders = [
     request.headers.get("cf-connecting-ip"),
     request.headers.get("cf-connecting-ipv6"),

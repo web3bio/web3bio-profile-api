@@ -1,7 +1,7 @@
 import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
-import { withLogging } from "./utils/logger.js";
-import { extractClientIp } from "./utils/ip.js";
+import { withLogging } from "./utils/logger";
+import { extractClientIp } from "./utils/ip";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
@@ -58,10 +58,7 @@ async function verifyAuth(token, env) {
 }
 
 function getBearerToken(value) {
-  if (!value) {
-    return "";
-  }
-  return value.startsWith("Bearer ") ? value.slice(7) : value;
+  return value?.startsWith("Bearer ") ? value.slice(7) : value || "";
 }
 
 function jsonResponse(status, payload) {
@@ -69,6 +66,17 @@ function jsonResponse(status, payload) {
     status,
     headers: { "Content-Type": "application/json" },
   });
+}
+
+function forbidden(message) {
+  return jsonResponse(403, { error: "Forbidden", message });
+}
+
+async function verifyApiToken(userToken, env) {
+  if (!userToken) {
+    return null;
+  }
+  return verifyAuth(getBearerToken(userToken), env);
 }
 
 function withClientIpHeader(request, clientIp) {
@@ -151,32 +159,20 @@ const handler = {
 
     if (requiredRole !== null && !trustedOrigin) {
       if (!userToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "API key required",
-        });
+        return forbidden("API key required");
       }
-      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
+      const verifiedToken = await verifyApiToken(userToken, env);
       if (!verifiedToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Invalid API token",
-        });
+        return forbidden("Invalid API token");
       }
       const role = Number(verifiedToken.role);
       if (!Number.isFinite(role) || role <= requiredRole) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Insufficient permissions",
-        });
+        return forbidden("Insufficient permissions");
       }
     } else if (userToken) {
-      const verifiedToken = await verifyAuth(getBearerToken(userToken), env);
+      const verifiedToken = await verifyApiToken(userToken, env);
       if (!verifiedToken) {
-        return jsonResponse(403, {
-          error: "Forbidden",
-          message: "Invalid API token",
-        });
+        return forbidden("Invalid API token");
       }
     } else if (
       !trustedOrigin &&
