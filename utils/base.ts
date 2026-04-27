@@ -252,7 +252,7 @@ export const processJson = async (json: IdentityGraphQueryResponse) => {
 
   if (!identity) return _json;
 
-  const promises: Promise<any>[] = [];
+  const promises: Promise<unknown>[] = [];
 
   // Process main identity avatar
   if (identity.profile) {
@@ -355,6 +355,26 @@ const resolveContenthash = async (
   return null;
 };
 
+const resolvePlatformByEnsText = (textKey: string): Platform | undefined => {
+  const lowered = textKey.toLowerCase();
+  return Array.from(PLATFORM_DATA.keys()).find((platformKey) =>
+    PLATFORM_DATA.get(platformKey)?.ensText?.includes(lowered),
+  );
+};
+
+const setSocialLink = (
+  links: Record<string, SocialLinksItem>,
+  platformKey: Platform | string,
+  handle: string | null,
+  edges?: IdentityGraphEdge[],
+) => {
+  links[platformKey] = {
+    link: getSocialMediaLink(handle, platformKey),
+    handle,
+    sources: resolveVerifiedLink(`${platformKey},${handle}`, edges),
+  };
+};
+
 export const generateSocialLinks = async (
   data: ProfileRecord,
   edges?: IdentityGraphEdge[],
@@ -382,20 +402,11 @@ export const generateSocialLinks = async (
       if (!texts) break;
       // Process ENS text records
       for (const [textKey, value] of Object.entries(texts)) {
-        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
-        );
+        const platformKey = resolvePlatformByEnsText(textKey);
         if (platformKey) {
           const resolvedHandle = resolveHandle(value, platformKey);
           if (resolvedHandle) {
-            links[platformKey] = {
-              link: getSocialMediaLink(resolvedHandle, platformKey),
-              handle: resolvedHandle,
-              sources: resolveVerifiedLink(
-                `${platformKey},${resolvedHandle}`,
-                edges,
-              ),
-            };
+            setSocialLink(links, platformKey, resolvedHandle, edges);
           }
         }
       }
@@ -403,25 +414,11 @@ export const generateSocialLinks = async (
 
     case Platform.farcaster:
       // Add Farcaster link
-      links[Platform.farcaster] = {
-        link: getSocialMediaLink(identity, Platform.farcaster),
-        handle: identity,
-        sources: resolveVerifiedLink(
-          `${Platform.farcaster},${identity}`,
-          edges,
-        ),
-      };
+      setSocialLink(links, Platform.farcaster, identity, edges);
 
       if (texts?.twitter) {
         const resolvedHandle = resolveHandle(texts.twitter);
-        links[Platform.twitter] = {
-          link: getSocialMediaLink(resolvedHandle, Platform.twitter),
-          handle: resolvedHandle,
-          sources: resolveVerifiedLink(
-            `${Platform.twitter},${resolvedHandle}`,
-            edges,
-          ),
-        };
+        setSocialLink(links, Platform.twitter, resolvedHandle, edges);
       }
       break;
 
@@ -437,19 +434,10 @@ export const generateSocialLinks = async (
       if (!texts) break;
 
       for (const [textKey, value] of Object.entries(texts)) {
-        const platformKey = Array.from(PLATFORM_DATA.keys()).find((k) =>
-          PLATFORM_DATA.get(k)?.ensText?.includes(textKey.toLowerCase()),
-        );
+        const platformKey = resolvePlatformByEnsText(textKey);
         if (platformKey) {
           const resolvedHandle = resolveHandle(value, platformKey);
-          links[platformKey] = {
-            link: getSocialMediaLink(resolvedHandle, platformKey),
-            handle: resolvedHandle,
-            sources: resolveVerifiedLink(
-              `${platformKey},${resolvedHandle}`,
-              edges,
-            ),
-          };
+          setSocialLink(links, platformKey, resolvedHandle, edges);
         }
       }
       break;
@@ -465,11 +453,7 @@ export const generateSocialLinks = async (
               ? Platform.website
               : recordKey;
 
-            links[platformKey] = {
-              link: getSocialMediaLink(handle, platformKey)!,
-              handle,
-              sources: resolveVerifiedLink(`${platformKey},${handle}`, edges),
-            };
+            setSocialLink(links, platformKey, handle, edges);
           }
         }
       }
@@ -484,14 +468,7 @@ export const generateSocialLinks = async (
             const platformKey =
               accountKey === Platform.url ? Platform.website : accountKey;
 
-            links[platformKey] = {
-              link: getSocialMediaLink(resolvedHandle, platformKey),
-              handle: resolvedHandle,
-              sources: resolveVerifiedLink(
-                `${platformKey},${resolvedHandle}`,
-                edges,
-              ),
-            };
+            setSocialLink(links, platformKey, resolvedHandle, edges);
           }
         }
       }

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { normalize } from "viem/ens";
 import { ErrorMessages, type Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
-import { type AuthHeaders, errorHandleProps } from "./types";
+import { type AuthHeaders, ErrorHandleProps } from "./types";
 
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const BASE_URL = process.env.PROFILE_ENDPOINT || "https://api.web3.bio";
@@ -27,7 +27,7 @@ export const errorHandle = ({
   message,
   code = 500,
   headers = {},
-}: errorHandleProps) => {
+}: ErrorHandleProps) => {
   return NextResponse.json(
     {
       identity,

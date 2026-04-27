@@ -9,7 +9,7 @@ import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
   CredentialRecord,
-  CredentialVertice,
+  CredentialVertex,
 } from "@/utils/types";
 import { errorHandle, respondJson } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
@@ -122,7 +122,7 @@ export const resolveCredentialHandle = async (
       return notFoundResponse();
     }
 
-    const vertices = rawVertices.filter((vertex: CredentialVertice) => {
+    const vertices = rawVertices.filter((vertex: CredentialVertex) => {
       if (vertex.id === queryId) return true;
       if (!address) return false;
 
@@ -139,7 +139,7 @@ export const resolveCredentialHandle = async (
         id: vertexId,
         platform: vertexPlatform,
         credentials: vertexCredentials,
-      }: CredentialVertice) =>
+      }: CredentialVertex) =>
         vertexCredentials?.map((credential: CredentialType) => ({
           ...credential,
           id: vertexId,

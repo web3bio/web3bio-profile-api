@@ -7,17 +7,18 @@ export const config = {
 
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
-export async function middleware(req: NextRequest) {
+export function middleware(req: NextRequest) {
   const clientIp = extractClientIp(req);
+  const headers = req.headers;
   const shouldSetClientIp =
-    clientIp !== "unknown" && req.headers.get("x-client-ip") !== clientIp;
-  const shouldSetApiKey = !!GENERAL_KEY && !req.headers.has("x-api-key");
+    clientIp !== "unknown" && headers.get("x-client-ip") !== clientIp;
+  const shouldSetApiKey = GENERAL_KEY !== "" && !headers.has("x-api-key");
 
-  if (!shouldSetClientIp && !shouldSetApiKey) {
+  if (!(shouldSetClientIp || shouldSetApiKey)) {
     return NextResponse.next();
   }
 
-  const userHeaders = new Headers(req.headers);
+  const userHeaders = new Headers(headers);
   if (shouldSetClientIp) {
     userHeaders.set("x-client-ip", clientIp);
   }
