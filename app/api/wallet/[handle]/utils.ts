@@ -22,6 +22,22 @@ const NETWORK_PLATFORM_SET = new Set(
 );
 const NS_PLATFORM_SET = new Set(NAME_SERVICE_MAPPING.map(({ ns }) => ns));
 
+type WalletIdentity = {
+  identity: string | null;
+  address: string | null;
+  platform: Platform;
+  isPrimary: boolean;
+  displayName: string | null;
+  avatar: string | null;
+  description: string | null;
+  updatedAt: string | number | null;
+  domains: WalletIdentity[];
+  sources?: string[];
+};
+
+const getIdentityKey = (record: Pick<IdentityRecord, "platform" | "identity">) =>
+  `${record.platform},${record.identity}`;
+
 const buildSourcesMap = (edges: IdentityGraphEdge[]): Map<string, string[]> => {
   const sourceSets = new Map<string, Set<string>>();
   for (const edge of edges) {
@@ -42,46 +58,87 @@ const buildSourcesMap = (edges: IdentityGraphEdge[]): Map<string, string[]> => {
   );
 };
 
-const format = async (
-  v: IdentityRecord,
-  all: IdentityRecord[] = [],
-  sourcesMap?: Map<string, string[]>,
-  isDomainItem: Boolean = false,
-): Promise<any> => {
-  const avatar = v.profile?.avatar
-    ? await resolveEipAssetURL(v.profile.avatar).catch(() => v.profile.avatar)
-    : null;
+const resolveAvatar = async (
+  avatarUrl: string | null | undefined,
+): Promise<string | null> => {
+  if (!avatarUrl) return null;
+  return resolveEipAssetURL(avatarUrl).catch(() => avatarUrl);
+};
 
-  const domains = NETWORK_PLATFORM_SET.has(v.platform)
+const toDomainIdentity = async (record: IdentityRecord): Promise<WalletIdentity> => ({
+  identity: record.identity || null,
+  address: record.profile?.address || null,
+  platform: record.platform,
+  isPrimary: record.isPrimary || false,
+  displayName: record.profile?.displayName || null,
+  avatar: await resolveAvatar(record.profile?.avatar),
+  description: record.profile?.description || null,
+  updatedAt: record.updatedAt || null,
+  domains: [],
+});
+
+const hasOwnerAddress = (
+  domainRecord: IdentityRecord,
+  address: string | undefined,
+): boolean => {
+  if (!address) return false;
+  return (
+    domainRecord.ownerAddress?.some((owner) =>
+      isSameAddress(owner.address, address),
+    ) || false
+  );
+};
+
+const buildDomainsMap = (
+  vertices: IdentityRecord[],
+): Map<string, IdentityRecord[]> => {
+  const networkVertices = vertices.filter(({ platform }) =>
+    NETWORK_PLATFORM_SET.has(platform),
+  );
+  const domainVertices = vertices
+    .filter(({ platform }) => NS_PLATFORM_SET.has(platform))
+    .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary));
+
+  const domainsMap = new Map<string, IdentityRecord[]>();
+  for (const networkVertex of networkVertices) {
+    const domains = domainVertices.filter((domainVertex) =>
+      hasOwnerAddress(domainVertex, networkVertex.profile?.address),
+    );
+    domainsMap.set(getIdentityKey(networkVertex), domains);
+  }
+
+  return domainsMap;
+};
+
+const formatWalletIdentity = async (
+  record: IdentityRecord,
+  domainsMap: Map<string, IdentityRecord[]>,
+  sourcesMap: Map<string, string[]>,
+  includeSources: boolean,
+): Promise<WalletIdentity> => {
+  const domains = NETWORK_PLATFORM_SET.has(record.platform)
     ? await Promise.all(
-        all
-          .filter(
-            (sv) =>
-              NS_PLATFORM_SET.has(sv.platform) &&
-              sv.ownerAddress?.some((o) =>
-                isSameAddress(o.address, v.profile?.address),
-              ),
-          )
-          .sort((a, b) => Number(b.isPrimary) - Number(a.isPrimary))
-          .map((sv) => format(sv, [], undefined, true)),
+        (domainsMap.get(getIdentityKey(record)) || []).map(toDomainIdentity),
       )
     : [];
 
-  const res = {
-    identity: v.identity || null,
-    address: v.profile?.address || null,
-    platform: v.platform,
-    isPrimary: v.isPrimary || false,
-    displayName: v.profile?.displayName || null,
-    avatar,
-    description: v.profile?.description || null,
-    updatedAt: v.updatedAt || null,
+  const result: WalletIdentity = {
+    identity: record.identity || null,
+    address: record.profile?.address || null,
+    platform: record.platform,
+    isPrimary: record.isPrimary || false,
+    displayName: record.profile?.displayName || null,
+    avatar: await resolveAvatar(record.profile?.avatar),
+    description: record.profile?.description || null,
+    updatedAt: record.updatedAt || null,
     domains,
   };
-  if (!isDomainItem) {
-    (res as any).sources = sourcesMap?.get(`${v.platform},${v.identity}`) || [];
+
+  if (includeSources) {
+    result.sources = sourcesMap.get(getIdentityKey(record)) || [];
   }
-  return res;
+
+  return result;
 };
 
 export const resolveWalletResponse = async (
@@ -110,9 +167,9 @@ export const resolveWalletResponse = async (
   const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];
   const edges: IdentityGraphEdge[] = root.identityGraph?.edges || [];
   const sourcesMap = buildSourcesMap(edges);
+  const domainsMap = buildDomainsMap(vertices);
   const [main, graph] = await Promise.all([
-    // root without sources
-    format(root, vertices, sourcesMap, true),
+    formatWalletIdentity(root, domainsMap, sourcesMap, false),
     Promise.all(
       vertices
         .filter(
@@ -120,7 +177,7 @@ export const resolveWalletResponse = async (
             !NS_PLATFORM_SET.has(v.platform) &&
             v.identity !== root.identity,
         )
-        .map((v) => format(v, vertices, sourcesMap)),
+        .map((v) => formatWalletIdentity(v, domainsMap, sourcesMap, true)),
     ),
   ]);
 
