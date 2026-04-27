@@ -9,13 +9,38 @@ import { QueryType, queryIdentityGraph } from "@/utils/query";
 import type {
   AuthHeaders,
   CredentialRecord,
-  CredentialVertice,
+  CredentialVertex,
 } from "@/utils/types";
 import { errorHandle, respondJson } from "@/utils/utils";
 import { CREDENTIAL_INFO } from "@/utils/credential";
 import { isSameAddress } from "web3bio-profile-kit/utils";
 
 type CredentialCategory = keyof CredentialResponse;
+const createCredentialGroups = (): CredentialResponse => ({
+  isHuman: [],
+  isRisky: [],
+  isSpam: [],
+});
+
+const isCredentialCategory = (
+  category: string | undefined,
+): category is CredentialCategory =>
+  category === "isHuman" || category === "isRisky" || category === "isSpam";
+
+const buildErrorResponse = (
+  identity: string,
+  platform: Platform,
+  pathname: string,
+  code: 404 | 500,
+) =>
+  errorHandle({
+    identity,
+    code,
+    path: pathname,
+    platform,
+    message:
+      code === 404 ? ErrorMessages.NOT_FOUND : ErrorMessages.NETWORK_ERROR,
+  });
 
 export const evaluateCategory = (
   category: CredentialCategory,
@@ -49,9 +74,8 @@ export const processCredentials = (
 ): CredentialResponse => {
   return credentials.reduce(
     (groups, credential) => {
-      const category = credential.category as CredentialCategory;
-
-      if (!category || !groups[category]) {
+      const { category } = credential;
+      if (!isCredentialCategory(category)) {
         return groups;
       }
 
@@ -66,8 +90,12 @@ export const processCredentials = (
         description = "",
         platform: metadataPlatform,
       } = metadata ?? {};
+      const group = groups[category];
+      if (!group) {
+        return groups;
+      }
 
-      groups[category].push({
+      group.push({
         id: credential.id,
         platform: metadataPlatform ?? credential.platform,
         category: credential.category,
@@ -83,13 +111,34 @@ export const processCredentials = (
 
       return groups;
     },
-    {
-      isHuman: [],
-      isRisky: [],
-      isSpam: [],
-    } as CredentialResponse,
+    createCredentialGroups(),
   );
 };
+
+const filterRelatedVertices = (
+  vertices: CredentialVertex[],
+  queryId: string,
+  address: string,
+): CredentialVertex[] =>
+  vertices.filter((vertex) => {
+    if (vertex.id === queryId) return true;
+    if (!address) return false;
+
+    const [, vertexIdentity] = vertex.id?.split(",") ?? [];
+    return vertexIdentity ? isSameAddress(address, vertexIdentity) : false;
+  });
+
+const flattenVertexCredentials = (
+  vertices: CredentialVertex[],
+): CredentialRecord[] =>
+  vertices.flatMap(({ id, platform, credentials }) => {
+    const normalized = (credentials || []).map((credential: CredentialType) => ({
+      ...credential,
+      id,
+      platform,
+    }));
+    return normalized as unknown as CredentialRecord[];
+  });
 
 export const resolveCredentialHandle = async (
   identity: string,
@@ -98,13 +147,7 @@ export const resolveCredentialHandle = async (
   pathname: string,
 ) => {
   const notFoundResponse = () =>
-    errorHandle({
-      identity,
-      code: 404,
-      path: pathname,
-      platform,
-      message: ErrorMessages.NOT_FOUND,
-    });
+    buildErrorResponse(identity, platform, pathname, 404);
 
   try {
     const res = await queryIdentityGraph(
@@ -122,39 +165,15 @@ export const resolveCredentialHandle = async (
       return notFoundResponse();
     }
 
-    const vertices = rawVertices.filter((vertex: CredentialVertice) => {
-      if (vertex.id === queryId) return true;
-      if (!address) return false;
-
-      const [, vertexIdentity] = vertex.id?.split(",") ?? [];
-      return vertexIdentity ? isSameAddress(address, vertexIdentity) : false;
-    });
+    const vertices = filterRelatedVertices(rawVertices, queryId, address);
 
     if (!vertices.length) {
       return notFoundResponse();
     }
 
-    const credentials = vertices.flatMap(
-      ({
-        id: vertexId,
-        platform: vertexPlatform,
-        credentials: vertexCredentials,
-      }: CredentialVertice) =>
-        vertexCredentials?.map((credential: CredentialType) => ({
-          ...credential,
-          id: vertexId,
-          platform: vertexPlatform,
-        })) || [],
-    );
-
-    return respondJson(processCredentials(credentials as CredentialRecord[]));
+    const credentials = flattenVertexCredentials(vertices);
+    return respondJson(processCredentials(credentials));
   } catch {
-    return errorHandle({
-      identity,
-      code: 500,
-      path: pathname,
-      platform,
-      message: ErrorMessages.NETWORK_ERROR,
-    });
+    return buildErrorResponse(identity, platform, pathname, 500);
   }
 };

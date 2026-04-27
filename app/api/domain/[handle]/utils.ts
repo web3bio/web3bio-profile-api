@@ -13,7 +13,7 @@ export const VALID_DOMAIN_PLATFORMS = new Set([
   Platform.linea,
 ]);
 
-const EXTEND_DOMAIN_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
+const EXTENDED_DOMAIN_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const TARGET_PLATFORMS = new Set([Platform.ens, Platform.sns]);
 
 const formatAddress = (addr?: Array<{ address: string }>) =>
@@ -21,10 +21,13 @@ const formatAddress = (addr?: Array<{ address: string }>) =>
 const formatTime = (timestamp?: number) =>
   timestamp ? formatTimestamp(timestamp) : null;
 const isExtendedPlatform = (platform: Platform) =>
-  EXTEND_DOMAIN_PLATFORMS.has(platform);
-const hasSameOwner = (identity: IdentityRecord, ownerAddress: string) =>
-  !!identity.ownerAddress?.[0]?.address &&
-  isSameAddress(identity.ownerAddress[0].address, ownerAddress);
+  EXTENDED_DOMAIN_PLATFORMS.has(platform);
+const getOwnerAddress = (identity: IdentityRecord) =>
+  identity.ownerAddress?.[0]?.address;
+const hasSameOwner = (identity: IdentityRecord, ownerAddress: string) => {
+  const currentOwnerAddress = getOwnerAddress(identity);
+  return !!currentOwnerAddress && isSameAddress(currentOwnerAddress, ownerAddress);
+};
 
 const getFirstTxAt = (
   identity: IdentityRecord,
@@ -72,12 +75,12 @@ const buildAddressesMap = (
     addresses?.map(({ network, address }) => [network, address]) ?? [],
   );
 
-const buildDomainsArray = (vertices?: IdentityRecord[], handle?: string) =>
+const buildDomainsArray = (vertices: IdentityRecord[] | undefined, handle: string) =>
   vertices
     ?.filter(
       (v) =>
         TARGET_PLATFORMS.has(v.platform) &&
-        hasSameOwner(v, handle || ""),
+        hasSameOwner(v, handle),
     )
     .map((v) => generateResponseStruct(v, vertices)) ?? [];
 

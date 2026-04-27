@@ -30,6 +30,8 @@ const parseAvatarHandle = (
 const isProfileError = (value: unknown): value is { message: unknown } =>
   !!value && typeof value === "object" && "message" in value;
 
+const respondWithFallbackAvatar = (id: string) => respondWithSVG(id, AVATAR_SIZE);
+
 async function isWebPUrl(url: string): Promise<boolean> {
   const normalizedUrl = url.toLowerCase().split("?")[0];
   if (normalizedUrl.endsWith(".webp")) {
@@ -54,6 +56,18 @@ function isValidUrl(url: string): boolean {
   }
 }
 
+const pickAvatarUrl = (profiles: ProfileResponse[]): string | null => {
+  const profile = profiles.find((item) => item.avatar);
+  return profile?.avatar && isValidUrl(profile.avatar) ? profile.avatar : null;
+};
+
+const getRedirectAvatarUrl = async (avatarUrl: string): Promise<string> => {
+  const isWebP = await isWebPUrl(avatarUrl);
+  return isWebP
+    ? `${IMAGE_API_ENDPOINT}/?url=${encodeURIComponent(avatarUrl)}&og`
+    : avatarUrl;
+};
+
 export async function GET(
   req: NextRequest,
   props: { params: Promise<{ handle: string }> },
@@ -75,7 +89,7 @@ export async function GET(
   const headers = getUserHeaders(req.headers);
   const { id, platform, identity } = parsed;
   if (!isSupportedPlatform(platform)) {
-    return respondWithSVG(id, AVATAR_SIZE);
+    return respondWithFallbackAvatar(id);
   }
   try {
     const response = await queryIdentityGraph(
@@ -93,18 +107,10 @@ export async function GET(
     if (isProfileError(profiles)) {
       return NextResponse.json(profiles);
     }
-    const profile = (profiles as ProfileResponse[]).find((x) => x.avatar);
-    if (!profile?.avatar || !isValidUrl(profile.avatar)) {
-      return respondWithSVG(id, AVATAR_SIZE);
-    }
-    const avatarUrl = profile.avatar;
-    const isWebP = await isWebPUrl(avatarUrl);
-    return NextResponse.redirect(
-      isWebP
-        ? `${IMAGE_API_ENDPOINT}/?url=${encodeURIComponent(avatarUrl)}&og`
-        : avatarUrl,
-    );
+    const avatarUrl = pickAvatarUrl(profiles as ProfileResponse[]);
+    if (!avatarUrl) return respondWithFallbackAvatar(id);
+    return NextResponse.redirect(await getRedirectAvatarUrl(avatarUrl));
   } catch {
-    return respondWithSVG(id, AVATAR_SIZE);
+    return respondWithFallbackAvatar(id);
   }
 }
