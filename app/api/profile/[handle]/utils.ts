@@ -320,13 +320,19 @@ const sortProfilesByPriority = (
 ): ProfileRecord[] => {
   if (profiles.length === 0) return profiles;
 
+  const workingProfiles = includeWeb2Platforms
+    ? profiles.filter((p) => p.platform !== Platform.unstoppableDomains)
+    : profiles;
+
+  if (workingProfiles.length === 0) return workingProfiles;
+
   const normalizedHandle = normalizeText(targetHandle);
   let exactMatchProfile: ProfileRecord | undefined;
   const platformGroups = new Map<Platform, ProfileRecord[]>();
   const nonPriorityProfiles: ProfileRecord[] = [];
 
   // Group profiles and find exact match
-  for (const profile of profiles) {
+  for (const profile of workingProfiles) {
     if (
       profile.identity === normalizedHandle &&
       profile.platform === primaryPlatform
