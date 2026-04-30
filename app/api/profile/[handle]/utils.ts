@@ -339,7 +339,7 @@ const sortProfilesByPriority = (
       !profile.platform ||
       !PLATFORM_PRIORITY_MAP.has(profile.platform as any)
     ) {
-      if (includeWeb2Platforms) {
+      if (includeWeb2Platforms && SOCIAL_MEDIA_PLATFORMS.has(profile.platform)) {
         nonPriorityProfiles.push(profile);
       }
       continue;
