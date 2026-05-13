@@ -43,6 +43,115 @@ interface ResolvedAliases {
   aliases: IdentityString[];
 }
 
+interface EnsWidgetItem {
+  name: string | null;
+  url: string | null;
+  desc: string | null;
+  emoji: string | null;
+}
+
+const ENS_WIDGETS_TEXT_KEY = "web3.bio.widgets";
+const ENS_LINKS_TEXT_KEY = "links";
+
+const stringOrNull = (value: unknown): string | null => {
+  if (value == null) return null;
+  if (typeof value !== "string") return null;
+  const t = value.trim();
+  return t === "" ? null : t;
+};
+
+const parseEnsTextJsonArray = (raw: string | undefined): unknown[] => {
+  if (raw == null || raw === "") return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const normalizeEnsWidgetsBioRow = (
+  row: Record<string, unknown>,
+): EnsWidgetItem | null => {
+  const name = stringOrNull(row.n ?? row.t ?? row.name);
+  if (!name) return null;
+  return {
+    name,
+    url: stringOrNull(row.u ?? row.url),
+    desc: stringOrNull(row.d ?? row.desc ?? row.description),
+    emoji: stringOrNull(row.e ?? row.emoji),
+  };
+};
+
+const normalizeEnsLinksRow = (row: Record<string, unknown>): EnsWidgetItem | null => {
+  const name = stringOrNull(row.name);
+  if (!name) return null;
+  return {
+    name,
+    url: stringOrNull(row.url),
+    desc: stringOrNull(row.desc ?? row.description),
+    emoji: stringOrNull(row.emoji),
+  };
+};
+
+const mergeEnsWidgetsItems = (
+  texts: Record<string, string> | undefined,
+): EnsWidgetItem[] | null => {
+  if (!texts) return null;
+
+  const widgetRows = parseEnsTextJsonArray(texts[ENS_WIDGETS_TEXT_KEY]) as Record<
+    string,
+    unknown
+  >[];
+  const linkRows = parseEnsTextJsonArray(texts[ENS_LINKS_TEXT_KEY]) as Record<
+    string,
+    unknown
+  >[];
+
+  const byName = new Map<string, EnsWidgetItem>();
+
+  for (const raw of widgetRows) {
+    if (!raw || typeof raw !== "object") continue;
+    const item = normalizeEnsWidgetsBioRow(raw);
+    if (!item || item.name == null) continue;
+    byName.set(item.name, item);
+  }
+
+  for (const raw of linkRows) {
+    if (!raw || typeof raw !== "object") continue;
+    const linkItem = normalizeEnsLinksRow(raw);
+    if (!linkItem || linkItem.name == null) continue;
+
+    const prev = byName.get(linkItem.name);
+    if (!prev) {
+      byName.set(linkItem.name, {
+        name: linkItem.name,
+        url: linkItem.url,
+        desc: linkItem.desc,
+        emoji: linkItem.emoji,
+      });
+      continue;
+    }
+
+    byName.set(linkItem.name, {
+      name: prev.name,
+      url: linkItem.url ?? prev.url,
+      desc: prev.desc ?? linkItem.desc,
+      emoji: linkItem.emoji ?? prev.emoji,
+    });
+  }
+
+  if (byName.size === 0) return null;
+  return [...byName.values()];
+};
+
+export const serializeEnsWidgetsFromTexts = (
+  texts: Record<string, string> | undefined,
+): string | null => {
+  const items = mergeEnsWidgetsItems(texts);
+  return items ? JSON.stringify(items) : null;
+};
+
 const UD_ACCOUNTS_LIST = [
   Platform.twitter,
   Platform.discord,
@@ -190,7 +299,7 @@ export async function generateProfileStruct(
     contenthash: socialData.contenthash || null,
     widgets:
       data.platform === Platform.ens
-        ? data.texts?.["web3.bio.widgets"] || null
+        ? serializeEnsWidgetsFromTexts(data.texts)
         : null,
     links: (socialData.links as SocialLinks) || {},
     social:
