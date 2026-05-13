@@ -55,6 +55,16 @@ const bioRow = (o: Row): Item | null => {
   return { name, url, desc, emoji, widget };
 };
 
+const stripNulls = (row: Item): Record<string, unknown> => {
+  const o: Record<string, unknown> = {};
+  if (row.name != null) o.name = row.name;
+  if (row.url != null) o.url = row.url;
+  if (row.desc != null) o.desc = row.desc;
+  if (row.emoji != null) o.emoji = row.emoji;
+  if (row.widget != null) o.widget = row.widget;
+  return o;
+};
+
 export const serializeEnsWidgetsFromTexts = (
   texts: Record<string, string> | undefined,
 ): { widgets: string | null } => {
@@ -102,6 +112,6 @@ export const serializeEnsWidgetsFromTexts = (
   }
 
   return {
-    widgets: items.length ? JSON.stringify(items) : null,
+    widgets: items.length ? JSON.stringify(items.map(stripNulls)) : null,
   };
 };
