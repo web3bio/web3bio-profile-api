@@ -73,7 +73,7 @@ export const serializeEnsWidgetsFromTexts = (
   const items: Item[] = [];
   const nameIdx = new Map<string, number>();
 
-  for (const x of jsonArr(texts["web3.bio.widgets"])) {
+  for (const x of jsonArr(texts["widgets"])) {
     if (!x || typeof x !== "object") continue;
     const row = bioRow(x as Row);
     if (!row) continue;

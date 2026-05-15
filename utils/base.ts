@@ -88,9 +88,14 @@ export const resolveIdentityResponse = async (
   platform: Platform,
   headers: AuthHeaders,
   ns: boolean,
+  refresh: boolean,
 ) => {
   const res = await queryIdentityGraph(
-    ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
+    refresh
+      ? QueryType.REFRESH_DOMAIN
+      : ns
+        ? QueryType.GET_PROFILES_NS
+        : QueryType.GET_PROFILES,
     handle,
     platform,
     headers,
@@ -105,7 +110,16 @@ export const resolveIdentityResponse = async (
     };
   }
 
-  const profile = res?.data?.identity?.profile;
+  const dr = refresh ? (res as any)?.data?.domainRefresh : null;
+  const identity = refresh
+    ? dr && {
+        profile: dr.profile as ProfileRecord,
+        registeredAt: dr.registeredAt,
+        identityGraph: undefined,
+      }
+    : (res as any)?.data?.identity;
+
+  const profile = identity?.profile;
 
   if (!profile) {
     if ([Platform.sns, Platform.ens].includes(platform)) {
@@ -140,13 +154,16 @@ export const resolveIdentityResponse = async (
     throw new Error(ErrorMessages.NOT_FOUND, { cause: 404 });
   }
 
+  const registeredAt = identity!.registeredAt;
+  const edges = identity!.identityGraph?.edges;
+
   return generateProfileStruct(
     {
       ...profile,
-      createdAt: res.data.identity?.registeredAt,
+      createdAt: registeredAt,
     },
     ns,
-    res.data.identity?.identityGraph?.edges,
+    edges,
   );
 };
 
@@ -219,6 +236,7 @@ export const resolveIdentityHandle = async (
   headers: AuthHeaders,
   ns: boolean = false,
   pathname: string,
+  refresh: boolean = false,
 ) => {
   try {
     const response = await resolveIdentityResponse(
@@ -226,6 +244,7 @@ export const resolveIdentityHandle = async (
       platform,
       headers,
       ns,
+      refresh
     );
     if ("code" in response) {
       return errorHandle({
