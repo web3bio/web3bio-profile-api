@@ -535,12 +535,6 @@ const REFRESH_DOMAIN = `
       expiredAt
       updatedAt
       registeredAt
-      credentials {
-        type
-        value
-        dataSource
-        link
-      }
       profile {
         uid
         identity
