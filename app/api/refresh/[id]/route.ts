@@ -38,7 +38,7 @@ export async function GET(
   if (REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
     try {
       const r = await refreshDomain(platform, identity, headers);
-      const domainRefreshStatus = r?.status;
+      domainRefreshStatus = r?.status;
     } catch (e) {
       const c =
         e instanceof Error &&
