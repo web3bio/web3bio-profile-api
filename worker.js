@@ -19,7 +19,6 @@ const DEFAULT_SWR = 86400; // 24h
 const MIN_ROLE_RESTRICTED = 6;
 const PATH_MIN_ROLE = {
   "/wallet": MIN_ROLE_RESTRICTED,
-  "/refresh": MIN_ROLE_RESTRICTED,
 };
 const RATE_LIMIT_ERROR =
   "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
@@ -67,15 +66,22 @@ function getBearerToken(value) {
   return value?.startsWith("Bearer ") ? value.slice(7) : value || "";
 }
 
-function jsonResponse(status, payload) {
+function jsonResponse(status, payload, extraHeaders = {}) {
   return new Response(JSON.stringify(payload), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...extraHeaders,
+    },
   });
 }
 
 function forbidden(message) {
-  return jsonResponse(403, { error: "Forbidden", message });
+  return jsonResponse(
+    403,
+    { error: "Forbidden", message },
+    { "Cache-Control": "no-store" },
+  );
 }
 
 async function verifyApiToken(userToken, env) {
@@ -188,7 +194,11 @@ const handler = {
       return forbidden("Invalid API token");
     }
 
-    if (requiredRole !== null && !trustedOrigin) {
+    if (isRefreshPath(pathname)) {
+      if (!verifiedToken) {
+        return forbidden("API key required");
+      }
+    } else if (requiredRole !== null && !trustedOrigin) {
       if (!userToken) {
         return forbidden("API key required");
       }
@@ -202,7 +212,6 @@ const handler = {
       !pathname.startsWith("/avatar/") &&
       env?.API_RATE_LIMIT
     ) {
-      // Rate limiting for unauthenticated requests
       const { success } = await env.API_RATE_LIMIT.limit({
         key: clientIp,
       });
@@ -243,8 +252,11 @@ const handler = {
     const ttl = getTTL(pathname);
     withCacheMetadata(response, "MISS", fullPath, ttl);
 
-    // Cache successful GET responses
-    if (response.status === 200 && request.method === "GET") {
+    if (
+      !isRefreshPath(pathname) &&
+      response.status === 200 &&
+      request.method === "GET"
+    ) {
       const cacheResponse = response.clone();
       if (isCacheableResponse(cacheResponse)) {
         ctx.waitUntil(
