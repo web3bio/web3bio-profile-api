@@ -34,9 +34,11 @@ export async function GET(
   const identity = resolved.slice(i + 1);
   const headers = getUserHeaders(req.headers);
 
+  let domainRefreshStatus: unknown;
   if (REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
     try {
-      await refreshDomain(platform, identity, headers);
+      const r = await refreshDomain(platform, identity, headers);
+      const domainRefreshStatus = r?.status;
     } catch (e) {
       const c =
         e instanceof Error &&
@@ -70,8 +72,9 @@ export async function GET(
     {
       refreshed: true,
       id: resolved,
-      purgedUrls: purge.skipped ? 0 : urls.length,
-      cachePurgeSkipped: purge.skipped,
+      ...(domainRefreshStatus !== undefined && {
+        status: domainRefreshStatus,
+      }),
     },
     { status: 200, headers: { "Cache-Control": "no-store" } },
   );

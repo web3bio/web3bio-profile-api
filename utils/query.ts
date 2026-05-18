@@ -804,7 +804,7 @@ export const refreshDomain = async (
   platform: Platform,
   identity: string,
   headers: AuthHeaders,
-) => {
+): Promise<{ status: unknown } | null> => {
   if (!REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
     return null;
   }
@@ -831,5 +831,8 @@ export const refreshDomain = async (
         : 502;
     throw new Error(msg || JSON.stringify(e), { cause: { code } });
   }
-  return body;
+  const status = (
+    body as { data?: { domainRefresh?: { status?: unknown } } }
+  ).data?.domainRefresh?.status;
+  return { status };
 };
