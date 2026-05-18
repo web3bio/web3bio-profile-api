@@ -200,17 +200,16 @@ export async function generateProfileStruct(
   }
 
   const socialData = await generateSocialLinks(data, edges, aliases);
-  const ensSerialized =
-    data.platform === Platform.ens
-      ? serializeEnsWidgetsFromTexts(data.texts)
-      : { widgets: null as string | null };
   const res = {
     ...nsObj,
     createdAt: data.createdAt ? formatTimestamp(data.createdAt) : null,
     email: data.texts?.email || null,
     location: resolveLocation(data.texts?.location),
     contenthash: socialData.contenthash || null,
-    widgets: ensSerialized.widgets,
+    widgets:
+      data.platform === Platform.ens
+        ? serializeEnsWidgetsFromTexts(data.texts)
+        : null,
     links: (socialData.links as SocialLinks) || {},
     social:
       data.social || data.uid

@@ -1,5 +1,13 @@
 type Row = Record<string, unknown>;
 
+export type EnsWidgetItem = {
+  name?: string;
+  url?: string | string[];
+  desc?: string;
+  emoji?: string;
+  widget?: string;
+};
+
 const str = (v: unknown): string | null =>
   typeof v === "string" && v.trim() ? v.trim() : null;
 
@@ -13,105 +21,93 @@ const jsonArr = (raw?: string): unknown[] => {
   }
 };
 
-type Item = {
+const urlField = (v: unknown): string | string[] | null => {
+  if (typeof v === "string") return str(v);
+  if (!Array.isArray(v)) return null;
+  const urls = v
+    .filter((x): x is string => typeof x === "string")
+    .map((x) => str(x))
+    .filter((u): u is string => u != null);
+  if (!urls.length) return null;
+  return urls.length === 1 ? urls[0] : urls;
+};
+
+const compact = (row: {
   name: string | null;
-  url: string | null;
+  url: string | string[] | null;
   desc: string | null;
   emoji: string | null;
   widget: string | null;
+}): EnsWidgetItem | null => {
+  const item: EnsWidgetItem = {};
+  if (row.name) item.name = row.name;
+  if (row.url != null) item.url = row.url;
+  if (row.desc) item.desc = row.desc;
+  if (row.emoji) item.emoji = row.emoji;
+  if (row.widget) item.widget = row.widget;
+  return Object.keys(item).length ? item : null;
 };
 
-const urlField = (v: unknown): string | null => {
-  if (typeof v === "string") return str(v);
-  if (!Array.isArray(v)) return null;
-  const urls: string[] = [];
-  for (const x of v) {
-    if (typeof x !== "string") continue;
-    const u = str(x);
-    if (u) urls.push(u);
-  }
-  return urls.length ? JSON.stringify(urls) : null;
-};
-
-const linkRow = (o: Row): Item | null => {
-  const name = str(o.name);
-  if (!name) return null;
-  return {
-    name,
-    url: str(o.url),
-    desc: str(o.desc ?? o.description),
-    emoji: str(o.emoji),
-    widget: null,
-  };
-};
-
-const bioRow = (o: Row): Item | null => {
-  const widget = str(o.w);
-  const name = str(o.n ?? o.t ?? o.name);
-  const url = urlField(o.u ?? o.url);
-  const desc = str(o.d ?? o.desc ?? o.description);
-  const emoji = str(o.e ?? o.emoji);
+const parseRow = (o: Row, shortKeys: boolean): EnsWidgetItem | null => {
+  const name = shortKeys ? str(o.n ?? o.t ?? o.name) : str(o.name);
+  const url = urlField(shortKeys ? (o.u ?? o.url) : o.url);
+  const desc = str(
+    shortKeys ? (o.d ?? o.desc ?? o.description) : (o.desc ?? o.description),
+  );
+  const emoji = str(shortKeys ? (o.e ?? o.emoji) : o.emoji);
+  const widget = shortKeys ? str(o.w) : null;
   if (!name && !url && !widget && !desc && !emoji) return null;
-  return { name, url, desc, emoji, widget };
+  if (!shortKeys && !name) return null;
+  return compact({ name, url, desc, emoji, widget });
 };
 
-const stripNulls = (row: Item): Record<string, unknown> => {
-  const o: Record<string, unknown> = {};
-  if (row.name != null) o.name = row.name;
-  if (row.url != null) o.url = row.url;
-  if (row.desc != null) o.desc = row.desc;
-  if (row.emoji != null) o.emoji = row.emoji;
-  if (row.widget != null) o.widget = row.widget;
-  return o;
+const mergeItems = (prev: EnsWidgetItem, next: EnsWidgetItem): EnsWidgetItem => ({
+  name: prev.name ?? next.name,
+  url: next.url ?? prev.url,
+  desc: next.desc ?? prev.desc,
+  emoji: next.emoji ?? prev.emoji,
+  widget: prev.widget ?? next.widget,
+});
+
+const upsertByName = (
+  items: EnsWidgetItem[],
+  nameIdx: Map<string, number>,
+  row: EnsWidgetItem,
+  merge = false,
+) => {
+  const name = row.name;
+  if (!name) {
+    items.push(row);
+    return;
+  }
+  const i = nameIdx.get(name);
+  if (i !== undefined) {
+    items[i] = merge ? mergeItems(items[i], row) : row;
+  } else {
+    nameIdx.set(name, items.length);
+    items.push(row);
+  }
 };
 
 export const serializeEnsWidgetsFromTexts = (
   texts: Record<string, string> | undefined,
-): { widgets: string | null } => {
-  if (!texts) return { widgets: null };
+): EnsWidgetItem[] | null => {
+  if (!texts) return null;
 
-  const items: Item[] = [];
+  const items: EnsWidgetItem[] = [];
   const nameIdx = new Map<string, number>();
 
   for (const x of jsonArr(texts["widgets"])) {
     if (!x || typeof x !== "object") continue;
-    const row = bioRow(x as Row);
-    if (!row) continue;
-    if (row.name) {
-      const i = nameIdx.get(row.name);
-      if (i !== undefined) items[i] = row;
-      else {
-        nameIdx.set(row.name, items.length);
-        items.push(row);
-      }
-    } else {
-      items.push(row);
-    }
+    const row = parseRow(x as Row, true);
+    if (row) upsertByName(items, nameIdx, row);
   }
 
   for (const x of jsonArr(texts.links)) {
     if (!x || typeof x !== "object") continue;
-    const L = linkRow(x as Row);
-    if (!L) continue;
-    const linkName = L.name;
-    if (!linkName) continue;
-    const i = nameIdx.get(linkName);
-    if (i !== undefined) {
-      const P = items[i];
-      items[i] = {
-        name: P.name,
-        url: L.url ?? P.url,
-        desc: P.desc ?? L.desc,
-        emoji: L.emoji ?? P.emoji,
-        widget: P.widget,
-      };
-    } else {
-      nameIdx.set(linkName, items.length);
-      items.push(L);
-    }
+    const row = parseRow(x as Row, false);
+    if (row) upsertByName(items, nameIdx, row, true);
   }
 
-  return {
-    widgets: items.length ? JSON.stringify(items.map(stripNulls)) : null,
-  };
+  return items.length ? items : null;
 };
