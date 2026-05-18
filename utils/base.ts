@@ -88,14 +88,9 @@ export const resolveIdentityResponse = async (
   platform: Platform,
   headers: AuthHeaders,
   ns: boolean,
-  refresh: boolean,
 ) => {
   const res = await queryIdentityGraph(
-    refresh
-      ? QueryType.REFRESH_DOMAIN
-      : ns
-        ? QueryType.GET_PROFILES_NS
-        : QueryType.GET_PROFILES,
+    ns ? QueryType.GET_PROFILES_NS : QueryType.GET_PROFILES,
     handle,
     platform,
     headers,
@@ -110,14 +105,7 @@ export const resolveIdentityResponse = async (
     };
   }
 
-  const dr = refresh ? (res as any)?.data?.domainRefresh : null;
-  const identity = refresh
-    ? dr && {
-        profile: dr.profile as ProfileRecord,
-        registeredAt: dr.registeredAt,
-        identityGraph: undefined,
-      }
-    : (res as any)?.data?.identity;
+  const identity = res?.data?.identity;
 
   const profile = identity?.profile;
 
@@ -235,7 +223,6 @@ export const resolveIdentityHandle = async (
   headers: AuthHeaders,
   ns: boolean = false,
   pathname: string,
-  refresh: boolean = false,
 ) => {
   try {
     const response = await resolveIdentityResponse(
@@ -243,7 +230,6 @@ export const resolveIdentityHandle = async (
       platform,
       headers,
       ns,
-      refresh
     );
     if ("code" in response) {
       return errorHandle({

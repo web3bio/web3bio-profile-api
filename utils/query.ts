@@ -513,49 +513,6 @@ const REFRESH_DOMAIN = `
   query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
     domainRefresh(platform: $platform, identity: $identity) {
       id
-      aliases
-      identity
-      platform
-      network
-      primaryName
-      isPrimary
-      resolver
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      managerAddress {
-        network
-        address
-      }
-      expiredAt
-      updatedAt
-      registeredAt
-      profile {
-        uid
-        identity
-        platform
-        network
-        address
-        displayName
-        avatar
-        description
-        contenthash
-        texts
-        addresses {
-          network
-          address
-        }
-        social {
-          uid
-          follower
-          following
-        }
-      }
       status
     }
   }
