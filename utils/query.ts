@@ -815,15 +815,21 @@ export const refreshDomain = async (
     headers,
   );
   if (body?.errors) {
+    const e = body.errors as unknown;
     const msg =
-      typeof body.errors === "string"
-        ? body.errors
-        : JSON.stringify(body.errors);
+      typeof e === "string"
+        ? e
+        : Array.isArray(e)
+          ? e
+              .map((x) => (x as { message?: string }).message)
+              .filter(Boolean)
+              .join("; ")
+          : "";
     const code =
       typeof (body as { code?: number }).code === "number"
         ? (body as { code: number }).code
         : 502;
-    throw new Error(msg, { cause: { code } });
+    throw new Error(msg || JSON.stringify(e), { cause: { code } });
   }
   return body;
 };

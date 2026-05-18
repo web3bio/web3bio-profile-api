@@ -41,61 +41,30 @@ export function normalizeWorkerCacheUrl(
   return url.toString();
 }
 
-const CF_PURGE_CHUNK = 30;
-
-async function purgeChunk(
-  zoneId: string,
-  token: string,
-  files: string[],
-): Promise<{ ok: boolean; error?: string }> {
-  const res = await fetch(
-    `https://api.cloudflare.com/client/v4/zones/${zoneId}/purge_cache`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ files }),
-    },
-  );
-
-  let body: { success?: boolean; errors?: unknown } | null = null;
-  try {
-    body = (await res.json()) as { success?: boolean; errors?: unknown };
-  } catch {
-    body = null;
-  }
-
-  if (!res.ok || body?.success === false) {
-    const detail =
-      body?.errors != null ? JSON.stringify(body.errors) : await res.text();
-    return {
-      ok: false,
-      error: detail || `HTTP ${res.status} ${res.statusText}`,
-    };
-  }
-
-  return { ok: true };
+function workerDefaultCache(): Cache | undefined {
+  return (
+    globalThis as unknown as { caches?: { default?: Cache } }
+  ).caches?.default;
 }
 
-export async function purgeCloudflareCacheByUrls(
+export async function purgeWorkerCacheUrls(
   urls: string[],
 ): Promise<{ ok: boolean; skipped: boolean; error?: string }> {
-  const zoneId = process.env.CLOUDFLARE_ZONE_ID;
-  const token = process.env.CLOUDFLARE_API_TOKEN;
+  if (urls.length === 0) return { ok: true, skipped: true };
 
-  if (!zoneId || !token || urls.length === 0) {
-    return { ok: true, skipped: true };
-  }
+  const edge = workerDefaultCache();
+  if (!edge) return { ok: true, skipped: true };
 
-  for (let i = 0; i < urls.length; i += CF_PURGE_CHUNK) {
-    const chunk = urls.slice(i, i + CF_PURGE_CHUNK);
-    const result = await purgeChunk(zoneId, token, chunk);
-    if (!result.ok) {
-      return { ok: false, skipped: false, error: result.error };
+  try {
+    for (const url of urls) {
+      await edge.delete(new Request(url, { method: "GET" }));
     }
+    return { ok: true, skipped: false };
+  } catch (e) {
+    return {
+      ok: false,
+      skipped: false,
+      error: e instanceof Error ? e.message : String(e),
+    };
   }
-
-  return { ok: true, skipped: false };
 }

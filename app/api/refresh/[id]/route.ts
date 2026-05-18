@@ -6,7 +6,7 @@ import { refreshDomain, REFRESH_DOMAIN_PLATFORMS } from "@/utils/query";
 import {
   getCacheKeysToClear,
   normalizeWorkerCacheUrl,
-  purgeCloudflareCacheByUrls,
+  purgeWorkerCacheUrls,
 } from "@/utils/cloudflare-cache";
 import {
   BASE_URL,
@@ -58,7 +58,7 @@ export async function GET(
   const urls = getCacheKeysToClear(platform, identity).map((p) =>
     normalizeWorkerCacheUrl(BASE_URL, p),
   );
-  const purge = await purgeCloudflareCacheByUrls(urls);
+  const purge = await purgeWorkerCacheUrls(urls);
   if (!purge.ok) {
     return NextResponse.json(
       { error: purge.error ?? "Cache purge failed" },
