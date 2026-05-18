@@ -794,22 +794,36 @@ export async function queryIdentityGraphBatch(
   }
 }
 
+export const REFRESH_DOMAIN_PLATFORMS: readonly Platform[] = [
+  Platform.ens,
+  Platform.basenames,
+  Platform.linea,
+];
+
 export const refreshDomain = async (
   platform: Platform,
   identity: string,
   headers: AuthHeaders,
 ) => {
-  if (
-    !Boolean(
-      [Platform.ens, Platform.basenames, Platform.linea].includes(platform),
-    )
-  ) {
+  if (!REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
     return null;
   }
-  return queryIdentityGraph(
+  const body = await queryIdentityGraph(
     QueryType.REFRESH_DOMAIN,
     identity,
     platform,
     headers,
   );
+  if (body?.errors) {
+    const msg =
+      typeof body.errors === "string"
+        ? body.errors
+        : JSON.stringify(body.errors);
+    const code =
+      typeof (body as { code?: number }).code === "number"
+        ? (body as { code: number }).code
+        : 502;
+    throw new Error(msg, { cause: { code } });
+  }
+  return body;
 };

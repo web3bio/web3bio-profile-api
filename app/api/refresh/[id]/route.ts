@@ -1,113 +1,78 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import type { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { refreshDomain } from "@/utils/query";
-import { getCacheKeysToClear, normalizeWorkerCacheUrl } from "@/utils/cache-keys";
-import { purgeCloudflareCacheByUrls } from "@/utils/cloudflare-cache";
+import { refreshDomain, REFRESH_DOMAIN_PLATFORMS } from "@/utils/query";
+import {
+  getCacheKeysToClear,
+  normalizeWorkerCacheUrl,
+  purgeCloudflareCacheByUrls,
+} from "@/utils/cloudflare-cache";
 import {
   BASE_URL,
   errorHandle,
   getUserHeaders,
   invalidIdentityResponse,
-  parseResolvedIdentityHandle,
 } from "@/utils/utils";
-
-function backendRefreshErrorMessage(payload: unknown): string | null {
-  if (payload == null || typeof payload !== "object") {
-    return null;
-  }
-  const p = payload as Record<string, unknown>;
-  if (typeof p.msg === "string" && p.msg.trim()) {
-    return p.msg;
-  }
-  if (typeof p.errors === "string" && p.errors.trim()) {
-    return p.errors;
-  }
-  if (Array.isArray(p.errors) && p.errors.length > 0) {
-    return p.errors
-      .map((e) =>
-        typeof e === "object" &&
-        e !== null &&
-        "message" in e &&
-        typeof (e as { message: unknown }).message === "string"
-          ? (e as { message: string }).message
-          : JSON.stringify(e),
-      )
-      .join("; ");
-  }
-  return null;
-}
 
 export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id: rawId } = await params;
-  const { pathname } = req.nextUrl;
-  let decoded = rawId?.trim() ?? "";
+  const pathname = req.nextUrl.pathname;
+  let decoded = (await params).id?.trim() ?? "";
   try {
     decoded = decodeURIComponent(decoded);
-  } catch {
-    /* raw segment */
-  }
+  } catch {}
 
-  if (!decoded) {
-    return invalidIdentityResponse(pathname, "");
-  }
+  if (!decoded) return invalidIdentityResponse(pathname, "");
 
   const resolved = resolveIdentity(decoded);
-  const parsed = parseResolvedIdentityHandle(resolved);
-  if (!parsed) {
-    return invalidIdentityResponse(pathname, decoded);
-  }
-
-  const [platform, identity] = parsed;
-  const compositeId = `${platform},${identity}`;
+  if (!resolved) return invalidIdentityResponse(pathname, decoded);
+  const i = resolved.indexOf(",");
+  const platform = resolved.slice(0, i) as Platform;
+  const identity = resolved.slice(i + 1);
   const headers = getUserHeaders(req.headers);
 
-  if (platform === Platform.ens) {
-    const gql = await refreshDomain(platform, identity, headers);
-    const gqlErr = backendRefreshErrorMessage(gql);
-    if (gqlErr) {
-      const httpCode =
-        typeof (gql as { code?: unknown }).code === "number"
-          ? (gql as { code: number }).code
+  if (REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
+    try {
+      await refreshDomain(platform, identity, headers);
+    } catch (e) {
+      const c =
+        e instanceof Error &&
+        e.cause &&
+        typeof e.cause === "object" &&
+        typeof (e.cause as { code?: unknown }).code === "number"
+          ? (e.cause as { code: number }).code
           : 502;
       return errorHandle({
-        identity: compositeId,
+        identity: resolved,
         platform,
         path: pathname,
-        code: httpCode,
-        message: gqlErr,
+        code: c,
+        message: e instanceof Error ? e.message : String(e),
       });
     }
   }
 
-  const relativePaths = getCacheKeysToClear(platform, identity);
-  const urls = relativePaths.map((p) => normalizeWorkerCacheUrl(BASE_URL, p));
-
+  const urls = getCacheKeysToClear(platform, identity).map((p) =>
+    normalizeWorkerCacheUrl(BASE_URL, p),
+  );
   const purge = await purgeCloudflareCacheByUrls(urls);
   if (!purge.ok) {
     return NextResponse.json(
       { error: purge.error ?? "Cache purge failed" },
-      {
-        status: 502,
-        headers: { "Cache-Control": "no-store" },
-      },
+      { status: 502, headers: { "Cache-Control": "no-store" } },
     );
   }
 
   return NextResponse.json(
     {
       refreshed: true,
-      id: compositeId,
+      id: resolved,
       purgedUrls: purge.skipped ? 0 : urls.length,
       cachePurgeSkipped: purge.skipped,
     },
-    {
-      status: 200,
-      headers: { "Cache-Control": "no-store" },
-    },
+    { status: 200, headers: { "Cache-Control": "no-store" } },
   );
 }

@@ -119,4 +119,4 @@ export const resolveDomainQuery = async (
   });
 };
 
-export { getCacheKeysToClear } from "@/utils/cache-keys";
+export { getCacheKeysToClear } from "@/utils/cloudflare-cache";
