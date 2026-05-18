@@ -22,6 +22,7 @@ export enum QueryType {
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
+  REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
 
 const GET_WALLET_QUERY = `
@@ -508,6 +509,58 @@ const GET_SEARCH_QUERY = `
   }
 `;
 
+const REFRESH_DOMAIN = `
+  query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
+    domainRefresh(platform: $platform, identity: $identity) {
+      id
+      aliases
+      identity
+      platform
+      network
+      primaryName
+      isPrimary
+      resolver
+      resolvedAddress {
+        network
+        address
+      }
+      ownerAddress {
+        network
+        address
+      }
+      managerAddress {
+        network
+        address
+      }
+      expiredAt
+      updatedAt
+      registeredAt
+      profile {
+        uid
+        identity
+        platform
+        network
+        address
+        displayName
+        avatar
+        description
+        contenthash
+        texts
+        addresses {
+          network
+          address
+        }
+        social {
+          uid
+          follower
+          following
+        }
+      }
+      status
+    }
+  }
+`;
+
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
@@ -520,6 +573,7 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
+  [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);
 
 export function getQuery(type: QueryType): string {
@@ -586,10 +640,7 @@ export function identityGraphErrorMessage(
     return fallback;
   }
   const b = body as { msg?: string; errors?: unknown };
-  return (
-    b.msg ||
-    (b.errors != null ? JSON.stringify(b.errors) : fallback)
-  );
+  return b.msg || (b.errors != null ? JSON.stringify(b.errors) : fallback);
 }
 
 export async function queryIdentityGraph(
@@ -775,7 +826,10 @@ export async function queryIdentityGraphBatch(
           return directMatch;
         }
         const [platform, identity] = queryId.split(",");
-        return normalizedResultMap.get(`${platform},${normalizeText(identity)}`) || null;
+        return (
+          normalizedResultMap.get(`${platform},${normalizeText(identity)}`) ||
+          null
+        );
       })
       .filter(Boolean);
   } catch (error) {

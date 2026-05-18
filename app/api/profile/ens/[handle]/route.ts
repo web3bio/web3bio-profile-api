@@ -11,7 +11,7 @@ export async function GET(
   const { handle: rawHandle } = await params;
   const { pathname } = req.nextUrl;
   const handle = rawHandle?.trim() ?? "";
-
+  const isRefresh = req.nextUrl.searchParams.get("refresh") === "true";
   if (!handle || (!REGEX.ENS.test(handle) && !isValidEthereumAddress(handle))) {
     return errorHandle({
       identity: handle,
@@ -23,5 +23,13 @@ export async function GET(
   }
 
   const headers = getUserHeaders(req.headers);
-  return resolveIdentityHandle(handle, Platform.ens, headers, false, pathname);
+
+  return resolveIdentityHandle(
+    handle,
+    Platform.ens,
+    headers,
+    false,
+    pathname,
+    isRefresh,
+  );
 }
