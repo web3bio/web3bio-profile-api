@@ -11,12 +11,16 @@ const CACHEABLE_API_PATHS = new Set([
   "/credential",
   "/search",
   "/wallet",
+  "/refresh",
 ]);
 
 const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
 const MIN_ROLE_RESTRICTED = 6;
-const PATH_MIN_ROLE = { "/wallet": MIN_ROLE_RESTRICTED };
+const PATH_MIN_ROLE = {
+  "/wallet": MIN_ROLE_RESTRICTED,
+  "/refresh": MIN_ROLE_RESTRICTED,
+};
 const RATE_LIMIT_ERROR =
   "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
 
@@ -148,6 +152,20 @@ function withCacheMetadata(response, cacheHit, fullPath, ttl) {
   return response;
 }
 
+function isRefreshPath(pathname) {
+  return pathname === "/refresh" || pathname.startsWith("/refresh/");
+}
+
+function responseWithNoStore(response) {
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "no-store");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 const handler = {
   async fetch(request, env, ctx) {
     const clientIp = extractClientIp(request);
@@ -196,7 +214,10 @@ const handler = {
     }
 
     const cacheKey = getCacheKey(url);
-    const cached = await caches.default.match(cacheKey);
+    let cached = null;
+    if (!isRefreshPath(pathname)) {
+      cached = await caches.default.match(cacheKey);
+    }
 
     // Return cached response if available and valid
     if (cached) {
@@ -214,6 +235,11 @@ const handler = {
 
     // Fetch from origin
     const response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
+
+    if (isRefreshPath(pathname)) {
+      return responseWithNoStore(response);
+    }
+
     const ttl = getTTL(pathname);
     withCacheMetadata(response, "MISS", fullPath, ttl);
 

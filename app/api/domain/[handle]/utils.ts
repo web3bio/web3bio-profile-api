@@ -118,3 +118,5 @@ export const resolveDomainQuery = async (
     domains: buildDomainsArray(vertices, handle),
   });
 };
+
+export { getCacheKeysToClear } from "@/utils/cache-keys";

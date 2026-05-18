@@ -793,3 +793,23 @@ export async function queryIdentityGraphBatch(
     throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
   }
 }
+
+export const refreshDomain = async (
+  platform: Platform,
+  identity: string,
+  headers: AuthHeaders,
+) => {
+  if (
+    !Boolean(
+      [Platform.ens, Platform.basenames, Platform.linea].includes(platform),
+    )
+  ) {
+    return null;
+  }
+  return queryIdentityGraph(
+    QueryType.REFRESH_DOMAIN,
+    identity,
+    platform,
+    headers,
+  );
+};

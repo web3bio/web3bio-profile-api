@@ -1,72 +1,113 @@
-import { type NextRequest, NextResponse } from "next/server";
-import type { Platform } from "web3bio-profile-kit/types";
-import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { getUserHeaders } from "@/utils/utils";
+import type { NextRequest } from "next/server";
+import { NextResponse } from "next/server";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
+import { resolveIdentity } from "web3bio-profile-kit/utils";
+import { refreshDomain } from "@/utils/query";
+import { getCacheKeysToClear, normalizeWorkerCacheUrl } from "@/utils/cache-keys";
+import { purgeCloudflareCacheByUrls } from "@/utils/cloudflare-cache";
+import {
+  BASE_URL,
+  errorHandle,
+  getUserHeaders,
+  invalidIdentityResponse,
+  parseResolvedIdentityHandle,
+} from "@/utils/utils";
 
-const badRequest = (message: string) =>
-  NextResponse.json({ message }, { status: 400 });
-
-const serverError = (error: string) =>
-  NextResponse.json({ error }, { status: 500 });
-
-type ParsedRevalidateId =
-  | { id: string; platform: Platform; identity: string }
-  | { error: string };
-
-const parseRevalidateId = (
-  id: string | undefined,
-): ParsedRevalidateId => {
-  if (!id || typeof id !== "string") {
-    return { error: "Missing or invalid id parameter" };
+function backendRefreshErrorMessage(payload: unknown): string | null {
+  if (payload == null || typeof payload !== "object") {
+    return null;
   }
-
-  const [platform, identity, ...rest] = id.split(",");
-  if (rest.length > 0 || !platform?.trim() || !identity?.trim()) {
-    return { error: "Invalid id format. Expected: platform,identity" };
+  const p = payload as Record<string, unknown>;
+  if (typeof p.msg === "string" && p.msg.trim()) {
+    return p.msg;
   }
+  if (typeof p.errors === "string" && p.errors.trim()) {
+    return p.errors;
+  }
+  if (Array.isArray(p.errors) && p.errors.length > 0) {
+    return p.errors
+      .map((e) =>
+        typeof e === "object" &&
+        e !== null &&
+        "message" in e &&
+        typeof (e as { message: unknown }).message === "string"
+          ? (e as { message: string }).message
+          : JSON.stringify(e),
+      )
+      .join("; ");
+  }
+  return null;
+}
 
-  return {
-    id,
-    platform: platform.trim() as Platform,
-    identity: identity.trim(),
-  };
-};
-
-// e.g `https://api.web3.bio/revalidate/ens,sujiyan.eth`
 export async function GET(
   req: NextRequest,
-  props: { params: Promise<{ id: string }> },
+  { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await props.params;
-  const parsedId = parseRevalidateId(id);
-  if ("error" in parsedId) {
-    return badRequest(parsedId.error);
-  }
-
+  const { id: rawId } = await params;
+  const { pathname } = req.nextUrl;
+  let decoded = rawId?.trim() ?? "";
   try {
-    const headers = getUserHeaders(req.headers);
-    const res = await queryIdentityGraph(
-      QueryType.GET_REFRESH_PROFILE,
-      parsedId.identity,
-      parsedId.platform,
-      headers,
-    );
-
-    if (res?.errors) {
-      return serverError(String(res.errors));
-    }
-
-    const refreshed = res?.data?.identity;
-    if (!refreshed) {
-      return serverError("Failed to refresh profile data");
-    }
-
-    return NextResponse.json({
-      id: parsedId.id,
-      status: refreshed.status,
-      now: new Date().toISOString(),
-    });
-  } catch (error) {
-    return serverError("Internal server error");
+    decoded = decodeURIComponent(decoded);
+  } catch {
+    /* raw segment */
   }
+
+  if (!decoded) {
+    return invalidIdentityResponse(pathname, "");
+  }
+
+  const resolved = resolveIdentity(decoded);
+  const parsed = parseResolvedIdentityHandle(resolved);
+  if (!parsed) {
+    return invalidIdentityResponse(pathname, decoded);
+  }
+
+  const [platform, identity] = parsed;
+  const compositeId = `${platform},${identity}`;
+  const headers = getUserHeaders(req.headers);
+
+  if (platform === Platform.ens) {
+    const gql = await refreshDomain(platform, identity, headers);
+    const gqlErr = backendRefreshErrorMessage(gql);
+    if (gqlErr) {
+      const httpCode =
+        typeof (gql as { code?: unknown }).code === "number"
+          ? (gql as { code: number }).code
+          : 502;
+      return errorHandle({
+        identity: compositeId,
+        platform,
+        path: pathname,
+        code: httpCode,
+        message: gqlErr,
+      });
+    }
+  }
+
+  const relativePaths = getCacheKeysToClear(platform, identity);
+  const urls = relativePaths.map((p) => normalizeWorkerCacheUrl(BASE_URL, p));
+
+  const purge = await purgeCloudflareCacheByUrls(urls);
+  if (!purge.ok) {
+    return NextResponse.json(
+      { error: purge.error ?? "Cache purge failed" },
+      {
+        status: 502,
+        headers: { "Cache-Control": "no-store" },
+      },
+    );
+  }
+
+  return NextResponse.json(
+    {
+      refreshed: true,
+      id: compositeId,
+      purgedUrls: purge.skipped ? 0 : urls.length,
+      cachePurgeSkipped: purge.skipped,
+    },
+    {
+      status: 200,
+      headers: { "Cache-Control": "no-store" },
+    },
+  );
 }
