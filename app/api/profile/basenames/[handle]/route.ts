@@ -39,7 +39,7 @@ export async function GET(
       message: ErrorMessages.INVALID_IDENTITY,
     });
   }
-
+  const isRefresh = req.nextUrl.searchParams.get("refresh") === "true";
   const headers = getUserHeaders(req.headers);
   return resolveIdentityHandle(
     handle,
@@ -47,5 +47,6 @@ export async function GET(
     headers,
     false,
     pathname,
+    isRefresh,
   );
 }
