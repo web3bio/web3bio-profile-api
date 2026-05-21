@@ -14,7 +14,6 @@ export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
-  GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
@@ -246,17 +245,6 @@ const GET_PROFILES = `
           dataSource
           edgeType
         }
-      }
-    }
-  }
-`;
-
-const GET_REFRESH_PROFILE = `
-  query GET_REFRESH_PROFILE($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity, refresh: true) {
-      status
-      identityGraph {
-        graphId
       }
     }
   }
@@ -513,49 +501,6 @@ const REFRESH_DOMAIN = `
   query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
     domainRefresh(platform: $platform, identity: $identity) {
       id
-      aliases
-      identity
-      platform
-      network
-      primaryName
-      isPrimary
-      resolver
-      resolvedAddress {
-        network
-        address
-      }
-      ownerAddress {
-        network
-        address
-      }
-      managerAddress {
-        network
-        address
-      }
-      expiredAt
-      updatedAt
-      registeredAt
-      profile {
-        uid
-        identity
-        platform
-        network
-        address
-        displayName
-        avatar
-        description
-        contenthash
-        texts
-        addresses {
-          network
-          address
-        }
-        social {
-          uid
-          follower
-          following
-        }
-      }
       status
     }
   }
@@ -565,7 +510,6 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
-  [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
@@ -836,3 +780,40 @@ export async function queryIdentityGraphBatch(
     throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
   }
 }
+
+export const REFRESH_DOMAIN_PLATFORMS: readonly Platform[] = [
+  Platform.ens,
+  Platform.basenames,
+  Platform.linea,
+];
+
+export const refreshDomain = async (
+  platform: Platform,
+  identity: string,
+  headers: AuthHeaders,
+): Promise<{ status: unknown } | null> => {
+  if (!REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
+    return null;
+  }
+  const body = await queryIdentityGraph(
+    QueryType.REFRESH_DOMAIN,
+    identity,
+    platform,
+    headers,
+  );
+  if (body?.errors) {
+    throw new Error(identityGraphErrorMessage(body, "GraphQL error"), {
+      cause: {
+        code: identityGraphErrorStatus(
+          false,
+          502,
+          (body as { code?: number }).code,
+        ),
+      },
+    });
+  }
+  const status = (
+    body as { data?: { domainRefresh?: { status?: unknown } } }
+  ).data?.domainRefresh?.status;
+  return { status };
+};

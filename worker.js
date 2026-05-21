@@ -2,6 +2,7 @@ import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger";
 import { extractClientIp } from "./utils/ip";
+import { workerCacheKey } from "./utils/cloudflare-cache";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
@@ -11,12 +12,15 @@ const CACHEABLE_API_PATHS = new Set([
   "/credential",
   "/search",
   "/wallet",
+  "/refresh",
 ]);
 
 const TRUSTED_HOST = "web3.bio";
 const DEFAULT_SWR = 86400; // 24h
 const MIN_ROLE_RESTRICTED = 6;
-const PATH_MIN_ROLE = { "/wallet": MIN_ROLE_RESTRICTED };
+const PATH_MIN_ROLE = {
+  "/wallet": MIN_ROLE_RESTRICTED,
+};
 const RATE_LIMIT_ERROR =
   "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
 
@@ -63,15 +67,22 @@ function getBearerToken(value) {
   return value?.startsWith("Bearer ") ? value.slice(7) : value || "";
 }
 
-function jsonResponse(status, payload) {
+function jsonResponse(status, payload, extraHeaders = {}) {
   return new Response(JSON.stringify(payload), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...extraHeaders,
+    },
   });
 }
 
 function forbidden(message) {
-  return jsonResponse(403, { error: "Forbidden", message });
+  return jsonResponse(
+    403,
+    { error: "Forbidden", message },
+    { "Cache-Control": "no-store" },
+  );
 }
 
 async function verifyApiToken(userToken, env) {
@@ -93,21 +104,6 @@ function withClientIpHeader(request, clientIp) {
   const headers = new Headers(request.headers);
   headers.set("x-client-ip", clientIp);
   return new Request(request, { headers });
-}
-
-function getCacheKey(url) {
-  const cacheUrl = new URL(url);
-  cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
-
-  if (cacheUrl.search) {
-    const params = new URLSearchParams(cacheUrl.search);
-    const sortedParams = new URLSearchParams(
-      [...params.entries()].sort((a, b) => a[0].localeCompare(b[0])),
-    );
-    cacheUrl.search = sortedParams.toString();
-  }
-
-  return new Request(cacheUrl.toString(), { method: "GET" });
 }
 
 function setCacheHeaders(response, ttl) {
@@ -148,6 +144,20 @@ function withCacheMetadata(response, cacheHit, fullPath, ttl) {
   return response;
 }
 
+function isRefreshPath(pathname) {
+  return pathname === "/refresh" || pathname.startsWith("/refresh/");
+}
+
+function responseWithNoStore(response) {
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "no-store");
+  return new Response(response.body, {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  });
+}
+
 const handler = {
   async fetch(request, env, ctx) {
     const clientIp = extractClientIp(request);
@@ -170,7 +180,11 @@ const handler = {
       return forbidden("Invalid API token");
     }
 
-    if (requiredRole !== null && !trustedOrigin) {
+    if (isRefreshPath(pathname)) {
+      if (!verifiedToken) {
+        return forbidden("API key required");
+      }
+    } else if (requiredRole !== null && !trustedOrigin) {
       if (!userToken) {
         return forbidden("API key required");
       }
@@ -184,19 +198,23 @@ const handler = {
       !pathname.startsWith("/avatar/") &&
       env?.API_RATE_LIMIT
     ) {
-      // Rate limiting for unauthenticated requests
       const { success } = await env.API_RATE_LIMIT.limit({
         key: clientIp,
       });
       if (!success) {
-        return jsonResponse(429, {
-          error: RATE_LIMIT_ERROR,
-        });
+        return jsonResponse(
+          429,
+          { error: RATE_LIMIT_ERROR },
+          { "Cache-Control": "no-store" },
+        );
       }
     }
 
-    const cacheKey = getCacheKey(url);
-    const cached = await caches.default.match(cacheKey);
+    const cacheKey = workerCacheKey(url);
+    let cached = null;
+    if (!isRefreshPath(pathname)) {
+      cached = await caches.default.match(cacheKey);
+    }
 
     // Return cached response if available and valid
     if (cached) {
@@ -214,10 +232,14 @@ const handler = {
 
     // Fetch from origin
     const response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
+
+    if (isRefreshPath(pathname)) {
+      return responseWithNoStore(response);
+    }
+
     const ttl = getTTL(pathname);
     withCacheMetadata(response, "MISS", fullPath, ttl);
 
-    // Cache successful GET responses
     if (response.status === 200 && request.method === "GET") {
       const cacheResponse = response.clone();
       if (isCacheableResponse(cacheResponse)) {
