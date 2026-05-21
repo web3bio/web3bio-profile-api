@@ -805,7 +805,7 @@ export const refreshDomain = async (
     throw new Error(identityGraphErrorMessage(body, "GraphQL error"), {
       cause: {
         code: identityGraphErrorStatus(
-          true,
+          false,
           502,
           (body as { code?: number }).code,
         ),
