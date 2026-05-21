@@ -119,8 +119,25 @@ export const parseResolvedIdentityHandle = (
     return null;
   }
 
-  const [platform, identity] = resolvedIdentity.split(",") as [Platform, string];
+  const i = resolvedIdentity.indexOf(",");
+  if (i <= 0) {
+    return null;
+  }
+  const platform = resolvedIdentity.slice(0, i) as Platform;
+  const identity = resolvedIdentity.slice(i + 1);
   return platform && identity ? [platform, identity] : null;
+};
+
+export const getErrorCauseCode = (error: unknown, fallback = 502): number => {
+  if (
+    error instanceof Error &&
+    error.cause &&
+    typeof error.cause === "object" &&
+    typeof (error.cause as { code?: unknown }).code === "number"
+  ) {
+    return (error.cause as { code: number }).code;
+  }
+  return fallback;
 };
 
 export const parseIdsParam = (idsParam: string): string[] | null => {

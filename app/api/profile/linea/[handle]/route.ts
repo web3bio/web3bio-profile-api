@@ -41,13 +41,11 @@ export async function GET(
   }
 
   const headers = getUserHeaders(req.headers);
-  const isRefresh = req.nextUrl.searchParams.get("refresh") === "true";
   return resolveIdentityHandle(
     handle,
     Platform.linea,
     headers,
     false,
     pathname,
-    isRefresh,
   );
 }
