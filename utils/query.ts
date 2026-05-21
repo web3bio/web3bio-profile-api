@@ -14,7 +14,6 @@ export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
-  GET_REFRESH_PROFILE = "GET_REFRESH_PROFILE",
   GET_DOMAIN = "GET_DOMAIN",
   GET_BATCH = "GET_BATCH",
   GET_BATCH_UNIVERSAL = "GET_BATCH_UNIVERSAL",
@@ -246,17 +245,6 @@ const GET_PROFILES = `
           dataSource
           edgeType
         }
-      }
-    }
-  }
-`;
-
-const GET_REFRESH_PROFILE = `
-  query GET_REFRESH_PROFILE($platform: Platform!, $identity: String!) {
-    identity(platform: $platform, identity: $identity, refresh: true) {
-      status
-      identityGraph {
-        graphId
       }
     }
   }
@@ -522,7 +510,6 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
-  [QueryType.GET_REFRESH_PROFILE, GET_REFRESH_PROFILE],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
   [QueryType.GET_BATCH, GET_BATCH],
   [QueryType.GET_BATCH_UNIVERSAL, GET_BATCH_UNIVERSAL],
@@ -815,21 +802,15 @@ export const refreshDomain = async (
     headers,
   );
   if (body?.errors) {
-    const e = body.errors as unknown;
-    const msg =
-      typeof e === "string"
-        ? e
-        : Array.isArray(e)
-          ? e
-              .map((x) => (x as { message?: string }).message)
-              .filter(Boolean)
-              .join("; ")
-          : "";
-    const code =
-      typeof (body as { code?: number }).code === "number"
-        ? (body as { code: number }).code
-        : 502;
-    throw new Error(msg || JSON.stringify(e), { cause: { code } });
+    throw new Error(identityGraphErrorMessage(body, "GraphQL error"), {
+      cause: {
+        code: identityGraphErrorStatus(
+          true,
+          502,
+          (body as { code?: number }).code,
+        ),
+      },
+    });
   }
   const status = (
     body as { data?: { domainRefresh?: { status?: unknown } } }

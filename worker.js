@@ -216,9 +216,11 @@ const handler = {
         key: clientIp,
       });
       if (!success) {
-        return jsonResponse(429, {
-          error: RATE_LIMIT_ERROR,
-        });
+        return jsonResponse(
+          429,
+          { error: RATE_LIMIT_ERROR },
+          { "Cache-Control": "no-store" },
+        );
       }
     }
 
@@ -252,11 +254,7 @@ const handler = {
     const ttl = getTTL(pathname);
     withCacheMetadata(response, "MISS", fullPath, ttl);
 
-    if (
-      !isRefreshPath(pathname) &&
-      response.status === 200 &&
-      request.method === "GET"
-    ) {
+    if (response.status === 200 && request.method === "GET") {
       const cacheResponse = response.clone();
       if (isCacheableResponse(cacheResponse)) {
         ctx.waitUntil(

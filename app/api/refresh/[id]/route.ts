@@ -1,8 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import type { Platform } from "web3bio-profile-kit/types";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
-import { refreshDomain, REFRESH_DOMAIN_PLATFORMS } from "@/utils/query";
+import { refreshDomain } from "@/utils/query";
 import {
   getCacheKeysToClear,
   normalizeWorkerCacheUrl,
@@ -11,8 +10,10 @@ import {
 import {
   BASE_URL,
   errorHandle,
+  getErrorCauseCode,
   getUserHeaders,
   invalidIdentityResponse,
+  parseResolvedIdentityHandle,
 } from "@/utils/utils";
 
 export async function GET(
@@ -23,38 +24,33 @@ export async function GET(
   let decoded = (await params).id?.trim() ?? "";
   try {
     decoded = decodeURIComponent(decoded);
-  } catch {}
+  } catch {
+    // keep raw id when decoding fails
+  }
 
   if (!decoded) return invalidIdentityResponse(pathname, "");
 
   const resolved = resolveIdentity(decoded);
-  if (!resolved) return invalidIdentityResponse(pathname, decoded);
-  const i = resolved.indexOf(",");
-  const platform = resolved.slice(0, i) as Platform;
-  const identity = resolved.slice(i + 1);
+  const parsed = parseResolvedIdentityHandle(resolved);
+  if (!parsed) return invalidIdentityResponse(pathname, decoded);
+
+  const [platform, identity] = parsed;
   const headers = getUserHeaders(req.headers);
 
   let domainRefreshStatus: unknown;
-  if (REFRESH_DOMAIN_PLATFORMS.includes(platform)) {
-    try {
-      const r = await refreshDomain(platform, identity, headers);
-      domainRefreshStatus = r?.status;
-    } catch (e) {
-      const c =
-        e instanceof Error &&
-        e.cause &&
-        typeof e.cause === "object" &&
-        typeof (e.cause as { code?: unknown }).code === "number"
-          ? (e.cause as { code: number }).code
-          : 502;
-      return errorHandle({
-        identity: resolved,
-        platform,
-        path: pathname,
-        code: c,
-        message: e instanceof Error ? e.message : String(e),
-      });
+  try {
+    const r = await refreshDomain(platform, identity, headers);
+    if (r?.status !== undefined) {
+      domainRefreshStatus = r.status;
     }
+  } catch (e) {
+    return errorHandle({
+      identity: resolved!,
+      platform,
+      path: pathname,
+      code: getErrorCauseCode(e),
+      message: e instanceof Error ? e.message : String(e),
+    });
   }
 
   const urls = getCacheKeysToClear(platform, identity).map((p) =>
@@ -72,9 +68,8 @@ export async function GET(
     {
       refreshed: true,
       id: resolved,
-      ...(domainRefreshStatus !== undefined && {
-        status: domainRefreshStatus,
-      }),
+      ...(domainRefreshStatus !== undefined && { status: domainRefreshStatus }),
+      cachePurged: !purge.skipped,
     },
     { status: 200, headers: { "Cache-Control": "no-store" } },
   );

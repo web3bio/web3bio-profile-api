@@ -56,9 +56,9 @@ export async function purgeWorkerCacheUrls(
   if (!edge) return { ok: true, skipped: true };
 
   try {
-    for (const url of urls) {
-      await edge.delete(new Request(url, { method: "GET" }));
-    }
+    await Promise.all(
+      urls.map((url) => edge.delete(new Request(url, { method: "GET" }))),
+    );
     return { ok: true, skipped: false };
   } catch (e) {
     return {
