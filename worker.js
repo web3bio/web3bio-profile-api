@@ -2,6 +2,7 @@ import { jwtVerify } from "jose";
 import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger";
 import { extractClientIp } from "./utils/ip";
+import { workerCacheKey } from "./utils/cloudflare-cache";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
@@ -103,21 +104,6 @@ function withClientIpHeader(request, clientIp) {
   const headers = new Headers(request.headers);
   headers.set("x-client-ip", clientIp);
   return new Request(request, { headers });
-}
-
-function getCacheKey(url) {
-  const cacheUrl = new URL(url);
-  cacheUrl.pathname = cacheUrl.pathname.toLowerCase();
-
-  if (cacheUrl.search) {
-    const params = new URLSearchParams(cacheUrl.search);
-    const sortedParams = new URLSearchParams(
-      [...params.entries()].sort((a, b) => a[0].localeCompare(b[0])),
-    );
-    cacheUrl.search = sortedParams.toString();
-  }
-
-  return new Request(cacheUrl.toString(), { method: "GET" });
 }
 
 function setCacheHeaders(response, ttl) {
@@ -224,7 +210,7 @@ const handler = {
       }
     }
 
-    const cacheKey = getCacheKey(url);
+    const cacheKey = workerCacheKey(url);
     let cached = null;
     if (!isRefreshPath(pathname)) {
       cached = await caches.default.match(cacheKey);

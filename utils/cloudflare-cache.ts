@@ -1,5 +1,31 @@
 import type { Platform } from "web3bio-profile-kit/types";
 
+function sortedSearch(search: string): string {
+  const raw = search.startsWith("?") ? search.slice(1) : search;
+  if (!raw) return "";
+  const qs = new URLSearchParams(
+    [...new URLSearchParams(raw).entries()].sort((a, b) =>
+      a[0].localeCompare(b[0]),
+    ),
+  ).toString();
+  return qs ? `?${qs}` : "";
+}
+
+/** Worker cache key: request origin + lowercase path + sorted query. */
+export function workerCacheKey(
+  input: URL | string,
+  base?: string | URL,
+): Request {
+  const url =
+    typeof input === "string" && input.startsWith("/")
+      ? new URL(input, base)
+      : new URL(input);
+  const path = url.pathname.toLowerCase();
+  return new Request(`${url.origin}${path}${sortedSearch(url.search)}`, {
+    method: "GET",
+  });
+}
+
 export function getCacheKeysToClear(
   platform: Platform,
   identity: string,
@@ -7,8 +33,10 @@ export function getCacheKeysToClear(
   const id = `${platform},${identity}`;
   return [
     `/ns/${platform}/${identity}`,
+    `/ns/${identity}`,
     `/ns/${id}`,
     `/profile/${platform}/${identity}`,
+    `/profile/${identity}`,
     `/profile/${id}`,
     `/domain/${identity}`,
     `/domain/${id}`,
@@ -22,42 +50,32 @@ export function getCacheKeysToClear(
   ];
 }
 
-export function normalizeWorkerCacheUrl(
-  origin: string,
-  pathAndQuery: string,
-): string {
-  const path = pathAndQuery.startsWith("/") ? pathAndQuery : `/${pathAndQuery}`;
-  const base = origin.replace(/\/$/, "");
-  const url = new URL(path, `${base}/`);
-  url.pathname = url.pathname.toLowerCase();
-  if (url.search) {
-    const sorted = new URLSearchParams(
-      [...new URLSearchParams(url.search).entries()].sort((a, b) =>
-        a[0].localeCompare(b[0]),
-      ),
-    );
-    url.search = sorted.toString();
-  }
-  return url.toString();
-}
-
-function workerDefaultCache(): Cache | undefined {
+function workerCache(): Cache | undefined {
   return (
     globalThis as unknown as { caches?: { default?: Cache } }
   ).caches?.default;
 }
 
-export async function purgeWorkerCacheUrls(
-  urls: string[],
+export async function purgeWorkerCache(
+  platform: Platform,
+  identity: string,
+  base: string | URL,
 ): Promise<{ ok: boolean; skipped: boolean; error?: string }> {
-  if (urls.length === 0) return { ok: true, skipped: true };
+  return purgeWorkerCachePaths(getCacheKeysToClear(platform, identity), base);
+}
 
-  const edge = workerDefaultCache();
-  if (!edge) return { ok: true, skipped: true };
+export async function purgeWorkerCachePaths(
+  paths: string[],
+  base: string | URL,
+): Promise<{ ok: boolean; skipped: boolean; error?: string }> {
+  if (paths.length === 0) return { ok: true, skipped: true };
+
+  const cache = workerCache();
+  if (!cache) return { ok: true, skipped: true };
 
   try {
     await Promise.all(
-      urls.map((url) => edge.delete(new Request(url, { method: "GET" }))),
+      paths.map((path) => cache.delete(workerCacheKey(path, base))),
     );
     return { ok: true, skipped: false };
   } catch (e) {

@@ -2,13 +2,8 @@ import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { resolveIdentity } from "web3bio-profile-kit/utils";
 import { refreshDomain } from "@/utils/query";
+import { purgeWorkerCache } from "@/utils/cloudflare-cache";
 import {
-  getCacheKeysToClear,
-  normalizeWorkerCacheUrl,
-  purgeWorkerCacheUrls,
-} from "@/utils/cloudflare-cache";
-import {
-  BASE_URL,
   errorHandle,
   getErrorCauseCode,
   getUserHeaders,
@@ -53,10 +48,7 @@ export async function GET(
     });
   }
 
-  const urls = getCacheKeysToClear(platform, identity).map((p) =>
-    normalizeWorkerCacheUrl(BASE_URL, p),
-  );
-  const purge = await purgeWorkerCacheUrls(urls);
+  const purge = await purgeWorkerCache(platform, identity, req.nextUrl.origin);
   if (!purge.ok) {
     return NextResponse.json(
       { error: purge.error ?? "Cache purge failed" },
