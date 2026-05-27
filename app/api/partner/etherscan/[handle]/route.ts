@@ -5,7 +5,7 @@ import {
   invalidIdentityResponse,
   parseResolvedIdentityHandle,
 } from "@/utils/utils";
-import { resolveEtherscanHandle } from "./utils";
+import { ALLOWED_PLATFORMS, resolveEtherscanHandle } from "./utils";
 
 export async function GET(
   req: NextRequest,
@@ -24,6 +24,10 @@ export async function GET(
     return invalidIdentityResponse(pathname, handle);
   }
   const [platform, identity] = parsedIdentity;
+
+  if (!ALLOWED_PLATFORMS.has(platform)) {
+    return invalidIdentityResponse(pathname, handle, platform);
+  }
 
   return resolveEtherscanHandle(
     identity,
