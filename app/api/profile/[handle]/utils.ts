@@ -584,6 +584,43 @@ export const resolveWithIdentityGraph = async ({
     : createResolveError(handle, platform, ErrorMessages.NOT_FOUND, 404);
 };
 
+export const extractSortedProfileRecords = (
+  handle: string,
+  platform: Platform,
+  response: IdentityGraphQueryResponse,
+): ProfileRecord[] | ResolveErrorResult => {
+  if (response.msg) {
+    return createResolveError(
+      handle,
+      platform,
+      response.msg,
+      response.code || 500,
+    );
+  }
+  if (!response?.data?.identity || response?.errors) {
+    return createResolveError(
+      handle,
+      platform,
+      response.errors || ErrorMessages.NOT_FOUND,
+      response.code ? response.code : response.errors ? 500 : 404,
+    );
+  }
+
+  const processedResponse = processJson(response);
+  const extractedProfiles = removeConflictingAddressProfile(
+    extractProfilesFromGraph(processedResponse),
+  );
+  const sortedProfiles = sortProfilesByPriority(
+    extractedProfiles,
+    platform,
+    handle,
+  );
+
+  return sortedProfiles.length > 0
+    ? sortedProfiles
+    : createResolveError(handle, platform, ErrorMessages.NOT_FOUND, 404);
+};
+
 export const resolveUniversalHandle = async (
   handle: string,
   platform: Platform,

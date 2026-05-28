@@ -12,6 +12,7 @@ const CACHEABLE_API_PATHS = new Set([
   "/credential",
   "/search",
   "/wallet",
+  "/partner",
   "/refresh",
 ]);
 
