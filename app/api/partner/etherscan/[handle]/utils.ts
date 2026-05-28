@@ -31,15 +31,15 @@ const BG_OPACITY = 10;
 const NETWORK_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const WEBSITE_PLATFORMS = new Set([Platform.website, Platform.url]);
 const LINK_RANK = new Map(
-  [Platform.ens, Platform.farcaster, Platform.lens].map((p, i) => [p, i]),
+  [Platform.ens, Platform.lens, Platform.farcaster].map((p, i) => [p, i]),
 );
 
 type EtherscanLinkItem = {
   platform: string;
-  link: string;
   icon: string;
   color: string;
   bgColor: string;
+  link: string;
 };
 
 type LinkSource = Pick<ProfileResponse, "platform" | "links"> & {
@@ -75,10 +75,10 @@ const toLinkItem = (platform: string, link: string): EtherscanLinkItem => {
   const { icon, color = "" } = getPlatform(platform as Platform);
   return {
     platform,
-    link,
     icon: `${WEB3BIO}/${icon}`,
     color,
     bgColor: hexToBgColor(color),
+    link,
   };
 };
 
