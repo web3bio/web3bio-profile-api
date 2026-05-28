@@ -1,14 +1,20 @@
-import { Platform, type ProfileResponse } from "web3bio-profile-kit/types";
+import {
+  Network,
+  Platform,
+  type ProfileResponse,
+  type SocialLinks,
+} from "web3bio-profile-kit/types";
 import {
   getPlatform,
   isSameAddress,
   isValidEthereumAddress,
+  isWeb3Address,
 } from "web3bio-profile-kit/utils";
-import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
-import { SOCIAL_PLATFORMS } from "@/utils/base";
+import { extractSortedProfileRecords } from "@/app/api/profile/[handle]/utils";
+import { generateSocialLinks, SOCIAL_PLATFORMS } from "@/utils/base";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { resolveHandle } from "@/utils/resolver";
-import type { AuthHeaders } from "@/utils/types";
+import { resolveEipAssetURL, resolveHandle } from "@/utils/resolver";
+import type { AuthHeaders, IdentityGraphEdge, ProfileRecord } from "@/utils/types";
 import { errorHandle, formatText, normalizeText, respondJson } from "@/utils/utils";
 
 export const ALLOWED_PLATFORMS = new Set([
@@ -21,97 +27,232 @@ export const ALLOWED_PLATFORMS = new Set([
 ]);
 
 const WEB3BIO = "https://web3.bio";
+const BG_OPACITY = 10;
 const NETWORK_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
+const WEBSITE_PLATFORMS = new Set([Platform.website, Platform.url]);
 const LINK_RANK = new Map(
   [Platform.ens, Platform.farcaster, Platform.lens].map((p, i) => [p, i]),
 );
 
-const platformIcon = (platform: Platform | string) =>
-  `${WEB3BIO}/${getPlatform(platform as Platform).icon}`;
+type EtherscanLinkItem = {
+  platform: string;
+  link: string;
+  icon: string;
+  color: string;
+  bgColor: string;
+};
+
+type LinkSource = Pick<ProfileResponse, "platform" | "links"> & {
+  identity?: string;
+};
+
+const bgColorCache = new Map<string, string>();
+
+const hexToBgColor = (hex: string) => {
+  if (!hex) return "";
+  const cached = bgColorCache.get(hex);
+  if (cached !== undefined) return cached;
+
+  const normalized = hex.replace("#", "");
+  if (normalized.length !== 6) {
+    bgColorCache.set(hex, "");
+    return "";
+  }
+
+  const ratio = BG_OPACITY / 100;
+  const blend = (channel: number) =>
+    Math.round(channel * ratio + 255 * (1 - ratio));
+  const bgColor = `#${[0, 2, 4]
+    .map((index) => blend(parseInt(normalized.slice(index, index + 2), 16)))
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("")}`;
+
+  bgColorCache.set(hex, bgColor);
+  return bgColor;
+};
+
+const toLinkItem = (platform: string, link: string): EtherscanLinkItem => {
+  const { icon, color = "" } = getPlatform(platform as Platform);
+  return {
+    platform,
+    link,
+    icon: `${WEB3BIO}/${icon}`,
+    color,
+    bgColor: hexToBgColor(color),
+  };
+};
+
+const formatBio = (
+  identity: string,
+  displayName: string,
+  description: string | null,
+) => {
+  if (!description) return "";
+  if (displayName !== identity) return `${identity} · ${description}`;
+  return description;
+};
+
+const toDisplayName = (profile: ProfileRecord) =>
+  profile.displayName ||
+  (isWeb3Address(profile.identity)
+    ? formatText(profile.identity)
+    : profile.identity);
 
 const mapLinks = (
-  all: ProfileResponse[],
-  source: ProfileResponse[],
+  sources: LinkSource[],
   queryPlatform: Platform,
   aggregate: boolean,
-) => {
-  const links = new Map<string, { platform: string; icon: string; link: string }>();
+): EtherscanLinkItem[] => {
+  const links = new Map<string, EtherscanLinkItem>();
   const websites = new Set<string>();
+  let hasEnsLink = false;
 
-  for (const { platform: owner, links: items } of source) {
-    if (!items) continue;
-    for (const [platform, value] of Object.entries(items)) {
+  for (const { platform: ownerPlatform, links: linkItems } of sources) {
+    if (!linkItems) continue;
+
+    for (const [platform, value] of Object.entries(linkItems)) {
       if (!value?.handle || !value.link) continue;
-      if (SOCIAL_PLATFORMS.has(owner) && platform !== owner) continue;
-      if (platform === Platform.website || platform === Platform.url) {
-        const key = resolveHandle(value.handle, Platform.website);
-        if (!key || websites.has(key)) continue;
-        websites.add(key);
+      if (SOCIAL_PLATFORMS.has(ownerPlatform) && platform !== ownerPlatform) {
+        continue;
       }
-      const key = `${platform},${value.handle.toLowerCase()}`;
-      if (!links.has(key)) {
-        links.set(key, { platform, link: value.link, icon: platformIcon(platform) });
+
+      if (WEBSITE_PLATFORMS.has(platform as Platform)) {
+        const websiteKey = resolveHandle(value.handle, Platform.website);
+        if (!websiteKey || websites.has(websiteKey)) continue;
+        websites.add(websiteKey);
       }
+
+      const dedupeKey = `${platform},${value.handle.toLowerCase()}`;
+      if (links.has(dedupeKey)) continue;
+
+      if (platform === Platform.ens) hasEnsLink = true;
+      links.set(dedupeKey, toLinkItem(platform, value.link));
     }
   }
 
   const result = [...links.values()];
-  if (
-    aggregate &&
-    queryPlatform !== Platform.ens &&
-    !result.some((l) => l.platform === Platform.ens)
-  ) {
-    const ens = all.find((p) => p.platform === Platform.ens);
-    if (ens) {
-      result.push({
-        platform: Platform.ens,
-        link: `${WEB3BIO}/${ens.identity}`,
-        icon: platformIcon(Platform.ens),
-      });
+  if (aggregate && queryPlatform !== Platform.ens && !hasEnsLink) {
+    const ensProfile = sources.find((item) => item.platform === Platform.ens);
+    if (ensProfile?.identity) {
+      result.push(toLinkItem(Platform.ens, `${WEB3BIO}/${ensProfile.identity}`));
     }
   }
 
   return result.sort(
-    (a, b) =>
-      (LINK_RANK.get(a.platform as Platform) ?? 99) -
-      (LINK_RANK.get(b.platform as Platform) ?? 99),
+    (left, right) =>
+      (LINK_RANK.get(left.platform as Platform) ?? 99) -
+      (LINK_RANK.get(right.platform as Platform) ?? 99),
   );
 };
 
 const pickProfile = (
-  profiles: ProfileResponse[],
+  profiles: ProfileRecord[],
   handle: string,
   platform: Platform,
 ) => {
   if (NETWORK_PLATFORMS.has(platform)) {
     return (
-      profiles.find((p) => p.address && isSameAddress(p.address, handle)) ??
+      profiles.find((profile) =>
+        profile.address ? isSameAddress(profile.address, handle) : false,
+      ) ??
       profiles.find(
-        (p) => p.platform === platform && isSameAddress(p.identity, handle),
+        (profile) =>
+          profile.platform === platform &&
+          isSameAddress(profile.identity, handle),
       )
     );
   }
-  const identity = normalizeText(handle);
+
+  const normalizedIdentity = normalizeText(handle);
   return profiles.find(
-    (p) => p.platform === platform && p.identity === identity,
+    (profile) =>
+      profile.platform === platform &&
+      profile.identity === normalizedIdentity,
   );
 };
 
-const toEthFallback = (handle: string, profiles: ProfileResponse[]) => {
+const toEthFallback = (
+  handle: string,
+  candidateRecords: ProfileRecord[],
+): ProfileRecord => {
   const address =
     (isValidEthereumAddress(handle) && handle) ||
-    profiles.find((p) => p.address && isValidEthereumAddress(p.address))
-      ?.address ||
+    candidateRecords.find(
+      (profile) => profile.address && isValidEthereumAddress(profile.address),
+    )?.address ||
     handle;
+
   return {
     address,
     identity: address,
     platform: Platform.ethereum,
     displayName: formatText(address),
     avatar: null,
-    description: null,
-  } as ProfileResponse;
+    description: "",
+  } as ProfileRecord;
 };
+
+const resolveProfile = (
+  allowedRecords: ProfileRecord[],
+  allRecords: ProfileRecord[],
+  handle: string,
+  platform: Platform,
+) =>
+  pickProfile(allowedRecords, handle, platform) ??
+  toEthFallback(
+    handle,
+    allowedRecords.length > 0 ? allowedRecords : allRecords,
+  );
+
+const resolveAddress = (profile: ProfileRecord) => {
+  if (profile.platform !== Platform.farcaster) {
+    return profile.address || "";
+  }
+
+  const addresses = profile.addresses;
+  if (!addresses?.length) return profile.address || "";
+
+  const primaryAddress =
+    addresses.find(
+      (item) => item.network === Network.ethereum && item.isPrimary,
+    ) || addresses.find((item) => item.isPrimary);
+
+  return (
+    primaryAddress?.address ||
+    addresses.find((item) => item.network === Network.ethereum)?.address ||
+    addresses[0].address ||
+    profile.address ||
+    ""
+  );
+};
+
+const resolveAvatar = async (avatar: string | null | undefined) => {
+  if (!avatar) return null;
+
+  try {
+    const resolved = await resolveEipAssetURL(avatar);
+    if (!resolved) return null;
+    new URL(resolved);
+    return resolved;
+  } catch {
+    return null;
+  }
+};
+
+const buildLinkSources = async (
+  records: ProfileRecord[],
+  edges: IdentityGraphEdge[] | undefined,
+): Promise<LinkSource[]> =>
+  Promise.all(
+    records.map(async (record) => {
+      const { links } = await generateSocialLinks(record, edges);
+      return {
+        platform: record.platform,
+        identity: record.identity,
+        links: links as SocialLinks,
+      };
+    }),
+  );
 
 export const resolveEtherscanHandle = async (
   handle: string,
@@ -119,50 +260,50 @@ export const resolveEtherscanHandle = async (
   headers: AuthHeaders,
   pathname: string,
 ) => {
-  const result = await resolveWithIdentityGraph({
+  const response = await queryIdentityGraph(
+    QueryType.GET_PROFILES,
     handle,
     platform,
-    pathname,
-    response: await queryIdentityGraph(
-      QueryType.GET_PROFILES,
-      handle,
-      platform,
-      headers,
-    ),
-  });
+    headers,
+  );
+  const recordsResult = extractSortedProfileRecords(handle, platform, response);
 
-  if ("message" in result) {
+  if ("message" in recordsResult) {
     return errorHandle({
-      identity: result.identity,
+      identity: recordsResult.identity,
       path: pathname,
-      platform: result.platform,
-      code: result.code,
-      message: result.message,
+      platform: recordsResult.platform,
+      code: recordsResult.code,
+      message: recordsResult.message,
     });
   }
 
-  const profiles = (result as ProfileResponse[]).filter((p) =>
-    ALLOWED_PLATFORMS.has(p.platform as Platform),
+  const allowedRecords = recordsResult.filter((record) =>
+    ALLOWED_PLATFORMS.has(record.platform),
   );
-  const profile =
-    pickProfile(profiles, handle, platform) ?? toEthFallback(handle, profiles);
-  const aggregate = !NETWORK_PLATFORMS.has(profile.platform);
+  const profile = resolveProfile(
+    allowedRecords,
+    recordsResult,
+    handle,
+    platform,
+  );
+  const shouldAggregateLinks = !NETWORK_PLATFORMS.has(profile.platform);
+  const linkRecords = shouldAggregateLinks ? allowedRecords : [profile];
+  const edges = response.data?.identity?.identityGraph?.edges;
+
+  const [avatar, linkSources] = await Promise.all([
+    resolveAvatar(profile.avatar),
+    buildLinkSources(linkRecords, edges),
+  ]);
+  const displayName = toDisplayName(profile);
 
   return respondJson({
-    address: profile.address || "",
+    address: resolveAddress(profile),
     identity: profile.identity,
     platform: profile.platform,
-    displayName: profile.displayName || profile.identity,
-    avatar: profile.avatar,
-    description: profile.description,
-    bio: profile.description
-      ? `${profile.identity} · ${profile.description}`
-      : profile.identity,
-    links: mapLinks(
-      profiles,
-      aggregate ? profiles : [profile],
-      platform,
-      aggregate,
-    ),
+    displayName,
+    avatar,
+    bio: formatBio(profile.identity, displayName, profile.description || null),
+    links: mapLinks(linkSources, platform, shouldAggregateLinks),
   });
 };
