@@ -46,11 +46,10 @@ const processProfileAvatar = async (
 };
 
 const processJson = async (json: IdentityGraphQueryResponse) => {
-  const _json = structuredClone(json);
-  const identity = _json?.data?.identity;
+  const identity = json?.data?.identity;
 
   if (!identity) {
-    return _json;
+    return json;
   }
 
   const avatarTasks: Promise<void>[] = [];
@@ -109,7 +108,7 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
   if (avatarTasks.length > 0) {
     await Promise.allSettled(avatarTasks);
   }
-  return _json;
+  return json;
 };
 
 export async function GET(req: NextRequest) {

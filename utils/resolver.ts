@@ -88,11 +88,11 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
   }
 };
 
-export const resolveEipAssetURL = async (
-  source: string | null,
+const eipAssetCache = new Map<string, Promise<string | null>>();
+
+const resolveEipAssetURLUncached = async (
+  normalized: string,
 ): Promise<string | null> => {
-  const normalized = source?.trim();
-  if (!normalized) return null;
   const fallback = () => resolveMediaURL(normalized);
 
   const eipMatch = normalized.match(REGEX.EIP);
@@ -111,7 +111,6 @@ export const resolveEipAssetURL = async (
     return fallback();
   }
 
-  // Try OpenSea first
   const openseaApiKey = process.env.OPENSEA_API_KEY;
   if (openseaApiKey) {
     try {
@@ -131,7 +130,6 @@ export const resolveEipAssetURL = async (
     }
   }
 
-  // Fallback to Alchemy
   const alchemyApiKey = process.env.ALCHEMY_NFT_API_KEY;
   if (alchemyApiKey) {
     const alchemyBase = getAlchemyBaseUrl(network as Network);
@@ -153,8 +151,21 @@ export const resolveEipAssetURL = async (
     }
   }
 
-  // Final fallback
   return fallback();
+};
+
+export const resolveEipAssetURL = async (
+  source: string | null,
+): Promise<string | null> => {
+  const normalized = source?.trim();
+  if (!normalized) return null;
+
+  let pending = eipAssetCache.get(normalized);
+  if (!pending) {
+    pending = resolveEipAssetURLUncached(normalized);
+    eipAssetCache.set(normalized, pending);
+  }
+  return pending;
 };
 
 const ALCHEMY_BASE_BY_NETWORK: Partial<Record<Network, string>> = {

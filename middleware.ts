@@ -2,7 +2,9 @@ import { type NextRequest, NextResponse } from "next/server";
 import { extractClientIp } from "@/utils/ip";
 
 export const config = {
-  matcher: ["/(avatar|domain|ns|profile|credential|search|wallet)/:path*"],
+  matcher: [
+    "/(avatar|domain|ns|profile|credential|search|wallet|partner)/:path*",
+  ],
 };
 
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";

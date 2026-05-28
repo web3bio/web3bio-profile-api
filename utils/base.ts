@@ -161,8 +161,12 @@ export async function generateProfileStruct(
   edges?: IdentityGraphEdge[],
   aliases?: ResolvedAliases[],
 ): Promise<ProfileResponse | NSResponse> {
-  const avatar = await processProfileAvatar(data);
-  // Basic profile data used in both response types
+  const [avatar, header] = await Promise.all([
+    processProfileAvatar(data),
+    data.texts?.header
+      ? resolveEipAssetURL(data.texts.header)
+      : Promise.resolve(null),
+  ]);
   const nsObj: NSResponse = {
     address:
       data.platform !== Platform.farcaster
@@ -177,9 +181,7 @@ export async function generateProfileStruct(
         : data.identity),
     avatar,
     description: data.description || null,
-    header: data.texts?.header
-      ? await resolveEipAssetURL(data.texts.header)
-      : null,
+    header,
     status: data.texts?.status || null,
   };
 
@@ -252,60 +254,28 @@ export const resolveIdentityHandle = async (
   }
 };
 
-export const processJson = async (json: IdentityGraphQueryResponse) => {
-  const _json = structuredClone(json);
-  const identity = _json?.data?.identity;
-
-  if (!identity) return _json;
-
-  const promises: Promise<unknown>[] = [];
-
-  // Process main identity avatar
-  if (identity.profile) {
-    promises.push(
-      processProfileAvatar(identity.profile).then((processedAvatar) => {
-        identity.profile.avatar = processedAvatar;
-      }),
-    );
-  }
+export const processJson = (json: IdentityGraphQueryResponse) => {
+  const identity = json?.data?.identity;
+  if (!identity) return json;
 
   const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
+  if (vertices.length === 0) return json;
 
-  if (vertices.length > 0) {
-    // Find current identity in vertices
-    const currentIndex = vertices.findIndex(
-      (vertex) =>
-        vertex.identity === identity.identity &&
-        vertex.platform === identity.platform,
-    );
+  const currentIndex = vertices.findIndex(
+    (vertex) =>
+      vertex.identity === identity.identity &&
+      vertex.platform === identity.platform,
+  );
 
-    // Ensure current identity is at the front
-    if (currentIndex === -1) {
-      // Current identity not in vertices, add it at the beginning
-      const currentIdentity = { ...identity };
-      delete currentIdentity.identityGraph;
-      vertices.unshift(currentIdentity);
-    } else if (currentIndex > 0) {
-      // Current identity exists but not at front, move it to front
-      const [currentIdentity] = vertices.splice(currentIndex, 1);
-      vertices.unshift(currentIdentity);
-    }
-
-    // Process avatars for all vertices with profiles
-    const avatarPromises = vertices
-      .filter((vertex) => vertex?.profile?.avatar)
-      .map(async (vertex) => {
-        const processedAvatar = await processProfileAvatar(vertex.profile);
-        vertex.profile.avatar = processedAvatar;
-      });
-
-    if (avatarPromises.length > 0) {
-      promises.push(Promise.allSettled(avatarPromises));
-    }
+  if (currentIndex === -1) {
+    const currentIdentity = { ...identity };
+    delete currentIdentity.identityGraph;
+    vertices.unshift(currentIdentity);
+  } else if (currentIndex > 0) {
+    vertices.unshift(...vertices.splice(currentIndex, 1));
   }
 
-  await Promise.allSettled(promises);
-  return _json;
+  return json;
 };
 
 const resolveContenthash = async (
@@ -361,12 +331,14 @@ const resolveContenthash = async (
   return null;
 };
 
-const resolvePlatformByEnsText = (textKey: string): Platform | undefined => {
-  const lowered = textKey.toLowerCase();
-  return Array.from(PLATFORM_DATA.keys()).find((platformKey) =>
-    PLATFORM_DATA.get(platformKey)?.ensText?.includes(lowered),
-  );
-};
+const ENS_TEXT_TO_PLATFORM = new Map<string, Platform>(
+  Array.from(PLATFORM_DATA.entries()).flatMap(([platform, data]) =>
+    (data.ensText ?? []).map((text) => [text.toLowerCase(), platform]),
+  ),
+);
+
+const resolvePlatformByEnsText = (textKey: string): Platform | undefined =>
+  ENS_TEXT_TO_PLATFORM.get(textKey.toLowerCase());
 
 const setSocialLink = (
   links: Record<string, SocialLinksItem>,
