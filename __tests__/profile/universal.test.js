@@ -207,7 +207,7 @@ describe("Test For Universal Profile API", () => {
       path: "/profile/krys.eth",
       assertJson: (json) => {
         const baseItem = findByPlatform(json, "basenames");
-        expect(baseItem.links.farcaster.handle).toBe("krys.eth");
+        expect(baseItem.links.farcaster.handle).toBe("krys");
       },
     },
   ];

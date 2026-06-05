@@ -165,16 +165,6 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    if (isSingleWeb2Identity(graphIdentity)) {
-      return createSearchError(
-        identity,
-        pathname,
-        (platform || "graph") as Platform,
-        404,
-        ErrorMessages.NOT_FOUND,
-      );
-    }
-
     const result = await processJson(envelope as IdentityGraphQueryResponse);
     return respondJson(result);
   } catch (e: unknown) {
@@ -188,14 +178,3 @@ export async function GET(req: NextRequest) {
   }
 }
 
-const isSingleWeb2Identity = (identity: IdentityRecord): boolean => {
-  if (!identity?.identityGraph) {
-    return true;
-  }
-  if (!isWeb2Platform(identity.platform)) {
-    return false;
-  }
-
-  const { vertices, edges } = identity.identityGraph;
-  return vertices.length === 1 && edges.length === 0;
-};
