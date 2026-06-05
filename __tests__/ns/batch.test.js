@@ -5,7 +5,7 @@ describe("Test For Batch Query", () => {
     "ens,sujiyan.eth",
     "ens,vitalik.eth",
     "basenames,tony.base.eth",
-    "farcaster,dwr.eth",
+    "farcaster,dwr",
   ];
 
   it("It should respond 200 for Batch Query GET", async () => {

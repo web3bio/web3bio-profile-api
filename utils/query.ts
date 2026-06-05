@@ -707,17 +707,13 @@ export async function queryIdentityGraphBatch(
       getQuery(QueryType.GET_BATCH),
       { ids: queryIds },
     );
-
     if (!r.ok) {
       throw new Error(`HTTP ${r.status}: ${r.statusText}`);
     }
-
     const json = r.body as any;
-
     if (!json?.data?.identities) {
       return json || [];
     }
-
     const processedResults = await Promise.allSettled(
       json.data.identities.map(
         async (identity: {
