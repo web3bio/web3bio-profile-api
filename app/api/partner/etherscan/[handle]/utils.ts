@@ -27,6 +27,7 @@ export const ALLOWED_PLATFORMS = new Set([
 ]);
 
 const WEB3BIO = "https://web3.bio";
+const BORDER_OPACITY = 20;
 const BG_OPACITY = 10;
 const NETWORK_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const WEBSITE_PLATFORMS = new Set([Platform.website, Platform.url]);
@@ -37,7 +38,7 @@ const LINK_RANK = new Map(
 type EtherscanLinkItem = {
   platform: string;
   icon: string;
-  color: string;
+  borderColor: string;
   bgColor: string;
   link: string;
 };
@@ -46,38 +47,39 @@ type LinkSource = Pick<ProfileResponse, "platform" | "links"> & {
   identity?: string;
 };
 
-const bgColorCache = new Map<string, string>();
+const blendCache = new Map<string, string>();
 
-const hexToBgColor = (hex: string) => {
+const hexBlendWithWhite = (hex: string, opacity: number) => {
   if (!hex) return "";
-  const cached = bgColorCache.get(hex);
+  const cacheKey = `${hex}:${opacity}`;
+  const cached = blendCache.get(cacheKey);
   if (cached !== undefined) return cached;
 
   const normalized = hex.replace("#", "");
   if (normalized.length !== 6) {
-    bgColorCache.set(hex, "");
+    blendCache.set(cacheKey, "");
     return "";
   }
 
-  const ratio = BG_OPACITY / 100;
+  const ratio = opacity / 100;
   const blend = (channel: number) =>
     Math.round(channel * ratio + 255 * (1 - ratio));
-  const bgColor = `#${[0, 2, 4]
+  const blended = `#${[0, 2, 4]
     .map((index) => blend(parseInt(normalized.slice(index, index + 2), 16)))
     .map((value) => value.toString(16).padStart(2, "0"))
     .join("")}`;
 
-  bgColorCache.set(hex, bgColor);
-  return bgColor;
+  blendCache.set(cacheKey, blended);
+  return blended;
 };
 
 const toLinkItem = (platform: string, link: string): EtherscanLinkItem => {
-  const { icon, color = "" } = getPlatform(platform as Platform);
+  const { icon, color: platformColor = "" } = getPlatform(platform as Platform);
   return {
     platform,
     icon: `${WEB3BIO}/${icon}`,
-    color,
-    bgColor: hexToBgColor(color),
+    borderColor: hexBlendWithWhite(platformColor, BORDER_OPACITY),
+    bgColor: hexBlendWithWhite(platformColor, BG_OPACITY),
     link,
   };
 };
