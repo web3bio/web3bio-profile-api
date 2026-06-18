@@ -37,10 +37,33 @@ const LINK_RANK = new Map(
 
 type EtherscanLinkItem = {
   platform: string;
+  handle: string;
   icon: string;
   borderColor: string;
   bgColor: string;
   link: string;
+};
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+
+const toLinkHtml = ({
+  platform,
+  icon,
+  borderColor,
+  bgColor,
+}: EtherscanLinkItem) => {
+  const safeIcon = escapeHtml(icon);
+  const safePlatform = escapeHtml(platform);
+  const safeBorderColor = escapeHtml(borderColor);
+  const safeBgColor = escapeHtml(bgColor);
+
+  return `<span style='display:inline-flex;align-items:center;padding:4px;border:1px solid ${safeBorderColor};background-color:${safeBgColor};border-radius:6px;margin-right:4px;'><img src='${safeIcon}' alt='${safePlatform}' width='14' height='14' style='display:block;flex-shrink:0;opacity:0.5;' /></span>`;
 };
 
 type LinkSource = Pick<ProfileResponse, "platform" | "links"> & {
@@ -73,10 +96,15 @@ const hexBlendWithWhite = (hex: string, opacity: number) => {
   return blended;
 };
 
-const toLinkItem = (platform: string, link: string): EtherscanLinkItem => {
+const toLinkItem = (
+  platform: string,
+  link: string,
+  handle: string,
+): EtherscanLinkItem => {
   const { icon, color: platformColor = "" } = getPlatform(platform as Platform);
   return {
     platform,
+    handle,
     icon: `${WEB3BIO}/${icon}`,
     borderColor: hexBlendWithWhite(platformColor, BORDER_OPACITY),
     bgColor: hexBlendWithWhite(platformColor, BG_OPACITY),
@@ -104,7 +132,7 @@ const mapLinks = (
   sources: LinkSource[],
   queryPlatform: Platform,
   aggregate: boolean,
-): EtherscanLinkItem[] => {
+): Record<string, string> => {
   const links = new Map<string, EtherscanLinkItem>();
   const websites = new Set<string>();
   let hasEnsLink = false;
@@ -128,7 +156,10 @@ const mapLinks = (
       if (links.has(dedupeKey)) continue;
 
       if (platform === Platform.ens) hasEnsLink = true;
-      links.set(dedupeKey, toLinkItem(platform, value.link));
+      links.set(
+        dedupeKey,
+        toLinkItem(platform, value.link, value.handle),
+      );
     }
   }
 
@@ -136,14 +167,24 @@ const mapLinks = (
   if (aggregate && queryPlatform !== Platform.ens && !hasEnsLink) {
     const ensProfile = sources.find((item) => item.platform === Platform.ens);
     if (ensProfile?.identity) {
-      result.push(toLinkItem(Platform.ens, `${WEB3BIO}/${ensProfile.identity}`));
+      result.push(
+        toLinkItem(
+          Platform.ens,
+          `${WEB3BIO}/${ensProfile.identity}`,
+          ensProfile.identity,
+        ),
+      );
     }
   }
 
-  return result.sort(
+  const sorted = result.sort(
     (left, right) =>
       (LINK_RANK.get(left.platform as Platform) ?? 99) -
       (LINK_RANK.get(right.platform as Platform) ?? 99),
+  );
+
+  return Object.fromEntries(
+    sorted.map((item, index) => [`link${index + 1}`, toLinkHtml(item)]),
   );
 };
 
