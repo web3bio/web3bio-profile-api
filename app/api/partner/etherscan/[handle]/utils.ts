@@ -37,11 +37,9 @@ const LINK_RANK = new Map(
 
 type EtherscanLinkItem = {
   platform: string;
-  handle: string;
   icon: string;
   borderColor: string;
   bgColor: string;
-  link: string;
 };
 
 const escapeHtml = (value: string) =>
@@ -96,19 +94,13 @@ const hexBlendWithWhite = (hex: string, opacity: number) => {
   return blended;
 };
 
-const toLinkItem = (
-  platform: string,
-  link: string,
-  handle: string,
-): EtherscanLinkItem => {
+const toLinkItem = (platform: string): EtherscanLinkItem => {
   const { icon, color: platformColor = "" } = getPlatform(platform as Platform);
   return {
     platform,
-    handle,
     icon: `${WEB3BIO}/${icon}`,
     borderColor: hexBlendWithWhite(platformColor, BORDER_OPACITY),
     bgColor: hexBlendWithWhite(platformColor, BG_OPACITY),
-    link,
   };
 };
 
@@ -141,7 +133,7 @@ const mapLinks = (
     if (!linkItems) continue;
 
     for (const [platform, value] of Object.entries(linkItems)) {
-      if (!value?.handle || !value.link) continue;
+      if (!value?.handle) continue;
       if (SOCIAL_PLATFORMS.has(ownerPlatform) && platform !== ownerPlatform) {
         continue;
       }
@@ -156,10 +148,7 @@ const mapLinks = (
       if (links.has(dedupeKey)) continue;
 
       if (platform === Platform.ens) hasEnsLink = true;
-      links.set(
-        dedupeKey,
-        toLinkItem(platform, value.link, value.handle),
-      );
+      links.set(dedupeKey, toLinkItem(platform));
     }
   }
 
@@ -167,13 +156,7 @@ const mapLinks = (
   if (aggregate && queryPlatform !== Platform.ens && !hasEnsLink) {
     const ensProfile = sources.find((item) => item.platform === Platform.ens);
     if (ensProfile?.identity) {
-      result.push(
-        toLinkItem(
-          Platform.ens,
-          `${WEB3BIO}/${ensProfile.identity}`,
-          ensProfile.identity,
-        ),
-      );
+      result.push(toLinkItem(Platform.ens));
     }
   }
 
