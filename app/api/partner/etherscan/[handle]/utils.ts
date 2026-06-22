@@ -32,8 +32,11 @@ const BG_OPACITY = 10;
 const NETWORK_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const WEBSITE_PLATFORMS = new Set([Platform.website, Platform.url]);
 const LINK_RANK = new Map(
-  [Platform.ens, Platform.lens, Platform.farcaster].map((p, i) => [p, i]),
+  [Platform.ens, Platform.lens, Platform.farcaster, Platform.twitter].map(
+    (p, i) => [p, i],
+  ),
 );
+const MAX_LINK_PLATFORMS = 6;
 
 type EtherscanLinkItem = {
   platform: string;
@@ -144,11 +147,10 @@ const mapLinks = (
         websites.add(websiteKey);
       }
 
-      const dedupeKey = `${platform},${value.handle.toLowerCase()}`;
-      if (links.has(dedupeKey)) continue;
+      if (links.has(platform)) continue;
 
       if (platform === Platform.ens) hasEnsLink = true;
-      links.set(dedupeKey, toLinkItem(platform));
+      links.set(platform, toLinkItem(platform));
     }
   }
 
@@ -160,11 +162,13 @@ const mapLinks = (
     }
   }
 
-  const sorted = result.sort(
-    (left, right) =>
-      (LINK_RANK.get(left.platform as Platform) ?? 99) -
-      (LINK_RANK.get(right.platform as Platform) ?? 99),
-  );
+  const sorted = result
+    .sort(
+      (left, right) =>
+        (LINK_RANK.get(left.platform as Platform) ?? 99) -
+        (LINK_RANK.get(right.platform as Platform) ?? 99),
+    )
+    .slice(0, MAX_LINK_PLATFORMS);
 
   return Object.fromEntries(
     sorted.map((item, index) => [`link${index + 1}`, toLinkHtml(item)]),
