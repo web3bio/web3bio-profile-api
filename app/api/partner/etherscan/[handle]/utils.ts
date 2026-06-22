@@ -13,9 +13,9 @@ import {
 import { extractSortedProfileRecords } from "@/app/api/profile/[handle]/utils";
 import { generateSocialLinks, SOCIAL_PLATFORMS } from "@/utils/base";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
-import { resolveEipAssetURL, resolveHandle } from "@/utils/resolver";
+import { resolveHandle } from "@/utils/resolver";
 import type { AuthHeaders, IdentityGraphEdge, ProfileRecord } from "@/utils/types";
-import { errorHandle, formatText, normalizeText, respondJson } from "@/utils/utils";
+import { errorHandle, formatText, normalizeText, respondJson, BASE_URL } from "@/utils/utils";
 
 export const ALLOWED_PLATFORMS = new Set([
   Platform.ens,
@@ -256,18 +256,14 @@ const resolveAddress = (profile: ProfileRecord) => {
   );
 };
 
-const resolveAvatar = async (avatar: string | null | undefined) => {
-  if (!avatar) return null;
+const buildDefaultAvatarUrl = (platform: Platform, identity: string) =>
+  `${BASE_URL}/avatar/svg/${platform},${encodeURIComponent(identity)}`;
 
-  try {
-    const resolved = await resolveEipAssetURL(avatar);
-    if (!resolved) return null;
-    new URL(resolved);
-    return resolved;
-  } catch {
-    return null;
-  }
-};
+const resolveAvatar = (
+  avatar: string | null | undefined,
+  platform: Platform,
+  identity: string,
+) => avatar || buildDefaultAvatarUrl(platform, identity);
 
 const buildLinkSources = async (
   records: ProfileRecord[],
@@ -321,10 +317,12 @@ export const resolveEtherscanHandle = async (
   const linkRecords = shouldAggregateLinks ? allowedRecords : [profile];
   const edges = response.data?.identity?.identityGraph?.edges;
 
-  const [avatar, linkSources] = await Promise.all([
-    resolveAvatar(profile.avatar),
-    buildLinkSources(linkRecords, edges),
-  ]);
+  const linkSources = await buildLinkSources(linkRecords, edges);
+  const avatar = resolveAvatar(
+    profile.avatar,
+    profile.platform,
+    profile.identity,
+  );
   const displayName = toDisplayName(profile);
 
   return respondJson({
