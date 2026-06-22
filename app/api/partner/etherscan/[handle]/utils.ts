@@ -15,7 +15,13 @@ import { generateSocialLinks, SOCIAL_PLATFORMS } from "@/utils/base";
 import { QueryType, queryIdentityGraph } from "@/utils/query";
 import { resolveEipAssetURL, resolveHandle } from "@/utils/resolver";
 import type { AuthHeaders, IdentityGraphEdge, ProfileRecord } from "@/utils/types";
-import { errorHandle, formatText, normalizeText, respondJson } from "@/utils/utils";
+import {
+  BASE_URL,
+  errorHandle,
+  formatText,
+  normalizeText,
+  respondJson,
+} from "@/utils/utils";
 
 export const ALLOWED_PLATFORMS = new Set([
   Platform.ens,
@@ -32,7 +38,9 @@ const BG_OPACITY = 10;
 const NETWORK_PLATFORMS = new Set([Platform.ethereum, Platform.solana]);
 const WEBSITE_PLATFORMS = new Set([Platform.website, Platform.url]);
 const LINK_RANK = new Map(
-  [Platform.ens, Platform.lens, Platform.farcaster].map((p, i) => [p, i]),
+  [Platform.ens, Platform.lens, Platform.farcaster, Platform.twitter].map(
+    (p, i) => [p, i],
+  ),
 );
 
 type EtherscanLinkItem = {
@@ -144,11 +152,10 @@ const mapLinks = (
         websites.add(websiteKey);
       }
 
-      const dedupeKey = `${platform},${value.handle.toLowerCase()}`;
-      if (links.has(dedupeKey)) continue;
+      if (links.has(platform)) continue;
 
       if (platform === Platform.ens) hasEnsLink = true;
-      links.set(dedupeKey, toLinkItem(platform));
+      links.set(platform, toLinkItem(platform));
     }
   }
 
@@ -252,16 +259,24 @@ const resolveAddress = (profile: ProfileRecord) => {
   );
 };
 
-const resolveAvatar = async (avatar: string | null | undefined) => {
-  if (!avatar) return null;
+const toDefaultAvatarUrl = (platform: Platform, identity: string) =>
+  `${BASE_URL}/avatar/svg/${platform},${encodeURIComponent(identity)}`;
+
+const resolveAvatar = async (
+  avatar: string | null | undefined,
+  platform: Platform,
+  identity: string,
+): Promise<string> => {
+  const fallback = toDefaultAvatarUrl(platform, identity);
+  if (!avatar) return fallback;
 
   try {
     const resolved = await resolveEipAssetURL(avatar);
-    if (!resolved) return null;
+    if (!resolved) return fallback;
     new URL(resolved);
     return resolved;
   } catch {
-    return null;
+    return fallback;
   }
 };
 
@@ -318,7 +333,7 @@ export const resolveEtherscanHandle = async (
   const edges = response.data?.identity?.identityGraph?.edges;
 
   const [avatar, linkSources] = await Promise.all([
-    resolveAvatar(profile.avatar),
+    resolveAvatar(profile.avatar, profile.platform, profile.identity),
     buildLinkSources(linkRecords, edges),
   ]);
   const displayName = toDisplayName(profile);
