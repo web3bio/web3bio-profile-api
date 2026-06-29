@@ -56,11 +56,15 @@ export async function GET(
       });
     }
 
-    result.data?.domainAvailableSearch?.sort(
-      (a, b) =>
-        (a.platform === Platform.lens ? 0 : a.platform === Platform.farcaster ? 1 : 99) -
-        (b.platform === Platform.lens ? 0 : b.platform === Platform.farcaster ? 1 : 99),
-    );
+    result.data?.domainAvailableSearch?.sort((a, b) => {
+      if (a.platform === Platform.lens && b.platform === Platform.farcaster) {
+        return -1;
+      }
+      if (a.platform === Platform.farcaster && b.platform === Platform.lens) {
+        return 1;
+      }
+      return 0;
+    });
 
     return respondJson(result);
   } catch (e: unknown) {
