@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
-import { isWeb2Platform } from "web3bio-profile-kit/utils";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import {
   IdentityGraphQueryResponse,
@@ -103,6 +102,16 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
           }),
         );
       });
+
+    if (vertices.length > 1) {
+      const [current, ...rest] = vertices;
+      rest.sort(
+        (a, b) =>
+          (a.platform === Platform.lens ? 0 : a.platform === Platform.farcaster ? 1 : 99) -
+          (b.platform === Platform.lens ? 0 : b.platform === Platform.farcaster ? 1 : 99),
+      );
+      identity.identityGraph!.vertices = [current, ...rest];
+    }
   }
 
   if (avatarTasks.length > 0) {
