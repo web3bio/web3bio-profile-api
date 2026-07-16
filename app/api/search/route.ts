@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
-import { isWeb2Platform } from "web3bio-profile-kit/utils";
 import { resolveEipAssetURL } from "@/utils/resolver";
 import {
   IdentityGraphQueryResponse,

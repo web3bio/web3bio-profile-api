@@ -69,7 +69,7 @@ const toLinkHtml = ({
   const safeBorderColor = escapeHtml(borderColor);
   const safeBgColor = escapeHtml(bgColor);
 
-  return `<span style='display:inline-flex;align-items:center;padding:4px;border:1px solid ${safeBorderColor};background-color:${safeBgColor};border-radius:6px;margin-right:4px;'><img src='${safeIcon}' alt='${safePlatform}' width='14' height='14' style='display:block;flex-shrink:0;opacity:0.5;' /></span>`;
+  return `<span style='display:inline-flex;align-items:center;padding:4px;border:1px solid ${safeBorderColor};background-color:${safeBgColor};border-radius:6px;'><img src='${safeIcon}' alt='${safePlatform}' width='14' height='14' style='display:block;flex-shrink:0;opacity:0.5;' /></span>`;
 };
 
 type LinkSource = Pick<ProfileResponse, "platform" | "links"> & {

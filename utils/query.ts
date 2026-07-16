@@ -448,6 +448,7 @@ const GET_SEARCH_QUERY = `
         network
         address
       }
+      provider
       profile {
         identity
         platform
@@ -466,6 +467,7 @@ const GET_SEARCH_QUERY = `
           isPrimary
           expiredAt
           registeredAt
+          provider
           resolvedAddress {
             network
             address
