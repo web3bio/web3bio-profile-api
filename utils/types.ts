@@ -58,6 +58,7 @@ export interface IdentityRecord {
   managerAddress: AddressRecord[];
   platform: Platform;
   primaryName: string | null;
+  provider?: string | null;
   profile: ProfileRecord;
   status: string;
   updatedAt: number;
