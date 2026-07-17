@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { ErrorMessages } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
   getQuery,
   identityGraphErrorMessage,
@@ -10,7 +10,9 @@ import {
 import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
 
 interface GraphQLEnvelope {
-  data?: unknown;
+  data?: {
+    domainAvailableSearch?: { platform: Platform }[];
+  };
   errors?: unknown;
   code?: number;
   msg?: string;
@@ -53,6 +55,16 @@ export async function GET(
         code: identityGraphErrorStatus(ok, status, result?.code),
       });
     }
+
+    result.data?.domainAvailableSearch?.sort((a, b) => {
+      if (a.platform === Platform.lens && b.platform === Platform.farcaster) {
+        return -1;
+      }
+      if (a.platform === Platform.farcaster && b.platform === Platform.lens) {
+        return 1;
+      }
+      return 0;
+    });
 
     return respondJson(result);
   } catch (e: unknown) {
