@@ -544,6 +544,34 @@ export default async function Home() {
             </p>
           </section>
           <section className="pt-4 pb-4">
+            <h2 className="text-bold h4">Agent Skills</h2>
+            <p>
+              For AI coding agents, we provide{" "}
+              <strong>Web3.bio Agent Skills</strong> — a skill that routes
+              natural-language identity queries to the Profile API (profiles,
+              NS, credentials, avatar, domain, batch, and wallet) with fixed
+              routing and auth boundaries.
+            </p>
+            <p>
+              Install globally with the Skills CLI, then start a new agent chat
+              and ask things like <code>Profile for vitalik.eth</code> or{" "}
+              <code>Avatar for vitalik.eth</code>.
+            </p>
+            <CodeBlock
+              language="bash"
+              code={`npx skills add web3bio/agent-skills -g -y`}
+            />
+            <p>
+              <a
+                href="https://github.com/web3bio/agent-skills"
+                target="_blank"
+                className="btn btn-sm btn-primary pt-4 pb-4"
+              >
+                🤖 View Agent Skills
+              </a>
+            </p>
+          </section>
+          <section className="pt-4 pb-4">
             <h2 className="text-bold h4">API Endpoints</h2>
             <p>
               The main public API endpoint domain for Web3.bio Profile API is{" "}
