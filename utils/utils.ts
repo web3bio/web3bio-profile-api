@@ -4,14 +4,6 @@ import { ErrorMessages, type Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, ErrorHandleProps } from "./types";
 
-type ResponsePlatformOverride = "batch" | "universal";
-type ResponsePlatform = Platform | ResponsePlatformOverride;
-
-const getRequestPlatformHeader = (
-  platform?: ResponsePlatform | null,
-): HeadersInit =>
-  platform ? { "x-request-platform": platform } : {};
-
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const BASE_URL = process.env.PROFILE_ENDPOINT || "https://api.web3.bio";
 export const IMAGE_API_ENDPOINT = "https://images.web3.bio";
@@ -48,7 +40,7 @@ export const errorHandle = ({
       headers: {
         "Cache-Control": "no-store",
         ...headers,
-        ...getRequestPlatformHeader(platform),
+        ...(platform ? { "x-request-platform": platform } : {}),
       },
     },
   );
@@ -56,7 +48,7 @@ export const errorHandle = ({
 
 export const respondJson = (
   data: any,
-  platformOverride?: ResponsePlatformOverride,
+  platformOverride?: Platform,
 ) => {
   const platform =
     platformOverride ?? data?.platform ?? data?.data?.identity?.platform;
@@ -65,7 +57,7 @@ export const respondJson = (
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      ...getRequestPlatformHeader(platform),
+      ...(platform ? { "x-request-platform": platform } : {}),
     },
   });
 };
