@@ -655,5 +655,5 @@ export const resolveUniversalHandle = async (
     });
   }
 
-  return respondJson(resolutionResult);
+  return respondJson(resolutionResult, "universal");
 };

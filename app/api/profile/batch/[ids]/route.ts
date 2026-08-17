@@ -27,7 +27,7 @@ export async function GET(
     }
 
     const resJson = await queryIdentityGraphBatch(ids, false, headers);
-    return respondJson(resJson);
+    return respondJson(resJson, "batch");
   } catch (e: unknown) {
     const isParseError = e instanceof SyntaxError;
 

@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
 
     const resJson = await queryIdentityGraphBatch(ids, true, headers);
-    return respondJson(resJson);
+    return respondJson(resJson, "batch");
   } catch (e: unknown) {
     const isParseError = e instanceof SyntaxError;
 

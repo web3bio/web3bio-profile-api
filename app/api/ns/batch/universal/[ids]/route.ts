@@ -30,7 +30,7 @@ export async function GET(req: NextRequest, { params }: RouteParams) {
     }
 
     const resJson = await queryBatchUniversal(ids, headers);
-    return respondJson(resJson);
+    return respondJson(resJson, "universal");
   } catch (e: unknown) {
     const isParseError = e instanceof SyntaxError;
 
