@@ -22,6 +22,7 @@ import {
   normalizeText,
   respondJson,
 } from "@/utils/utils";
+import { shouldFilterAssociatedLensProfile } from "@/utils/profile-filter";
 import {
   generateProfileStruct,
   processJson,
@@ -83,6 +84,8 @@ const PLATFORM_PRIORITY_MAP = new Map(
   PLATFORM_PRIORITY_ORDER.map((platform, index) => [platform, index]),
 );
 const VALID_PLATFORM_SET = new Set(Object.values(Platform));
+const isUniversalProfilePath = (pathname: string): boolean =>
+  /^\/(?:profile|ns)\/[^/]+$/.test(pathname);
 
 const isPrimaryOrSocialProfile = (identity: IdentityRecord): boolean =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
@@ -517,6 +520,7 @@ export const resolveWithIdentityGraph = async ({
   response,
   pathname,
   includeWeb2Platforms,
+  filterAssociatedLensProfiles = false,
 }: {
   handle: string;
   platform: Platform;
@@ -524,6 +528,7 @@ export const resolveWithIdentityGraph = async ({
   ns?: boolean;
   pathname?: string;
   includeWeb2Platforms?: boolean;
+  filterAssociatedLensProfiles?: boolean;
 }): Promise<ResolveResult> => {
   // Handle error responses early
   if (response.msg) {
@@ -553,6 +558,15 @@ export const resolveWithIdentityGraph = async ({
     handle,
     includeWeb2Platforms,
   );
+  const responseProfiles = filterAssociatedLensProfiles
+    ? sortedProfiles.filter(
+        (profile) =>
+          !shouldFilterAssociatedLensProfile(profile, {
+            identity: handle,
+            platform,
+          }),
+      )
+    : sortedProfiles;
   const farcasterProfiles = extractedProfiles.filter(
     (p) => p.aliases && p.platform === Platform.farcaster,
   );
@@ -561,7 +575,7 @@ export const resolveWithIdentityGraph = async ({
     : [];
 
   // Generate profile structures
-  const profileStructPromises = sortedProfiles.map((profile) =>
+  const profileStructPromises = responseProfiles.map((profile) =>
     generateProfileStruct(
       profile,
       ns,
@@ -643,6 +657,7 @@ export const resolveUniversalHandle = async (
     response,
     pathname,
     includeWeb2Platforms,
+    filterAssociatedLensProfiles: isUniversalProfilePath(pathname),
   });
 
   if (isResolveErrorResult(resolutionResult)) {
