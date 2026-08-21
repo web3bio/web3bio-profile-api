@@ -57,7 +57,7 @@ describe("Test For Universal NS API", () => {
       name: "0xc28... includes linea profile",
       path: "/ns/0xc28de09ad1a20737b92834943558ddfcc88d020d",
       assertJson: (json) => {
-        expect(json.some((x) => x.platform === "linea")).toBe(true);
+        expect(json.some((x) => x.platform === "linea")).toBe(false); // no more primary
       },
     },
     {

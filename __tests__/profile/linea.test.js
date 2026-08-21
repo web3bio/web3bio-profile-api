@@ -24,14 +24,6 @@ describe("Test For Linea Profile API", () => {
       },
     },
     {
-      name: "0xc28de09ad1a20737b92834943558ddfcc88d020d",
-      path: "/profile/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d",
-      assertJson: (json) => {
-        expect(json.identity).toBe("184.linea.eth");
-        expect(json.links.twitter.handle).toBe("184eth");
-      },
-    },
-    {
       name: "tacoz.linea.eth",
       path: "/profile/linea/tacoz.linea",
       assertJson: (json) => {
