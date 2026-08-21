@@ -40,16 +40,24 @@ export const errorHandle = ({
       headers: {
         "Cache-Control": "no-store",
         ...headers,
+        ...(platform ? { "x-request-platform": platform } : {}),
       },
     },
   );
 };
 
-export const respondJson = (data: any) => {
+export const respondJson = (
+  data: any,
+  platformOverride?: Platform,
+) => {
+  const platform =
+    platformOverride ?? data?.platform ?? data?.data?.identity?.platform;
+
   return NextResponse.json(data, {
     status: 200,
     headers: {
       "Content-Type": "application/json",
+      ...(platform ? { "x-request-platform": platform } : {}),
     },
   });
 };

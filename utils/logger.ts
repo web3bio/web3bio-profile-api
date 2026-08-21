@@ -34,6 +34,7 @@ export const withLogging = (handler: any) => {
           query: url.search || "none",
           endpoint: pathParts.slice(0, -1).join("/") || "unknown",
           identity: pathParts[pathParts.length - 1] || "unknown",
+          platform: response.headers.get("x-request-platform") || "unknown",
           status,
           host: request.headers.get("host") || "unknown",
           origin: request.headers.get("origin") || "none",
