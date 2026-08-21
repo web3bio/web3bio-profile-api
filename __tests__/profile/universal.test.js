@@ -174,13 +174,6 @@ describe("Test For Universal Profile API", () => {
         );
       },
     },
-    // {
-    //   name: "emoji ens sorting profile",
-    //   path: "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
-    //   assertJson: (json) => {
-    //     expect(json[0].identity).toBe("🦊🦊🦊.eth");
-    //   },
-    // },
     {
       name: "30315.eth identity",
       path: "/profile/30315.eth",
