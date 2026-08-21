@@ -14,6 +14,7 @@ import {
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
+import { shouldFilterAssociatedLensProfile } from "@/utils/profile-filter";
 
 const createSearchError = (
   identity: string | null,
@@ -44,7 +45,10 @@ const processProfileAvatar = async (
   }
 };
 
-const processJson = async (json: IdentityGraphQueryResponse) => {
+const processJson = async (
+  json: IdentityGraphQueryResponse,
+  directTarget: { identity: string; platform: Platform },
+) => {
   const identity = json?.data?.identity;
 
   if (!identity) {
@@ -62,7 +66,8 @@ const processJson = async (json: IdentityGraphQueryResponse) => {
   }
 
   const isRemovedNode = (v: IdentityRecord) =>
-    v.platform === Platform.clusters && v.identity.includes("/");
+    (v.platform === Platform.clusters && v.identity.includes("/")) ||
+    shouldFilterAssociatedLensProfile(v, directTarget);
 
   const filteredNodes = new Set(
     identity.identityGraph?.vertices
@@ -164,7 +169,10 @@ export async function GET(req: NextRequest) {
       );
     }
 
-    const result = await processJson(envelope as IdentityGraphQueryResponse);
+    const result = await processJson(envelope as IdentityGraphQueryResponse, {
+      identity,
+      platform,
+    });
     return respondJson(result);
   } catch (e: unknown) {
     return createSearchError(
@@ -176,4 +184,3 @@ export async function GET(req: NextRequest) {
     );
   }
 }
-
