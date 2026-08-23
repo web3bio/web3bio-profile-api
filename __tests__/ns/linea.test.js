@@ -10,10 +10,10 @@ describe("Test For Linea NS API", () => {
       },
     },
     {
-      name: "0xc28de09ad1a20737b92834943558ddfcc88d020d",
-      path: "/ns/linea/0xc28de09ad1a20737b92834943558ddfcc88d020d",
+      name: "184.linea",
+      path: "/ns/linea/184.linea",
       assertJson: (json) => {
-        expect(json.identity).toBe("184.linea.eth");
+        expect(json.address).toBe("0xc28de09ad1a20737b92834943558ddfcc88d020d");
       },
     },
   ];

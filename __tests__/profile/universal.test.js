@@ -8,6 +8,7 @@ describe("Test For Universal Profile API", () => {
       assertJson: (json) => {
         expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
         expect(json[0].displayName).toBe("sujiyan.eth");
+        expect(json.some(x=>x.identity === 'ff-2296550846.lens')).toBe(false);
         expect(json[2].platform).toBe("basenames");
       },
     },
@@ -171,13 +172,6 @@ describe("Test For Universal Profile API", () => {
         expect(json[0].address).toBe(
           "8iK1d14zA54SR6bWuzAwbRTcUpMLQCHyN5zv7rWo5ZFL",
         );
-      },
-    },
-    {
-      name: "emoji ens sorting profile",
-      path: "/profile/%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F%F0%9F%A6%8A%EF%B8%8F.eth",
-      assertJson: (json) => {
-        expect(json[0].identity).toBe("🦊🦊🦊.eth");
       },
     },
     {

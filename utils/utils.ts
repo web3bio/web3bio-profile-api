@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { normalize } from "viem/ens";
-import { ErrorMessages, type Platform } from "web3bio-profile-kit/types";
+import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, ErrorHandleProps } from "./types";
+
+const KNOWN_PLATFORMS = new Set<string>(Object.values(Platform));
+const platformHeader = (platform?: string | null): Record<string, string> =>
+  platform && KNOWN_PLATFORMS.has(platform)
+    ? { "x-request-platform": platform }
+    : {};
 
 export const ARWEAVE_ASSET_PREFIX = "https://arweave.net/";
 export const BASE_URL = process.env.PROFILE_ENDPOINT || "https://api.web3.bio";
@@ -40,16 +46,24 @@ export const errorHandle = ({
       headers: {
         "Cache-Control": "no-store",
         ...headers,
+        ...platformHeader(platform),
       },
     },
   );
 };
 
-export const respondJson = (data: any) => {
+export const respondJson = (
+  data: any,
+  platformOverride?: Platform,
+) => {
+  const platform =
+    platformOverride ?? data?.platform ?? data?.data?.identity?.platform;
+
   return NextResponse.json(data, {
     status: 200,
     headers: {
       "Content-Type": "application/json",
+      ...platformHeader(platform),
     },
   });
 };
