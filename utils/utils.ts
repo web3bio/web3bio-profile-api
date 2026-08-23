@@ -5,7 +5,7 @@ import { REGEX } from "web3bio-profile-kit/utils";
 import { type AuthHeaders, ErrorHandleProps } from "./types";
 
 const KNOWN_PLATFORMS = new Set<string>(Object.values(Platform));
-const platformHeader = (platform?: string | null) =>
+const platformHeader = (platform?: string | null): Record<string, string> =>
   platform && KNOWN_PLATFORMS.has(platform)
     ? { "x-request-platform": platform }
     : {};
