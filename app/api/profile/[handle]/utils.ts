@@ -85,7 +85,7 @@ const PLATFORM_PRIORITY_MAP = new Map(
 );
 const VALID_PLATFORM_SET = new Set(Object.values(Platform));
 const shouldFilterAssociatedLensProfiles = (pathname: string): boolean =>
-  /^\/(?:profile\/(?:web2\/)?|ns\/)[^/]+$/.test(pathname);
+  /^\/(?:profile(?:\/web2)?|ns)\/[^/]+$/.test(pathname);
 
 const isPrimaryOrSocialProfile = (identity: IdentityRecord): boolean =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
