@@ -84,8 +84,8 @@ const PLATFORM_PRIORITY_MAP = new Map(
   PLATFORM_PRIORITY_ORDER.map((platform, index) => [platform, index]),
 );
 const VALID_PLATFORM_SET = new Set(Object.values(Platform));
-const isUniversalProfilePath = (pathname: string): boolean =>
-  /^\/(?:profile|ns)\/[^/]+$/.test(pathname);
+const shouldFilterAssociatedLensProfiles = (pathname: string): boolean =>
+  /^\/(?:profile\/(?:web2\/)?|ns\/)[^/]+$/.test(pathname);
 
 const isPrimaryOrSocialProfile = (identity: IdentityRecord): boolean =>
   identity.isPrimary || SOCIAL_PLATFORMS.has(identity.platform);
@@ -657,7 +657,7 @@ export const resolveUniversalHandle = async (
     response,
     pathname,
     includeWeb2Platforms,
-    filterAssociatedLensProfiles: isUniversalProfilePath(pathname),
+    filterAssociatedLensProfiles: shouldFilterAssociatedLensProfiles(pathname),
   });
 
   if (isResolveErrorResult(resolutionResult)) {
