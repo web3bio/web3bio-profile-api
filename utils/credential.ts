@@ -10,16 +10,6 @@ export const CREDENTIAL_INFO: Readonly<
   Record<CredentialSource, CredentialMetaData>
 > = {
   // isHuman
-  [CredentialSource.talent]: {
-    platform: Platform.talent,
-    label: "Talent Verified",
-    description: "Proof of Personhood by Talent",
-  },
-  [CredentialSource.humanPassport]: {
-    platform: Platform.humanpassport,
-    label: "Passport Humanity Verified",
-    description: "Proof of Personhood by Human Passport",
-  },
   [CredentialSource.binance]: {
     platform: Platform.binance,
     label: "Binance KYC Verified",
@@ -29,6 +19,16 @@ export const CREDENTIAL_INFO: Readonly<
     platform: Platform.coinbase,
     label: "Coinbase KYC Verified",
     description: "Proof of KYC by Coinbase",
+  },
+  [CredentialSource.dentity]: {
+    platform: Platform.dentity,
+    label: "Dentity Humanity Verified",
+    description: "Personhood Verified by Dentity",
+  },
+  [CredentialSource.ethos]: {
+    platform: Platform.ethos,
+    label: "Ethos Humanity Verified",
+    description: "Personhood Verified by Ethos",
   },
   [CredentialSource.farcasterPro]: {
     platform: Platform.farcaster,
@@ -40,6 +40,26 @@ export const CREDENTIAL_INFO: Readonly<
     label: "Galxe KYC Verified",
     description: "Proof of KYC by Galxe",
   },
+  [CredentialSource.humanode]: {
+    platform: Platform.humanode,
+    label: "Humanode Humanity Verified",
+    description: "Proof of Humanity by Humanode",
+  },
+  [CredentialSource.humanPassport]: {
+    platform: Platform.humanpassport,
+    label: "Passport Humanity Verified",
+    description: "Proof of Personhood by Human Passport",
+  },
+  [CredentialSource.self_xyz]: {
+    platform: Platform.self_xyz,
+    label: "Self.xyz Humanity Verified",
+    description: "Proof of Humanity by Self.xyz",
+  },
+  [CredentialSource.talent]: {
+    platform: Platform.talent,
+    label: "Talent Verified",
+    description: "Proof of Personhood by Talent",
+  },
   [CredentialSource.world_id]: {
     platform: Platform.world_id,
     label: "World Humanity Verified",
@@ -50,22 +70,12 @@ export const CREDENTIAL_INFO: Readonly<
     label: "zkMe KYC Verified",
     description: "Proof of KYC by zkMe",
   },
-  [CredentialSource.humanode]: {
-    platform: Platform.humanode,
-    label: "Humanode Humanity Verified",
-    description: "Proof of Humanity by Humanode",
-  },
-  [CredentialSource.self_xyz]: {
-    platform: Platform.self_xyz,
-    label: "Self.xyz Humanity Verified",
-    description: "Proof of Humanity by Self.xyz",
-  },
-  [CredentialSource.dentity]: {
-    platform: Platform.dentity,
-    label: "Dentity Humanity Verified",
-    description: "Personhood Verified by Dentity",
-  },
   // isRisky
+  [CredentialSource.dmca]: {
+    label: "Copyright Violation",
+    description:
+      "This profile is in violation of the DMCA (Digital Millennium Copyright Act). It contains copyrighted material without proper authorization. Please refrain from interacting with or sharing any content associated with this profile.",
+  },
   [CredentialSource.hacked]: {
     label: "Compromised",
     description:
@@ -75,11 +85,6 @@ export const CREDENTIAL_INFO: Readonly<
     label: "Flagged for Hacking",
     description:
       "This account is flagged as a hacker account. It is associated with suspicious or malicious activity. Avoid any interactions, transactions, or sharing of sensitive information.",
-  },
-  [CredentialSource.dmca]: {
-    label: "Copyright Violation",
-    description:
-      "This profile is in violation of the DMCA (Digital Millennium Copyright Act). It contains copyrighted material without proper authorization. Please refrain from interacting with or sharing any content associated with this profile.",
   },
   // isSpam
   [CredentialSource.farcasterSpam]: {
