@@ -139,7 +139,7 @@ describe("Test For Universal Profile API", () => {
       path: "/profile/sujiyan.bnb",
       expectedStatus: 404,
       assertJson: (json) => {
-        expect(json.error).toBe("Invalid Identity or Domain");
+        expect(json.error).toBe("Not Found");
       },
     },
     {
