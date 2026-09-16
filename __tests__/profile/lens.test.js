@@ -7,7 +7,7 @@ describe("Test For Lens Profile API", () => {
       path: "/profile/lens/sujiyan.lens",
       assertJson: (json) => {
         expect(json.links.lens.handle).toBe("sujiyan.lens");
-        expect(json.address).toBe("0x9a96f14e39fe946014ff1a11540c4d4f7b441006");
+        expect(json.address).toBe("0x23b743ceda567ba4bdf437af6b83bb7fe7f51bdf");
       },
     },
     {

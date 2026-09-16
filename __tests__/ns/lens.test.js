@@ -14,7 +14,7 @@ describe("Test For Lens NS API", () => {
       path: "/ns/lens/stani.lens",
       assertJson: (json) => {
         expect(json.displayName).toBe("Stani");
-        expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
+        expect(json.address).toBe("0xad2c0beade60fb9f7ec5c87bde8e4c126145f6e7");
       },
     },
     {
