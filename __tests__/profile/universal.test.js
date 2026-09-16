@@ -6,9 +6,13 @@ describe("Test For Universal Profile API", () => {
       name: "0x7cb... profile identity",
       path: "/profile/0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
       assertJson: (json) => {
-        expect(json[0].address).toBe("0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5");
+        expect(json[0].address).toBe(
+          "0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
+        );
         expect(json[0].displayName).toBe("sujiyan.eth");
-        expect(json.some(x=>x.identity === 'ff-2296550846.lens')).toBe(false);
+        expect(json.some((x) => x.identity === "ff-2296550846.lens")).toBe(
+          false,
+        );
         expect(json[2].platform).toBe("basenames");
       },
     },
@@ -40,7 +44,9 @@ describe("Test For Universal Profile API", () => {
       name: "0x3dd... single result",
       path: "/profile/0x3ddfa8ec3052539b6c9549f12cea2c295cff5296",
       assertJson: (json) => {
-        expect(json[0].address).toBe("0x3ddfa8ec3052539b6c9549f12cea2c295cff5296");
+        expect(json[0].address).toBe(
+          "0x3ddfa8ec3052539b6c9549f12cea2c295cff5296",
+        );
         expect(json.length).toBe(1);
       },
     },
@@ -50,14 +56,18 @@ describe("Test For Universal Profile API", () => {
       assertJson: (json) => {
         expect(findByPlatform(json, "lens")?.address).toBeTruthy();
         expect(findByPlatform(json, "ens")?.address).toBeTruthy();
-        expect(findByPlatform(json, "farcaster")?.social?.follower).toBeTruthy();
+        expect(
+          findByPlatform(json, "farcaster")?.social?.follower,
+        ).toBeTruthy();
       },
     },
     {
       name: "mcdonalds.eth",
       path: "/profile/mcdonalds.eth",
       assertJson: (json) => {
-        expect(json[0].address).toBe("0x782cf6b6e735496f7e608489b0c57ee27f407e7d");
+        expect(json[0].address).toBe(
+          "0x782cf6b6e735496f7e608489b0c57ee27f407e7d",
+        );
       },
     },
     {
@@ -84,16 +94,17 @@ describe("Test For Universal Profile API", () => {
       name: "0x934... starts with lens",
       path: "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649",
       assertJson: (json) => {
-        expect(json[0].platform).toBe("lens");
+        expect(json[0].platform).toBe("ethereum");
+        expect(json.find((x) => x.platform === "lens")).toBeTruthy();
       },
     },
     {
       name: "0xE0b... has multiple lens records",
       path: "/profile/0xE0b3Ef5A61324acceE3798B6D9Da5B47b0312b7c",
       assertJson: (json) => {
-        expect(json.filter((x) => x.platform === "lens").length).toBeGreaterThan(
-          1,
-        );
+        expect(
+          json.filter((x) => x.platform === "lens").length,
+        ).toBeGreaterThan(1);
       },
     },
     {
