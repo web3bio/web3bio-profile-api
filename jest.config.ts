@@ -13,6 +13,7 @@ const config: Config = {
   testPathIgnorePatterns: [
     "/__tests__/helpers/",
   ],
+  modulePathIgnorePatterns: ["<rootDir>/.open-next/"],
   setupFiles: ["<rootDir>/utils/test-utils.ts"],
   transform: {
     "^.+\\.tsx?$": "ts-jest",

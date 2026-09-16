@@ -549,6 +549,7 @@ export async function postIdentityGraphQuery(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables }),
+    signal: AbortSignal.timeout(30_000),
   });
 
   let body: unknown;

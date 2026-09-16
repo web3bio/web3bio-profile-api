@@ -88,7 +88,12 @@ const resolveSocialLink = (name: string, type: Platform | string): string => {
   }
 };
 
-const eipAssetCache = new Map<string, Promise<string | null>>();
+const EIP_ASSET_CACHE_LIMIT = 256;
+const EIP_ASSET_CACHE_TTL = 5 * 60 * 1000;
+const eipAssetCache = new Map<
+  string,
+  { value: string | null; expiresAt: number }
+>();
 
 const resolveEipAssetURLUncached = async (
   normalized: string,
@@ -117,6 +122,7 @@ const resolveEipAssetURLUncached = async (
       const fetchURL = `https://api.opensea.io/api/v2/chain/${network}/contract/${contractAddress}/nfts/${tokenId}`;
       const response = await fetch(fetchURL, {
         headers: { "x-api-key": openseaApiKey },
+        signal: AbortSignal.timeout(10_000),
       });
       if (response.ok) {
         const data = await response.json();
@@ -135,7 +141,9 @@ const resolveEipAssetURLUncached = async (
     const alchemyBase = getAlchemyBaseUrl(network as Network);
     try {
       const fetchURL = `https://${alchemyBase}-mainnet.g.alchemy.com/nft/v3/${alchemyApiKey}/getNFTMetadata?contractAddress=${contractAddress}&tokenId=${tokenId}`;
-      const response = await fetch(fetchURL);
+      const response = await fetch(fetchURL, {
+        signal: AbortSignal.timeout(10_000),
+      });
       if (response.ok) {
         const data = await response.json();
         const imageUrl =
@@ -160,12 +168,25 @@ export const resolveEipAssetURL = async (
   const normalized = source?.trim();
   if (!normalized) return null;
 
-  let pending = eipAssetCache.get(normalized);
-  if (!pending) {
-    pending = resolveEipAssetURLUncached(normalized);
-    eipAssetCache.set(normalized, pending);
+  if (!REGEX.EIP.test(normalized)) {
+    return resolveMediaURL(normalized);
   }
-  return pending;
+
+  const cached = eipAssetCache.get(normalized);
+  if (cached && cached.expiresAt > Date.now()) {
+    return cached.value;
+  }
+  eipAssetCache.delete(normalized);
+
+  const value = await resolveEipAssetURLUncached(normalized);
+  if (eipAssetCache.size >= EIP_ASSET_CACHE_LIMIT) {
+    eipAssetCache.delete(eipAssetCache.keys().next().value!);
+  }
+  eipAssetCache.set(normalized, {
+    value,
+    expiresAt: Date.now() + EIP_ASSET_CACHE_TTL,
+  });
+  return value;
 };
 
 const ALCHEMY_BASE_BY_NETWORK: Partial<Record<Network, string>> = {
