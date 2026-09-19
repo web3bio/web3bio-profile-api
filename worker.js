@@ -114,11 +114,36 @@ function setCacheHeaders(response, ttl) {
       `public, max-age=${ttl}, s-maxage=${ttl}, stale-while-revalidate=${DEFAULT_SWR}`,
     );
   }
-  response.headers.set("Vary", "Accept-Encoding");
+  const vary = response.headers.get("Vary");
+  if (!vary) {
+    response.headers.set("Vary", "Accept-Encoding");
+  } else if (
+    vary !== "*" &&
+    !vary
+      .split(",")
+      .some((value) => value.trim().toLowerCase() === "accept-encoding")
+  ) {
+    response.headers.append("Vary", "Accept-Encoding");
+  }
 }
 
-function isCacheableResponse(response) {
-  return response.headers.get("content-length") !== "0";
+function isCacheableResponse(response, pathname) {
+  if (
+    /(?:^|,)\s*(?:private|no-store|no-cache)(?:\s*(?:=|,|$))/i.test(
+      response.headers.get("Cache-Control") || "",
+    ) ||
+    response.headers.has("Set-Cookie") ||
+    response.headers.get("Vary") === "*"
+  ) {
+    return false;
+  }
+
+  return (
+    (response.status === 200 && response.headers.get("content-length") !== "0") ||
+    (pathname.startsWith("/avatar/") &&
+      response.status === 307 &&
+      response.headers.has("Location"))
+  );
 }
 
 function getTTL(pathname) {
@@ -211,16 +236,24 @@ const handler = {
       }
     }
 
+    if (isRefreshPath(pathname) || !["GET", "HEAD"].includes(request.method)) {
+      return responseWithNoStore(
+        await openNextHandler.fetch(requestWithClientIp, env, ctx),
+      );
+    }
+
     const cacheKey = workerCacheKey(url);
     let cached = null;
-    if (!isRefreshPath(pathname)) {
+    try {
       cached = await caches.default.match(cacheKey);
+    } catch (err) {
+      console.error("[Cache]", err);
     }
 
     // Return cached response if available and valid
     if (cached) {
       return withCacheMetadata(
-        new Response(cached.body, {
+        new Response(request.method === "HEAD" ? null : cached.body, {
           status: cached.status,
           statusText: cached.statusText,
           headers: cached.headers,
@@ -232,24 +265,23 @@ const handler = {
     }
 
     // Fetch from origin
-    const response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
+    let response = await openNextHandler.fetch(requestWithClientIp, env, ctx);
 
-    if (isRefreshPath(pathname)) {
-      return responseWithNoStore(response);
+    if (!isCacheableResponse(response, pathname)) {
+      return withCacheMetadata(responseWithNoStore(response), "MISS", fullPath, 0);
     }
 
+    response = new Response(response.body, response);
     const ttl = getTTL(pathname);
     withCacheMetadata(response, "MISS", fullPath, ttl);
 
-    if (response.status === 200 && request.method === "GET") {
+    if (request.method === "GET") {
       const cacheResponse = response.clone();
-      if (isCacheableResponse(cacheResponse)) {
-        ctx.waitUntil(
-          caches.default
-            .put(cacheKey, cacheResponse)
-            .catch((err) => console.error("[Cache]", err)),
-        );
-      }
+      ctx.waitUntil(
+        caches.default
+          .put(cacheKey, cacheResponse)
+          .catch((err) => console.error("[Cache]", err)),
+      );
     }
     return response;
   },

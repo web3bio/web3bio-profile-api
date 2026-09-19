@@ -6,7 +6,7 @@ describe("Test For Lens NS API", () => {
       name: "sujiyan.lens",
       path: "/ns/lens/sujiyan.lens",
       assertJson: (json) => {
-        expect(json.address).toBe("0x9a96f14e39fe946014ff1a11540c4d4f7b441006");
+        expect(json.address).toBe("0x23b743ceda567ba4bdf437af6b83bb7fe7f51bdf");
       },
     },
     {
@@ -14,7 +14,7 @@ describe("Test For Lens NS API", () => {
       path: "/ns/lens/stani.lens",
       assertJson: (json) => {
         expect(json.displayName).toBe("Stani");
-        expect(json.address).toBe("0x7241dddec3a6af367882eaf9651b87e1c7549dff");
+        expect(json.address).toBe("0xad2c0beade60fb9f7ec5c87bde8e4c126145f6e7");
       },
     },
     {

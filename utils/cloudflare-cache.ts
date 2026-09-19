@@ -11,7 +11,6 @@ function sortedSearch(search: string): string {
   return qs ? `?${qs}` : "";
 }
 
-/** Worker cache key: request origin + lowercase path + sorted query. */
 export function workerCacheKey(
   input: URL | string,
   base?: string | URL,
@@ -20,8 +19,7 @@ export function workerCacheKey(
     typeof input === "string" && input.startsWith("/")
       ? new URL(input, base)
       : new URL(input);
-  const path = url.pathname.toLowerCase();
-  return new Request(`${url.origin}${path}${sortedSearch(url.search)}`, {
+  return new Request(`${url.origin}${url.pathname}${sortedSearch(url.search)}`, {
     method: "GET",
   });
 }

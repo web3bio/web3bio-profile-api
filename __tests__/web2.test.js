@@ -16,10 +16,10 @@ describe("Test For NS API web2 query", () => {
       },
     },
     {
-      name: "nicksdjohnson.twitter",
-      path: "/ns/nicksdjohnson.twitter",
+      name: "brantlymillegan.twitter",
+      path: "/ns/brantlymillegan.twitter",
       assertJson: (json) => {
-        expect(json[0].identity).toBe("nick.eth");
+        expect(json[0].identity).toBe("brantly.eth");
       },
     },
     {
