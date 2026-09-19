@@ -38,7 +38,10 @@ async function isWebPUrl(url: string): Promise<boolean> {
     return true;
   }
   try {
-    const response = await fetch(url, { method: "HEAD" });
+    const response = await fetch(url, {
+      method: "HEAD",
+      signal: AbortSignal.timeout(5_000),
+    });
     return (
       response.headers.get("content-type")?.includes("image/webp") || false
     );
@@ -105,7 +108,9 @@ export async function GET(
       response,
     });
     if (isProfileError(profiles)) {
-      return NextResponse.json(profiles);
+      return NextResponse.json(profiles, {
+        headers: { "Cache-Control": "no-store" },
+      });
     }
     const avatarUrl = pickAvatarUrl(profiles as ProfileResponse[]);
     if (!avatarUrl) return respondWithFallbackAvatar(id);
