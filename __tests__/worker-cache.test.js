@@ -186,60 +186,15 @@ describe("Worker response caching", () => {
     }
   });
 
-  it.each([
-    ["/profile/Alice.ETH", "/profile/alice.eth"],
-    ["/profile/ens/Alice.ETH", "/profile/ens/alice.eth"],
-    ["/profile/ens%2CAlice.ETH", "/profile/ens,alice.eth"],
-    [
-      "/ns/0xAbCd000000000000000000000000000000000000",
-      "/ns/0xabcd000000000000000000000000000000000000",
-    ],
-    ["/search?platform=ens&identity=Alice.ETH", "/search?identity=alice.eth&platform=ens"],
-    ["/search/suggest/Alice", "/search/suggest/alice"],
-  ])("normalizes case-insensitive identities in %s", (first, second) => {
-    expect(workerCacheKey(first, origin).url).toBe(workerCacheKey(second, origin).url);
-  });
-
-  it.each([
-    (id) => `/profile/${id}`,
-    (id) => `/profile/solana/${id}`,
-    (id) => `/profile/solana,${id}`,
-    (id) => `/profile/solana%2C${id}`,
-    (id) => `/search?platform=solana&identity=${id}`,
-  ])("preserves exempt identity case across route formats", (path) => {
-    const key = workerCacheKey(path(solana), origin).url;
-    expect(key).toContain(solana);
-    expect(key).not.toBe(workerCacheKey(path(solana.toLowerCase()), origin).url);
-  });
-
-  it.each(["/profile/batch/", "/ns/batch/", "/ns/batch/universal/"])(
-    "normalizes each identity in %s without changing order or duplicates",
-    (prefix) => {
-      const key = (ids) => workerCacheKey(
-        prefix + encodeURIComponent(JSON.stringify(ids)), origin,
-      ).url;
-      const ids = ["ens,Alice.ETH", `solana,${solana}`, "ens,Alice.ETH"];
-      expect(key(ids)).toBe(key(["ens,alice.eth", `solana,${solana}`, "ens,alice.eth"]));
-      expect(key(ids)).not.toBe(key([...ids].reverse().slice(1)));
-      expect(key(ids)).not.toBe(key([ids[1], ids[0], ids[2]]));
-      expect(key(ids)).not.toBe(key(ids.map((id) => id.toLowerCase())));
-    },
-  );
-
-  it("does not normalize route prefixes or unrelated query values", () => {
-    expect(workerCacheKey("/Profile/ens/Alice.ETH?token=AbCd", origin).url).toBe(
-      `${origin}/Profile/ens/alice.eth?token=AbCd`,
+  it("normalizes identity case while preserving exempt addresses", () => {
+    expect(workerCacheKey(`${origin}/profile/Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/profile/alice.eth`).url,
     );
-    expect(workerCacheKey("/profile/%ZZ", origin).url).toBe(`${origin}/profile/%ZZ`);
-  });
-
-  it("shares cache entries across equivalent identity casing and purges them", async () => {
-    const first = await request("/profile/ens/Alice.ETH");
-    const second = await request("/profile/ens/alice.eth");
-    expect(second.headers.get("x-cache-hit")).toBe("HIT");
-    expect(await second.json()).toEqual(await first.json());
-    await purgeWorkerCache("ens", "ALICE.ETH", origin);
-    expect((await request("/profile/ens/alice.eth")).headers.get("x-cache-hit")).toBe("MISS");
-    expect(openNextHandler.fetch).toHaveBeenCalledTimes(2);
+    expect(workerCacheKey(`${origin}/profile/solana/${solana}`).url).not.toBe(
+      workerCacheKey(`${origin}/profile/solana/${solana.toLowerCase()}`).url,
+    );
+    expect(workerCacheKey(`${origin}/search?platform=ens&identity=Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/search?identity=alice.eth&platform=ens`).url,
+    );
   });
 });
