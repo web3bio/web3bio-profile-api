@@ -1,11 +1,11 @@
 import type { Platform } from "web3bio-profile-kit/types";
-import { REGEX } from "web3bio-profile-kit/utils";
+import { prettify, REGEX } from "web3bio-profile-kit/utils";
 
 function normalizeIdentity(handle: string): string {
   const separator = handle.indexOf(",");
   const prefix = handle.slice(0, separator + 1);
   const identity = handle.slice(separator + 1);
-  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(identity)
+  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(prettify(identity.trim()))
     ? identity
     : identity.toLowerCase();
   return prefix + normalizedIdentity;
@@ -17,48 +17,37 @@ function normalizedPath(pathname: string): string {
 
   const prefix = pathname.slice(0, separator + 1);
   try {
-    const handle = decodeURIComponent(pathname.slice(separator + 1));
+    let handle = decodeURIComponent(pathname.slice(separator + 1));
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
       const ids: unknown = JSON.parse(handle);
       if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
         return pathname;
       }
-      return (
-        prefix + encodeURIComponent(JSON.stringify(ids.map(normalizeIdentity)))
-      );
+      handle = JSON.stringify(ids.map(normalizeIdentity));
+    } else {
+      handle = normalizeIdentity(handle);
     }
-    return prefix + encodeURIComponent(normalizeIdentity(handle));
+    return prefix + encodeURIComponent(handle);
   } catch {
     return pathname;
   }
-}
-
-function sortedSearch(search: string): string {
-  const raw = search.startsWith("?") ? search.slice(1) : search;
-  if (!raw) return "";
-  const qs = new URLSearchParams(
-    [...new URLSearchParams(raw).entries()]
-      .map(([key, value]): [string, string] => [
-        key,
-        key === "identity" ? normalizeIdentity(value) : value,
-      ])
-      .sort((a, b) => a[0].localeCompare(b[0])),
-  ).toString();
-  return qs ? `?${qs}` : "";
 }
 
 export function workerCacheKey(
   input: URL | string,
   base?: string | URL,
 ): Request {
-  const url =
-    typeof input === "string" && input.startsWith("/")
-      ? new URL(input, base)
-      : new URL(input);
-  return new Request(
-    `${url.origin}${normalizedPath(url.pathname)}${sortedSearch(url.search)}`,
-    { method: "GET" },
-  );
+  const url = new URL(input, base);
+  url.pathname = normalizedPath(url.pathname);
+  url.search = new URLSearchParams(
+    [...url.searchParams].map(([key, value]) => [
+      key,
+      key === "identity" ? normalizeIdentity(value) : value,
+    ]),
+  ).toString();
+  url.searchParams.sort();
+  url.hash = "";
+  return new Request(url, { method: "GET" });
 }
 
 export function getCacheKeysToClear(
