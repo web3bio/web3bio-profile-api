@@ -15,6 +15,7 @@ jest.mock(
 
 describe("Worker response caching", () => {
   const origin = "https://api.web3.bio";
+  const solana = "4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s";
   const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
   let cache;
   let env;
@@ -159,13 +160,13 @@ describe("Worker response caching", () => {
   });
 
   it("bypasses caching for refresh and purges matching case-sensitive keys", async () => {
-    const path = "/profile/solana/AbCdEF";
+    const path = `/profile/solana/${solana}`;
     await request(path);
-    await purgeWorkerCache("solana", "AbCdEF", origin);
+    await purgeWorkerCache("solana", solana, origin);
     expect(await cache.match(workerCacheKey(path, origin))).toBeUndefined();
     cache.match.mockClear();
     cache.put.mockClear();
-    const response = await request("/refresh/solana,AbCdEF", {
+    const response = await request(`/refresh/solana,${solana}`, {
       headers: { "x-api-key": "valid" },
     });
     expect(response.headers.get("cache-control")).toBe("no-store");
@@ -185,15 +186,60 @@ describe("Worker response caching", () => {
     }
   });
 
-  it("preserves identity case and query values while sorting query names", () => {
-    expect(workerCacheKey(`${origin}/profile/solana/AbCdEF`).url).not.toBe(
-      workerCacheKey(`${origin}/profile/solana/aBcDef`).url,
+  it.each([
+    ["/profile/Alice.ETH", "/profile/alice.eth"],
+    ["/profile/ens/Alice.ETH", "/profile/ens/alice.eth"],
+    ["/profile/ens%2CAlice.ETH", "/profile/ens,alice.eth"],
+    [
+      "/ns/0xAbCd000000000000000000000000000000000000",
+      "/ns/0xabcd000000000000000000000000000000000000",
+    ],
+    ["/search?platform=ens&identity=Alice.ETH", "/search?identity=alice.eth&platform=ens"],
+    ["/search/suggest/Alice", "/search/suggest/alice"],
+  ])("normalizes case-insensitive identities in %s", (first, second) => {
+    expect(workerCacheKey(first, origin).url).toBe(workerCacheKey(second, origin).url);
+  });
+
+  it.each([
+    (id) => `/profile/${id}`,
+    (id) => `/profile/solana/${id}`,
+    (id) => `/profile/solana,${id}`,
+    (id) => `/profile/solana%2C${id}`,
+    (id) => `/search?platform=solana&identity=${id}`,
+  ])("preserves exempt identity case across route formats", (path) => {
+    const key = workerCacheKey(path(solana), origin).url;
+    expect(key).toContain(solana);
+    expect(key).not.toBe(workerCacheKey(path(solana.toLowerCase()), origin).url);
+  });
+
+  it.each(["/profile/batch/", "/ns/batch/", "/ns/batch/universal/"])(
+    "normalizes each identity in %s without changing order or duplicates",
+    (prefix) => {
+      const key = (ids) => workerCacheKey(
+        prefix + encodeURIComponent(JSON.stringify(ids)), origin,
+      ).url;
+      const ids = ["ens,Alice.ETH", `solana,${solana}`, "ens,Alice.ETH"];
+      expect(key(ids)).toBe(key(["ens,alice.eth", `solana,${solana}`, "ens,alice.eth"]));
+      expect(key(ids)).not.toBe(key([...ids].reverse().slice(1)));
+      expect(key(ids)).not.toBe(key([ids[1], ids[0], ids[2]]));
+      expect(key(ids)).not.toBe(key(ids.map((id) => id.toLowerCase())));
+    },
+  );
+
+  it("does not normalize route prefixes or unrelated query values", () => {
+    expect(workerCacheKey("/Profile/ens/Alice.ETH?token=AbCd", origin).url).toBe(
+      `${origin}/Profile/ens/alice.eth?token=AbCd`,
     );
-    expect(workerCacheKey(`${origin}/search?platform=solana&identity=AbCdEF`).url).toBe(
-      workerCacheKey(`${origin}/search?identity=AbCdEF&platform=solana`).url,
-    );
-    expect(workerCacheKey(`${origin}/search?identity=AbCdEF`).url).not.toBe(
-      workerCacheKey(`${origin}/search?identity=aBcDef`).url,
-    );
+    expect(workerCacheKey("/profile/%ZZ", origin).url).toBe(`${origin}/profile/%ZZ`);
+  });
+
+  it("shares cache entries across equivalent identity casing and purges them", async () => {
+    const first = await request("/profile/ens/Alice.ETH");
+    const second = await request("/profile/ens/alice.eth");
+    expect(second.headers.get("x-cache-hit")).toBe("HIT");
+    expect(await second.json()).toEqual(await first.json());
+    await purgeWorkerCache("ens", "ALICE.ETH", origin);
+    expect((await request("/profile/ens/alice.eth")).headers.get("x-cache-hit")).toBe("MISS");
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(2);
   });
 });
