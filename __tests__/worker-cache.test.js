@@ -15,6 +15,7 @@ jest.mock(
 
 describe("Worker response caching", () => {
   const origin = "https://api.web3.bio";
+  const solana = "4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s";
   const originalCaches = Object.getOwnPropertyDescriptor(globalThis, "caches");
   let cache;
   let env;
@@ -159,13 +160,13 @@ describe("Worker response caching", () => {
   });
 
   it("bypasses caching for refresh and purges matching case-sensitive keys", async () => {
-    const path = "/profile/solana/AbCdEF";
+    const path = `/profile/solana/${solana}`;
     await request(path);
-    await purgeWorkerCache("solana", "AbCdEF", origin);
+    await purgeWorkerCache("solana", solana, origin);
     expect(await cache.match(workerCacheKey(path, origin))).toBeUndefined();
     cache.match.mockClear();
     cache.put.mockClear();
-    const response = await request("/refresh/solana,AbCdEF", {
+    const response = await request(`/refresh/solana,${solana}`, {
       headers: { "x-api-key": "valid" },
     });
     expect(response.headers.get("cache-control")).toBe("no-store");
@@ -185,15 +186,15 @@ describe("Worker response caching", () => {
     }
   });
 
-  it("preserves identity case and query values while sorting query names", () => {
-    expect(workerCacheKey(`${origin}/profile/solana/AbCdEF`).url).not.toBe(
-      workerCacheKey(`${origin}/profile/solana/aBcDef`).url,
+  it("normalizes identity case while preserving exempt addresses", () => {
+    expect(workerCacheKey(`${origin}/profile/Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/profile/alice.eth`).url,
     );
-    expect(workerCacheKey(`${origin}/search?platform=solana&identity=AbCdEF`).url).toBe(
-      workerCacheKey(`${origin}/search?identity=AbCdEF&platform=solana`).url,
+    expect(workerCacheKey(`${origin}/profile/solana/${solana}`).url).not.toBe(
+      workerCacheKey(`${origin}/profile/solana/${solana.toLowerCase()}`).url,
     );
-    expect(workerCacheKey(`${origin}/search?identity=AbCdEF`).url).not.toBe(
-      workerCacheKey(`${origin}/search?identity=aBcDef`).url,
+    expect(workerCacheKey(`${origin}/search?platform=ens&identity=Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/search?identity=alice.eth&platform=ens`).url,
     );
   });
 });
