@@ -1,12 +1,48 @@
 import type { Platform } from "web3bio-profile-kit/types";
+import { REGEX } from "web3bio-profile-kit/utils";
+
+function normalizeIdentity(handle: string): string {
+  const separator = handle.indexOf(",");
+  const prefix = handle.slice(0, separator + 1);
+  const identity = handle.slice(separator + 1);
+  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(identity)
+    ? identity
+    : identity.toLowerCase();
+  return prefix + normalizedIdentity;
+}
+
+function normalizedPath(pathname: string): string {
+  const separator = pathname.lastIndexOf("/");
+  if (separator <= 0) return pathname;
+
+  const prefix = pathname.slice(0, separator + 1);
+  try {
+    const handle = decodeURIComponent(pathname.slice(separator + 1));
+    if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
+      const ids: unknown = JSON.parse(handle);
+      if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
+        return pathname;
+      }
+      return (
+        prefix + encodeURIComponent(JSON.stringify(ids.map(normalizeIdentity)))
+      );
+    }
+    return prefix + encodeURIComponent(normalizeIdentity(handle));
+  } catch {
+    return pathname;
+  }
+}
 
 function sortedSearch(search: string): string {
   const raw = search.startsWith("?") ? search.slice(1) : search;
   if (!raw) return "";
   const qs = new URLSearchParams(
-    [...new URLSearchParams(raw).entries()].sort((a, b) =>
-      a[0].localeCompare(b[0]),
-    ),
+    [...new URLSearchParams(raw).entries()]
+      .map(([key, value]): [string, string] => [
+        key,
+        key === "identity" ? normalizeIdentity(value) : value,
+      ])
+      .sort((a, b) => a[0].localeCompare(b[0])),
   ).toString();
   return qs ? `?${qs}` : "";
 }
@@ -19,9 +55,10 @@ export function workerCacheKey(
     typeof input === "string" && input.startsWith("/")
       ? new URL(input, base)
       : new URL(input);
-  return new Request(`${url.origin}${url.pathname}${sortedSearch(url.search)}`, {
-    method: "GET",
-  });
+  return new Request(
+    `${url.origin}${normalizedPath(url.pathname)}${sortedSearch(url.search)}`,
+    { method: "GET" },
+  );
 }
 
 export function getCacheKeysToClear(
