@@ -84,7 +84,7 @@ const processJson = async (
   }
 
   const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
-  if (vertices.length > 0) {
+  if (identity.identityGraph) {
     const currentIndex = vertices.findIndex(
       (v) =>
         v.identity === identity.identity && v.platform === identity.platform,
@@ -93,7 +93,21 @@ const processJson = async (
 
     if (currentIndex === -1 && !filteredNodes.has(currentKey)) {
       const { identityGraph, ...currentIdentity } = identity;
-      vertices.unshift(currentIdentity as IdentityRecord);
+      vertices.unshift(
+        vertices.length === 0
+          ? ({
+              identity: identity.identity,
+              platform: identity.platform,
+              isPrimary: false,
+              expiredAt: null,
+              registeredAt: null,
+              provider: null,
+              resolvedAddress: [],
+              ownerAddress: [],
+              profile: null,
+            } as unknown as IdentityRecord)
+          : (currentIdentity as IdentityRecord),
+      );
     } else if (currentIndex > 0) {
       vertices.unshift(...vertices.splice(currentIndex, 1));
     }
