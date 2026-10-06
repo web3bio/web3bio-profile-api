@@ -31,101 +31,59 @@ const createSearchError = (
     message,
   });
 
-const processProfileAvatar = async (
-  profile: ProfileRecord,
-): Promise<string | null> => {
-  if (!profile?.avatar) {
-    return null;
-  }
-
-  try {
-    return await resolveEipAssetURL(profile.avatar);
-  } catch {
-    return null;
-  }
-};
-
 const processJson = async (
   json: IdentityGraphQueryResponse,
   directTarget: { identity: string; platform: Platform },
 ) => {
   const identity = json?.data?.identity;
+  if (!identity) return json;
 
-  if (!identity) {
-    return json;
-  }
+  const profiles = new Set<ProfileRecord>();
+  if (identity.profile?.avatar) profiles.add(identity.profile);
 
-  const avatarTasks: Promise<void>[] = [];
-
-  if (identity.profile?.avatar) {
-    avatarTasks.push(
-      processProfileAvatar(identity.profile).then((processedAvatar) => {
-        identity.profile.avatar = processedAvatar;
-      }),
+  const graph = identity.identityGraph;
+  if (graph) {
+    const isRemovedNode = (v: IdentityRecord) =>
+      (v.platform === Platform.clusters && v.identity.includes("/")) ||
+      shouldFilterAssociatedLensProfile(v, directTarget);
+    const all = graph.vertices ?? [];
+    const filteredNodes = new Set(
+      all.filter(isRemovedNode).map((v) => `${v.platform},${v.identity}`),
     );
-  }
+    const vertices = all.filter((v) => !isRemovedNode(v));
+    graph.vertices = vertices;
+    if (filteredNodes.size > 0) {
+      graph.edges = graph.edges?.filter(
+        (e) => !filteredNodes.has(e.source) && !filteredNodes.has(e.target),
+      );
+    }
 
-  const isRemovedNode = (v: IdentityRecord) =>
-    (v.platform === Platform.clusters && v.identity.includes("/")) ||
-    shouldFilterAssociatedLensProfile(v, directTarget);
-
-  const filteredNodes = new Set(
-    identity.identityGraph?.vertices
-      ?.filter(isRemovedNode)
-      .map((v) => `${v.platform},${v.identity}`) || [],
-  );
-
-  if (filteredNodes.size > 0 && identity.identityGraph) {
-    const graph = identity.identityGraph;
-    graph.vertices = graph.vertices?.filter((v) => !isRemovedNode(v));
-    graph.edges = graph.edges?.filter(
-      (e) => !filteredNodes.has(e.source) && !filteredNodes.has(e.target),
-    );
-  }
-
-  const vertices: IdentityRecord[] = identity.identityGraph?.vertices || [];
-  if (identity.identityGraph) {
     const currentIndex = vertices.findIndex(
       (v) =>
         v.identity === identity.identity && v.platform === identity.platform,
     );
-    const currentKey = `${identity.platform},${identity.identity}`;
-
-    if (currentIndex === -1 && !filteredNodes.has(currentKey)) {
+    if (
+      currentIndex === -1 &&
+      !filteredNodes.has(`${identity.platform},${identity.identity}`)
+    ) {
       const { identityGraph, ...currentIdentity } = identity;
-      vertices.unshift(
-        vertices.length === 0
-          ? ({
-              identity: identity.identity,
-              platform: identity.platform,
-              isPrimary: false,
-              expiredAt: null,
-              registeredAt: null,
-              provider: null,
-              resolvedAddress: [],
-              ownerAddress: [],
-              profile: null,
-            } as unknown as IdentityRecord)
-          : (currentIdentity as IdentityRecord),
-      );
+      vertices.unshift(currentIdentity);
     } else if (currentIndex > 0) {
       vertices.unshift(...vertices.splice(currentIndex, 1));
     }
 
-    vertices
-      .filter((v) => v?.profile?.avatar)
-      .forEach((v) => {
-        avatarTasks.push(
-          processProfileAvatar(v.profile).then((processedAvatar) => {
-            v.profile.avatar = processedAvatar;
-          }),
-        );
-      });
+    for (const v of vertices) {
+      if (v.profile?.avatar) profiles.add(v.profile);
+    }
   }
 
-  if (avatarTasks.length > 0) {
-    await Promise.allSettled(avatarTasks);
-  }
+  await Promise.allSettled(
+    [...profiles].map(async (profile) => {
+      profile.avatar = await resolveEipAssetURL(profile.avatar).catch(
+        () => null,
+      );
+    }),
+  );
   return json;
 };
 

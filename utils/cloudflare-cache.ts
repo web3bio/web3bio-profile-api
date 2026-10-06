@@ -5,7 +5,9 @@ function normalizeIdentity(handle: string): string {
   const separator = handle.indexOf(",");
   const prefix = handle.slice(0, separator + 1);
   const identity = handle.slice(separator + 1);
-  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(prettify(identity.trim()))
+  const normalizedIdentity = REGEX.LOWERCASE_EXEMPT.test(
+    prettify(identity.trim()),
+  )
     ? identity
     : identity.toLowerCase();
   return prefix + normalizedIdentity;
