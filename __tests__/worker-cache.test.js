@@ -200,4 +200,13 @@ describe("Worker response caching", () => {
       workerCacheKey(`${origin}/search?identity=alice.eth&platform=ens`).url,
     );
   });
+
+  it("normalizes qualified platform prefixes without merging case-sensitive SVGs", () => {
+    expect(workerCacheKey(`${origin}/profile/ENS,Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/profile/ens,alice.eth`).url,
+    );
+    expect(workerCacheKey(`${origin}/avatar/svg/Alice.eth`).url).not.toBe(
+      workerCacheKey(`${origin}/avatar/svg/alice.eth`).url,
+    );
+  });
 });

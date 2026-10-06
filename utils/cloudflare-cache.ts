@@ -10,7 +10,7 @@ function normalizeIdentity(handle: string): string {
   )
     ? identity
     : identity.toLowerCase();
-  return prefix + normalizedIdentity;
+  return prefix.toLowerCase() + normalizedIdentity;
 }
 
 function normalizedPath(pathname: string): string {
@@ -18,6 +18,8 @@ function normalizedPath(pathname: string): string {
   if (separator <= 0) return pathname;
 
   const prefix = pathname.slice(0, separator + 1);
+  if (prefix === "/avatar/svg/") return pathname;
+
   try {
     let handle = decodeURIComponent(pathname.slice(separator + 1));
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
