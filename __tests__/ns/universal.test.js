@@ -68,10 +68,10 @@ describe("Test For Universal NS API", () => {
       },
     },
     {
-      name: "solana address resolves to v2ex.sol",
+      name: "solana address resolves to v2ex.sns",
       path: "/ns/4JBz4tAKgAmxjDPHHi9HRLj14RsCQJyuCkCFKnpz7B9s",
       assertJson: (json) => {
-        expect(json[0].identity).toBe("v2ex.sol");
+        expect(json[0].identity).toBe("v2ex.sns");
       },
     },
     {
