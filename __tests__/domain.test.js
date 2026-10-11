@@ -11,8 +11,8 @@ describe("Test For Domain API", () => {
       },
     },
     {
-      name: "bonfida.sol",
-      path: "/domain/bonfida.sol",
+      name: "bonfida.sns",
+      path: "/domain/bonfida.sns",
       assertJson: (json) => {
         expect(json.resolvedAddress).toBe(
           "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
