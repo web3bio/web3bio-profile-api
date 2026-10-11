@@ -874,12 +874,12 @@ export default async function Home() {
               </li>
               <li>
                 <span className="label">SNS</span>{" "}
-                <a href={`${BASE_URL}/profile/bonfida.sol`} target="_blank">
-                  /profile/bonfida.sol
+                <a href={`${BASE_URL}/profile/bonfida.sns`} target="_blank">
+                  /profile/bonfida.sns
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/bonfida.sol`} target="_blank">
-                  /ns/bonfida.sol
+                <a href={`${BASE_URL}/ns/bonfida.sns`} target="_blank">
+                  /ns/bonfida.sns
                 </a>
               </li>
             </ul>
@@ -975,7 +975,7 @@ export default async function Home() {
                   }
                 },
                 "social": {
-                  "uid": 134682,
+                  "uid": null,
                   "follower": 53837,
                   "following": 7
                 }
@@ -1383,7 +1383,7 @@ export default async function Home() {
                 }
               },
               "social": {
-                "uid": 12747,
+                "uid": null,
                 "follower": 141799,
                 "following": 1322
               }
@@ -1927,14 +1927,14 @@ export default async function Home() {
               <li>
                 <span className="label">Solana Name Service</span>{" "}
                 <a
-                  href={`${BASE_URL}/profile/solana/bonfida.sol`}
+                  href={`${BASE_URL}/profile/solana/bonfida.sns`}
                   target="_blank"
                 >
-                  /profile/solana/bonfida.sol
+                  /profile/solana/bonfida.sns
                 </a>
                 <span className="text-gray ml-2 mr-2">OR</span>
-                <a href={`${BASE_URL}/ns/solana/bonfida.sol`} target="_blank">
-                  /ns/solana/bonfida.sol
+                <a href={`${BASE_URL}/ns/solana/bonfida.sns`} target="_blank">
+                  /ns/solana/bonfida.sns
                 </a>
               </li>
             </ul>
@@ -1942,12 +1942,12 @@ export default async function Home() {
               language="json"
               code={`
             // ${BASE_URL}/profile/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA
-            // ${BASE_URL}/profile/solana/bonfida.sol
+            // ${BASE_URL}/profile/solana/bonfida.sns
             {
               "address": "HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA",
-              "identity": "bonfida.sol",
+              "identity": "bonfida.sns",
               "platform": "sns",
-              "displayName": "bonfida.sol",
+              "displayName": "bonfida.sns",
               "avatar": null,
               "description": null,
               "status": null,
@@ -1960,12 +1960,12 @@ export default async function Home() {
             }
 
             // ${BASE_URL}/ns/solana/HKKp49qGWXd639QsuH7JiLijfVW5UtCVY4s1n2HANwEA
-            // ${BASE_URL}/ns/solana/bonfida.sol
+            // ${BASE_URL}/ns/solana/bonfida.sns
             {
               "address": "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
-              "identity": "bonfida.sol",
+              "identity": "bonfida.sns",
               "platform": "sns",
-              "displayName": "bonfida.sol",
+              "displayName": "bonfida.sns",
               "avatar": null,
               "description": null,
               "header": null,
@@ -2251,7 +2251,7 @@ export default async function Home() {
                   }
                 },
                 "social": {
-                  "uid": 12747,
+                  "uid": null,
                   "following": 1322,
                   "follower": 141799
                 },
