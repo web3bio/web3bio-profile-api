@@ -3205,6 +3205,16 @@ export default async function Home() {
             </p>
             <h3 className="text-bold h6 mt-4">
               <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🪁</span>{" "}
+              2026 October Update
+            </h3>
+            <ul>
+              <li>
+                <span className="label label-gray">Change</span> Migrated Solana
+                Name Service (SNS) to <code>.sns</code> domain.
+              </li>
+            </ul>
+            <h3 className="text-bold h6 mt-4">
+              <span style={{ fontSize: "1.4rem", marginRight: "5px" }}>🪁</span>{" "}
               2026 March Update
             </h3>
             <ul>
