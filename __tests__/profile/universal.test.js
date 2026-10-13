@@ -200,6 +200,14 @@ describe("Test For Universal Profile API", () => {
         expect(json[0].identity).toBe("suji");
       },
     },
+    {
+      name: "jango.eth farcaster handle",
+      path: "/profile/jango.eth",
+      assertJson: (json) => {
+        const farcasterItem = findByPlatform(json, "farcaster");
+        expect(farcasterItem.links.farcaster.handle).toBe("jango.eth");
+      },
+    },
   ];
 
   it.each(cases)("$name", async ({ path, expectedStatus, assertJson }) => {
