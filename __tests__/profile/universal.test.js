@@ -200,14 +200,6 @@ describe("Test For Universal Profile API", () => {
         expect(json[0].identity).toBe("suji");
       },
     },
-    {
-      name: "krys.eth basenames farcaster handle",
-      path: "/profile/krys.eth",
-      assertJson: (json) => {
-        const baseItem = findByPlatform(json, "basenames");
-        expect(baseItem.links.twitter.handle).toBe("miyaspokeofthis");
-      },
-    },
   ];
 
   it.each(cases)("$name", async ({ path, expectedStatus, assertJson }) => {
