@@ -201,11 +201,11 @@ describe("Test For Universal Profile API", () => {
       },
     },
     {
-      name: "krys.eth basenames farcaster handle",
-      path: "/profile/krys.eth",
+      name: "jango.eth farcaster handle",
+      path: "/profile/jango.eth",
       assertJson: (json) => {
-        const baseItem = findByPlatform(json, "basenames");
-        expect(baseItem.links.twitter.handle).toBe("miyaspokeofthis");
+        const farcasterItem = findByPlatform(json, "farcaster");
+        expect(farcasterItem.links.farcaster.handle).toBe("jango.eth");
       },
     },
   ];

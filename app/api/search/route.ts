@@ -89,9 +89,10 @@ const processJson = async (
 
 export async function GET(req: NextRequest) {
   const { searchParams, pathname } = req.nextUrl;
-  const identity = searchParams.get("identity")?.trim() || null;
+  let identity = searchParams.get("identity")?.trim() || null;
   const platform = (searchParams.get("platform")?.trim() ||
     null) as Platform | null;
+  if (platform === Platform.sns) identity = identity?.replace(/\.sol$/i, ".sns") ?? null;
   const headers = getUserHeaders(req.headers);
 
   if (!identity || !platform) {
