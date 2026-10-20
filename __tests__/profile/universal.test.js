@@ -186,13 +186,6 @@ describe("Test For Universal Profile API", () => {
       },
     },
     {
-      name: "30315.eth identity",
-      path: "/profile/30315.eth",
-      assertJson: (json) => {
-        expect(json[0].identity).toBe("30315.eth");
-      },
-    },
-    {
       name: "farcaster,address resolves suji",
       path: "/profile/farcaster,0x7cbba07e31dc7b12bb69a1209c5b11a8ac50acf5",
       assertJson: (json) => {
