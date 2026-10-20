@@ -3,7 +3,7 @@ import { extractClientIp } from "@/utils/ip";
 
 export const config = {
   matcher: [
-    "/(avatar|domain|ns|profile|credential|search|wallet|partner)/:path*",
+    "/(avatar|domain|ns|profile|credential|search|socialGraph|wallet|partner)/:path*",
   ],
 };
 
