@@ -202,9 +202,12 @@ export async function generateProfileStruct(
         : null,
     links: (socialData.links as SocialLinks) || {},
     social:
-      data.social || data.uid
+      data.social || data.uid || data.platform === Platform.lens
         ? {
-            uid: Number(data.social?.uid || data.uid) || null,
+            uid:
+              data.platform === Platform.lens
+                ? null
+                : Number(data.social?.uid || data.uid) || null,
             follower:
               data.social?.follower != null
                 ? Number(data.social.follower)

@@ -3,8 +3,8 @@ import { expectJsonCase } from "../helpers/api-assertions";
 describe("Test For Solana NS API", () => {
   const cases = [
     {
-      name: "bonfida.sol",
-      path: "/ns/solana/bonfida.sol",
+      name: "bonfida.sns",
+      path: "/ns/solana/bonfida.sns",
       assertJson: (json) => {
         expect(json.address).toBe(
           "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",

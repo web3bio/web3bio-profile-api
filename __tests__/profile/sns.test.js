@@ -3,8 +3,8 @@ import { expectJsonCase } from "../helpers/api-assertions";
 describe("Test For Solana Profile API", () => {
   const cases = [
     {
-      name: "bonfida.sol",
-      path: "/profile/sns/bonfida.sol",
+      name: "bonfida.sns",
+      path: "/profile/sns/bonfida.sns",
       assertJson: (json) => {
         expect(json.address).toBe(
           "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
@@ -12,8 +12,8 @@ describe("Test For Solana Profile API", () => {
       },
     },
     {
-      name: "🍍.sol",
-      path: "/profile/sns/🍍.sol",
+      name: "🍍.sns",
+      path: "/profile/sns/🍍.sns",
       assertJson: (json) => {
         expect(json.address).toBe(
           "8fe1EFcmz4BYeX6zGp6HUdoaHjVYhzsv599ub52WJbos",
@@ -22,29 +22,29 @@ describe("Test For Solana Profile API", () => {
       },
     },
     {
-      name: "7059.sol",
-      path: "/profile/sns/7059.sol",
+      name: "7059.sns",
+      path: "/profile/sns/7059.sns",
       assertJson: (json) => {
         expect(json.address).toBeTruthy();
       },
     },
     {
-      name: "0x33.sol",
-      path: "/profile/sns/0x33.sol",
+      name: "0x33.sns",
+      path: "/profile/sns/0x33.sns",
       assertJson: (json) => {
         expect(json.avatar).toBeTruthy();
       },
     },
     {
-      name: "lewsales.sol",
-      path: "/profile/sns/lewsales.sol",
+      name: "lewsales.sns",
+      path: "/profile/sns/lewsales.sns",
       assertJson: (json) => {
         expect(json.contenthash).toBe("ipfs://lewsales.blockchain");
       },
     },
     {
-      name: "anarcrypt.sol",
-      path: "/profile/sns/anarcrypt.sol",
+      name: "anarcrypt.sns",
+      path: "/profile/sns/anarcrypt.sns",
       assertJson: () => {},
     },
     {

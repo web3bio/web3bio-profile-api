@@ -10,13 +10,28 @@ export const config = {
 const GENERAL_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
 
 export function middleware(req: NextRequest) {
+  const url = req.nextUrl.clone();
+  const toSns = (value: string) =>
+    value.replace(/^((?:sns,)?[^,]+)\.sol$/i, "$1.sns");
+  const separator = url.pathname.lastIndexOf("/");
+  try {
+    const handle = decodeURIComponent(url.pathname.slice(separator + 1));
+    const normalized = url.pathname.includes("/batch/")
+      ? JSON.stringify(JSON.parse(handle).map(toSns))
+      : toSns(handle);
+    if (normalized !== handle) {
+      url.pathname =
+        url.pathname.slice(0, separator + 1) + encodeURIComponent(normalized);
+    }
+  } catch {}
+  const shouldRewrite = url.href !== req.nextUrl.href;
   const clientIp = extractClientIp(req);
   const headers = req.headers;
   const shouldSetClientIp =
     clientIp !== "unknown" && headers.get("x-client-ip") !== clientIp;
   const shouldSetApiKey = GENERAL_KEY !== "" && !headers.has("x-api-key");
 
-  if (!(shouldSetClientIp || shouldSetApiKey)) {
+  if (!(shouldSetClientIp || shouldSetApiKey || shouldRewrite)) {
     return NextResponse.next();
   }
 
@@ -28,9 +43,8 @@ export function middleware(req: NextRequest) {
     userHeaders.set("x-api-key", GENERAL_KEY);
   }
 
-  return NextResponse.next({
-    request: {
-      headers: userHeaders,
-    },
-  });
+  if (shouldRewrite) {
+    return NextResponse.rewrite(url, { request: { headers: userHeaders } });
+  }
+  return NextResponse.next({ request: { headers: userHeaders } });
 }

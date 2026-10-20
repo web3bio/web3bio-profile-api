@@ -3,8 +3,8 @@ import { expectJsonCase } from "../helpers/api-assertions";
 describe("Test For SNS NS API", () => {
   const cases = [
     {
-      name: "bonfida.sol",
-      path: "/ns/sns/bonfida.sol",
+      name: "bonfida.sns",
+      path: "/ns/sns/bonfida.sns",
       assertJson: (json) => {
         expect(json.address).toBe(
           "Fw1ETanDZafof7xEULsnq9UY6o71Tpds89tNwPkWLb1v",
@@ -12,8 +12,8 @@ describe("Test For SNS NS API", () => {
       },
     },
     {
-      name: "sujiyan.sol",
-      path: "/ns/sns/sujiyan.sol",
+      name: "sujiyan.sns",
+      path: "/ns/sns/sujiyan.sns",
       assertJson: (json) => {
         expect(json.address).toBe(
           "2E3k7otC558kJJsK8wV8oehXf2VxPRQA3LtyW2mvF6w5",
@@ -21,15 +21,15 @@ describe("Test For SNS NS API", () => {
       },
     },
     {
-      name: "_tesla.sol",
-      path: "/ns/sns/_tesla.sol",
+      name: "_tesla.sns",
+      path: "/ns/sns/_tesla.sns",
       assertJson: (json) => {
         expect(json.address).toBeTruthy();
       },
     },
     {
-      name: "wallet-guide-9.sol",
-      path: "/ns/sns/wallet-guide-9.sol",
+      name: "wallet-guide-9.sns",
+      path: "/ns/sns/wallet-guide-9.sns",
       assertJson: (json) => {
         expect(json.avatar).toBeTruthy();
       },

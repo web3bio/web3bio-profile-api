@@ -193,8 +193,20 @@ describe("Worker response caching", () => {
     expect(workerCacheKey(`${origin}/profile/solana/${solana}`).url).not.toBe(
       workerCacheKey(`${origin}/profile/solana/${solana.toLowerCase()}`).url,
     );
+    expect(workerCacheKey(`${origin}/profile/${solana}.solana`).url).toBe(
+      `${origin}/profile/${solana}.solana`,
+    );
     expect(workerCacheKey(`${origin}/search?platform=ens&identity=Alice.ETH`).url).toBe(
       workerCacheKey(`${origin}/search?identity=alice.eth&platform=ens`).url,
+    );
+  });
+
+  it("normalizes qualified platform prefixes without merging case-sensitive SVGs", () => {
+    expect(workerCacheKey(`${origin}/profile/ENS,Alice.ETH`).url).toBe(
+      workerCacheKey(`${origin}/profile/ens,alice.eth`).url,
+    );
+    expect(workerCacheKey(`${origin}/avatar/svg/Alice.eth`).url).not.toBe(
+      workerCacheKey(`${origin}/avatar/svg/alice.eth`).url,
     );
   });
 });
