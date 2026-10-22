@@ -200,9 +200,7 @@ const handler = {
       return openNextHandler.fetch(requestWithClientIp, env, ctx);
     }
 
-    const userToken = pathname.startsWith("/socialgraph/")
-      ? null
-      : request.headers.get("x-api-key");
+    const userToken = request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
     const verifiedToken = userToken ? await verifyApiToken(userToken, env) : null;
 

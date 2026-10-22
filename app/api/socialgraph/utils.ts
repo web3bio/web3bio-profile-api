@@ -19,6 +19,7 @@ const parseInteger = (value: string | null, fallback: number) =>
 
 export async function getSocialGraph(req: NextRequest, handle: string) {
   const { pathname, searchParams } = req.nextUrl;
+  handle = handle.replace(/^[^,]+/, (prefix) => prefix.toLowerCase());
   const match = /^(farcaster|lens),([^,\s]+)$/.exec(handle);
   if (!match) return invalidIdentityResponse(pathname, handle, null, 400);
   const platform = match[1] as Platform;
