@@ -7,3 +7,10 @@ allowBuilds:
   sharp: true
   unrs-resolver: true
   workerd: true
+minimumReleaseAgeExclude:
+  - '@opennextjs/aws@4.1.12'
+  - '@opennextjs/cloudflare@1.20.13'
+  - viem@2.57.8
+overrides:
+  next>postcss: 8.5.23
+  '@node-minify/core>glob': 10.5.0

@@ -21,7 +21,6 @@ export enum QueryType {
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
   GET_SOCIAL_GRAPH = "GET_SOCIAL_GRAPH",
-  GET_SOCIAL_GRAPH_RECOMMENDATIONS = "GET_SOCIAL_GRAPH_RECOMMENDATIONS",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
   REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
@@ -501,47 +500,8 @@ const GET_SEARCH_QUERY = `
   }
 `;
 
-const SOCIAL_GRAPH_FIELDS = `
-  pagination {
-    total
-    page
-    totalPage
-    hasMore
-  }
-  source {
-    id
-    identity
-    platform
-    displayName
-    avatar
-  }
-  vertices {
-    id
-    identity
-    platform
-    displayName
-    avatar
-  }
-  edges {
-    source
-    target
-    dataSource
-    edgeType
-    recommendReason
-    updatedAt
-  }
-`;
-
 const GET_SOCIAL_GRAPH = `
-  query GET_SOCIAL_GRAPH($handle: String!, $page: Union!, $totalPage: Union!) {
-    twitterSocialSearch(handle: $handle, page: $page, totalPage: $totalPage) {
-      ${SOCIAL_GRAPH_FIELDS}
-    }
-  }
-`;
-
-const GET_SOCIAL_GRAPH_RECOMMENDATIONS = `
-  query GET_SOCIAL_GRAPH_RECOMMENDATIONS(
+  query QUERY_SOCIAL(
     $sourceId: String!
     $recommendPlatform: Platform!
     $page: Union!
@@ -553,7 +513,38 @@ const GET_SOCIAL_GRAPH_RECOMMENDATIONS = `
       page: $page
       totalPage: $totalPage
     ) {
-      ${SOCIAL_GRAPH_FIELDS}
+      pagination {
+        total
+        hasMore
+        page
+        limit: totalPage
+      }
+      source {
+        id
+        platform
+        identity
+        address
+        displayName
+        avatar
+        description
+      }
+      vertices {
+        id
+        platform
+        identity
+        address
+        displayName
+        avatar
+        description
+      }
+      edges {
+        source
+        target
+        edgeType
+        dataSource
+        recommendReason
+        updatedAt
+      }
     }
   }
 `;
@@ -578,10 +569,6 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
   [QueryType.GET_SOCIAL_GRAPH, GET_SOCIAL_GRAPH],
-  [
-    QueryType.GET_SOCIAL_GRAPH_RECOMMENDATIONS,
-    GET_SOCIAL_GRAPH_RECOMMENDATIONS,
-  ],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
   [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);

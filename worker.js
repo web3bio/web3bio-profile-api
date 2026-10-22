@@ -11,7 +11,7 @@ const CACHEABLE_API_PATHS = new Set([
   "/profile",
   "/credential",
   "/search",
-  "/socialGraph",
+  "/socialgraph",
   "/wallet",
   "/partner",
   "/refresh",
@@ -148,6 +148,7 @@ function isCacheableResponse(response, pathname) {
 }
 
 function getTTL(pathname) {
+  if (pathname.startsWith("/socialgraph/")) return 2592000;
   if (pathname.startsWith("/avatar/svg/")) return 2592000; // 30d
   if (pathname.startsWith("/avatar/")) return 86400; // 24h
   if (pathname.startsWith("/domain/")) return 900; // 15m
@@ -199,7 +200,9 @@ const handler = {
       return openNextHandler.fetch(requestWithClientIp, env, ctx);
     }
 
-    const userToken = request.headers.get("x-api-key");
+    const userToken = pathname.startsWith("/socialgraph/")
+      ? null
+      : request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
     const verifiedToken = userToken ? await verifyApiToken(userToken, env) : null;
 
