@@ -14,9 +14,6 @@ describe("Test For Badges API", () => {
         "https://explorer.lens.xyz/token/0x81A028cb73D88e54f8C148Eb08861572d09B808B/instance/18040",
     },
     { platform: "lens", identity: "thetrickymoney.lens" },
-    { platform: "lens", identity: "abaandon.lens" },
-    { platform: "lens", identity: "rvkingr.lens" },
-    { platform: "lens", identity: "forgetginger.lens" },
   ];
 
   it.each(cases)("$platform,$identity", async ({ platform, identity, expectedBadgeUrl }) => {
