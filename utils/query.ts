@@ -12,6 +12,7 @@ import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
+  GET_BADGES_QUERY = "GET_BADGES_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
   GET_DOMAIN = "GET_DOMAIN",
@@ -96,6 +97,24 @@ const GET_CREDENTIALS_QUERY = `
             expiredAt
           }
         }
+      }
+    }
+  }
+`;
+
+const GET_BADGES_QUERY = `
+  query GET_BADGES_QUERY($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      badges {
+        badgeId
+        badgeName
+        badgeCategory
+        network
+        address
+        claimTxhash
+        dataSource
+        issuedAt
+        updatedAt
       }
     }
   }
@@ -560,6 +579,7 @@ const REFRESH_DOMAIN = `
 
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
+  [QueryType.GET_BADGES_QUERY, GET_BADGES_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
