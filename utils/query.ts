@@ -22,6 +22,7 @@ export enum QueryType {
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
   GET_SOCIAL_GRAPH = "GET_SOCIAL_GRAPH",
+  GET_ASSOCIATED_ACCOUNTS = "GET_ASSOCIATED_ACCOUNTS",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
   REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
@@ -568,6 +569,34 @@ const GET_SOCIAL_GRAPH = `
   }
 `;
 
+const GET_ASSOCIATED_ACCOUNTS = `
+  query GET_ASSOCIATED_ACCOUNTS($queryIds: [String!]!) {
+    batchAssociatedAccountsLookup(queryIds: $queryIds) {
+      queryId
+      profile {
+        id
+        uid
+        identity
+        platform
+        network
+        address
+        avatar
+        description
+      }
+      associatedAccounts {
+        id
+        uid
+        identity
+        platform
+        network
+        address
+        avatar
+        description
+      }
+    }
+  }
+`;
+
 const REFRESH_DOMAIN = `
   query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
     domainRefresh(platform: $platform, identity: $identity) {
@@ -589,6 +618,7 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
   [QueryType.GET_SOCIAL_GRAPH, GET_SOCIAL_GRAPH],
+  [QueryType.GET_ASSOCIATED_ACCOUNTS, GET_ASSOCIATED_ACCOUNTS],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
   [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);
