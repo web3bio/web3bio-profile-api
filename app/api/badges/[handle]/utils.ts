@@ -23,8 +23,10 @@ export const resolveBadgesHandle = async (
         identity,
         platform,
         path: pathname,
-        code: 404,
-        message: ErrorMessages.NOT_FOUND,
+        code: res.errors ? (res.code ?? 500) : 404,
+        message: res.errors
+          ? ErrorMessages.NETWORK_ERROR
+          : ErrorMessages.NOT_FOUND,
       });
     }
 
