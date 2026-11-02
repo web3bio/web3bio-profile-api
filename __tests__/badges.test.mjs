@@ -1,3 +1,4 @@
+import { ErrorMessages } from "web3bio-profile-kit/types";
 import { expectJsonCase } from "./helpers/api-assertions";
 
 describe("Test For Badges API", () => {
@@ -7,44 +8,23 @@ describe("Test For Badges API", () => {
     { platform: "farcaster", identity: "abaandon" },
     { platform: "farcaster", identity: "rvkingr" },
     { platform: "farcaster", identity: "forgetginger" },
-    {
-      platform: "lens",
-      identity: "everyone.lens",
-      expectedBadgeUrl:
-        "https://explorer.lens.xyz/token/0x81A028cb73D88e54f8C148Eb08861572d09B808B/instance/18040",
-    },
+    { platform: "lens", identity: "everyone.lens" },
     { platform: "lens", identity: "thetrickymoney.lens" },
   ];
 
-  it.each(cases)("$platform,$identity", async ({ platform, identity, expectedBadgeUrl }) => {
+  it.each(cases)("$platform,$identity without badges", async ({ platform, identity }) => {
     await expectJsonCase({
       path: `/badges/${encodeURIComponent(`${platform},${identity}`)}`,
+      expectedStatus: 404,
       assertJson: (json, res) => {
         expect(res.headers.get("x-request-platform")).toBe(platform);
-        expect(Array.isArray(json)).toBe(true);
-        expect(json.length).toBeGreaterThan(0);
-        if (expectedBadgeUrl) {
-          expect(json.some((badge) => badge.badgeUrl === expectedBadgeUrl)).toBe(true);
-        }
-        for (const badge of json) {
-          expect(badge).toEqual({
-            badgeId: expect.any(String),
-            badgeName: expect.any(String),
-            badgeCategory: expect.any(String),
-            network: expect.any(String),
-            address: expect.any(String),
-            claimTxhash: expect.any(String),
-            dataSource: expect.any(String),
-            issuedAt: expect.any(Number),
-            updatedAt: expect.any(Number),
-            badgeUrl: expect.any(String),
-          });
-          expect(badge.badgeId).toMatch(/-\d+$/);
-          const tokenId = badge.badgeId.slice(badge.badgeId.lastIndexOf("-") + 1);
-          expect(badge.badgeUrl).toBe(
-            `https://explorer.lens.xyz/token/0x81A028cb73D88e54f8C148Eb08861572d09B808B/instance/${tokenId}`,
-          );
-        }
+        expect(res.headers.get("cache-control")).toBe("no-store");
+        expect(json).toEqual({
+          identity,
+          platform,
+          path: expect.any(String),
+          error: ErrorMessages.NOT_FOUND,
+        });
       },
     });
   });
