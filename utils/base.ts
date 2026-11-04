@@ -96,12 +96,12 @@ export const resolveIdentityResponse = async (
     headers,
   );
 
-  if (res.msg) {
+  if (res.msg || res.errors) {
     return {
       identity: handle,
       platform,
-      message: res.msg,
-      code: res.code,
+      message: res.msg || res.errors,
+      code: res.code || 500,
     };
   }
 
