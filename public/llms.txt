@@ -16,6 +16,7 @@ URL-encode the identity as one path segment. Use the returned platform together 
 - Public profile endpoints allow anonymous requests, limited to 6 requests per 10 seconds per IP. Shared crawler IPs share this allowance.
 - Fetch clients can send their own key as `X-API-KEY: Bearer YOUR_API_KEY`. Never put keys in URLs. [Obtain a key](https://api.web3.bio/#api-key).
 - GET /profile/web2/{identity} requires an authorized API key for external clients.
+- Automated crawling is limited to documentation and public single-profile endpoints. Batch, web2, and other API endpoints are excluded in robots.txt; fetch clients still need to follow the API's access rules.
 - 403 means the API key is missing, invalid, or lacks permission. Do not retry with the same credentials.
 - 404 means the identity is invalid or no profile was found. A fetch failure does not prove an identity is absent.
 - 429 means rate limited. Wait at least the Retry-After number of seconds, then use bounded backoff instead of immediate parallel retries.

@@ -615,7 +615,7 @@ export async function postIdentityGraphQuery(
     !body || typeof body !== "object" || Array.isArray(body) ||
     !("data" in body || "errors" in body || "msg" in body)
   )) {
-    throw new Error("Invalid Identity Graph response", { cause: { code: 502 } });
+    throw new Error("Invalid Identity Graph response", { cause: 502 });
   }
 
   return {
@@ -671,7 +671,18 @@ export async function queryIdentityGraph(
       };
     }
 
-    return r.body as any;
+    const body = r.body as any;
+    const result = body.data?.[
+      query === QueryType.REFRESH_DOMAIN ? "domainRefresh" : "identity"
+    ];
+    if (!body.msg && !body.errors && (
+      result === undefined ||
+      (result !== null && (typeof result !== "object" || Array.isArray(result)))
+    )) {
+      throw new Error("Invalid Identity Graph response");
+    }
+
+    return body;
   } catch (error) {
     const timedOut = typeof error === "object" && error !== null &&
       "name" in error && error.name === "TimeoutError";
