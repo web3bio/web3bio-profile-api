@@ -10,7 +10,7 @@ const CACHEABLE_API_PATHS = new Set([
   "/ns",
   "/profile",
   "/credential",
-  "/badges",
+  "/badge",
   "/search",
   "/socialgraph",
   "/wallet",
@@ -25,7 +25,7 @@ const PATH_MIN_ROLE = {
   "/wallet": MIN_ROLE_RESTRICTED,
 };
 const RATE_LIMIT_ERROR =
-  "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
+  "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#api-key.";
 
 function isCacheableApiPath(pathname) {
   const secondSlash = pathname.indexOf("/", 1);

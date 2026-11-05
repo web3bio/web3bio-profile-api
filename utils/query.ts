@@ -102,19 +102,31 @@ const GET_CREDENTIALS_QUERY = `
   }
 `;
 
+const BADGE_FIELDS = `
+  badgeId
+  badgeName
+  badgeCategory
+  network
+  address
+  claimTxhash
+  dataSource
+  issuedAt
+  updatedAt
+`;
+
 const GET_BADGES_QUERY = `
   query GET_BADGES_QUERY($platform: Platform!, $identity: String!) {
     identity(platform: $platform, identity: $identity) {
-      badges {
-        badgeId
-        badgeName
-        badgeCategory
-        network
+      profile {
         address
-        claimTxhash
-        dataSource
-        issuedAt
-        updatedAt
+      }
+      badges {${BADGE_FIELDS}}
+      identityGraph {
+        vertices {
+          id
+          platform
+          badges {${BADGE_FIELDS}}
+        }
       }
     }
   }
