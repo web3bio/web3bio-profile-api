@@ -12,6 +12,7 @@ import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
 export enum QueryType {
   GET_CREDENTIALS_QUERY = "GET_CREDENTIALS_QUERY",
+  GET_BADGES_QUERY = "GET_BADGES_QUERY",
   GET_PROFILES_NS = "GET_PROFILES_NS",
   GET_PROFILES = "GET_PROFILES",
   GET_DOMAIN = "GET_DOMAIN",
@@ -21,6 +22,8 @@ export enum QueryType {
   GET_SEARCH_SUGGEST = "GET_SEARCH_SUGGEST",
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
   GET_SOCIAL_GRAPH = "GET_SOCIAL_GRAPH",
+  GET_ASSOCIATED_ACCOUNTS = "GET_ASSOCIATED_ACCOUNTS",
+  GET_FOLLOWING_ASSOCIATED_ACCOUNTS = "GET_FOLLOWING_ASSOCIATED_ACCOUNTS",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
   REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
@@ -96,6 +99,24 @@ const GET_CREDENTIALS_QUERY = `
             expiredAt
           }
         }
+      }
+    }
+  }
+`;
+
+const GET_BADGES_QUERY = `
+  query GET_BADGES_QUERY($platform: Platform!, $identity: String!) {
+    identity(platform: $platform, identity: $identity) {
+      badges {
+        badgeId
+        badgeName
+        badgeCategory
+        network
+        address
+        claimTxhash
+        dataSource
+        issuedAt
+        updatedAt
       }
     }
   }
@@ -549,6 +570,77 @@ const GET_SOCIAL_GRAPH = `
   }
 `;
 
+const GET_ASSOCIATED_ACCOUNTS = `
+  query GET_ASSOCIATED_ACCOUNTS($queryIds: [String!]!) {
+    batchAssociatedAccountsLookup(queryIds: $queryIds) {
+      queryId
+      profile {
+        id
+        uid
+        identity
+        platform
+        network
+        address
+        avatar
+        description
+      }
+      associatedAccounts {
+        id
+        uid
+        identity
+        platform
+        network
+        address
+        avatar
+        description
+      }
+    }
+  }
+`;
+
+const GET_FOLLOWING_ASSOCIATED_ACCOUNTS = `
+  query GET_FOLLOWING_ASSOCIATED_ACCOUNTS(
+    $sourcePlatform: Platform!
+    $sourceIdentity: String!
+    $targetPlatform: Platform!
+    $page: Union!
+    $totalPage: Union!
+  ) {
+    searchFollowingAssociatedAccounts(
+      sourcePlatform: $sourcePlatform
+      sourceIdentity: $sourceIdentity
+      targetPlatform: $targetPlatform
+      page: $page
+      totalPage: $totalPage
+    ) {
+      pagination {
+        total
+        hasMore
+        page
+        limit: totalPage
+      }
+      queryId
+      profile { ...FollowingProfile }
+      following {
+        queryId
+        profile { ...FollowingProfile }
+        associatedAccounts { ...FollowingProfile }
+      }
+    }
+  }
+
+  fragment FollowingProfile on IdentityProfileSimplified {
+    id
+    uid
+    identity
+    platform
+    network
+    address
+    avatar
+    description
+  }
+`;
+
 const REFRESH_DOMAIN = `
   query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
     domainRefresh(platform: $platform, identity: $identity) {
@@ -560,6 +652,7 @@ const REFRESH_DOMAIN = `
 
 const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_CREDENTIALS_QUERY, GET_CREDENTIALS_QUERY],
+  [QueryType.GET_BADGES_QUERY, GET_BADGES_QUERY],
   [QueryType.GET_PROFILES_NS, GET_PROFILES_NS],
   [QueryType.GET_PROFILES, GET_PROFILES],
   [QueryType.GET_DOMAIN, GET_DOMAIN],
@@ -569,6 +662,8 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SEARCH_SUGGEST, GET_SEARCH_SUGGEST],
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
   [QueryType.GET_SOCIAL_GRAPH, GET_SOCIAL_GRAPH],
+  [QueryType.GET_ASSOCIATED_ACCOUNTS, GET_ASSOCIATED_ACCOUNTS],
+  [QueryType.GET_FOLLOWING_ASSOCIATED_ACCOUNTS, GET_FOLLOWING_ASSOCIATED_ACCOUNTS],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
   [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);

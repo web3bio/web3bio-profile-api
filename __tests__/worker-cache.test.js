@@ -201,6 +201,65 @@ describe("Worker response caching", () => {
     );
   });
 
+  it("caches identity GETs for 30 days without changing the echoed queryId", async () => {
+    openNextHandler.fetch.mockImplementation(async (req) => Response.json({
+      queryId: decodeURIComponent(new URL(req.url).pathname.split("/").pop()),
+      profile: null,
+      associatedAccounts: [],
+    }));
+    const path = "/socialgraph/identities/lens,sujiyan.lens";
+    await request(path);
+    const hit = await request(path);
+    expect(hit.headers.get("x-cache-hit")).toBe("HIT");
+    expect(hit.headers.get("cache-control")).toContain("max-age=2592000");
+    const mixed = await request("/socialgraph/identities/lens,SujiYan.lens");
+    expect((await mixed.json()).queryId).toBe("lens,SujiYan.lens");
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(2);
+    await purgeWorkerCache("lens", "sujiyan.lens", origin);
+    expect(await cache.match(workerCacheKey(path, origin))).toBeUndefined();
+  });
+
+  it("never caches POST identity batches under their shared URL", async () => {
+    openNextHandler.fetch.mockImplementation(async (req) =>
+      Response.json((await req.json()).queryIds),
+    );
+    for (const id of ["lens,sujiyan.lens", "farcaster,#12396"]) {
+      const response = await request("/socialgraph/identities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ queryIds: [id] }),
+      });
+      expect(await response.json()).toEqual([id]);
+      expect(response.headers.get("cache-control")).toBe("no-store");
+    }
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(2);
+    expect(cache.match).not.toHaveBeenCalled();
+    expect(cache.put).not.toHaveBeenCalled();
+  });
+
+  it.each(["farcaster", "%66arcaster"])("caches following GETs for target %s while preserving queryId case and pagination", async (target) => {
+    openNextHandler.fetch.mockImplementation(async (req) => {
+      const url = new URL(req.url);
+      return Response.json({
+        queryId: decodeURIComponent(url.pathname.split("/").pop()),
+        pagination: { page: Number(url.searchParams.get("page") || 0) },
+        following: [],
+      });
+    });
+    const path = `/socialgraph/following/${target}/lens,SujiYan.lens?page=0&limit=50`;
+    await request(path);
+    const hit = await request(path);
+    expect(hit.headers.get("x-cache-hit")).toBe("HIT");
+    expect(hit.headers.get("cache-control")).toContain("max-age=2592000");
+    expect((await hit.json()).queryId).toBe("lens,SujiYan.lens");
+    const lower = await request(path.replace("SujiYan", "sujiyan"));
+    expect((await lower.json()).queryId).toBe("lens,sujiyan.lens");
+    const next = await request(path.replace("page=0", "page=1"));
+    expect((await next.json()).pagination.page).toBe(1);
+    await request(path.replace("limit=50", "limit=100"));
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(4);
+  });
+
   it("normalizes qualified platform prefixes without merging case-sensitive SVGs", () => {
     expect(workerCacheKey(`${origin}/profile/ENS,Alice.ETH`).url).toBe(
       workerCacheKey(`${origin}/profile/ens,alice.eth`).url,

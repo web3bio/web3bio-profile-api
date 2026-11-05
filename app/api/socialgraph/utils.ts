@@ -14,7 +14,7 @@ import {
   respondJson,
 } from "@/utils/utils";
 
-const parseInteger = (value: string | null, fallback: number) =>
+export const parseInteger = (value: string | null, fallback: number) =>
   value === null ? fallback : /^\d+$/.test(value) ? Number(value) : NaN;
 
 export async function getSocialGraph(req: NextRequest, handle: string) {

@@ -22,6 +22,11 @@ function normalizedPath(pathname: string): string {
 
   try {
     let handle = decodeURIComponent(pathname.slice(separator + 1));
+    // Associated-account lookups echo queryId verbatim.
+    if (prefix === "/socialgraph/identities/" ||
+        /^\/socialgraph\/following\/[^/]+\/$/i.test(prefix)) {
+      return prefix + encodeURIComponent(handle);
+    }
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
       const ids: unknown = JSON.parse(handle);
       if (!Array.isArray(ids) || !ids.every((id) => typeof id === "string")) {
@@ -72,6 +77,9 @@ export function getCacheKeysToClear(
     `/avatar/${id}`,
     `/credential/${identity}`,
     `/credential/${id}`,
+    `/badges/${identity}`,
+    `/badges/${id}`,
+    `/socialgraph/identities/${id}`,
     `/wallet/${identity}`,
     `/wallet/${id}`,
     `/search?identity=${encodeURIComponent(identity)}&platform=${platform}`,
