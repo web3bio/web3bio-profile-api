@@ -23,7 +23,8 @@ function normalizedPath(pathname: string): string {
   try {
     let handle = decodeURIComponent(pathname.slice(separator + 1));
     // Associated-account lookups echo queryId verbatim.
-    if (prefix === "/socialgraph/identities/") {
+    if (prefix === "/socialgraph/identities/" ||
+        /^\/socialgraph\/following\/(?:lens|farcaster)\/$/.test(prefix)) {
       return prefix + encodeURIComponent(handle);
     }
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {

@@ -23,6 +23,7 @@ export enum QueryType {
   GET_SEARCH_QUERY = "GET_SEARCH_QUERY",
   GET_SOCIAL_GRAPH = "GET_SOCIAL_GRAPH",
   GET_ASSOCIATED_ACCOUNTS = "GET_ASSOCIATED_ACCOUNTS",
+  GET_FOLLOWING_ASSOCIATED_ACCOUNTS = "GET_FOLLOWING_ASSOCIATED_ACCOUNTS",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
   REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
@@ -597,6 +598,49 @@ const GET_ASSOCIATED_ACCOUNTS = `
   }
 `;
 
+const GET_FOLLOWING_ASSOCIATED_ACCOUNTS = `
+  query GET_FOLLOWING_ASSOCIATED_ACCOUNTS(
+    $sourcePlatform: Platform!
+    $sourceIdentity: String!
+    $targetPlatform: Platform!
+    $page: Union!
+    $totalPage: Union!
+  ) {
+    searchFollowingAssociatedAccounts(
+      sourcePlatform: $sourcePlatform
+      sourceIdentity: $sourceIdentity
+      targetPlatform: $targetPlatform
+      page: $page
+      totalPage: $totalPage
+    ) {
+      pagination {
+        total
+        hasMore
+        page
+        limit: totalPage
+      }
+      queryId
+      profile { ...FollowingProfile }
+      following {
+        queryId
+        profile { ...FollowingProfile }
+        associatedAccounts { ...FollowingProfile }
+      }
+    }
+  }
+
+  fragment FollowingProfile on IdentityProfileSimplified {
+    id
+    uid
+    identity
+    platform
+    network
+    address
+    avatar
+    description
+  }
+`;
+
 const REFRESH_DOMAIN = `
   query REFRESH_DOMAIN($platform: Platform!, $identity: String!) {
     domainRefresh(platform: $platform, identity: $identity) {
@@ -619,6 +663,7 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SEARCH_QUERY, GET_SEARCH_QUERY],
   [QueryType.GET_SOCIAL_GRAPH, GET_SOCIAL_GRAPH],
   [QueryType.GET_ASSOCIATED_ACCOUNTS, GET_ASSOCIATED_ACCOUNTS],
+  [QueryType.GET_FOLLOWING_ASSOCIATED_ACCOUNTS, GET_FOLLOWING_ASSOCIATED_ACCOUNTS],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
   [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);

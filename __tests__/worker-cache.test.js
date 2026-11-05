@@ -237,6 +237,29 @@ describe("Worker response caching", () => {
     expect(cache.put).not.toHaveBeenCalled();
   });
 
+  it("caches following GETs for 30 days while preserving queryId case and pagination", async () => {
+    openNextHandler.fetch.mockImplementation(async (req) => {
+      const url = new URL(req.url);
+      return Response.json({
+        queryId: decodeURIComponent(url.pathname.split("/").pop()),
+        pagination: { page: Number(url.searchParams.get("page") || 0) },
+        following: [],
+      });
+    });
+    const path = "/socialgraph/following/farcaster/lens,SujiYan.lens?page=0&limit=50";
+    await request(path);
+    const hit = await request(path);
+    expect(hit.headers.get("x-cache-hit")).toBe("HIT");
+    expect(hit.headers.get("cache-control")).toContain("max-age=2592000");
+    expect((await hit.json()).queryId).toBe("lens,SujiYan.lens");
+    const lower = await request(path.replace("SujiYan", "sujiyan"));
+    expect((await lower.json()).queryId).toBe("lens,sujiyan.lens");
+    const next = await request(path.replace("page=0", "page=1"));
+    expect((await next.json()).pagination.page).toBe(1);
+    await request(path.replace("limit=50", "limit=100"));
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(4);
+  });
+
   it("normalizes qualified platform prefixes without merging case-sensitive SVGs", () => {
     expect(workerCacheKey(`${origin}/profile/ENS,Alice.ETH`).url).toBe(
       workerCacheKey(`${origin}/profile/ens,alice.eth`).url,

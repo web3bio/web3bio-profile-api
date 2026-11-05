@@ -43,6 +43,27 @@ Platform-specific routes are available under `/profile` and `/ns` for `ens`, `et
 
 See the [interactive API documentation](https://api.web3.bio) for request/response examples.
 
+## Social Graph
+
+| Endpoint | Description |
+| --- | --- |
+| `GET /socialgraph/{sourceId}` | Existing cross-platform recommendations |
+| `POST /socialgraph/identities` | Associated accounts for 1–200 Lens/Farcaster query IDs; body: `{"queryIds":["lens,sujiyan.lens","farcaster,#12396"]}` |
+| `GET /socialgraph/identities/{sourceId}` | Associated accounts for one Lens/Farcaster identity |
+| `GET /socialgraph/following/{targetPlatform}/{sourceId}` | Accounts followed on the source platform that have associated accounts on the target platform |
+
+Following supports Farcaster → Lens and Lens → Farcaster. `sourceId` is
+`farcaster,{fname}` / `farcaster,#{fid}` or `lens,{username or address}`.
+URL-encode `#` as `%23` when using a FID in a URL.
+For following, `page` defaults to 0; `limit` defaults to 200 and accepts 1–200.
+The response contains `pagination`, `queryId`, `profile`, and `following`;
+each following entry contains `queryId`, `profile`, and `associatedAccounts`.
+Pagination uses `limit` for the backend's `totalPage`, matching recommendations;
+the API forwards these parameters and returns the backend result unchanged.
+GET responses use the existing 30-day SocialGraph cache; POST batches use `no-store`.
+
+Example: `/socialgraph/following/lens/farcaster,%2312396?page=0&limit=50`.
+
 ## Partner APIs
 
 Partner endpoints return tailored response formats for third-party integrations.
