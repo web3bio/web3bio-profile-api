@@ -237,7 +237,7 @@ describe("Worker response caching", () => {
     expect(cache.put).not.toHaveBeenCalled();
   });
 
-  it("caches following GETs for 30 days while preserving queryId case and pagination", async () => {
+  it.each(["farcaster", "%66arcaster"])("caches following GETs for target %s while preserving queryId case and pagination", async (target) => {
     openNextHandler.fetch.mockImplementation(async (req) => {
       const url = new URL(req.url);
       return Response.json({
@@ -246,7 +246,7 @@ describe("Worker response caching", () => {
         following: [],
       });
     });
-    const path = "/socialgraph/following/farcaster/lens,SujiYan.lens?page=0&limit=50";
+    const path = `/socialgraph/following/${target}/lens,SujiYan.lens?page=0&limit=50`;
     await request(path);
     const hit = await request(path);
     expect(hit.headers.get("x-cache-hit")).toBe("HIT");
