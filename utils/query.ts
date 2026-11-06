@@ -625,6 +625,7 @@ export async function postIdentityGraphQuery(
   query: string,
   variables: Record<string, unknown>,
 ): Promise<IdentityGraphPostResult> {
+  const signal = AbortSignal.timeout(30_000);
   const response = await fetch(IDENTITY_GRAPH_SERVER, {
     method: "POST",
     headers: {
@@ -632,14 +633,21 @@ export async function postIdentityGraphQuery(
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ query, variables }),
-    signal: AbortSignal.timeout(30_000),
+    signal,
   });
 
-  let body: unknown;
+  let body: unknown = null;
   try {
     body = await response.json();
   } catch {
-    body = null;
+    signal.throwIfAborted();
+  }
+
+  if (response.ok && (
+    !body || typeof body !== "object" || Array.isArray(body) ||
+    !("data" in body || "errors" in body || "msg" in body)
+  )) {
+    throw new Error("Invalid Identity Graph response", { cause: 502 });
   }
 
   return {
@@ -695,10 +703,26 @@ export async function queryIdentityGraph(
       };
     }
 
-    return r.body as any;
+    const body = r.body as any;
+    const result = body.data?.[
+      query === QueryType.REFRESH_DOMAIN ? "domainRefresh" : "identity"
+    ];
+    if (!body.msg && !body.errors && (
+      result === undefined ||
+      (result !== null && (typeof result !== "object" || Array.isArray(result)))
+    )) {
+      throw new Error("Invalid Identity Graph response");
+    }
+
+    return body;
   } catch (error) {
+    const timedOut = typeof error === "object" && error !== null &&
+      "name" in error && error.name === "TimeoutError";
     return {
-      errors: error instanceof Error ? error.message : "Unknown error occurred",
+      errors: timedOut
+        ? "Identity Graph request timed out"
+        : "Identity Graph request failed",
+      code: timedOut ? 504 : 502,
     };
   }
 }

@@ -42,6 +42,19 @@ const nextConfig = {
             key: "Access-Control-Allow-Headers",
             value: "Content-Type, X-Api-Key",
           },
+          {
+            key: "Access-Control-Expose-Headers",
+            value: "Retry-After, X-Request-Platform",
+          },
+        ],
+      },
+      {
+        source: "/profile/:path*",
+        headers: [
+          {
+            key: "Link",
+            value: '</llms.txt>; rel="describedby"; type="text/plain"',
+          },
         ],
       },
     ];
