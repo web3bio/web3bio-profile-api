@@ -10,6 +10,11 @@ const config: Config = {
   coverageProvider: "v8",
   testEnvironment: "node",
   testTimeout: 200000,
+  testMatch: [
+    "**/__tests__/**/*.[jt]s?(x)",
+    "**/?(*.)+(spec|test).[tj]s?(x)",
+    "**/?(*.)+(spec|test).mjs",
+  ],
   testPathIgnorePatterns: [
     "/__tests__/helpers/",
   ],

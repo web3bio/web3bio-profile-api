@@ -72,6 +72,8 @@ export function getCacheKeysToClear(
     `/avatar/${id}`,
     `/credential/${identity}`,
     `/credential/${id}`,
+    `/badge/${identity}`,
+    `/badge/${id}`,
     `/wallet/${identity}`,
     `/wallet/${id}`,
     `/search?identity=${encodeURIComponent(identity)}&platform=${platform}`,
