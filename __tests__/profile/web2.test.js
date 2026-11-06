@@ -21,9 +21,7 @@ describe("Test For Profile Web2 API", () => {
         expect(findByPlatform(json, "ens").links.website.handle).toBe(
           "linktr.ee/alexanderchopan",
         );
-        expect(findByPlatform(json, "github").links.website.handle).toBe(
-          "linktr.ee/alexanderchopan",
-        );
+        expect(findByPlatform(json, "github").identity).toBe("alexanderchopan");
       },
     },
   ];
