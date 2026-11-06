@@ -10,6 +10,7 @@ const CACHEABLE_API_PATHS = new Set([
   "/ns",
   "/profile",
   "/credential",
+  "/badge",
   "/search",
   "/socialgraph",
   "/wallet",
