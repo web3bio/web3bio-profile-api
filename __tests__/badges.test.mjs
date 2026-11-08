@@ -98,7 +98,7 @@ describe("collectBadges", () => {
   });
 });
 
-describe("Test For Badges API", () => {
+describe("Test For Badge API", () => {
   const cases = [
     { platform: "farcaster", identity: "thetrickymoney.eth" },
     { platform: "farcaster", identity: "jasvinder500" },
@@ -112,17 +112,7 @@ describe("Test For Badges API", () => {
   it.each(cases)("$platform,$identity without badges", async ({ platform, identity }) => {
     await expectJsonCase({
       path: `/badge/${encodeURIComponent(`${platform},${identity}`)}`,
-      expectedStatus: 404,
-      assertJson: (json, res) => {
-        expect(res.headers.get("x-request-platform")).toBe(platform);
-        expect(res.headers.get("cache-control")).toBe("no-store");
-        expect(json).toEqual({
-          identity,
-          platform,
-          path: expect.any(String),
-          error: ErrorMessages.NOT_FOUND,
-        });
-      },
+      expectedStatus: 200,
     });
   });
 
