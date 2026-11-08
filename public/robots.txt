@@ -1,8 +1,3 @@
 User-agent: *
-Disallow: /
-Allow: /$
-Allow: /robots.txt$
-Allow: /llms.txt$
-Allow: /profile/
 Disallow: /profile/batch/
 Disallow: /profile/web2/
