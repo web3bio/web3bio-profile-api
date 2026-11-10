@@ -139,6 +139,63 @@ describe("Worker response caching", () => {
     expect(cache.put).not.toHaveBeenCalled();
   });
 
+  it("serves the same cached JSON to browser and AI user agents", async () => {
+    const browser = await request("/profile/alice.eth", {
+      headers: { "user-agent": "Mozilla/5.0" },
+    });
+    const expected = await browser.json();
+    for (const userAgent of ["ChatGPT-User/1.0", "OAI-SearchBot/1.3", "Claude-User/1.0"]) {
+      const response = await request("/profile/alice.eth", {
+        headers: { "user-agent": userAgent },
+      });
+      expect(response.status).toBe(200);
+      expect(response.headers.get("content-type")).toContain("application/json");
+      expect(response.headers.get("x-cache-hit")).toBe("HIT");
+      expect(await response.json()).toEqual(expected);
+    }
+    expect(openNextHandler.fetch).toHaveBeenCalledTimes(1);
+  });
+
+  it("accepts key-header preflight without consuming quota or fetching data", async () => {
+    env.API_RATE_LIMIT.limit.mockResolvedValue({ success: false });
+    const response = await request("/profile/web2/alice.eth", {
+      method: "OPTIONS",
+      headers: {
+        origin: "https://client.example",
+        "access-control-request-method": "GET",
+        "access-control-request-headers": "x-api-key",
+      },
+    });
+    expect(response.status).toBe(204);
+    expect(response.headers.get("access-control-allow-headers")).toContain("X-Api-Key");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect(env.API_RATE_LIMIT.limit).not.toHaveBeenCalled();
+    expect(cache.match).not.toHaveBeenCalled();
+    expect(openNextHandler.fetch).not.toHaveBeenCalled();
+    const denied = await request("/profile/web2/alice.eth");
+    expect(denied.status).toBe(403);
+    expect(denied.headers.get("access-control-allow-origin")).toBe("*");
+  });
+
+  it("returns readable rate-limit errors and a retry delay for AI clients", async () => {
+    env.API_RATE_LIMIT.limit.mockResolvedValue({ success: false });
+    const response = await request("/profile/alice.eth", {
+      headers: { "user-agent": "ChatGPT-User/1.0" },
+    });
+    expect(response.status).toBe(429);
+    expect(response.headers.get("retry-after")).toBe("10");
+    expect(response.headers.get("access-control-expose-headers")).toContain("Retry-After");
+    expect(response.headers.get("cache-control")).toBe("no-store");
+    expect((await response.json()).error).toContain("Too Many Requests");
+    expect(openNextHandler.fetch).not.toHaveBeenCalled();
+    expect(cache.match).not.toHaveBeenCalled();
+    const authorized = await request("/profile/alice.eth", {
+      headers: { "x-api-key": "valid", "user-agent": "ChatGPT-User/1.0" },
+    });
+    expect(authorized.status).toBe(200);
+    expect(env.API_RATE_LIMIT.limit).toHaveBeenCalledTimes(1);
+  });
+
   it("keeps authorization ahead of cache lookup", async () => {
     await request("/wallet/alice.eth", { headers: { "x-api-key": "valid" } });
     const response = await request("/wallet/alice.eth");

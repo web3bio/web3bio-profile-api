@@ -94,7 +94,7 @@ describe("Test For Universal Profile API", () => {
       name: "0x934... starts with lens",
       path: "/profile/0x934b510d4c9103e6a87aef13b816fb080286d649",
       assertJson: (json) => {
-        expect(json[0].platform).toBe("ethereum");
+        expect(json[0].platform).toBe("lens");
         expect(json.find((x) => x.platform === "lens")).toBeTruthy();
       },
     },

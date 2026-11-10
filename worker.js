@@ -10,7 +10,7 @@ const CACHEABLE_API_PATHS = new Set([
   "/ns",
   "/profile",
   "/credential",
-  "/badges",
+  "/badge",
   "/search",
   "/socialgraph",
   "/wallet",
@@ -25,7 +25,13 @@ const PATH_MIN_ROLE = {
   "/wallet": MIN_ROLE_RESTRICTED,
 };
 const RATE_LIMIT_ERROR =
-  "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#authentication.";
+  "429 Too Many Requests. Please refer to the rate limit guidelines at https://api.web3.bio/#api-key.";
+const CORS_HEADERS = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Methods": "GET, OPTIONS, HEAD",
+  "Access-Control-Allow-Headers": "Content-Type, X-Api-Key",
+  "Access-Control-Expose-Headers": "Retry-After, X-Request-Platform",
+};
 
 function isCacheableApiPath(pathname) {
   const secondSlash = pathname.indexOf("/", 1);
@@ -75,6 +81,7 @@ function jsonResponse(status, payload, extraHeaders = {}) {
     status,
     headers: {
       "Content-Type": "application/json",
+      ...CORS_HEADERS,
       ...extraHeaders,
     },
   });
@@ -201,6 +208,14 @@ const handler = {
       return openNextHandler.fetch(requestWithClientIp, env, ctx);
     }
 
+    // Preflight carries header names, not the API key itself.
+    if (request.method === "OPTIONS") {
+      return new Response(null, {
+        status: 204,
+        headers: { ...CORS_HEADERS, "Cache-Control": "no-store" },
+      });
+    }
+
     const userToken = request.headers.get("x-api-key");
     const requiredRole = getRequiredRole(pathname);
     const verifiedToken = userToken ? await verifyApiToken(userToken, env) : null;
@@ -234,7 +249,7 @@ const handler = {
         return jsonResponse(
           429,
           { error: RATE_LIMIT_ERROR },
-          { "Cache-Control": "no-store" },
+          { "Cache-Control": "no-store", "Retry-After": "10" },
         );
       }
     }

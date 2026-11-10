@@ -1,0 +1,25 @@
+# Web3.bio Profile API
+
+> Public Web3 identity profiles as JSON. GET requests work without JavaScript, cookies, an Origin header, or a browser session.
+
+## Endpoints
+
+- [API documentation](https://api.web3.bio/): Supported platforms, response fields, and examples.
+- [Universal profile example](https://api.web3.bio/profile/pugson.eth): GET /profile/{identity} returns an array of associated profiles, each with its own platform and identity.
+- [ENS profile example](https://api.web3.bio/profile/ens/pugson.eth): GET /profile/{platform}/{identity} returns a single profile object for that platform.
+- [Profile page](https://web3.bio/pugson.eth): Server-rendered HTML for the same identity.
+
+URL-encode the identity as one path segment. Use the returned platform together with the identity; equal names on different platforms do not establish that they belong to the same person. Social links with non-empty sources have verification evidence reported by the API; other links are unverified.
+
+## Authentication and errors
+
+- Public profile endpoints allow anonymous requests, limited to 6 requests per 10 seconds per IP. Shared crawler IPs share this allowance.
+- Fetch clients can send their own key as `X-API-KEY: Bearer YOUR_API_KEY`. Never put keys in URLs. [Obtain a key](https://api.web3.bio/#api-key).
+- GET /profile/web2/{identity} requires an authorized API key for external clients.
+- Public API paths are open to automated crawling unless listed in robots.txt. Batch profile and `/profile/web2/` are excluded; fetch clients still need to follow the API's access rules and rate limits.
+- 403 means the API key is missing, invalid, or lacks permission. Do not retry with the same credentials.
+- 404 means the identity is invalid or no profile was found. A fetch failure does not prove an identity is absent.
+- 429 means rate limited. Wait at least the Retry-After number of seconds, then use bounded backoff instead of immediate parallel retries.
+- 5xx means a server or upstream failure. Retry only a limited number of times with backoff.
+
+Use canonical profile URLs. Changing query strings to bypass caches increases backend work and does not bypass authentication or rate limits. Browser and AI clients use the same endpoints, data, and access rules.
