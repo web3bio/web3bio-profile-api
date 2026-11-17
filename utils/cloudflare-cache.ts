@@ -22,9 +22,12 @@ function normalizedPath(pathname: string): string {
 
   try {
     let handle = decodeURIComponent(pathname.slice(separator + 1));
-    // Associated-account lookups echo queryId verbatim.
-    if (prefix === "/social/identities/" ||
-        /^\/social\/following\/[^/]+\/$/i.test(prefix)) {
+    // Preserve identity case for social account lookups.
+    if (
+      prefix === "/social/identities/" ||
+      prefix === "/social/besties/" ||
+      /^\/social\/following\/[^/]+\/$/i.test(prefix)
+    ) {
       return prefix + encodeURIComponent(handle);
     }
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
