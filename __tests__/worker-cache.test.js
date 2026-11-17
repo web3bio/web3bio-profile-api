@@ -264,12 +264,12 @@ describe("Worker response caching", () => {
       profile: null,
       associatedAccounts: [],
     }));
-    const path = "/socialgraph/identities/lens,sujiyan.lens";
+    const path = "/social/identities/lens,sujiyan.lens";
     await request(path);
     const hit = await request(path);
     expect(hit.headers.get("x-cache-hit")).toBe("HIT");
     expect(hit.headers.get("cache-control")).toContain("max-age=2592000");
-    const mixed = await request("/socialgraph/identities/lens,SujiYan.lens");
+    const mixed = await request("/social/identities/lens,SujiYan.lens");
     expect((await mixed.json()).queryId).toBe("lens,SujiYan.lens");
     expect(openNextHandler.fetch).toHaveBeenCalledTimes(2);
     await purgeWorkerCache("lens", "sujiyan.lens", origin);
@@ -281,7 +281,7 @@ describe("Worker response caching", () => {
       Response.json((await req.json()).queryIds),
     );
     for (const id of ["lens,sujiyan.lens", "farcaster,#12396"]) {
-      const response = await request("/socialgraph/identities", {
+      const response = await request("/social/identities", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ queryIds: [id] }),
@@ -303,7 +303,7 @@ describe("Worker response caching", () => {
         following: [],
       });
     });
-    const path = `/socialgraph/following/${target}/lens,SujiYan.lens?page=0&limit=50`;
+    const path = `/social/following/${target}/lens,SujiYan.lens?page=0&limit=50`;
     await request(path);
     const hit = await request(path);
     expect(hit.headers.get("x-cache-hit")).toBe("HIT");
