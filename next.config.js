@@ -23,6 +23,17 @@ const nextConfig = {
         destination: "/",
         permanent: true,
       },
+      {
+        // OpenNext matches the generated regex without case-insensitive flags.
+        source: "/:legacy([sS][oO][cC][iI][aA][lL][gG][rR][aA][pP][hH])/:path*",
+        destination: "/social/:path*",
+        permanent: true,
+      },
+      {
+        source: "/api/social/:path*",
+        destination: "/social/:path*",
+        permanent: true,
+      },
     ];
   },
 

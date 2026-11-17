@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import { GET } from "../app/api/socialgraph/following/[targetPlatform]/[handle]/route";
+import { GET } from "../app/api/social/following/[targetPlatform]/[handle]/route";
 import { getQuery, postIdentityGraphQuery, QueryType } from "../utils/query";
 
 jest.mock("../utils/base", () => ({}));
@@ -9,7 +9,7 @@ jest.mock("../utils/query", () => ({
   postIdentityGraphQuery: jest.fn(),
 }));
 
-const endpoint = "https://api.web3.bio/socialgraph/following";
+const endpoint = "https://api.web3.bio/social/following";
 const headers = { "x-api-key": "Bearer test-key", "x-client-ip": "203.0.113.9" };
 const postQuery = jest.mocked(postIdentityGraphQuery);
 const result = {

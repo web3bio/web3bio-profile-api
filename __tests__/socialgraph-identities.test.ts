@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { GET } from "../app/api/socialgraph/identities/[handle]/route";
-import { POST } from "../app/api/socialgraph/identities/route";
+import { GET } from "../app/api/social/identities/[handle]/route";
+import { POST } from "../app/api/social/identities/route";
 import { getQuery, postIdentityGraphQuery, QueryType } from "../utils/query";
 
 jest.mock("../utils/base", () => ({}));
@@ -10,7 +10,7 @@ jest.mock("../utils/query", () => ({
   postIdentityGraphQuery: jest.fn(),
 }));
 
-const endpoint = "https://api.web3.bio/socialgraph/identities";
+const endpoint = "https://api.web3.bio/social/identities";
 const headers = {
   "content-type": "application/json",
   "x-api-key": "Bearer test-key",
