@@ -4,7 +4,7 @@ import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger";
 import { extractClientIp } from "./utils/ip";
 import { workerCacheKey } from "./utils/cloudflare-cache";
-export { KeyQuota } from "./quota";
+import { admitKey, chargeKey } from "./quota";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
@@ -194,8 +194,9 @@ function preflight() {
 function clientResponse(response, remaining, restricted = false) {
   // The cache stores the data response before we add the caller's balance.
   const result = new Response(response.body, response);
+  if (remaining == null) result.headers.delete("X-Quota-Remaining");
+  else result.headers.set("X-Quota-Remaining", String(remaining));
   if (remaining !== undefined) {
-    if (remaining != null) result.headers.set("X-Quota-Remaining", String(remaining));
     result.headers.set("Access-Control-Expose-Headers", CORS_HEADERS["Access-Control-Expose-Headers"]);
   }
   if (remaining !== undefined || restricted) {
@@ -287,25 +288,6 @@ function unavailable() {
   return jsonResponse(503, { error: "Service unavailable" });
 }
 
-async function recoverResponse(getLedger, hold, response) {
-  const billable = response?.ok || response?.status === 404;
-  let recoveryError;
-  for (let attempt = 0; attempt < 2; attempt++) {
-    try {
-      const result = await getLedger().resolve(hold);
-      if (!result) break;
-      if (response && (result.charged || !billable)) return clientResponse(response, result.remaining);
-      return unavailable();
-    } catch (error) {
-      recoveryError = error;
-      if (!error.retryable || error.overloaded) break;
-    }
-  }
-  if (response && !billable) return clientResponse(response, null);
-  // The transport failed and the durable decision is unreachable. Do not invent an HTTP outcome.
-  throw recoveryError || new Error("Quota settlement outcome is unavailable");
-}
-
 const handler = {
   async fetch(request, env, ctx) {
     const clientIp = extractClientIp(request);
@@ -344,40 +326,42 @@ const handler = {
     // The signature bytes identify the same issued key across accepted base64url spellings.
     const canonicalToken = token.replace(/\.([^.]+)$/, (_, signature) =>
       "." + base64url.encode(base64url.decode(signature)));
-    const keyName = createHash("sha256").update(canonicalToken).digest("hex");
-    const getLedger = () => env.KEY_QUOTAS.getByName(keyName);
-    let hold;
+    const keyHash = createHash("sha256").update(canonicalToken).digest("hex");
+    const db = env.QUOTA_DB;
+    let admission;
     let response;
     try {
+      admission = await admitKey(db, keyHash, env.PAID_REQUESTS_PER_10_SECONDS);
+      const { remaining, retryAfter } = admission;
+      if (retryAfter) return clientResponse(rateLimited(retryAfter), remaining);
       if (balanceOnly) {
-        const { remaining, retryAfter } = await getLedger().admit(true);
-        if (retryAfter) return clientResponse(rateLimited(retryAfter), remaining);
-        const balance = remaining === 0 && !(await allowAnonymous(env, clientIp))
-          ? rateLimited()
-          : jsonResponse(200, { remaining });
-        return clientResponse(balance, remaining);
+        const limited = !remaining && !(await allowAnonymous(env, clientIp));
+        return clientResponse(limited ? rateLimited() : jsonResponse(200, { remaining }), remaining);
       }
-      const result = await getLedger().run(async reservation => {
-        hold = reservation;
-        try {
-          response = await serveData(request, env, ctx, path, claims);
-        } catch (error) {
-          console.error("[Worker]", error);
-          response = unavailable();
-        }
-        return clientResponse(new Response(null, response), null);
-      });
-      if (result instanceof Response) return new Response(response.body, result);
-      if (result.unavailable) return unavailable();
-      if (result.retryAfter) return clientResponse(rateLimited(result.retryAfter), result.remaining);
-      // Let OpenNext inject the ordinary upstream credential for a depleted key.
-      const headers = new Headers(request.headers);
-      headers.delete("x-api-key");
-      return clientResponse(await serveData(new Request(request, { headers }), env, ctx, path, null), 0);
+      if (!remaining) {
+        const headers = new Headers(request.headers);
+        headers.delete("x-api-key");
+        const anonymous = await serveData(new Request(request, { headers }), env, ctx, path, null);
+        return clientResponse(anonymous, 0);
+      }
+
+      response = await serveData(request, env, ctx, path, claims);
     } catch (error) {
       console.error("[Worker]", error);
-      return hold ? recoverResponse(getLedger, hold, response) : unavailable();
+      return unavailable();
     }
+    if (!response.ok && response.status !== 404) {
+      try {
+        const remaining = await db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?")
+          .bind(keyHash).first("remaining");
+        return clientResponse(response, remaining ?? 0);
+      } catch (error) {
+        console.error("[Quota]", error);
+        return clientResponse(response, null);
+      }
+    }
+    const balance = await chargeKey(db, keyHash, admission.requestId);
+    return balance === null ? unavailable() : clientResponse(response, balance);
   },
 };
 

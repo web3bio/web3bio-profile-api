@@ -16,7 +16,7 @@ URL-encode the identity as one path segment. Use the returned platform together 
 - Public profile endpoints allow anonymous requests, limited to 6 requests per 10 seconds per IP. Shared crawler IPs share this allowance.
 - Fetch clients can send their own key as `X-API-KEY: Bearer YOUR_API_KEY`. Never put keys in URLs. [Obtain a key](https://api.web3.bio/#api-key).
 - Funded keys allow 50 requests per 10 seconds per key. Each data request returning 2xx or 404 costs one credit, including batches and cached responses. At zero, the request follows anonymous access rules.
-- GET /quota returns the supplied key's available balance as `{"remaining":98}`. It is rate limited and costs zero credits. Keyed data responses report the available balance in X-Quota-Remaining.
+- GET /quota returns the supplied key's available balance as `{"remaining":98}`. It is rate limited and costs zero credits. Keyed data responses include X-Quota-Remaining when the balance is available.
 - GET /profile/web2/{identity} requires an authorized API key for external clients.
 - Public API paths are open to automated crawling unless listed in robots.txt. Batch profile and `/profile/web2/` are excluded; fetch clients still need to follow the API's access rules and rate limits.
 - 403 means the API key is missing, invalid, or lacks permission. Do not retry with the same credentials.

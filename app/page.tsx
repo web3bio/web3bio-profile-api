@@ -700,10 +700,11 @@ export default async function Home() {
             <h2 className="text-bold h4">API Key and Authentication</h2>
             <p>
               Public queries normally allow 6 requests per 10 seconds per IP.
-              A prepaid key allows 50 requests per 10 seconds across the API.
-              Each data request returning 2xx or 404 uses one credit, including
-              cache hits and batch queries. Once the balance reaches zero,
-              anonymous access rules apply. For a key, contact Web3.bio via{" "}
+              A key with credits allows 50 requests per 10 seconds across all
+              endpoints. A data request returning <code>2xx</code> or <code>404</code>{" "}
+              costs one credit, even for a cached result or a batch of 10 profiles.
+              Other responses cost zero. Once your balance reaches zero, new
+              requests follow the public access rules. For a key, contact Web3.bio via{" "}
               <a
                 href="https://x.com/web3bio"
                 target="_blank"
@@ -722,14 +723,16 @@ export default async function Home() {
               .
             </p>
             <p>
-              Please include the API key in the request header using the
-              following format:
-              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
+              Send your key in the{" "}
+              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span> header.
             </p>
             <p>
               Use <code>GET /quota</code> with your key to check the available
-              balance for free. It shares your rate limit. Data requests also
-              return the balance in <code>X-Quota-Remaining</code>.
+              balance for free. This counts toward your rate limit. Keyed data
+              responses include <code>X-Quota-Remaining</code> when the balance is available.
+              If the connection drops, check your balance before retrying. If you receive{" "}
+              <code>429</code>, wait for the number of seconds in{" "}
+              <code>Retry-After</code> before trying again.
             </p>
 
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>

@@ -1,45 +1,51 @@
 import { createHash } from "node:crypto";
 import { DatabaseSync } from "node:sqlite";
+import { readdirSync, readFileSync } from "node:fs";
+import { join } from "node:path";
 import { jwtVerify } from "jose";
 import openNextHandler from "../.open-next/worker.js";
-import worker, { KeyQuota } from "../worker";
+import worker from "../worker";
 import {
   purgeWorkerCache,
   workerCacheKey,
 } from "../utils/cloudflare-cache";
 
 jest.mock("jose", () => ({ ...jest.requireActual("jose"), jwtVerify: jest.fn() }));
-jest.mock("cloudflare:workers", () => ({
-  DurableObject: class { constructor(ctx) { this.ctx = ctx; } },
-}), { virtual: true });
 jest.mock(
   "../.open-next/worker.js",
   () => ({ __esModule: true, default: { fetch: jest.fn() } }),
   { virtual: true },
 );
 
-// Exercise the production ledger SQL with the same synchronous transaction boundary as workerd.
-function localLedger(env) {
-  const db = new DatabaseSync(":memory:");
-  const storage = {
-    sql: { exec(sql, ...params) {
-      if (sql.trimStart().startsWith("CREATE")) return db.exec(sql);
-      const rows = db.prepare(sql).all(...params);
-      return { one: () => rows[0], toArray: () => rows };
-    } },
-    transactionSync(fn) {
+const migrationDir = join(__dirname, "../migrations");
+const migrations = readdirSync(migrationDir).filter(name => name.endsWith(".sql")).sort()
+  .map(name => readFileSync(join(migrationDir, name), "utf8")).join("\n");
+
+function localD1(db) {
+  return {
+    prepare: (sql) => ({
+      sql,
+      bind: (...args) => ({
+        sql, args,
+        first: async column => db.prepare(sql).get(...args)?.[column] ?? null,
+      }),
+    }),
+    batch: jest.fn(async (statements) => {
       db.exec("BEGIN");
       try {
-        const result = fn();
+        const results = statements.map(({ sql, args = [] }) => {
+          const statement = db.prepare(sql);
+          if (statement.columns().length) return { results: statement.all(...args) };
+          return { results: [], meta: statement.run(...args) };
+        });
         db.exec("COMMIT");
-        return result;
+        return results;
       } catch (error) {
         db.exec("ROLLBACK");
         throw error;
       }
-    },
+    }),
   };
-  return { db, storage, quota: new KeyQuota({ storage }, env) };
 }
 
 describe("Worker API", () => {
@@ -49,15 +55,12 @@ describe("Worker API", () => {
   let cache;
   let env;
   let pending;
-  let ledgers;
+  let db;
   const paid = { headers: { "x-api-key": "Bearer valid" } };
   const keyId = (token) => createHash("sha256").update(token).digest("hex");
-  function topup(token, credits, order = "test-order") {
-    const id = keyId(token);
-    env.KEY_QUOTAS.getByName(id);
-    ledgers.get(id).db.prepare(
-      "INSERT INTO topups (order_id, credits) VALUES (?, ?) ON CONFLICT DO NOTHING",
-    ).run(order, credits);
+  function topup(token, credits, order = token + "-order") {
+    db.prepare("INSERT INTO topups (order_id, key_hash, credits) VALUES (?, ?, ?)")
+      .run(order, keyId(token), credits);
   }
 
   const request = async (path, init) => {
@@ -81,18 +84,16 @@ describe("Worker API", () => {
       configurable: true,
       value: { default: cache },
     });
-    ledgers = new Map();
+    db = new DatabaseSync(":memory:");
+    db.function("unixepoch", { varargs: true }, () => Date.now() / 1000);
+    db.exec(migrations);
     env = {
       JWT_KEY: "test-secret",
       PAID_REQUESTS_PER_10_SECONDS: 50,
       API_RATE_LIMIT: { limit: jest.fn(async () => ({ success: true })) },
-      KEY_QUOTAS: { getByName: jest.fn((id) => {
-        if (!ledgers.has(id)) ledgers.set(id, localLedger(env));
-        return ledgers.get(id).quota;
-      }) },
+      QUOTA_DB: localD1(db),
     };
     topup("valid", 10);
-    env.KEY_QUOTAS.getByName.mockClear();
     jwtVerify.mockResolvedValue({ payload: { role: 8 } });
     openNextHandler.fetch.mockImplementation(async () =>
       Response.json(
@@ -103,7 +104,7 @@ describe("Worker API", () => {
   });
 
   afterEach(() => {
-    for (const { db } of ledgers.values()) db.close();
+    db.close();
   });
 
   afterAll(() => {
@@ -267,7 +268,7 @@ describe("Worker API", () => {
     expect((await request("/wallet/alice.eth")).status).toBe(403);
   });
 
-  it("locates an issued JWT by the object name used for top-ups", async () => {
+  it("locates an issued key by its hash for raw and Bearer headers", async () => {
     const jose = jest.requireActual("jose");
     const token = await new jose.SignJWT({ role: 8 }).setProtectedHeader({ alg: "HS256" })
       .sign(new TextEncoder().encode(env.JWT_KEY));
@@ -277,7 +278,6 @@ describe("Worker API", () => {
       expect(await (await request("/quota", { headers: { "x-api-key": header } })).json())
         .toEqual({ remaining: 3 });
     }
-    expect(env.KEY_QUOTAS.getByName).toHaveBeenLastCalledWith(keyId(token));
   });
 
   it("still rejects invalid tokens and rate-limited requests on cache hits", async () => {
@@ -318,28 +318,30 @@ describe("Worker API", () => {
     },
   );
 
-  it("downgrades the next concurrent request when the last credit is already held", async () => {
+  it("admits overlapping requests on the last credit and downgrades after it is spent", async () => {
     topup("last", 1);
     const init = { headers: { "x-api-key": "last" } };
     const { promise: entered, resolve: started } = Promise.withResolvers();
     const { promise: data, resolve: finish } = Promise.withResolvers();
     openNextHandler.fetch.mockImplementationOnce(() => { started(); return data; });
-    const last = request("/wallet/alice.eth", init);
+    const first = request("/wallet/first.eth", init);
     await entered;
     try {
-      const denied = await request("/api/wallet/alice.eth", init);
-      expect(denied.status).toBe(403);
-      expect(denied.headers.get("X-Quota-Remaining")).toBe("0");
-      expect(openNextHandler.fetch).toHaveBeenCalledTimes(1);
+      expect(await (await request("/quota", init)).json()).toEqual({ remaining: 1 });
+      const second = await request("/api/wallet/second.eth", init);
+      expect(second.status).toBe(200);
+      expect(second.headers.get("X-Quota-Remaining")).toBe("0");
+      expect((await request("/wallet/third.eth", init)).status).toBe(403);
     } finally {
       finish(Response.json({ wallet: true }));
     }
-    expect((await last).headers.get("X-Quota-Remaining")).toBe("0");
+    const response = await first;
+    expect(response.status).toBe(200);
+    expect(response.headers.get("X-Quota-Remaining")).toBe("0");
+    expect(await (await request("/quota", init)).json()).toEqual({ remaining: 0 });
     const ordinary = await request("/profile/alice.eth", init);
     expect(ordinary.status).toBe(200);
-    expect(ordinary.headers.get("X-Quota-Remaining")).toBe("0");
     expect(openNextHandler.fetch.mock.lastCall[0].headers.has("x-api-key")).toBe(false);
-    expect(env.API_RATE_LIMIT.limit).toHaveBeenCalledTimes(1);
   });
 
   it("shares a rolling 50-call limit with free balance reads, before route permissions", async () => {
@@ -358,6 +360,9 @@ describe("Worker API", () => {
       expect(limited.status).toBe(429);
       expect(limited.headers.get("Retry-After")).toBe("1");
       expect((await request("/quota", paid)).status).toBe(429);
+      topup("second", 2);
+      expect(await (await request("/quota", { headers: { "x-api-key": "second" } })).json())
+        .toEqual({ remaining: 2 });
       clock.mockReturnValue(start + 10_000);
       expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
       expect(env.API_RATE_LIMIT.limit).not.toHaveBeenCalled();
@@ -367,11 +372,31 @@ describe("Worker API", () => {
     }
   });
 
+  it("charges a slow response after its rate window has expired", async () => {
+    const start = Date.now();
+    const clock = jest.spyOn(Date, "now").mockReturnValue(start);
+    const { promise: entered, resolve: started } = Promise.withResolvers();
+    const { promise: body, resolve: finish } = Promise.withResolvers();
+    openNextHandler.fetch.mockImplementationOnce(() => { started(); return body; });
+    const slow = request("/wallet/slow.eth", paid);
+    try {
+      await entered;
+      clock.mockReturnValue(start + 70_000);
+      expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
+      finish(Response.json({ wallet: true }));
+      expect((await slow).headers.get("X-Quota-Remaining")).toBe("9");
+    } finally {
+      finish();
+      clock.mockRestore();
+    }
+  });
+
   it("applies the anonymous IP limit to unfunded lookups and funds an existing key by order", async () => {
     const init = { headers: { "x-api-key": "legacy", "cf-connecting-ip": "192.0.2.1" } };
     expect((await request("/quota")).status).toBe(403);
-    expect(env.KEY_QUOTAS.getByName).not.toHaveBeenCalled();
+    expect(env.QUOTA_DB.batch).not.toHaveBeenCalled();
     expect(await (await request("/quota", init)).json()).toEqual({ remaining: 0 });
+    expect(db.prepare("SELECT count(*) AS n FROM quota_requests").get().n).toBe(0);
     env.API_RATE_LIMIT.limit.mockResolvedValue({ success: false });
     expect((await request("/quota", init)).status).toBe(429);
     expect(env.API_RATE_LIMIT.limit).toHaveBeenLastCalledWith({ key: "192.0.2.1" });
@@ -384,20 +409,20 @@ describe("Worker API", () => {
     expect((await request("/quota", init)).status).toBe(403);
   });
 
-  it("recovers the balance after restart and expires an abandoned reservation", () => {
-    const { db, storage, quota } = ledgers.get(keyId("valid"));
-    const first = quota.admit(false);
-    const restarted = new KeyQuota({ storage }, env);
-    expect(restarted.admit(true).remaining).toBe(9);
-    expect(restarted.settle(first.hold, true)).toBe(9);
-    const abandoned = restarted.admit(false).hold;
-    db.prepare("UPDATE reservations SET expires_at = 0 WHERE id = ?").run(abandoned.id);
-    expect(restarted.admit(true).remaining).toBe(9);
-    expect(restarted.settle({ ...abandoned, expires_at: 0 }, true)).toBeNull();
-    db.prepare("INSERT OR REPLACE INTO topups VALUES ('test-order', 100)").run();
-    expect(db.prepare("SELECT * FROM balance").get()).toEqual({
-      credited: 10, used: 1, reserved: 0, remaining: 9,
-    });
+  it("credits identical order retries once and rejects conflicting purchases", () => {
+    topup("valid", 4, "new-order");
+    topup("valid", 4, "new-order");
+    expect(() => topup("other", 4, "new-order")).toThrow("different key or credit amount");
+    expect(() => db.prepare("INSERT OR REPLACE INTO topups VALUES (?, ?, ?)")
+      .run("new-order", keyId("valid"), 99)).toThrow("different key or credit amount");
+    expect(() => db.prepare("INSERT INTO topups VALUES (?, ?, ?)")
+      .run("bad-key", "not-a-key-hash", 7)).toThrow("lowercase SHA-256");
+    const repeat = db.prepare("INSERT INTO topups VALUES ('new-order', ?, ?)");
+    expect(() => repeat.run(null, 4)).toThrow("lowercase SHA-256");
+    expect(() => repeat.run(keyId("valid"), null)).toThrow("different key or credit amount");
+    expect(() => repeat.run("a".repeat(63) + "\0", 4)).toThrow("lowercase SHA-256");
+    expect(db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?").get(keyId("valid")).remaining).toBe(14);
+    expect(db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?").get(keyId("other"))).toBeUndefined();
   });
 
   it("charges route-level 404s in the API namespace once", async () => {
@@ -410,7 +435,7 @@ describe("Worker API", () => {
 
   it("meters keyed HEAD and 204 responses and keeps public assets outside billing", async () => {
     expect((await request("/llms.txt", paid)).headers.has("X-Quota-Remaining")).toBe(false);
-    expect(env.KEY_QUOTAS.getByName).not.toHaveBeenCalled();
+    expect(env.QUOTA_DB.batch).not.toHaveBeenCalled();
     openNextHandler.fetch.mockResolvedValue(new Response(null, { status: 200 }));
     const head = await request("/profile/alice.eth", { ...paid, method: "HEAD" });
     expect(head.headers.get("X-Quota-Remaining")).toBe("9");
@@ -437,13 +462,13 @@ describe("Worker API", () => {
     expect(cache.put).not.toHaveBeenCalled();
   });
 
-  it("releases an upstream failure and fails closed when admission is unavailable", async () => {
+  it("skips charging upstream failures and fails closed when D1 admission is unavailable", async () => {
     const log = jest.spyOn(console, "error").mockImplementation(() => {});
     try {
       openNextHandler.fetch.mockRejectedValueOnce(new Error("upstream unavailable"));
       expect((await request("/domain/other.eth", paid)).status).toBe(503);
       expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
-      env.KEY_QUOTAS.getByName.mockImplementationOnce(() => { throw new Error("unavailable"); });
+      env.QUOTA_DB.batch.mockImplementationOnce(() => { throw new Error("unavailable"); });
       expect((await request("/wallet/alice.eth", paid)).status).toBe(503);
       expect(openNextHandler.fetch).toHaveBeenCalledTimes(1);
     } finally {
@@ -451,44 +476,78 @@ describe("Worker API", () => {
     }
   });
 
-  it.each([200, 404, 502])("recovers HTTP %i from durable state when the reply is lost", async (status) => {
-    const { quota, storage } = ledgers.get(keyId("valid"));
-    const run = quota.run.bind(quota);
-    jest.spyOn(quota, "run").mockImplementationOnce(async prepare => {
-      await run(prepare);
-      throw new Error("lost reply");
+  it.each([200, 404])("recovers a committed %i when D1 loses the debit acknowledgement", async (status) => {
+    const batch = env.QUOTA_DB.batch.getMockImplementation();
+    env.QUOTA_DB.batch.mockImplementationOnce(batch).mockImplementationOnce(async statements => {
+      await batch(statements);
+      throw new Error("lost acknowledgement");
     });
-    const restarted = new KeyQuota({ storage }, env);
-    env.KEY_QUOTAS.getByName.mockReturnValueOnce(quota).mockReturnValueOnce(restarted);
     openNextHandler.fetch.mockResolvedValue(new Response("data", { status }));
     const response = await request("/profile/alice.eth", paid);
     expect(response.status).toBe(status);
+    expect(response.headers.get("X-Quota-Remaining")).toBe("9");
     expect(await response.text()).toBe("data");
-    expect(response.headers.get("X-Quota-Remaining")).toBe(status === 502 ? "10" : "9");
-    expect(response.headers.get("Cache-Control")).toBe("no-store");
-    expect(openNextHandler.fetch).toHaveBeenCalledTimes(1);
-    expect(await (await request("/quota", paid)).json()).toEqual({ remaining: status === 502 ? 10 : 9 });
+    expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 9 });
   });
 
-  it("cancels an uncommitted request and rejects a late debit after recovery", async () => {
-    const { db, quota } = ledgers.get(keyId("valid"));
-    const settle = jest.spyOn(quota, "settle").mockImplementation(() => { throw new Error("offline"); });
-    expect((await request("/profile/alice.eth", paid)).status).toBe(503);
-    const [hold] = settle.mock.calls[0];
-    settle.mockRestore();
-    expect(quota.settle(hold, true)).toBeNull();
-    expect(db.prepare("SELECT used, reserved FROM balance").get()).toEqual({ used: 0, reserved: 0 });
-    expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
+  it("prevents a late write from charging a failed response", async () => {
+    const batch = env.QUOTA_DB.batch.getMockImplementation();
+    let late;
+    env.QUOTA_DB.batch.mockImplementationOnce(batch).mockImplementationOnce(async statements => {
+      late = statements;
+      throw new Error("write timed out");
+    });
+    const log = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      expect((await request("/profile/alice.eth", paid)).status).toBe(503);
+      await batch(late);
+      expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
+    } finally {
+      log.mockRestore();
+    }
   });
 
-  it("propagates a transport failure if the charge and its receipt are both unreachable", async () => {
-    const { db, quota } = ledgers.get(keyId("valid"));
-    const overloaded = Object.assign(new Error("overloaded"), { retryable: true, overloaded: true });
-    jest.spyOn(quota, "settle").mockImplementationOnce(() => { throw overloaded; });
-    jest.spyOn(quota, "resolve").mockRejectedValue(overloaded);
-    await expect(request("/profile/alice.eth", paid)).rejects.toThrow("overloaded");
-    expect(quota.resolve).toHaveBeenCalledTimes(1);
-    expect(db.prepare("SELECT used FROM balance").get().used).toBe(0);
+  it.each(["disconnected", "expired", "before submission"])("withholds paid data when settlement fails: %s", async reason => {
+    const batch = env.QUOTA_DB.batch.getMockImplementation();
+    const start = Date.now();
+    const clock = jest.spyOn(Date, "now").mockReturnValue(start);
+    const log = jest.spyOn(console, "error").mockImplementation(() => {});
+    env.QUOTA_DB.batch.mockImplementationOnce(batch).mockImplementationOnce(async statements => {
+      if (reason !== "before submission") await batch(statements);
+      if (reason === "expired") {
+        clock.mockReturnValue(start + 61_000);
+        await request("/quota", paid);
+      }
+      throw new Error("lost acknowledgement");
+    });
+    if (reason !== "expired") env.QUOTA_DB.batch.mockRejectedValueOnce(new Error("offline"));
+    try {
+      await expect(request("/profile/alice.eth", paid)).rejects.toThrow(
+        reason === "expired" ? "lost acknowledgement" : "offline",
+      );
+      expect(await (await request("/quota", paid)).json()).toEqual({
+        remaining: reason === "before submission" ? 10 : 9,
+      });
+    } finally {
+      log.mockRestore();
+      clock.mockRestore();
+    }
+  });
+
+  it("reports the current balance on a non-billable response after a concurrent charge", async () => {
+    const { promise: entered, resolve: started } = Promise.withResolvers();
+    const { promise: data, resolve: finish } = Promise.withResolvers();
+    openNextHandler.fetch.mockImplementationOnce(() => { started(); return data; });
+    const slow = request("/wallet/slow.eth", paid);
+    await entered;
+    try {
+      expect((await request("/wallet/other.eth", paid)).headers.get("X-Quota-Remaining")).toBe("9");
+    } finally {
+      finish(new Response(null, { status: 502 }));
+    }
+    const response = await slow;
+    expect(response.status).toBe(502);
+    expect(response.headers.get("X-Quota-Remaining")).toBe("9");
   });
 
   it("bypasses caching for refresh and purges matching case-sensitive keys", async () => {

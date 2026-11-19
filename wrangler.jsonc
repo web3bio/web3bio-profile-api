@@ -16,12 +16,9 @@
   "vars": {
     "PAID_REQUESTS_PER_10_SECONDS": 50,
   },
-  "durable_objects": {
-    "bindings": [{ "name": "KEY_QUOTAS", "class_name": "KeyQuota" }],
-  },
-  "exports": {
-    "KeyQuota": { "type": "durable-object", "storage": "sqlite" },
-  },
+  "d1_databases": [
+    { "binding": "QUOTA_DB", "database_name": "keyQuota" },
+  ],
   "ratelimits": [
     {
       "name": "API_RATE_LIMIT",

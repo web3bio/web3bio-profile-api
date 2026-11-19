@@ -60,96 +60,18 @@ For React developers, [web3bio-profile-kit](https://www.npmjs.com/package/web3bi
 pnpm add web3bio-profile-kit
 ```
 
-## API Key and Authentication
+## API keys and limits
 
-Public queries normally allow 6 requests per 10 seconds per IP. A key with prepaid credits allows 50 requests per 10 seconds across the product, subject to its endpoint permissions. To obtain a key, contact Web3.bio via [Twitter (X)](https://x.com/web3bio) or the [Telegram group](https://t.me/web3dotbio).
+| Access | Request limit |
+| --- | --- |
+| Public requests, including keys with no credits | Normally 6 requests per 10 seconds per IP |
+| Keys with prepaid credits | 50 requests per 10 seconds per key, shared across endpoints |
 
-Send the key in the request header.
+Send your key in the `X-API-KEY: Bearer {API_KEY}` header. To obtain a key, contact Web3.bio on [X](https://x.com/web3bio) or [Telegram](https://t.me/web3dotbio).
 
-```
-X-API-KEY: Bearer {API_KEY}
-```
+While your key has credits, a data request costs one credit when it returns `2xx` or `404`, including cached results. A batch of 10 profiles also costs one credit. Other responses cost zero. Once the balance reaches zero, new requests follow the public access rules. An invalid key returns `403`. If you receive `429`, wait for the number of seconds in `Retry-After` before trying again.
 
-Each paid data request returning HTTP `2xx` or `404` uses one credit, including cache hits and batch queries. Other statuses release the reserved credit. At zero available credits, the request receives anonymous access and rate limits. Invalid keys return `403`. A rate-limited request returns `429` with `Retry-After`.
-
-`GET /quota` requires a valid key and returns `{"remaining":98}` for a key with 98 available credits. This read shares the applicable rate limit and uses zero credits. After a data request, a browser can read the balance from `response.headers.get("X-Quota-Remaining")`. Available credits exclude requests still in progress. If the connection drops during settlement, check `GET /quota` after service recovers. A paid response can be committed before it reaches the client.
-
-### Managing prepaid credits
-
-The Durable Object name is the lowercase hex SHA-256 of the originally issued JWT, excluding the `Bearer ` prefix. Given that JWT in a local `API_KEY` variable, `printf %s "$API_KEY" | shasum -a 256` prints its object name. Call `GET /quota` with the key to initialize its ledger at zero.
-
-In Cloudflare **Durable Objects → KeyQuota → Data Studio**, select **Name** and enter the hash. Add one row to the append-only `topups` table per purchase. Reuse the same order ID when retrying a credit. The `balance` view shows the total credited, charged, reserved and available. An abandoned request's reservation expires after five minutes. [Cloudflare Data Studio](https://developers.cloudflare.com/durable-objects/observability/data-studio/)
-
-```sql
-INSERT INTO topups (order_id, credits) VALUES ('P-1008', 10000)
-ON CONFLICT (order_id) DO NOTHING;
-SELECT credited, used, reserved, remaining FROM balance;
-```
-
-The Worker setting `PAID_REQUESTS_PER_10_SECONDS` controls the paid rate for every key.
-
-Use a two-stage rollout the first time each target environment enables billing.
-
-1. Deploy the ledger registration commit `f57870d` with `pnpm deploy`. This creates the namespace while the existing Worker still handles requests with its original permissions.
-2. From the metering commit, run `pnpm staging` to upload a preview version to the same Worker. Call the preview's `GET /quota` for each existing customer key that should receive credits and the CI test key. Credit their orders in Data Studio and verify the balances on that preview.
-3. Promote the verified version to 100% of traffic to activate metering. [Cloudflare version deployments](https://developers.cloudflare.com/workers/versions-and-deployments/gradual-deployments/)
-
-## Local Development
-
-```bash
-pnpm install
-pnpm dev
-```
-
-The dev server starts at [http://localhost:3000](http://localhost:3000).
-
-For local quota testing, build with `pnpm exec opennextjs-cloudflare build` and run `pnpm exec wrangler dev --local`. Set a development `JWT_KEY` in `.dev.vars` for signed test keys.
-
-### Environment Variables
-
-| Variable                         | Description                                              |
-| -------------------------------- | -------------------------------------------------------- |
-| `GRAPHQL_SERVER`                 | Identity Graph GraphQL server URL                        |
-| `PROFILE_ENDPOINT`               | Public API base URL (defaults to `https://api.web3.bio`) |
-| `GENERAL_IDENTITY_GRAPH_API_KEY` | Internal API key injected by middleware                  |
-| `JWT_KEY`                        | Worker secret for verifying customer keys               |
-
-### Testing
-
-```bash
-pnpm test
-```
-
-CI runs against the deployed preview. Set the GitHub Actions secret `PROFILE_TEST_API_KEY` to a dedicated key with credits and wallet access. The existing `GENERAL_IDENTITY_GRAPH_API_KEY` secret is supported as a fallback and needs the same credits and permissions when used for testing. For local diff tests:
-
-```bash
-pnpm test:diff
-```
-
-### Deploy
-
-Deployed to Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare):
-
-```bash
-pnpm deploy      # production
-pnpm preview     # remote preview
-pnpm staging     # upload version
-```
-
-## Project Structure
-
-```
-app/api/
-├── profile/     # Universal and platform profiles
-├── ns/          # Name service resolution
-├── credential/  # Verifiable credentials
-├── domain/      # Domain queries
-├── wallet/      # Wallet data
-├── avatar/      # Avatar resolution
-├── search/      # Search and suggestions
-├── partner/     # Partner integrations
-└── refresh/     # Cache refresh
-```
+Use `GET /quota` with your key to check your balance. It returns a result such as `{"remaining":98}` and counts toward your rate limit, but costs zero credits. Keyed data responses include `X-Quota-Remaining` when the balance is available. If the connection drops, check your balance before retrying.
 
 ## Contributing
 
