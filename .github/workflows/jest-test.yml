@@ -133,7 +133,7 @@ jobs:
           BASE_URL: ${{ steps.url.outputs.value }}
           ENVIRONMENT: ${{ steps.url.outputs.environment }}
           GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}
-          GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
+          PROFILE_TEST_API_KEY: ${{ secrets.PROFILE_TEST_API_KEY || secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
         run: |
           URL="${{ steps.url.outputs.value }}"
 
@@ -141,10 +141,9 @@ jobs:
           echo "BASE_URL: $URL"
           echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
           echo "GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}"
-          if [ -z "${GENERAL_IDENTITY_GRAPH_API_KEY}" ]; then
-            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (not set)"
-          else
-            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (provided)"
+          if [ -z "${PROFILE_TEST_API_KEY}" ]; then
+            echo "A funded PROFILE_TEST_API_KEY is required for preview tests." >&2
+            exit 1
           fi
           echo "=========================================="
 

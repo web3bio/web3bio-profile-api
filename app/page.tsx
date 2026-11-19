@@ -507,9 +507,9 @@ export default async function Home() {
             <p>
               This documentation describes the publicly available endpoints of
               the Web3.bio Profile API, which is a set of RESTful JSON APIs. It
-              explains how to use them and what they return. Currently, the APIs
-              are offered for free to assist developers in getting started with
-              Web3 profiles. We will do our best to maintain uptime.
+              explains how to use them and what they return. Public queries
+              support anonymous access and prepaid API keys. We will do our best
+              to maintain uptime.
             </p>
           </section>
           <section className="pt-4 pb-4">
@@ -699,9 +699,11 @@ export default async function Home() {
           <section className="pt-4 pb-4" id="api-key">
             <h2 className="text-bold h4">API Key and Authentication</h2>
             <p>
-              The Profile API is free, but usage without API keys includes rate
-              limiting mechanisms to ensure fair usage and prevent abuse. If you
-              need an API Key, you can obtain one by contacting Web3.bio via{" "}
+              Public queries normally allow 6 requests per 10 seconds per IP.
+              A prepaid key allows 50 requests per 10 seconds across the API.
+              Each data request returning 2xx or 404 uses one credit, including
+              cache hits and batch queries. Once the balance reaches zero,
+              anonymous access rules apply. For a key, contact Web3.bio via{" "}
               <a
                 href="https://x.com/web3bio"
                 target="_blank"
@@ -723,6 +725,11 @@ export default async function Home() {
               Please include the API key in the request header using the
               following format:
               <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
+            </p>
+            <p>
+              Use <code>GET /quota</code> with your key to check the available
+              balance for free. It shares your rate limit. Data requests also
+              return the balance in <code>X-Quota-Remaining</code>.
             </p>
 
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -3156,7 +3163,7 @@ export default async function Home() {
             </p>
             <p>
               Error responses are returned with non-2xx HTTP codes, typically{" "}
-              <code>401</code> (missing/invalid API key), <code>404</code> (not
+              <code>403</code> (missing, invalid, or insufficiently privileged API key), <code>404</code> (not
               found), <code>429</code> (rate limited), or <code>500</code>{" "}
               (upstream/internal failure). Most endpoints include an{" "}
               <code>error</code> field with a human-readable reason.

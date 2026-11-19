@@ -9,9 +9,16 @@ export const queryClient = async (
   baseUrl?: string,
 ) => {
   const apiBase = baseUrl || process.env.BASE_URL || "http://localhost:3000";
-  const API_KEY = process.env.GENERAL_IDENTITY_GRAPH_API_KEY || "";
-
-  return fetch(apiBase + path, {
-    headers: { "x-api-key": API_KEY, ...headers },
-  });
+  const key = process.env.PROFILE_TEST_API_KEY || process.env.GENERAL_IDENTITY_GRAPH_API_KEY;
+  const requestHeaders = { ...(key && { "x-api-key": key }), ...headers };
+  const send = () => fetch(apiBase + path, { headers: requestHeaders });
+  let response = await send();
+  for (let retry = 0; response.status === 429 && retry < 2; retry++) {
+    const seconds = Number(response.headers.get("Retry-After"));
+    if (!Number.isInteger(seconds) || seconds < 1 || seconds > 10) break;
+    await response.body?.cancel();
+    await new Promise(resolve => setTimeout(resolve, seconds * 1000));
+    response = await send();
+  }
+  return response;
 };
