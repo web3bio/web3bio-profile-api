@@ -3,6 +3,7 @@ import openNextHandler from "./.open-next/worker.js";
 import { withLogging } from "./utils/logger";
 import { extractClientIp } from "./utils/ip";
 import { workerCacheKey } from "./utils/cloudflare-cache";
+export { KeyQuota } from "./quota";
 
 const CACHEABLE_API_PATHS = new Set([
   "/avatar",
