@@ -38,16 +38,16 @@ describe("Avatar response compatibility", () => {
 
   afterEach(() => jest.restoreAllMocks());
 
-  it("preserves error status and payload while preventing error caching", async () => {
+  it.each([[404, 200], [429, 429], [503, 503]])("returns profile error %i with HTTP %i", async (code, status) => {
     const error = {
       identity: "alice.eth",
       platform: Platform.ens,
-      message: "Not Found",
-      code: 404,
+      message: "Profile lookup failed",
+      code,
     };
     jest.mocked(resolveWithIdentityGraph).mockResolvedValue(error);
     const response = await request();
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(status);
     expect(await response.json()).toEqual(error);
     expect(response.headers.get("cache-control")).toBe("no-store");
   });

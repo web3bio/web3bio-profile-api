@@ -30,10 +30,11 @@ const request = (targetPlatform: string, handle: string, query = "") => GET(
 beforeEach(() => {
   postQuery.mockReset();
   postQuery.mockResolvedValue({
-    ok: true, status: 200, statusText: "OK",
-    body: { data: { searchFollowingAssociatedAccounts: result } },
+    data: { searchFollowingAssociatedAccounts: result },
   });
 });
+
+afterEach(() => jest.restoreAllMocks());
 
 describe("SocialGraph following associated accounts", () => {
   it.each([
@@ -87,8 +88,7 @@ describe("SocialGraph following associated accounts", () => {
   it("returns an empty following list and missing profile unchanged", async () => {
     const empty = { ...result, profile: null, following: [], pagination: null };
     postQuery.mockResolvedValue({
-      ok: true, status: 200, statusText: "OK",
-      body: { data: { searchFollowingAssociatedAccounts: empty } },
+      data: { searchFollowingAssociatedAccounts: empty },
     });
     const response = await request("lens", "farcaster,suji");
     expect(response.status).toBe(200);
@@ -96,16 +96,17 @@ describe("SocialGraph following associated accounts", () => {
   });
 
   it.each([
-    { ok: false, status: 503, body: { msg: "Unavailable" }, expected: 503 },
-    { ok: true, status: 200, body: { code: 429, msg: "Limited" }, expected: 429 },
-    { ok: true, status: 200, body: { errors: [{ message: "Failed" }] }, expected: 500 },
-    { ok: true, status: 200, body: { data: { searchFollowingAssociatedAccounts: null } }, expected: 404 },
-    { ok: true, status: 200, body: null, expected: 502 },
-    { ok: true, status: 200, body: { data: {} }, expected: 502 },
-    { ok: true, status: 200, body: { data: { searchFollowingAssociatedAccounts: {} } }, expected: 502 },
-    { ok: true, status: 200, body: { data: { searchFollowingAssociatedAccounts: { queryId: "farcaster,suji", following: null } } }, expected: 502 },
-  ])("preserves backend failure $expected", async ({ ok, status, body, expected }) => {
-    postQuery.mockResolvedValue({ ok, status, statusText: "", body });
+    { status: 503, body: { msg: "Unavailable" }, expected: 503 },
+    { status: 200, body: { code: 429, msg: "Limited" }, expected: 429 },
+    { status: 200, body: { errors: [{ message: "Failed" }] }, expected: 500 },
+    { status: 200, body: { data: { searchFollowingAssociatedAccounts: null } }, expected: 404 },
+    { status: 200, body: null, expected: 502 },
+    { status: 200, body: { data: {} }, expected: 502 },
+    { status: 200, body: { data: { searchFollowingAssociatedAccounts: {} } }, expected: 502 },
+    { status: 200, body: { data: { searchFollowingAssociatedAccounts: { queryId: "farcaster,suji", following: null } } }, expected: 502 },
+  ])("preserves backend failure $expected", async ({ status, body, expected }) => {
+    postQuery.mockImplementation(jest.requireActual("../utils/query").postIdentityGraphQuery);
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body, { status }));
     const response = await request("lens", "farcaster,suji");
     expect(response.status).toBe(expected);
     expect(response.headers.get("cache-control")).toBe("no-store");
@@ -114,7 +115,7 @@ describe("SocialGraph following associated accounts", () => {
   it("handles network errors without retrying", async () => {
     postQuery.mockRejectedValue(new Error("Network unavailable"));
     const response = await request("lens", "farcaster,suji");
-    expect(response.status).toBe(500);
+    expect(response.status).toBe(502);
     expect(response.headers.get("cache-control")).toBe("no-store");
     expect(postQuery).toHaveBeenCalledTimes(1);
   });

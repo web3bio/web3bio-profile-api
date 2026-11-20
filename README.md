@@ -71,7 +71,7 @@ Send your key in the `X-API-KEY: Bearer {API_KEY}` header. To obtain a key, cont
 
 While your key has credits, a data request costs one credit when it returns `2xx` or `404`, including cached results. A batch of 10 profiles also costs one credit. Other responses cost zero. Once the balance reaches zero, new requests follow the public access rules. An invalid key returns `403`. If you receive `429`, wait for the number of seconds in `Retry-After` before trying again.
 
-Use `GET /quota` with your key to check your balance. It returns a result such as `{"remaining":98}` and counts toward your rate limit, but costs zero credits. Keyed data responses include `X-Quota-Remaining` when the balance is available. If the connection drops, check your balance before retrying.
+Read your balance from the `X-Quota-Remaining` response header. If the API cannot confirm the balance, you still receive the data and the header is omitted. To check your balance separately, call `GET /quota` with your key. It returns a result such as `{"remaining":98}`, costs zero credits, and counts toward your rate limit.
 
 ## Contributing
 

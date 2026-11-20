@@ -27,9 +27,6 @@ const parseAvatarHandle = (
   return platform && identity ? { id, platform, identity } : null;
 };
 
-const isProfileError = (value: unknown): value is { message: unknown } =>
-  !!value && typeof value === "object" && "message" in value;
-
 const respondWithFallbackAvatar = (id: string) => respondWithSVG(id, AVATAR_SIZE);
 
 async function isWebPUrl(url: string): Promise<boolean> {
@@ -107,8 +104,9 @@ export async function GET(
       ns: true,
       response,
     });
-    if (isProfileError(profiles)) {
+    if (!Array.isArray(profiles)) {
       return NextResponse.json(profiles, {
+        status: profiles.code === 404 ? 200 : profiles.code,
         headers: { "Cache-Control": "no-store" },
       });
     }

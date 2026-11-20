@@ -209,7 +209,6 @@ function clientResponse(response, remaining, restricted = false) {
 
 async function serveData(request, env, ctx, pathname, claims) {
   if (request.method === "OPTIONS") return preflight();
-  // The single-handle discovery route passes straight through to OpenNext.
   if (!isCacheableApiPath(pathname)) return openNextHandler.fetch(request, env, ctx);
 
   const trustedOrigin = isTrustedOrigin(request);
@@ -276,6 +275,16 @@ async function serveData(request, env, ctx, pathname, claims) {
   return response;
 }
 
+async function serveAnonymous(request, env, ctx, path, remaining) {
+  if (request.headers.has("x-api-key")) {
+    const headers = new Headers(request.headers);
+    headers.delete("x-api-key");
+    request = new Request(request, { headers });
+  }
+  const response = await serveData(request, env, ctx, path, null);
+  return clientResponse(response, remaining, getRequiredRole(path) !== null);
+}
+
 // Match the public route and its native Next.js /api alias using the same policy.
 function policyPath(pathname) {
   try {
@@ -294,29 +303,27 @@ const handler = {
     request = withClientIpHeader(request, clientIp);
     const url = new URL(request.url);
     const path = policyPath(url.pathname);
-    const balanceOnly = path === "/quota";
-    const discovery = /^\/[^/]+$/.test(path) && path !== "/api" && !STATIC_PATHS.has(path);
-    const knownRoute = balanceOnly || discovery || isCacheableApiPath(path);
-    const nativeApi = /^\/api\/.+/i.test(url.pathname);
-    if (!knownRoute && !nativeApi) {
+    if (url.pathname === "/" || /^\/api\/?$/i.test(url.pathname) ||
+        url.pathname === "/_next" || url.pathname.startsWith("/_next/") || STATIC_PATHS.has(url.pathname)) {
       return openNextHandler.fetch(request, env, ctx);
     }
-    if (nativeApi && knownRoute) {
+    const balanceOnly = path === "/quota";
+    const discovery = /^\/[^/]+$/.test(path) && path !== "/api" && !STATIC_PATHS.has(path);
+    if (/^\/api\//i.test(url.pathname) && (discovery || isCacheableApiPath(path))) {
       url.pathname = url.pathname.slice(4);
       request = new Request(url, request);
     }
 
     const suppliedKey = request.headers.get("x-api-key");
-    if (request.method === "OPTIONS" && (suppliedKey === null || balanceOnly)) return preflight();
+    if (request.method === "OPTIONS" && (!suppliedKey || balanceOnly)) return preflight();
     if (balanceOnly && request.method !== "GET") {
       return jsonResponse(405, { error: "Method not allowed" }, { Allow: "GET, OPTIONS" });
     }
-    if (suppliedKey === null) {
+    if (!suppliedKey) {
       if (balanceOnly) {
         return await allowAnonymous(env, clientIp) ? forbidden("API key required") : rateLimited();
       }
-      const response = await serveData(request, env, ctx, path, null);
-      return clientResponse(response, undefined, getRequiredRole(path) !== null);
+      return serveAnonymous(request, env, ctx, path);
     }
 
     const token = suppliedKey.replace(/^Bearer /, "");
@@ -339,10 +346,7 @@ const handler = {
         return clientResponse(limited ? rateLimited() : jsonResponse(200, { remaining }), remaining);
       }
       if (!remaining) {
-        const headers = new Headers(request.headers);
-        headers.delete("x-api-key");
-        const anonymous = await serveData(new Request(request, { headers }), env, ctx, path, null);
-        return clientResponse(anonymous, 0);
+        return await serveAnonymous(request, env, ctx, path, 0);
       }
 
       response = await serveData(request, env, ctx, path, claims);
@@ -350,18 +354,16 @@ const handler = {
       console.error("[Worker]", error);
       return unavailable();
     }
-    if (!response.ok && response.status !== 404) {
-      try {
-        const remaining = await db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?")
+    let remaining = null;
+    try {
+      remaining = response.ok || response.status === 404
+        ? await chargeKey(db, keyHash, admission.requestId)
+        : await db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?")
           .bind(keyHash).first("remaining");
-        return clientResponse(response, remaining ?? 0);
-      } catch (error) {
-        console.error("[Quota]", error);
-        return clientResponse(response, null);
-      }
+    } catch (error) {
+      console.error("[Quota]", admission.requestId, error);
     }
-    const balance = await chargeKey(db, keyHash, admission.requestId);
-    return balance === null ? unavailable() : clientResponse(response, balance);
+    return clientResponse(response, remaining);
   },
 };
 

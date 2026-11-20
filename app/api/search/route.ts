@@ -6,11 +6,9 @@ import {
   IdentityRecord,
   ProfileRecord,
 } from "@/utils/types";
-import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
+import { errorHandle, getErrorCauseCode, getUserHeaders, respondJson } from "@/utils/utils";
 import {
   getQuery,
-  identityGraphErrorMessage,
-  identityGraphErrorStatus,
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
@@ -105,34 +103,17 @@ export async function GET(req: NextRequest) {
     );
   }
   try {
-    const {
-      ok,
-      status,
-      body: rawJson,
-    } = await postIdentityGraphQuery(
+    const envelope = await postIdentityGraphQuery<{ identity?: IdentityRecord | null }>(
       headers,
       getQuery(QueryType.GET_SEARCH_QUERY),
       { identity, platform },
     );
 
-    const envelope = rawJson as {
-      code?: number;
-      errors?: unknown;
-      data?: { identity?: IdentityRecord };
-    } | null;
-
-    if (!ok || envelope?.code || envelope?.errors) {
-      return createSearchError(
-        identity,
-        pathname,
-        platform,
-        identityGraphErrorStatus(ok, status, envelope?.code),
-        identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
-      );
+    const graphIdentity = envelope.data.identity;
+    if (graphIdentity !== null && (!graphIdentity || typeof graphIdentity !== "object" || Array.isArray(graphIdentity))) {
+      throw new Error("Invalid Identity Graph response");
     }
-
-    const graphIdentity = envelope?.data?.identity;
-    if (!graphIdentity) {
+    if (graphIdentity === null) {
       return createSearchError(
         identity,
         pathname,
@@ -152,7 +133,7 @@ export async function GET(req: NextRequest) {
       identity,
       pathname,
       platform,
-      e instanceof Error ? Number(e.cause) || 500 : 500,
+      getErrorCauseCode(e),
       e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
     );
   }

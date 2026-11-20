@@ -160,8 +160,8 @@ export const resolveWalletResponse = async (
       identity: handle,
       path: pathname,
       platform,
-      code: 404,
-      message: ErrorMessages.NOT_FOUND,
+      code: res.code ?? 404,
+      message: res.errors ?? ErrorMessages.NOT_FOUND,
     });
 
   const vertices: IdentityRecord[] = root.identityGraph?.vertices || [root];

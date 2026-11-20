@@ -293,7 +293,7 @@ describe("Worker API", () => {
   });
 
   it("shares cached data across keys and settles each caller's own balance", async () => {
-    const path = "/profile/batch/" + encodeURIComponent(JSON.stringify(["ens,a.eth", "ens,b.eth"]));
+    const path = "/profile/batch/" + encodeURIComponent(JSON.stringify(Array.from({ length: 10 }, (_, i) => `ens,user${i}.eth`)));
     topup("second", 3);
     const first = await request(path, paid);
     const second = await request(path, { headers: { "x-api-key": "second" } });
@@ -425,16 +425,35 @@ describe("Worker API", () => {
     expect(db.prepare("SELECT remaining FROM api_keys WHERE key_hash = ?").get(keyId("other"))).toBeUndefined();
   });
 
-  it("charges route-level 404s in the API namespace once", async () => {
+  it("charges the same 404 on public and native API paths", async () => {
     openNextHandler.fetch.mockResolvedValue(new Response(null, { status: 404 }));
-    const response = await request("/api/unknown/endpoint", paid);
-    expect(response.status).toBe(404);
-    expect(response.headers.get("X-Quota-Remaining")).toBe("9");
-    expect(new URL(openNextHandler.fetch.mock.lastCall[0].url).pathname).toBe("/api/unknown/endpoint");
+    for (const [path, balance] of [["/unknown/endpoint", "9"], ["/api/unknown/endpoint", "8"]]) {
+      const response = await request(path, paid);
+      expect(response.status).toBe(404);
+      expect(response.headers.get("X-Quota-Remaining")).toBe(balance);
+      expect(new URL(openNextHandler.fetch.mock.lastCall[0].url).pathname).toBe(path);
+    }
+  });
+
+  it("treats an empty API key as an anonymous request", async () => {
+    const empty = { headers: { "x-api-key": "" } };
+    const response = await request("/profile/alice.eth", empty);
+    expect(response.status).toBe(200);
+    expect(response.headers.has("X-Quota-Remaining")).toBe(false);
+    expect(openNextHandler.fetch.mock.lastCall[0].headers.has("x-api-key")).toBe(false);
+    expect((await request("/wallet/alice.eth", empty)).status).toBe(403);
+    env.API_RATE_LIMIT.limit.mockResolvedValue({ success: false });
+    expect((await request("/quota", empty)).status).toBe(429);
+    expect((await request("/profile/alice.eth", empty)).status).toBe(429);
+    expect((await request("/profile/alice.eth", { ...empty, method: "OPTIONS" })).status).toBe(204);
+    expect(env.QUOTA_DB.batch).not.toHaveBeenCalled();
+    expect(jwtVerify).not.toHaveBeenCalled();
   });
 
   it("meters keyed HEAD and 204 responses and keeps public assets outside billing", async () => {
-    expect((await request("/llms.txt", paid)).headers.has("X-Quota-Remaining")).toBe(false);
+    for (const path of ["/", "/api", "/llms.txt", "/favicon.ico", "/_next/static/file.js"]) {
+      expect((await request(path, paid)).headers.has("X-Quota-Remaining")).toBe(false);
+    }
     expect(env.QUOTA_DB.batch).not.toHaveBeenCalled();
     openNextHandler.fetch.mockResolvedValue(new Response(null, { status: 200 }));
     const head = await request("/profile/alice.eth", { ...paid, method: "HEAD" });
@@ -490,47 +509,53 @@ describe("Worker API", () => {
     expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 9 });
   });
 
-  it("prevents a late write from charging a failed response", async () => {
+  it("settles a delayed debit once even if the first write arrives after its retry", async () => {
     const batch = env.QUOTA_DB.batch.getMockImplementation();
     let late;
     env.QUOTA_DB.batch.mockImplementationOnce(batch).mockImplementationOnce(async statements => {
       late = statements;
       throw new Error("write timed out");
     });
-    const log = jest.spyOn(console, "error").mockImplementation(() => {});
-    try {
-      expect((await request("/profile/alice.eth", paid)).status).toBe(503);
-      await batch(late);
-      expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 10 });
-    } finally {
-      log.mockRestore();
-    }
+    const response = await request("/profile/alice.eth", paid);
+    expect(response.status).toBe(200);
+    expect(response.headers.get("X-Quota-Remaining")).toBe("9");
+    await batch(late);
+    expect(await (await request("/quota", paid)).json()).toEqual({ remaining: 9 });
   });
 
-  it.each(["disconnected", "expired", "before submission"])("withholds paid data when settlement fails: %s", async reason => {
+  it.each([
+    ["both writes unavailable", false, false, 200, 10],
+    ["lost acknowledgement and retry unavailable", true, false, 404, 9],
+    ["receipt expired before retry", true, true, 200, 9],
+  ])("preserves the data and omits an uncertain balance: %s", async (_, committed, expired, status, remaining) => {
     const batch = env.QUOTA_DB.batch.getMockImplementation();
     const start = Date.now();
     const clock = jest.spyOn(Date, "now").mockReturnValue(start);
     const log = jest.spyOn(console, "error").mockImplementation(() => {});
     env.QUOTA_DB.batch.mockImplementationOnce(batch).mockImplementationOnce(async statements => {
-      if (reason !== "before submission") await batch(statements);
-      if (reason === "expired") {
+      if (committed) await batch(statements);
+      if (expired) {
         clock.mockReturnValue(start + 61_000);
         await request("/quota", paid);
       }
       throw new Error("lost acknowledgement");
     });
-    if (reason !== "expired") env.QUOTA_DB.batch.mockRejectedValueOnce(new Error("offline"));
+    if (!expired) env.QUOTA_DB.batch.mockRejectedValueOnce(new Error("offline"));
+    openNextHandler.fetch.mockResolvedValue(new Response("original body", {
+      status, headers: { "X-Quota-Remaining": "stale" },
+    }));
     try {
-      await expect(request("/profile/alice.eth", paid)).rejects.toThrow(
-        reason === "expired" ? "lost acknowledgement" : "offline",
-      );
-      expect(await (await request("/quota", paid)).json()).toEqual({
-        remaining: reason === "before submission" ? 10 : 9,
-      });
+      const response = await request("/profile/alice.eth", paid);
+      expect(response.status).toBe(status);
+      expect(await response.text()).toBe("original body");
+      expect(response.headers.has("X-Quota-Remaining")).toBe(false);
+      expect(response.headers.get("Cache-Control")).toBe("no-store");
+      expect(env.QUOTA_DB.batch).toHaveBeenCalledTimes(expired ? 4 : 3);
+      if (expired) expect(db.prepare("SELECT count(*) AS n FROM quota_requests WHERE expires_at = 0").get().n).toBe(0);
+      expect(await (await request("/quota", paid)).json()).toEqual({ remaining });
     } finally {
-      log.mockRestore();
       clock.mockRestore();
+      log.mockRestore();
     }
   });
 

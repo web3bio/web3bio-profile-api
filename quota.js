@@ -27,26 +27,20 @@ export async function admitKey(db, keyHash, limit) {
 
 export async function chargeKey(db, keyHash, requestId) {
   const deadline = Date.now() / 1000 + 60;
-  const decide = async (billable) => {
-    const [, , state] = await db.batch([
-      // A slow response can outlive its rate-limit entry.
-      db.prepare("INSERT OR IGNORE INTO quota_requests (id, key_hash) VALUES (?, ?)").bind(requestId, keyHash),
-      db.prepare(`UPDATE quota_requests SET billable = ?1, expires_at = ?2
-        WHERE id = ?3 AND billable IS NULL AND ${NOW} < ?2`).bind(billable, deadline, requestId),
-      db.prepare(`SELECT k.remaining, r.billable FROM quota_requests r
-        JOIN api_keys k ON k.key_hash = r.key_hash WHERE r.id = ?`).bind(requestId),
-    ]);
-    return state.results[0];
-  };
-
-  let result;
+  // A slow response can outlive its admission. Both attempts share one receipt and expiry.
+  const statements = [
+    db.prepare(`INSERT OR IGNORE INTO quota_requests (id, key_hash)
+      SELECT ?1, ?2 WHERE ${NOW} < ?3`).bind(requestId, keyHash, deadline),
+    db.prepare(`UPDATE quota_requests SET billable = 1, expires_at = ?1
+      WHERE id = ?2 AND billable IS NULL AND ${NOW} < ?1`).bind(deadline, requestId),
+    db.prepare(`SELECT k.remaining FROM quota_requests r JOIN api_keys k ON k.key_hash = r.key_hash
+      WHERE r.id = ? AND r.billable = 1`).bind(requestId),
+  ];
+  let results;
   try {
-    result = await decide(1);
-  } catch (error) {
-    // If the commit reply was lost, recover its decision or cancel a late debit.
-    console.error("[Quota]", error);
-    result = await decide(0);
-    if (result?.billable == null) throw error;
+    results = await db.batch(statements);
+  } catch {
+    results = await db.batch(statements);
   }
-  return result?.billable ? result.remaining : null;
+  return results[2].results[0]?.remaining ?? null;
 }

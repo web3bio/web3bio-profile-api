@@ -727,10 +727,11 @@ export default async function Home() {
               <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span> header.
             </p>
             <p>
-              Use <code>GET /quota</code> with your key to check the available
-              balance for free. This counts toward your rate limit. Keyed data
-              responses include <code>X-Quota-Remaining</code> when the balance is available.
-              If the connection drops, check your balance before retrying. If you receive{" "}
+              Read your balance from the <code>X-Quota-Remaining</code> response header.
+              If the balance cannot be confirmed, you still receive the data and the
+              header is omitted. To check separately, call <code>GET /quota</code> with
+              your key. This costs zero credits and counts toward your rate limit.
+              If you receive{" "}
               <code>429</code>, wait for the number of seconds in{" "}
               <code>Retry-After</code> before trying again.
             </p>

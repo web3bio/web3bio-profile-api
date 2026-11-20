@@ -47,16 +47,13 @@ const batch = (queryIds: unknown) => POST(new NextRequest(endpoint, {
 beforeEach(() => {
   postQuery.mockReset();
   postQuery.mockImplementation(async (_headers, _query, variables) => ({
-    ok: true,
-    status: 200,
-    statusText: "OK",
-    body: {
-      data: {
-        batchAssociatedAccountsLookup: (variables.queryIds as string[]).map(result),
-      },
+    data: {
+      batchAssociatedAccountsLookup: (variables.queryIds as string[]).map(result),
     },
   }));
 });
+
+afterEach(() => jest.restoreAllMocks());
 
 describe("SocialGraph associated identities", () => {
   it.each([
@@ -143,8 +140,7 @@ describe("SocialGraph associated identities", () => {
   it("preserves a missing profile and empty associatedAccounts", async () => {
     const row = { queryId: "lens,missing.lens", profile: null, associatedAccounts: [] };
     postQuery.mockResolvedValue({
-      ok: true, status: 200, statusText: "OK",
-      body: { data: { batchAssociatedAccountsLookup: [row] } },
+      data: { batchAssociatedAccountsLookup: [row] },
     });
     const response = await single(row.queryId);
     expect(response.status).toBe(200);
@@ -152,12 +148,13 @@ describe("SocialGraph associated identities", () => {
   });
 
   it.each([
-    { ok: false, status: 503, body: { msg: "Unavailable" }, expected: 503 },
-    { ok: true, status: 200, body: { errors: [{ message: "Failed" }] }, expected: 500 },
-    { ok: true, status: 200, body: { code: 429, msg: "Limited" }, expected: 429 },
-    { ok: true, status: 200, body: null, expected: 502 },
-  ])("preserves backend failures: $expected", async ({ ok, status, body, expected }) => {
-    postQuery.mockResolvedValue({ ok, status, statusText: "", body });
+    { status: 503, body: { msg: "Unavailable" }, expected: 503 },
+    { status: 200, body: { errors: [{ message: "Failed" }] }, expected: 500 },
+    { status: 200, body: { code: 429, msg: "Limited" }, expected: 429 },
+    { status: 200, body: null, expected: 502 },
+  ])("preserves backend failures: $expected", async ({ status, body, expected }) => {
+    postQuery.mockImplementation(jest.requireActual("../utils/query").postIdentityGraphQuery);
+    jest.spyOn(globalThis, "fetch").mockResolvedValue(Response.json(body, { status }));
     const response = await batch(["lens,sujiyan.lens"]);
     expect(response.status).toBe(expected);
     expect(response.headers.get("cache-control")).toBe("no-store");
@@ -165,7 +162,7 @@ describe("SocialGraph associated identities", () => {
 
   it("handles backend request failures without retries", async () => {
     postQuery.mockRejectedValue(new Error("Network unavailable"));
-    expect((await single("lens,sujiyan.lens")).status).toBe(500);
+    expect((await single("lens,sujiyan.lens")).status).toBe(502);
     expect(postQuery).toHaveBeenCalledTimes(1);
   });
 });

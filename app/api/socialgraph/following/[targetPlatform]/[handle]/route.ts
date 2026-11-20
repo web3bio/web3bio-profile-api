@@ -2,13 +2,12 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
   getQuery,
-  identityGraphErrorMessage,
-  identityGraphErrorStatus,
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
 import {
   errorHandle,
+  getErrorCauseCode,
   getUserHeaders,
   invalidIdentityResponse,
   respondJson,
@@ -38,24 +37,14 @@ export async function GET(
   }
 
   try {
-    const { ok, status, body } = await postIdentityGraphQuery(
+    const { data } = await postIdentityGraphQuery<{
+      searchFollowingAssociatedAccounts?: { queryId?: string; following?: unknown[] } | null;
+    }>(
       getUserHeaders(req.headers),
       getQuery(QueryType.GET_FOLLOWING_ASSOCIATED_ACCOUNTS),
       { sourcePlatform: platform, sourceIdentity: identity, targetPlatform, page, totalPage: limit },
     );
-    const envelope = body as {
-      code?: number;
-      errors?: unknown;
-      data?: { searchFollowingAssociatedAccounts?: { queryId?: string; following?: unknown[] } | null };
-    } | null;
-    if (!ok || envelope?.code || envelope?.errors) {
-      return fail(
-        identityGraphErrorStatus(ok, status, envelope?.code),
-        identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
-      );
-    }
-
-    const result = envelope?.data?.searchFollowingAssociatedAccounts;
+    const result = data.searchFollowingAssociatedAccounts;
     if (result === null) return fail(404, ErrorMessages.NOT_FOUND);
     if (typeof result?.queryId !== "string" || !Array.isArray(result?.following)) {
       return fail(502, ErrorMessages.NETWORK_ERROR);
@@ -63,7 +52,7 @@ export async function GET(
     return respondJson(result, platform);
   } catch (error: unknown) {
     return fail(
-      error instanceof Error ? Number(error.cause) || 500 : 500,
+      getErrorCauseCode(error),
       error instanceof Error ? error.message : ErrorMessages.NETWORK_ERROR,
     );
   }
