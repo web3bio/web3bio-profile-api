@@ -1,4 +1,4 @@
-import { expectJsonCase } from "./helpers/api-assertions";
+import { expectPaidJsonCase } from "./helpers/api-assertions";
 
 describe("Test For Wallet API query", () => {
   const cases = [
@@ -39,6 +39,6 @@ describe("Test For Wallet API query", () => {
   ];
 
   it.each(cases)("$name", async ({ path, assertJson }) => {
-    await expectJsonCase({ path, assertJson });
+    await expectPaidJsonCase({ path, assertJson });
   });
 });

@@ -21,6 +21,8 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: pnpm/action-setup@v3
         with:
@@ -33,6 +35,9 @@ jobs:
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
+
+      - name: Build Worker for isolated paid tests
+        run: pnpm exec opennextjs-cloudflare build
 
       - name: Get deployment URL
         id: url
@@ -74,6 +79,7 @@ jobs:
           ENVIRONMENT: ${{ steps.url.outputs.environment }}
           GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}
           PROFILE_TEST_API_KEY: ${{ secrets.PROFILE_TEST_API_KEY || secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
+          GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
         run: |
           URL="${{ steps.url.outputs.value }}"
 
@@ -82,7 +88,7 @@ jobs:
           echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
           echo "GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}"
           if [ -z "${PROFILE_TEST_API_KEY}" ]; then
-            echo "A funded PROFILE_TEST_API_KEY is required for preview tests." >&2
+            echo "A valid zero-balance test key is required for preview access checks." >&2
             exit 1
           fi
           echo "=========================================="
@@ -91,7 +97,7 @@ jobs:
           for i in $(seq 1 12); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
               echo "Deployment ready, running tests..."
-              pnpm test
+              node scripts/test-preview.mjs
               exit 0
             fi
             echo "Attempt $i/12: Not ready yet; sleeping 15s..."
