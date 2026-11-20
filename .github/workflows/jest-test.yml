@@ -7,10 +7,7 @@ on:
 
 permissions:
   contents: read
-  issues: read
-  pull-requests: read
   checks: read
-  statuses: read
 
 concurrency:
   group: tests-${{ github.event.pull_request.number || github.ref }}
@@ -24,6 +21,8 @@ jobs:
     if: github.event_name != 'pull_request' || github.event.pull_request.draft == false
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
 
       - uses: pnpm/action-setup@v3
         with:
@@ -37,102 +36,49 @@ jobs:
 
       - run: pnpm install --frozen-lockfile
 
+      - name: Build Worker for isolated paid tests
+        run: pnpm exec opennextjs-cloudflare build
+
       - name: Get deployment URL
         id: url
         uses: actions/github-script@v7
         with:
+          retries: 2
           script: |
-            const owner = context.repo.owner;
-            const repo = context.repo.repo;
-            const isPR = context.eventName === 'pull_request';
-            const baseBranch = isPR
-              ? context.payload.pull_request.base.ref
-              : context.ref.replace('refs/heads/', '');
-            const refSha = isPR
-              ? context.payload.pull_request.head.sha
-              : context.sha;
+            const pr = context.payload.pull_request;
+            const sha = pr?.head.sha ?? context.sha;
+            const production = !pr && context.ref === 'refs/heads/main';
+            const cloudflare = 'cloudflare-workers-and-pages';
+            const versionUrl = /^Preview URL:[ \t]*(https:\/\/[a-z0-9-]+-profile-api\.web3bio\.workers\.dev)\/?[ \t]*$/im;
 
-            const isMain = baseBranch === 'main';
-
-            const urlRegex = /https:\/\/[a-zA-Z0-9-]+\.web3bio\.workers\.dev/;
-
-            async function findFromComments() {
-              if (isPR) {
-                const { data } = await github.rest.issues.listComments({ owner, repo, issue_number: context.issue.number });
-                const comment = data.find(c => c.user?.login === 'cloudflare-workers-and-pages[bot]' && urlRegex.test(c.body || ''));
-                const match = comment?.body?.match(urlRegex);
-                return match?.[0] || null;
-              } else {
-                const { data } = await github.rest.repos.listCommentsForCommit({ owner, repo, commit_sha: refSha });
-                const comment = data.find(c => c.user?.login === 'cloudflare-workers-and-pages[bot]' && urlRegex.test(c.body || ''));
-                const match = comment?.body?.match(urlRegex);
-                return match?.[0] || null;
-              }
-            }
-
-            async function findFromChecks() {
-              try {
-                const { data } = await github.rest.checks.listForRef({ owner, repo, ref: refSha });
-                for (const run of data.check_runs || []) {
-                  if (/cloudflare/i.test(run.name || '') || /cloudflare/i.test(run.app?.name || '')) {
-                    const text = [run.details_url, run.output?.summary, run.output?.text].filter(Boolean).join('\n');
-                    const match = text.match(urlRegex);
-                    if (match) return match[0];
-                  }
+            for (let attempt = 0; attempt < 40; attempt++) {
+              const { data } = await github.rest.checks.listForRef({
+                ...context.repo, ref: sha, check_name: 'Workers Builds: profile-api', per_page: 10,
+              });
+              const build = data.check_runs.find(run => run.head_sha === sha && run.app?.slug === cloudflare);
+              if (build?.status === 'completed') {
+                if (build.conclusion !== 'success') {
+                  throw new Error(`Cloudflare build for ${sha} finished with ${build.conclusion}: ${build.html_url}`);
                 }
-              } catch (e) {
-                core.info(`checks.listForRef failed: ${e.message}`);
+                const preview = build.output?.summary?.match(versionUrl)?.[1];
+                const url = production ? 'https://api.web3.bio' : preview;
+                if (!url) throw new Error(`Cloudflare build for ${sha} has no test URL: ${build.html_url}`);
+                core.setOutput('value', url);
+                core.setOutput('environment', production ? 'production' : 'staging');
+                core.setOutput('graphql_server', 'https://graph.web3.bio/graphql');
+                core.info(`Testing ${sha} at ${url}`);
+                return;
               }
-              return null;
+              if (attempt < 39) await new Promise(resolve => setTimeout(resolve, 15_000));
             }
-
-            async function findFromStatuses() {
-              try {
-                const { data } = await github.rest.repos.getCombinedStatusForRef({ owner, repo, ref: refSha });
-                for (const status of data.statuses || []) {
-                  if (/cloudflare/i.test(status.context || '')) {
-                    const text = `${status.target_url || ''} ${status.description || ''}`;
-                    const match = text.match(urlRegex);
-                    if (match) return match[0];
-                  }
-                }
-              } catch (e) {
-                core.info(`repos.getCombinedStatusForRef failed: ${e.message}`);
-              }
-              return null;
-            }
-
-            const maxAttempts = 30; // up to ~5 minutes with 10s sleep
-            for (let i = 1; i <= maxAttempts; i++) {
-              const sources = [findFromComments, findFromChecks, findFromStatuses];
-              for (const fn of sources) {
-                try {
-                  const url = await fn();
-                  if (url) {
-                    core.setOutput('value', url);
-                    core.setOutput('environment', isMain ? 'production' : 'staging');
-                    core.setOutput('graphql_server', 'https://graph.web3.bio/graphql');
-                    core.info(`Target branch: ${baseBranch}`);
-                    core.info(`Cloudflare URL found: ${url}`);
-                    return;
-                  }
-                } catch (e) {
-                  core.info(`Lookup error: ${e.message}`);
-                }
-              }
-              if (i < maxAttempts) {
-                core.info(`Cloudflare URL not found yet (attempt ${i}/${maxAttempts}). Retrying in 10s...`);
-                await new Promise(r => setTimeout(r, 10000));
-              }
-            }
-
-            core.setFailed('Deployment URL not found after polling comments, checks, and statuses.');
+            throw new Error(`Timed out waiting for the Cloudflare build of ${sha}`);
 
       - name: Wait and test
         env:
           BASE_URL: ${{ steps.url.outputs.value }}
           ENVIRONMENT: ${{ steps.url.outputs.environment }}
           GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}
+          PROFILE_TEST_API_KEY: ${{ secrets.PROFILE_TEST_API_KEY || secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
           GENERAL_IDENTITY_GRAPH_API_KEY: ${{ secrets.GENERAL_IDENTITY_GRAPH_API_KEY }}
         run: |
           URL="${{ steps.url.outputs.value }}"
@@ -141,10 +87,9 @@ jobs:
           echo "BASE_URL: $URL"
           echo "ENVIRONMENT: ${{ steps.url.outputs.environment }}"
           echo "GRAPHQL_SERVER: ${{ steps.url.outputs.graphql_server }}"
-          if [ -z "${GENERAL_IDENTITY_GRAPH_API_KEY}" ]; then
-            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (not set)"
-          else
-            echo "GENERAL_IDENTITY_GRAPH_API_KEY: (provided)"
+          if [ -z "${PROFILE_TEST_API_KEY}" ]; then
+            echo "A valid zero-balance test key is required for preview access checks." >&2
+            exit 1
           fi
           echo "=========================================="
 
@@ -152,7 +97,7 @@ jobs:
           for i in $(seq 1 12); do
             if curl -sf --max-time 10 "$URL" > /dev/null 2>&1; then
               echo "Deployment ready, running tests..."
-              pnpm test
+              node scripts/test-preview.mjs
               exit 0
             fi
             echo "Attempt $i/12: Not ready yet; sleeping 15s..."

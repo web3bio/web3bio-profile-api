@@ -44,7 +44,7 @@ const nextConfig = {
           },
           {
             key: "Access-Control-Expose-Headers",
-            value: "Retry-After, X-Request-Platform",
+            value: "Retry-After, X-Request-Platform, X-Quota-Remaining",
           },
         ],
       },

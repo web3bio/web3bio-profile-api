@@ -12,6 +12,17 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
+  "keep_vars": true,
+  "vars": {
+    "PAID_REQUESTS_PER_10_SECONDS": 50,
+  },
+  "d1_databases": [
+    {
+      "binding": "QUOTA_DB",
+      "database_name": "keyQuota",
+      "database_id": "f6f0fb21-c9d4-4c31-bf9d-373e1bcbaaa6",
+    },
+  ],
   "ratelimits": [
     {
       "name": "API_RATE_LIMIT",

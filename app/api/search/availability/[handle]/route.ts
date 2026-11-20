@@ -2,21 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
   getQuery,
-  identityGraphErrorMessage,
-  identityGraphErrorStatus,
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
-import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
-
-interface GraphQLEnvelope {
-  data?: {
-    domainAvailableSearch?: { platform: Platform }[];
-  };
-  errors?: unknown;
-  code?: number;
-  msg?: string;
-}
+import { errorHandle, getErrorCauseCode, getUserHeaders, respondJson } from "@/utils/utils";
 
 export async function GET(
   req: NextRequest,
@@ -38,25 +27,15 @@ export async function GET(
   const headers = getUserHeaders(req.headers);
 
   try {
-    const { ok, status, body } = await postIdentityGraphQuery(
+    const result = await postIdentityGraphQuery<{ domainAvailableSearch?: { platform: Platform }[] }>(
       headers,
       getQuery(QueryType.GET_AVAILABLE_DOMAINS),
       { name: handle },
     );
 
-    const result = body as GraphQLEnvelope | null;
-
-    if (!ok || !result || result.code || result.errors) {
-      return errorHandle({
-        identity: handle,
-        platform: null,
-        path: pathname,
-        message: identityGraphErrorMessage(result, ErrorMessages.NOT_FOUND),
-        code: identityGraphErrorStatus(ok, status, result?.code),
-      });
-    }
-
-    result.data?.domainAvailableSearch?.sort((a, b) => {
+    const domains = result.data.domainAvailableSearch;
+    if (!Array.isArray(domains)) throw new Error("Invalid Identity Graph response");
+    domains.sort((a, b) => {
       if (a.platform === Platform.lens && b.platform === Platform.farcaster) {
         return -1;
       }
@@ -73,7 +52,7 @@ export async function GET(
       platform: null,
       path: pathname,
       message: e instanceof Error ? e.message : ErrorMessages.NOT_FOUND,
-      code: e instanceof Error ? Number(e.cause) || 500 : 500,
+      code: getErrorCauseCode(e),
     });
   }
 }

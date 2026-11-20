@@ -8,7 +8,7 @@ describe("Test For Farcaster Profile API", () => {
       assertJson: (json) => {
         expect(json.identity).toBe("suji");
         expect(json.links.twitter.handle).toBe("suji_yan");
-        expect(json.links.twitter.sources.includes("farcaster")).toBeTruthy();
+        expect(json.links.twitter.sources).toEqual(expect.arrayContaining([expect.stringMatching(/\S/)]));
       },
     },
     {

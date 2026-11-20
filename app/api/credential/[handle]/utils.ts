@@ -31,7 +31,7 @@ const buildErrorResponse = (
   identity: string,
   platform: Platform,
   pathname: string,
-  code: 404 | 500,
+  code: number,
 ) =>
   errorHandle({
     identity,
@@ -156,6 +156,8 @@ export const resolveCredentialHandle = async (
       platform,
       headers,
     );
+
+    if (res.errors) return buildErrorResponse(identity, platform, pathname, res.code ?? 500);
 
     const queryId = `${platform},${identity}`;
     const address = res.data?.identity?.profile?.address || "";
