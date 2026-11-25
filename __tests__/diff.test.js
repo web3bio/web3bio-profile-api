@@ -503,7 +503,7 @@ const runDiffSuite = process.env.RUN_DIFF_TESTS === "1";
     "ns/sns.test.js /ns/sns/bonfida.sns",
     "ns/solana.test.js /ns/solana/bonfida.sol",
     "ns/universal.test.js /ns/sujiyan.lens",
-    "profile/basenames.test.js /profile/basenames/suji.base",
+    "profile/basenames.test.js /profile/basenames/tony.base.eth",
     `profile/batch.test.js /profile/batch/${encodeURIComponent(JSON.stringify(profileBatchIds))}`,
     "profile/ens.test.js /profile/ens/brantly.eth",
     "profile/ens.test.js /profile/ens/0xhelena.eth",
