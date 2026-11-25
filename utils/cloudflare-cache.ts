@@ -25,6 +25,7 @@ function normalizedPath(pathname: string): string {
     // Preserve identity case for social account lookups.
     if (
       prefix === "/social/identities/" ||
+      prefix === "/social/associate/" ||
       prefix === "/social/besties/" ||
       /^\/social\/following\/[^/]+\/$/i.test(prefix)
     ) {

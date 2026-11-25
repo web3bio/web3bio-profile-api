@@ -663,6 +663,7 @@ const GET_BESTIES_ASSOCIATED_ACCOUNTS = `
     $sourceIdentity: String!
     $page: Union!
     $totalPage: Union!
+    $includeDetails: Boolean! = false
   ) {
     searchBestiesAssociatedAccounts(
       sourcePlatform: farcaster
@@ -677,9 +678,19 @@ const GET_BESTIES_ASSOCIATED_ACCOUNTS = `
         page
         limit: totalPage
       }
+      queryId @include(if: $includeDetails)
       profile { ...AssociatedAccountProfile }
       besties {
+        queryId @include(if: $includeDetails)
         profile { ...AssociatedAccountProfile }
+        score @include(if: $includeDetails) {
+          bestiesScore
+          followType
+          commentCount
+          mentionCount
+          shareCount
+          likeCount
+        }
         associatedAccounts { ...AssociatedAccountProfile }
       }
     }

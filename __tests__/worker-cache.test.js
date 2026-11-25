@@ -276,6 +276,12 @@ describe("Worker response caching", () => {
     expect(await cache.match(workerCacheKey(path, origin))).toBeUndefined();
   });
 
+  it("keeps associate cache entries distinct by identity case and page", () => {
+    const key = (path) => workerCacheKey(`${origin}/social/associate/${path}`).url;
+    expect(key("Alice?page=0")).not.toBe(key("alice?page=0"));
+    expect(key("%2316970?page=0")).not.toBe(key("%2316970?page=1"));
+  });
+
   it("never caches POST identity batches under their shared URL", async () => {
     openNextHandler.fetch.mockImplementation(async (req) =>
       Response.json((await req.json()).queryIds),
