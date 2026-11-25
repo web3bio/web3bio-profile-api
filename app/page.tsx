@@ -507,9 +507,9 @@ export default async function Home() {
             <p>
               This documentation describes the publicly available endpoints of
               the Web3.bio Profile API, which is a set of RESTful JSON APIs. It
-              explains how to use them and what they return. Currently, the APIs
-              are offered for free to assist developers in getting started with
-              Web3 profiles. We will do our best to maintain uptime.
+              explains how to use them and what they return. Public queries
+              support anonymous access and prepaid API keys. We will do our best
+              to maintain uptime.
             </p>
           </section>
           <section className="pt-4 pb-4">
@@ -699,9 +699,12 @@ export default async function Home() {
           <section className="pt-4 pb-4" id="api-key">
             <h2 className="text-bold h4">API Key and Authentication</h2>
             <p>
-              The Profile API is free, but usage without API keys includes rate
-              limiting mechanisms to ensure fair usage and prevent abuse. If you
-              need an API Key, you can obtain one by contacting Web3.bio via{" "}
+              Public queries normally allow 6 requests per 10 seconds per IP.
+              A key with credits allows 50 requests per 10 seconds across all
+              endpoints. A data request returning <code>2xx</code> or <code>404</code>{" "}
+              costs one credit, even for a cached result or a batch of 10 profiles.
+              Other responses cost zero. Once your balance reaches zero, new
+              requests follow the public access rules. For a key, contact Web3.bio via{" "}
               <a
                 href="https://x.com/web3bio"
                 target="_blank"
@@ -720,9 +723,17 @@ export default async function Home() {
               .
             </p>
             <p>
-              Please include the API key in the request header using the
-              following format:
-              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span>.
+              Send your key in the{" "}
+              <span className="label">X-API-KEY: Bearer {`{API_KEY}`}</span> header.
+            </p>
+            <p>
+              Read your balance from the <code>X-Quota-Remaining</code> response header.
+              If the balance cannot be confirmed, you still receive the data and the
+              header is omitted. To check separately, call <code>GET /quota</code> with
+              your key. This costs zero credits and counts toward your rate limit.
+              If you receive{" "}
+              <code>429</code>, wait for the number of seconds in{" "}
+              <code>Retry-After</code> before trying again.
             </p>
 
             <h3 className="text-bold h6" style={{ marginTop: "2rem" }}>
@@ -3156,7 +3167,7 @@ export default async function Home() {
             </p>
             <p>
               Error responses are returned with non-2xx HTTP codes, typically{" "}
-              <code>401</code> (missing/invalid API key), <code>404</code> (not
+              <code>403</code> (missing, invalid, or insufficiently privileged API key), <code>404</code> (not
               found), <code>429</code> (rate limited), or <code>500</code>{" "}
               (upstream/internal failure). Most endpoints include an{" "}
               <code>error</code> field with a human-readable reason.

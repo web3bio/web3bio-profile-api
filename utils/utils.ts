@@ -142,32 +142,7 @@ export const parseResolvedIdentityHandle = (
   return platform && identity ? [platform, identity] : null;
 };
 
-export const getErrorCauseCode = (error: unknown, fallback = 502): number => {
-  if (
-    error instanceof Error &&
-    error.cause &&
-    typeof error.cause === "object" &&
-    typeof (error.cause as { code?: unknown }).code === "number"
-  ) {
-    return (error.cause as { code: number }).code;
-  }
-  return fallback;
+export const getErrorCauseCode = (error: unknown): number => {
+  if (typeof error === "object" && error !== null && "name" in error && error.name === "TimeoutError") return 504;
+  return error instanceof Error && typeof error.cause === "number" ? error.cause : 502;
 };
-
-export const parseIdsParam = (idsParam: string): string[] | null => {
-  const ids = JSON.parse(decodeURIComponent(idsParam));
-  return Array.isArray(ids) ? ids : null;
-};
-
-export const invalidBatchIdentityResponse = (
-  pathname: string,
-  identity: string,
-  code = 400,
-) =>
-  errorHandle({
-    identity,
-    path: pathname,
-    platform: null,
-    code,
-    message: ErrorMessages.INVALID_IDENTITY,
-  });

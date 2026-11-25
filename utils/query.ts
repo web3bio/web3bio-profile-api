@@ -1,12 +1,7 @@
-import {
-  ErrorMessages,
-  IdentityString,
-  NSResponse,
-  Platform,
-} from "web3bio-profile-kit/types";
+import { Platform } from "web3bio-profile-kit/types";
 import { detectPlatform } from "web3bio-profile-kit/utils";
-import { IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
-import { ProfileRecord, type AuthHeaders } from "./types";
+import { getErrorCauseCode, IDENTITY_GRAPH_SERVER, normalizeText } from "./utils";
+import type { AuthHeaders, IdentityRecord } from "./types";
 import { generateProfileStruct, resolveIdentityBatch } from "./base";
 import { resolveWithIdentityGraph } from "@/app/api/profile/[handle]/utils";
 
@@ -688,72 +683,38 @@ export function getQuery(type: QueryType): string {
   return query;
 }
 
-export interface IdentityGraphPostResult {
-  ok: boolean;
-  status: number;
-  statusText: string;
-  body: unknown;
-}
-
-export async function postIdentityGraphQuery(
+export async function postIdentityGraphQuery<T = Record<string, unknown>>(
   headers: AuthHeaders,
   query: string,
   variables: Record<string, unknown>,
-): Promise<IdentityGraphPostResult> {
+  allowPartial = false,
+): Promise<{ data: T; errors?: unknown }> {
   const signal = AbortSignal.timeout(30_000);
   const response = await fetch(IDENTITY_GRAPH_SERVER, {
     method: "POST",
-    headers: {
-      ...headers,
-      "Content-Type": "application/json",
-    },
+    headers: { ...headers, "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
     signal,
   });
-
-  let body: unknown = null;
+  let result: { data?: Record<string, unknown>; msg?: string; errors?: unknown; code?: number } | null = null;
   try {
-    body = await response.json();
+    result = await response.json();
   } catch {
     signal.throwIfAborted();
   }
 
-  if (response.ok && (
-    !body || typeof body !== "object" || Array.isArray(body) ||
-    !("data" in body || "errors" in body || "msg" in body)
-  )) {
+  const code = result?.code;
+  const hasErrorCode = typeof code === "number" && Number.isInteger(code) && code >= 400 && code <= 599;
+  if (!response.ok || result?.msg || hasErrorCode || (result?.errors && !(allowPartial && result.data))) {
+    const status = !response.ok ? response.status : hasErrorCode ? code : 500;
+    const errors = result?.errors;
+    const message = result?.msg || (typeof errors === "string" ? errors : JSON.stringify(errors));
+    throw new Error(message || `HTTP ${status}: ${response.statusText}`, { cause: status });
+  }
+  if (!result?.data || typeof result.data !== "object" || Array.isArray(result.data)) {
     throw new Error("Invalid Identity Graph response", { cause: 502 });
   }
-
-  return {
-    ok: response.ok,
-    status: response.status,
-    statusText: response.statusText,
-    body,
-  };
-}
-
-/** Resolve HTTP status for Identity Graph error responses (body `code` wins when numeric). */
-export function identityGraphErrorStatus(
-  responseOk: boolean,
-  httpStatus: number,
-  bodyCode: unknown,
-): number {
-  if (typeof bodyCode === "number" && !Number.isNaN(bodyCode)) {
-    return bodyCode;
-  }
-  return responseOk ? 500 : httpStatus;
-}
-
-export function identityGraphErrorMessage(
-  body: unknown,
-  fallback: string,
-): string {
-  if (!body || typeof body !== "object") {
-    return fallback;
-  }
-  const b = body as { msg?: string; errors?: unknown };
-  return b.msg || (b.errors != null ? JSON.stringify(b.errors) : fallback);
+  return result as { data: T; errors?: unknown };
 }
 
 export async function queryIdentityGraph(
@@ -766,200 +727,103 @@ export async function queryIdentityGraph(
     return { errors: `Unable to detect platform for handle: ${handle}` };
   }
   try {
-    const r = await postIdentityGraphQuery(headers, getQuery(query), {
-      identity: handle,
-      platform,
-    });
-
-    if (!r.ok) {
-      return {
-        errors: `HTTP ${r.status}: ${r.statusText}`,
-        code: r.status,
-      };
-    }
-
-    const body = r.body as any;
-    const result = body.data?.[
-      query === QueryType.REFRESH_DOMAIN ? "domainRefresh" : "identity"
-    ];
-    if (!body.msg && !body.errors && (
-      result === undefined ||
-      (result !== null && (typeof result !== "object" || Array.isArray(result)))
-    )) {
+    const { data } = await postIdentityGraphQuery(headers, getQuery(query), { identity: handle, platform });
+    const result = data[query === QueryType.REFRESH_DOMAIN ? "domainRefresh" : "identity"];
+    if (result === undefined || (result !== null && (typeof result !== "object" || Array.isArray(result)))) {
       throw new Error("Invalid Identity Graph response");
     }
-
-    return body;
+    return { data } as any;
   } catch (error) {
-    const timedOut = typeof error === "object" && error !== null &&
-      "name" in error && error.name === "TimeoutError";
+    const code = getErrorCauseCode(error);
     return {
-      errors: timedOut
-        ? "Identity Graph request timed out"
-        : "Identity Graph request failed",
-      code: timedOut ? 504 : 502,
+      errors: code === 504 ? "Identity Graph request timed out"
+        : error instanceof Error ? error.message : "Identity Graph request failed",
+      code,
     };
   }
 }
 
-export async function queryBatchUniversal(ids: string[], headers: AuthHeaders) {
+export type BatchMode = "profile" | "ns" | "universal";
+
+export async function queryIdentityGraphBatch(ids: string[], mode: BatchMode, headers: AuthHeaders) {
   const queryIds = resolveIdentityBatch(ids);
-  if (queryIds.length === 0) {
-    return [];
-  }
+  if (!queryIds.length) return [];
+  const universal = mode === "universal";
+  const query = getQuery(universal ? QueryType.GET_BATCH_UNIVERSAL : QueryType.GET_BATCH);
+  const { data, errors } = await postIdentityGraphQuery(headers, query, { ids: queryIds }, true);
+  const identities = data[universal ? "identitiesWithGraph" : "identities"];
+  if (!Array.isArray(identities)) throw new Error("Invalid Identity Graph response");
 
-  try {
-    const r = await postIdentityGraphQuery(
-      headers,
-      getQuery(QueryType.GET_BATCH_UNIVERSAL),
-      { ids: queryIds },
-    );
-
-    if (!r.ok) {
-      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
-    }
-
-    const json = r.body as any;
-    const identities = json?.data?.identitiesWithGraph;
-
-    if (!Array.isArray(identities)) {
-      return [];
-    }
-
-    const identityMap = new Map(
-      identities
-        .filter((x) => !!x)
-        .map((identity) => [
-          `${identity.platform},${identity.identity}`,
-          identity,
-        ]),
-    );
-
-    const emptyResult = (id: string) => ({ id, profiles: [] as NSResponse[] });
-
-    const results = await Promise.all(
-      queryIds.map(async (id) => {
-        const matchingIdentity = identityMap.get(id);
-        if (!matchingIdentity) {
-          return emptyResult(id);
-        }
-
-        try {
-          const resolvedResult = await resolveWithIdentityGraph({
-            handle: matchingIdentity.identity,
-            platform: matchingIdentity.platform,
-            ns: true,
-            response: {
-              data: {
-                identity: matchingIdentity,
-              },
-            },
-          });
-
-          if (resolvedResult && !(resolvedResult as any).message) {
-            return {
-              id,
-              profiles: [...(resolvedResult as NSResponse[])],
-            };
-          }
-        } catch {
-          // Silent fail for individual identity resolution
-        }
-
-        return emptyResult(id);
-      }),
-    );
-
-    return results.filter((result) => result.profiles.length > 0);
-  } catch (e) {
-    throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
-  }
+  const results = universal
+    ? await resolveBatchGraphs(queryIds, identities)
+    : await resolveBatchProfiles(queryIds, identities, mode === "ns");
+  if (errors && !results.length) throw new Error("Batch lookup failed", { cause: 500 });
+  return results;
 }
 
-export async function queryIdentityGraphBatch(
-  ids: string[],
-  ns: boolean,
-  headers: AuthHeaders,
-) {
-  const queryIds = resolveIdentityBatch(ids);
-  if (queryIds.length === 0) {
-    return [];
-  }
+async function resolveBatchGraphs(queryIds: string[], identities: IdentityRecord[]) {
+  const identityMap = new Map(
+    identities
+      .filter((x) => !!x)
+      .map((identity) => [
+        `${identity.platform},${identity.identity}`,
+        identity,
+      ]),
+  );
 
-  try {
-    const r = await postIdentityGraphQuery(
-      headers,
-      getQuery(QueryType.GET_BATCH),
-      { ids: queryIds },
-    );
-    if (!r.ok) {
-      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
-    }
-    const json = r.body as any;
-    if (!json?.data?.identities) {
-      return json || [];
-    }
-    const processedResults = await Promise.allSettled(
-      json.data.identities.map(
-        async (identity: {
-          profile: ProfileRecord;
-          aliases: IdentityString[];
-          registeredAt: number;
-        }) => {
-          const profileStruct = await generateProfileStruct(
-            {
-              ...identity.profile,
-              createdAt: identity.registeredAt,
-            },
-            ns,
-          );
+  const results = await Promise.all(queryIds.map(async (id) => {
+    const identity = identityMap.get(id);
+    if (!identity) return null;
+    const profiles = await resolveWithIdentityGraph({
+      handle: identity.identity,
+      platform: identity.platform,
+      ns: true,
+      response: { data: { identity } },
+    }).catch(() => null);
+    return Array.isArray(profiles) && profiles.length ? { id, profiles } : null;
+  }));
+  return results.filter(result => result !== null);
+}
 
-          return {
-            ...profileStruct,
-            aliases: identity.aliases,
-          };
-        },
-      ),
-    );
+async function resolveBatchProfiles(queryIds: string[], identities: IdentityRecord[], ns: boolean) {
+  const processedResults = await Promise.allSettled(
+    identities.map(async ({ profile, registeredAt, aliases }) => ({
+      ...await generateProfileStruct({ ...profile, createdAt: registeredAt }, ns),
+      aliases,
+    })),
+  );
+  const validResults = processedResults.flatMap(result =>
+    result.status === "fulfilled" ? [result.value] : []
+  );
 
-    const validResults = processedResults
-      .filter(
-        (result): result is PromiseFulfilledResult<any> =>
-          result.status === "fulfilled",
-      )
-      .map((result) => result.value);
-
-    const queryIdSet = new Set(queryIds);
-    const normalizedResultMap = new Map(
-      validResults.map((result) => [
+  const queryIdSet = new Set(queryIds);
+  const normalizedResultMap = new Map(
+    validResults.map((result) => [
+      `${result.platform},${normalizeText(result.identity)}`,
+      result,
+    ]),
+  );
+  const resultMap = new Map(
+    validResults.map((result) => [
+      result.aliases?.find((alias: string) => queryIdSet.has(alias)) ||
         `${result.platform},${normalizeText(result.identity)}`,
-        result,
-      ]),
-    );
-    const resultMap = new Map(
-      validResults.map((result) => [
-        result.aliases?.find((alias: string) => queryIdSet.has(alias)) ||
-          `${result.platform},${normalizeText(result.identity)}`,
-        result,
-      ]),
-    );
+      result,
+    ]),
+  );
 
-    return queryIds
-      .map((queryId) => {
-        const directMatch = resultMap.get(queryId);
-        if (directMatch) {
-          return directMatch;
-        }
-        const [platform, identity] = queryId.split(",");
-        return (
-          normalizedResultMap.get(`${platform},${normalizeText(identity)}`) ||
-          null
-        );
-      })
-      .filter(Boolean);
-  } catch (error) {
-    throw new Error(ErrorMessages.NOT_FOUND, { cause: { code: 404 } });
-  }
+  return queryIds
+    .map((queryId) => {
+      const directMatch = resultMap.get(queryId);
+      if (directMatch) {
+        return directMatch;
+      }
+      const [platform, identity] = queryId.split(",");
+      return (
+        normalizedResultMap.get(`${platform},${normalizeText(identity)}`) ||
+        null
+      );
+    })
+    .filter(Boolean);
 }
 
 export const REFRESH_DOMAIN_PLATFORMS: readonly Platform[] = [
@@ -983,15 +847,7 @@ export const refreshDomain = async (
     headers,
   );
   if (body?.errors) {
-    throw new Error(identityGraphErrorMessage(body, "GraphQL error"), {
-      cause: {
-        code: identityGraphErrorStatus(
-          false,
-          502,
-          (body as { code?: number }).code,
-        ),
-      },
-    });
+    throw new Error(body.errors, { cause: body.code });
   }
   const status = (
     body as { data?: { domainRefresh?: { status?: unknown } } }

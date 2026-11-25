@@ -2,13 +2,12 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
   getQuery,
-  identityGraphErrorMessage,
-  identityGraphErrorStatus,
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
 import {
   errorHandle,
+  getErrorCauseCode,
   getUserHeaders,
   invalidIdentityResponse,
   respondJson,
@@ -35,29 +34,20 @@ export async function getSocialGraph(req: NextRequest, handle: string) {
   }
 
   try {
-    const { ok, status, body } = await postIdentityGraphQuery(
+    const { data } = await postIdentityGraphQuery<{
+      socialGraphCrossPlatformRecommendation?: { source?: unknown } | null;
+    }>(
       getUserHeaders(req.headers),
       getQuery(QueryType.GET_SOCIAL_GRAPH),
       { sourceId: handle, recommendPlatform: platform, page, totalPage: limit },
     );
-    const envelope = body as {
-      code?: number;
-      errors?: unknown;
-      data?: { socialGraphCrossPlatformRecommendation?: { source?: unknown } | null };
-    } | null;
-    if (!ok || envelope?.code || envelope?.errors) {
-      return fail(
-        identityGraphErrorStatus(ok, status, envelope?.code),
-        identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
-      );
-    }
-
-    const socialGraph = envelope?.data?.socialGraphCrossPlatformRecommendation;
-    if (!socialGraph?.source) return fail(404, ErrorMessages.NOT_FOUND);
+    const socialGraph = data.socialGraphCrossPlatformRecommendation;
+    if (socialGraph === null || socialGraph?.source === null) return fail(404, ErrorMessages.NOT_FOUND);
+    if (!socialGraph?.source) return fail(502, ErrorMessages.NETWORK_ERROR);
     return respondJson(socialGraph, platform);
   } catch (error: unknown) {
     return fail(
-      error instanceof Error ? Number(error.cause) || 500 : 500,
+      getErrorCauseCode(error),
       error instanceof Error ? error.message : ErrorMessages.NOT_FOUND,
     );
   }

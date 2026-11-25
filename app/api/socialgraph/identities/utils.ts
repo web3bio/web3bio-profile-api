@@ -2,12 +2,10 @@ import type { NextRequest } from "next/server";
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import {
   getQuery,
-  identityGraphErrorMessage,
-  identityGraphErrorStatus,
   postIdentityGraphQuery,
   QueryType,
 } from "@/utils/query";
-import { errorHandle, getUserHeaders, respondJson } from "@/utils/utils";
+import { errorHandle, getErrorCauseCode, getUserHeaders, respondJson } from "@/utils/utils";
 
 export async function lookupAssociatedAccounts(
   req: NextRequest,
@@ -33,24 +31,14 @@ export async function lookupAssociatedAccounts(
   }
 
   try {
-    const { ok, status, body } = await postIdentityGraphQuery(
+    const { data } = await postIdentityGraphQuery<{
+      batchAssociatedAccountsLookup?: unknown[] | null;
+    }>(
       getUserHeaders(req.headers),
       getQuery(QueryType.GET_ASSOCIATED_ACCOUNTS),
       { queryIds },
     );
-    const envelope = body as {
-      code?: number;
-      errors?: unknown;
-      data?: { batchAssociatedAccountsLookup?: unknown[] | null };
-    } | null;
-    if (!ok || envelope?.code || envelope?.errors) {
-      return fail(
-        identityGraphErrorStatus(ok, status, envelope?.code),
-        identityGraphErrorMessage(envelope, ErrorMessages.NOT_FOUND),
-      );
-    }
-
-    const results = envelope?.data?.batchAssociatedAccountsLookup;
+    const results = data.batchAssociatedAccountsLookup;
     if (!Array.isArray(results)) return fail(502, ErrorMessages.NETWORK_ERROR);
     if (single && !results.length) return fail(404, ErrorMessages.NOT_FOUND);
     return respondJson(
@@ -59,7 +47,7 @@ export async function lookupAssociatedAccounts(
     );
   } catch (error: unknown) {
     return fail(
-      error instanceof Error ? Number(error.cause) || 500 : 500,
+      getErrorCauseCode(error),
       error instanceof Error ? error.message : ErrorMessages.NETWORK_ERROR,
     );
   }

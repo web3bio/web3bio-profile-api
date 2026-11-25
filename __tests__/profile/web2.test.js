@@ -1,4 +1,4 @@
-import { expectJsonCase, findByPlatform } from "../helpers/api-assertions";
+import { expectPaidJsonCase, findByPlatform } from "../helpers/api-assertions";
 
 describe("Test For Profile Web2 API", () => {
   const cases = [
@@ -27,6 +27,6 @@ describe("Test For Profile Web2 API", () => {
   ];
 
   it.each(cases)("$name", async ({ path, assertJson }) => {
-    await expectJsonCase({ path, assertJson });
+    await expectPaidJsonCase({ path, assertJson });
   });
 });

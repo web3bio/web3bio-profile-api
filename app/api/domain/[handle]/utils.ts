@@ -103,8 +103,8 @@ export const resolveDomainQuery = async (
       identity: handle,
       platform,
       path: pathname,
-      code: 404,
-      message: ErrorMessages.NOT_FOUND,
+      code: response.code ?? 404,
+      message: response.errors ?? ErrorMessages.NOT_FOUND,
     });
   }
 

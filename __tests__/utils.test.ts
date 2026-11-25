@@ -1,5 +1,14 @@
 import { ErrorMessages, Platform } from "web3bio-profile-kit/types";
 import { errorHandle, respondJson } from "@/utils/utils";
+import { resolveVerifiedLink } from "@/utils/base";
+
+it("attributes a social link to the distinct sources of its matching graph edges", () => {
+  const edge = { source: "farcaster,suji", target: "twitter,suji_yan", dataSource: "farcaster", edgeType: "proof" };
+  expect(resolveVerifiedLink(edge.target, [
+    edge, { ...edge, dataSource: "keybase" }, edge,
+    { ...edge, target: "twitter,another", dataSource: "ens" },
+  ])).toEqual(["farcaster", "keybase"]);
+});
 
 describe("x-request-platform header", () => {
   it("sets a known platform and ignores unsafe values", () => {

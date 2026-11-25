@@ -6,7 +6,7 @@ Web3.bio Profile API enables developers to easily and quickly integrate Web3 uni
 
 **Live docs:** [https://api.web3.bio](https://api.web3.bio)
 
-This documentation describes the publicly available endpoints of the Web3.bio Profile API, which is a set of RESTful JSON APIs. Currently, the APIs are offered for free to assist developers in getting started with Web3 profiles.
+The REST API supports anonymous access to public data and prepaid request packs for API keys.
 
 ## Supported Platforms
 
@@ -38,6 +38,7 @@ Base URL: `https://api.web3.bio`
 | `GET /wallet/{identity}`             | Wallet holdings and positions                         |
 | `GET /avatar/{identity}`             | Profile avatar                                        |
 | `GET /avatar/svg/{identity}`         | SVG avatar                                            |
+| `GET /quota`                         | Available requests for the supplied API key           |
 
 Platform-specific routes are available under `/profile` and `/ns` for `ens`, `ethereum`, `farcaster`, `lens`, `basenames`, `linea`, `solana`, and `sns`.
 
@@ -59,69 +60,18 @@ For React developers, [web3bio-profile-kit](https://www.npmjs.com/package/web3bi
 pnpm add web3bio-profile-kit
 ```
 
-## API Key and Authentication
+## API keys and limits
 
-The Profile API is free, but requests without an API key are rate-limited. To obtain an API key, contact Web3.bio via [Twitter (X)](https://x.com/web3bio) or the [Telegram group](https://t.me/web3dotbio).
+| Access | Request limit |
+| --- | --- |
+| Public requests, including keys with no credits | Normally 6 requests per 10 seconds per IP |
+| Keys with prepaid credits | 50 requests per 10 seconds per key, shared across endpoints |
 
-Include the API key in the request header:
+Send your key in the `X-API-KEY: Bearer {API_KEY}` header. To obtain a key, contact Web3.bio on [X](https://x.com/web3bio) or [Telegram](https://t.me/web3dotbio).
 
-```
-X-API-KEY: Bearer {API_KEY}
-```
+While your key has credits, a data request costs one credit when it returns `2xx` or `404`, including cached results. A batch of 10 profiles also costs one credit. Other responses cost zero. Once the balance reaches zero, new requests follow the public access rules. An invalid key returns `403`. If you receive `429`, wait for the number of seconds in `Retry-After` before trying again.
 
-## Local Development
-
-```bash
-pnpm install
-pnpm dev
-```
-
-The dev server starts at [http://localhost:3000](http://localhost:3000).
-
-### Environment Variables
-
-| Variable                         | Description                                              |
-| -------------------------------- | -------------------------------------------------------- |
-| `GRAPHQL_SERVER`                 | Identity Graph GraphQL server URL                        |
-| `PROFILE_ENDPOINT`               | Public API base URL (defaults to `https://api.web3.bio`) |
-| `GENERAL_IDENTITY_GRAPH_API_KEY` | Internal API key injected by middleware                  |
-
-### Testing
-
-```bash
-pnpm test
-```
-
-Tests run against the deployed preview URL in CI. For local diff tests:
-
-```bash
-pnpm test:diff
-```
-
-### Deploy
-
-Deployed to Cloudflare Workers via [OpenNext](https://opennext.js.org/cloudflare):
-
-```bash
-pnpm deploy      # production
-pnpm preview     # remote preview
-pnpm staging     # upload version
-```
-
-## Project Structure
-
-```
-app/api/
-├── profile/     # Universal and platform profiles
-├── ns/          # Name service resolution
-├── credential/  # Verifiable credentials
-├── domain/      # Domain queries
-├── wallet/      # Wallet data
-├── avatar/      # Avatar resolution
-├── search/      # Search and suggestions
-├── partner/     # Partner integrations
-└── refresh/     # Cache refresh
-```
+Read your balance from the `X-Quota-Remaining` response header. If the API cannot confirm the balance, you still receive the data and the header is omitted. To check your balance separately, call `GET /quota` with your key. It returns a result such as `{"remaining":98}`, costs zero credits, and counts toward your rate limit.
 
 ## Contributing
 
