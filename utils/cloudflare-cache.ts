@@ -22,9 +22,13 @@ function normalizedPath(pathname: string): string {
 
   try {
     let handle = decodeURIComponent(pathname.slice(separator + 1));
-    // Associated-account lookups echo queryId verbatim.
-    if (prefix === "/socialgraph/identities/" ||
-        /^\/socialgraph\/following\/[^/]+\/$/i.test(prefix)) {
+    // Preserve identity case for social account lookups.
+    if (
+      prefix === "/social/identities/" ||
+      prefix === "/social/associate/" ||
+      prefix === "/social/besties/" ||
+      /^\/social\/following\/[^/]+\/$/i.test(prefix)
+    ) {
       return prefix + encodeURIComponent(handle);
     }
     if (/^\/(?:profile|ns)\/batch\/(?:universal\/)?$/.test(prefix)) {
@@ -79,7 +83,7 @@ export function getCacheKeysToClear(
     `/credential/${id}`,
     `/badges/${identity}`,
     `/badges/${id}`,
-    `/socialgraph/identities/${id}`,
+    `/social/identities/${id}`,
     `/wallet/${identity}`,
     `/wallet/${id}`,
     `/search?identity=${encodeURIComponent(identity)}&platform=${platform}`,

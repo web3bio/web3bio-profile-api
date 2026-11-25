@@ -24,6 +24,7 @@ export enum QueryType {
   GET_SOCIAL_GRAPH = "GET_SOCIAL_GRAPH",
   GET_ASSOCIATED_ACCOUNTS = "GET_ASSOCIATED_ACCOUNTS",
   GET_FOLLOWING_ASSOCIATED_ACCOUNTS = "GET_FOLLOWING_ASSOCIATED_ACCOUNTS",
+  GET_BESTIES_ASSOCIATED_ACCOUNTS = "GET_BESTIES_ASSOCIATED_ACCOUNTS",
   GET_WALLET_QUERY = "GET_WALLET_QUERY",
   REFRESH_DOMAIN = "REFRESH_DOMAIN",
 }
@@ -610,6 +611,19 @@ const GET_ASSOCIATED_ACCOUNTS = `
   }
 `;
 
+const ASSOCIATED_ACCOUNT_PROFILE_FRAGMENT = `
+  fragment AssociatedAccountProfile on IdentityProfileSimplified {
+    id
+    uid
+    identity
+    platform
+    network
+    address
+    avatar
+    description
+  }
+`;
+
 const GET_FOLLOWING_ASSOCIATED_ACCOUNTS = `
   query GET_FOLLOWING_ASSOCIATED_ACCOUNTS(
     $sourcePlatform: Platform!
@@ -632,25 +646,57 @@ const GET_FOLLOWING_ASSOCIATED_ACCOUNTS = `
         limit: totalPage
       }
       queryId
-      profile { ...FollowingProfile }
+      profile { ...AssociatedAccountProfile }
       following {
         queryId
-        profile { ...FollowingProfile }
-        associatedAccounts { ...FollowingProfile }
+        profile { ...AssociatedAccountProfile }
+        associatedAccounts { ...AssociatedAccountProfile }
       }
     }
   }
 
-  fragment FollowingProfile on IdentityProfileSimplified {
-    id
-    uid
-    identity
-    platform
-    network
-    address
-    avatar
-    description
+${ASSOCIATED_ACCOUNT_PROFILE_FRAGMENT}
+`;
+
+const GET_BESTIES_ASSOCIATED_ACCOUNTS = `
+  query GET_BESTIES_ASSOCIATED_ACCOUNTS(
+    $sourceIdentity: String!
+    $page: Union!
+    $totalPage: Union!
+    $includeDetails: Boolean! = false
+  ) {
+    searchBestiesAssociatedAccounts(
+      sourcePlatform: farcaster
+      sourceIdentity: $sourceIdentity
+      targetPlatform: lens
+      page: $page
+      totalPage: $totalPage
+    ) {
+      pagination {
+        total
+        hasMore
+        page
+        limit: totalPage
+      }
+      queryId @include(if: $includeDetails)
+      profile { ...AssociatedAccountProfile }
+      besties {
+        queryId @include(if: $includeDetails)
+        profile { ...AssociatedAccountProfile }
+        score @include(if: $includeDetails) {
+          bestiesScore
+          followType
+          commentCount
+          mentionCount
+          shareCount
+          likeCount
+        }
+        associatedAccounts { ...AssociatedAccountProfile }
+      }
+    }
   }
+
+${ASSOCIATED_ACCOUNT_PROFILE_FRAGMENT}
 `;
 
 const REFRESH_DOMAIN = `
@@ -676,6 +722,7 @@ const QUERY_MAP = new Map<QueryType, string>([
   [QueryType.GET_SOCIAL_GRAPH, GET_SOCIAL_GRAPH],
   [QueryType.GET_ASSOCIATED_ACCOUNTS, GET_ASSOCIATED_ACCOUNTS],
   [QueryType.GET_FOLLOWING_ASSOCIATED_ACCOUNTS, GET_FOLLOWING_ASSOCIATED_ACCOUNTS],
+  [QueryType.GET_BESTIES_ASSOCIATED_ACCOUNTS, GET_BESTIES_ASSOCIATED_ACCOUNTS],
   [QueryType.GET_WALLET_QUERY, GET_WALLET_QUERY],
   [QueryType.REFRESH_DOMAIN, REFRESH_DOMAIN],
 ]);

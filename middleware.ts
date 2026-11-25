@@ -3,7 +3,7 @@ import { extractClientIp } from "@/utils/ip";
 
 export const config = {
   matcher: [
-    "/(avatar|domain|ns|profile|credential|badge|search|socialgraph|wallet|partner)/:path*",
+    "/(avatar|domain|ns|profile|credential|badge|search|social|wallet|partner)/:path*",
   ],
 };
 
@@ -30,7 +30,7 @@ export function middleware(req: NextRequest) {
   const shouldSetClientIp =
     clientIp !== "unknown" && headers.get("x-client-ip") !== clientIp;
   const shouldSetApiKey = GENERAL_KEY !== "" &&
-    (url.pathname.startsWith("/socialgraph/") || !headers.has("x-api-key"));
+    (url.pathname.startsWith("/social/") || !headers.has("x-api-key"));
 
   if (!(shouldSetClientIp || shouldSetApiKey || shouldRewrite)) {
     return NextResponse.next();

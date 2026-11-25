@@ -3,7 +3,7 @@ import { GET as universalProfile } from "@/app/api/profile/[handle]/route";
 import { GET as ensProfile } from "@/app/api/profile/ens/[handle]/route";
 import { GET as search } from "@/app/api/search/route";
 import { GET as availability } from "@/app/api/search/availability/[handle]/route";
-import { GET as socialGraph } from "@/app/api/socialgraph/[handle]/route";
+import { GET as socialGraph } from "@/app/api/social/[handle]/route";
 
 describe.each([
   ["/profile/pugson.eth", universalProfile],
@@ -80,7 +80,7 @@ describe("Shared Identity Graph response errors", () => {
   it.each([
     ["/search?platform=ens&identity=pugson.eth", search],
     ["/search/availability/pugson", availability],
-    ["/socialgraph/lens,pugson", socialGraph],
+    ["/social/lens,pugson", socialGraph],
   ] as const)("preserves 502 for %s", async (path, getResponse) => {
     jest.spyOn(globalThis, "fetch").mockResolvedValue(new Response("<html>upstream error</html>"));
     const response = await getResponse(
